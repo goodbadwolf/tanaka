@@ -52,8 +52,41 @@ Tanaka uses a client-server architecture with CRDT-based synchronization. For de
 
 ## 🗺️ Roadmap
 
-- **v1.0**  Live tab mirroring via polling (SQLite, Swagger, CRDTs).
-- **v2.0**  Scroll-position sync & persistent extension signing.
+## 🗺️ Roadmap
+
+### v0.1 - Proof of Concept
+
+- [x] Documentation and architecture design
+- [ ] Basic project structure
+- [ ] Minimal WebExtension that captures tab events
+- [ ] Basic Rust server with SQLite storage
+- [ ] Simple HTTP sync (no CRDT yet)
+
+### v0.5 - Core Functionality
+
+- [ ] Yjs/yrs CRDT integration
+- [ ] Bidirectional tab sync
+- [ ] TLS + auth token security
+- [ ] Selective window tracking
+
+### v1.0 - First Stable Release
+
+- [ ] Adaptive polling (5s → 1s on activity)
+- [ ] Session resurrection
+- [ ] Signed extension on addons.mozilla.org
+- [ ] Single-binary server distribution
+
+### v2.0 - Enhanced Experience
+
+- [ ] Scroll position sync
+- [ ] WebSocket real-time updates
+- [ ] Tab groups & containers support
+
+### Future Ideas
+
+- [ ] Cross-browser support
+- [ ] P2P sync option
+- [ ] Collaborative tab sharing
 
 ---
 
