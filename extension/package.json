@@ -1,0 +1,33 @@
+{
+  "name": "tanaka-extension",
+  "version": "0.1.0",
+  "description": "Firefox extension for cross-device tab synchronization",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "firefox": "web-ext run --source-dir dist",
+    "lint": "tsc --noEmit"
+  },
+  "keywords": [
+    "firefox",
+    "extension",
+    "tabs",
+    "sync"
+  ],
+  "author": "",
+  "license": "MIT",
+  "packageManager": "pnpm@10.11.0",
+  "devDependencies": {
+    "@types/firefox-webext-browser": "^120.0.4",
+    "@types/webextension-polyfill": "^0.12.3",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5",
+    "web-ext": "^8.7.1",
+    "webextension-polyfill": "^0.12.0"
+  },
+  "dependencies": {
+    "yjs": "^13.6.27"
+  }
+}
