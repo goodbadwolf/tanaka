@@ -31,7 +31,7 @@ cd tanaka/server && cargo build --release
 sudo cp target/release/tanaka-server /usr/local/bin/
 ```
 
-Copy `config/example.toml` to `~/.config/tanaka/tanaka.toml` and edit the paths and token.
+Copy `server/config/example.toml` to `~/.config/tanaka/tanaka.toml` and edit the paths and token.
 
 Run the server:
 

@@ -29,8 +29,8 @@ For installation and setup instructions, see [@docs/INSTALL.md](docs/INSTALL.md)
 
 - `/extension` - Firefox WebExtension (TypeScript, Yjs)
 - `/server` - Rust Tanaka server (axum, tokio, yrs, SQLite)
+  - `/server/config` - Example configuration files
 - `/docs` - Project documentation
-- `/config` - Example configuration files
 
 ### Essential Commands
 
@@ -73,7 +73,7 @@ See [@docs/DEV.md](docs/DEV.md#8-essential-commands) for all development command
 
 - To add a new API endpoint: Check existing routes in `/server/src/routes/`
 - To modify tab sync behavior: Look at `/extension/src/sync/`
-- For configuration changes: Update both `config/example.toml` and docs
+- For configuration changes: Update both `server/config/example.toml` and docs
 - When adding dependencies: Update `Cargo.toml` or `package.json` appropriately
 
 ### Misc
