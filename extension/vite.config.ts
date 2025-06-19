@@ -1,7 +1,9 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
+import fs from 'fs';
 
 export default defineConfig({
+  publicDir: false,
   build: {
     outDir: 'dist',
     emptyOutDir: true,
@@ -17,4 +19,16 @@ export default defineConfig({
       },
     },
   },
+  plugins: [
+    {
+      name: 'copy-manifest',
+      writeBundle() {
+        fs.copyFileSync('manifest.json', 'dist/manifest.json');
+        // Move popup.html to root of dist
+        if (fs.existsSync('dist/src/popup.html')) {
+          fs.copyFileSync('dist/src/popup.html', 'dist/popup.html');
+        }
+      }
+    }
+  ]
 });
