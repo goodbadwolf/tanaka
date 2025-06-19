@@ -85,8 +85,6 @@ See [docs/DEV.md](@docs/DEV.md#8-essential-commands) for all development command
 
 - After compacting, read the docs and CLAUDE.md to refresh your memory
 
-### Git Commit Messages
+### Git Workflow
 
-- Keep commit messages concise - if the title clearly explains the change, skip redundant bullet points
-- Don't explain what's obvious from the diff (e.g., "uncommented X" when diff shows commented lines becoming uncommented)
-- Focus on the "why" rather than the "what" when adding details
+Refer to [docs/GIT.md](@docs/GIT.md) for git workflow guidelines
