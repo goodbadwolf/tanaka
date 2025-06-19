@@ -36,15 +36,15 @@ Tanaka keeps your Firefox browsing **entangled** across every computer you use. 
 ## 🚀 Quick Start
 
 1. **Install the extension**: Download the latest `tanaka.xpi` from [releases](https://github.com/goodbadwolf/tanaka/releases)
-2. **Run the server**: Clone the repo and follow the setup in [docs/INSTALL.md](@docs/INSTALL.md)
+2. **Run the server**: Clone the repo and follow the setup in [@docs/INSTALL.md](docs/INSTALL.md)
 
-For detailed installation instructions, see [docs/INSTALL.md](@docs/INSTALL.md).
+For detailed installation instructions, see [@docs/INSTALL.md](docs/INSTALL.md).
 
 ---
 
 ## 🏗️ Architecture Overview
 
-Tanaka uses a client-server architecture with CRDT-based synchronization. For detailed architecture information, see [docs/DEV.md](@docs/DEV.md#1-architecture).
+Tanaka uses a client-server architecture with CRDT-based synchronization. For detailed architecture information, see [@docs/DEV.md](docs/DEV.md#1-architecture).
 
 ---
 
