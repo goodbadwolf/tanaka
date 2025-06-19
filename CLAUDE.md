@@ -84,6 +84,7 @@ See [@docs/DEV.md](docs/DEV.md#8-essential-commands) for all development command
 ### Memory
 
 - After compacting, read the docs and CLAUDE.md to refresh your memory
+- When you encounter patterns or lessons that would be helpful to remember, proactively suggest adding them to CLAUDE.md or relevant documentation
 
 ### Git Workflow
 
