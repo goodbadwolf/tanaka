@@ -74,7 +74,7 @@ web-ext run --firefox=nightly
 
 ## 4. Configuration
 
-See [docs/INSTALL.md](@docs/INSTALL.md#configuration) for detailed configuration instructions.
+See [@docs/INSTALL.md](docs/INSTALL.md#configuration) for detailed configuration instructions.
 
 The server automatically applies SQLite safety settings at startup:
 
