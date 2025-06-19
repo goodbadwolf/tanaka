@@ -13,25 +13,25 @@ Tanaka keeps your Firefox browsing **entangled** across every computer you use. 
 
 ## ✨ Features
 
-| Capability                  | Notes                                                                                                                   |
-| --------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Capability                  | Notes                                                                                                                  |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | **Live mirroring**          | Tab create / move / close events propagate across devices in ~1 s (baseline poll 5 s, adaptive downwards on activity). |
-| **Selective tracking**      | Opt-in per window; leave private or throw-away windows unsynced.                                                        |
-| **Session resurrection**    | Browser crashed? Tanaka restores the last good state from another device.                                               |
-| **Conflict-free merges**    | Uses Yjs/yrs CRDTs—order-independent, race-free.                                                                        |
-| **End-to-end encryption**   | TLS + shared token; data never travels plaintext.                                                                       |
-| _(Planned)_ **Scroll sync** | Resume reading at exactly the same pixel offset.                                                                        |
+| **Selective tracking**      | Opt-in per window; leave private or throw-away windows unsynced.                                                       |
+| **Session resurrection**    | Browser crashed? Tanaka restores the last good state from another device.                                              |
+| **Conflict-free merges**    | Uses Yjs/yrs CRDTs—order-independent, race-free.                                                                       |
+| **End-to-end encryption**   | TLS + shared token; data never travels plaintext.                                                                      |
+| _(Planned)_ **Scroll sync** | Resume reading at exactly the same pixel offset.                                                                       |
 
 ---
 
 ## 🛠️ Tech Stack (Personal-Scale)
 
-| Tier            | Technology                                          | Rationale                                            |
-| --------------- | --------------------------------------------------- | ---------------------------------------------------- |
-| **Extension**   | TypeScript + WebExtension API + Yjs                 | Native API support & fast dev loop.                  |
+| Tier              | Technology                                          | Rationale                                            |
+| ----------------- | --------------------------------------------------- | ---------------------------------------------------- |
+| **Extension**     | TypeScript + WebExtension API + Yjs                 | Native API support & fast dev loop.                  |
 | **Tanaka server** | Rust (**axum** + tokio + yrs)                       | Async, small single binary, excellent performance.   |
-| **Persistence** | **SQLite 3 (WAL)** + in-memory read cache (DashMap) | Crash-safe, zero-config file DB, ultra-fast lookups. |
-| **OpenAPI UI**  | **utoipa-swagger-ui** (enabled at `/swagger/`)      | FastAPI-style swagger docs out-of-the-box.           |
+| **Persistence**   | **SQLite 3 (WAL)** + in-memory read cache (DashMap) | Crash-safe, zero-config file DB, ultra-fast lookups. |
+| **OpenAPI UI**    | **utoipa-swagger-ui** (enabled at `/swagger/`)      | FastAPI-style swagger docs out-of-the-box.           |
 
 ---
 
