@@ -54,10 +54,25 @@ See [docs/DEV.md](@docs/DEV.md#8-essential-commands) for all development command
 - When fixing bugs, check if similar issues exist in related code
 - Validate that changes work with both server and extension components
 
+### Documentation Maintenance
+
+- When cleaning up docs, check for redundancy across README.md, CLAUDE.md, and docs/
+- Keep configuration examples only in INSTALL.md
+- Use `@path` syntax for internal markdown links
+- Remove `$` prefix from commands for easier copy-paste
+- AGENTS.md is a symlink to CLAUDE.md (changes affect both)
+
+### Common String Replacement Issues
+
+- Multi-line replacements often fail due to hidden characters
+- For complex deletions, use `sed` instead of Edit tool
+- Always verify exact content before attempting replacements
+- On macOS, use `od -c` instead of `cat -A` (BSD vs GNU tools)
+
 ### Common Tasks
 
 - To add a new API endpoint: Check existing routes in `/server/src/routes/`
-- To modify tab sync behavior: Look at `/extension/src/sync/` 
+- To modify tab sync behavior: Look at `/extension/src/sync/`
 - For configuration changes: Update both `config/example.toml` and docs
 - When adding dependencies: Update `Cargo.toml` or `package.json` appropriately
 
@@ -65,3 +80,7 @@ See [docs/DEV.md](@docs/DEV.md#8-essential-commands) for all development command
 
 - AGENTS.md (used by OpenAI's Codex) is a symlink for CLAUDE.md (used by Anthropic's Claude)
 - The project uses semantic versioning - update versions in `manifest.json` and `Cargo.toml`
+
+### Memory
+
+- After compacting, read the docs and CLAUDE.md to refresh your memory
