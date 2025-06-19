@@ -1,1 +1,10 @@
+# Repomix
+.repomix/
+repomix-output.*
+
+# AI Agents
 AGENTS.md
+.claude/
+
+# Local
+.DS_Store
