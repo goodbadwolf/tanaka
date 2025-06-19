@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "Tanaka",
+  "version": "0.1.0",
+  "description": "Keep your Firefox browsing entangled across every computer you use",
+
+  "permissions": ["tabs", "storage", "windows"],
+
+  "host_permissions": ["https://localhost/*", "https://*/*"],
+
+  "background": {
+    "scripts": ["background.js"],
+    "type": "module"
+  },
+
+  "action": {
+    "default_title": "Tanaka - Tab Sync",
+    "default_popup": "popup.html"
+  },
+
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  }
+}

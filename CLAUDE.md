@@ -69,6 +69,22 @@ See [@docs/DEV.md](docs/DEV.md#8-essential-commands) for all development command
 - Always verify exact content before attempting replacements
 - On macOS, use `od -c` instead of `cat -A` (BSD vs GNU tools)
 
+### Bash Command Best Practices
+
+- Avoid `cd` in bash commands - it fails with "no such file or directory" in subshells
+- Use full paths instead: `/Users/manish/projects/tanaka/extension` not just `extension`
+- When running pnpm/npm commands, stay in the correct directory context
+- File operations (mv, rm, ls) need full paths when not in the expected directory
+- Check current working directory context before running commands
+
+### Project Organization
+
+When working with this codebase:
+- Keep language/framework-specific files in their respective directories (e.g., extension-related files in `extension/`, server-related files in `server/`)
+- Repository-level tools (like git hooks) belong at the repository root
+- Run commands from the appropriate directory context based on where the tools are installed
+- Always verify file contents after moving or modifying them
+
 ### Common Tasks
 
 - To add a new API endpoint: Check existing routes in `/server/src/routes/`

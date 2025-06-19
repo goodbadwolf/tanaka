@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tanaka</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Tanaka</h1>
+      <p class="subtitle">Tab Synchronization</p>
+
+      <div class="window-control">
+        <label>
+          <input type="checkbox" id="track-window" />
+          <span>Sync this window</span>
+        </label>
+      </div>
+
+      <div class="status" id="status">
+        <p>Not connected to server</p>
+      </div>
+    </div>
+
+    <script type="module" src="popup.ts"></script>
+  </body>
+</html>

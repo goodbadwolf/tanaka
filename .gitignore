@@ -1,3 +1,7 @@
+# Dependencies
+node_modules/
+.pnpm-debug.log*
+
 # Repomix
 .repomix/
 repomix-output.*
