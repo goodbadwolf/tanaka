@@ -50,8 +50,6 @@ Tanaka uses a client-server architecture with CRDT-based synchronization. For de
 
 ## 🗺️ Roadmap
 
-## 🗺️ Roadmap
-
 ### v0.1 - Proof of Concept
 
 - [x] Documentation and architecture design
