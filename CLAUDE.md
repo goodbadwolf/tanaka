@@ -84,3 +84,9 @@ See [docs/DEV.md](@docs/DEV.md#8-essential-commands) for all development command
 ### Memory
 
 - After compacting, read the docs and CLAUDE.md to refresh your memory
+
+### Git Commit Messages
+
+- Keep commit messages concise - if the title clearly explains the change, skip redundant bullet points
+- Don't explain what's obvious from the diff (e.g., "uncommented X" when diff shows commented lines becoming uncommented)
+- Focus on the "why" rather than the "what" when adding details
