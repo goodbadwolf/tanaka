@@ -52,10 +52,8 @@ Tanaka uses a client-server architecture with CRDT-based synchronization. For de
 
 ## 🗺️ Roadmap
 
-- **v0.1**  MVP – live tab mirroring via polling (SQLite, Swagger, CRDTs).
-- **v0.2**  Scroll-position sync & persistent extension signing.
-- **v0.3**  Additional optimizations for sub-second latency.
-- **v1.0**  Android support, pre-built binaries for arm64, auto-update channel.
+- **v1.0**  Live tab mirroring via polling (SQLite, Swagger, CRDTs).
+- **v2.0**  Scroll-position sync & persistent extension signing.
 
 ---
 
