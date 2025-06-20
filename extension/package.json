@@ -7,7 +7,7 @@
   "scripts": {
     "predist": "mkdir -p dist",
     "dist:manifest": "cp manifest.json dist/",
-    "dist:icons": "cp -r icons dist/",
+    "dist:icons": "mkdir -p dist/icons && cp icons/*.png dist/icons/",
     "dist": "pnpm run dist:manifest && pnpm run dist:icons",
     "gen-icons": "sh icons/generate-icons.sh",
     "prewatch": "pnpm run dist",
