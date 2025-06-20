@@ -1,12 +1,11 @@
 #!/usr/bin/env -S npx tsx
-import { ok, Result } from 'neverthrow';
+import { Result } from 'neverthrow';
 import { exitWithError, runCLI } from './common.js';
 import { runStages, Stage, buildCode, copyIcons, copyManifest } from './stages.js';
 
 export async function build(): Promise<Result<void, Error>> {
   const buildStages: Stage[] = [buildCode, copyIcons, copyManifest];
-  const result = await runStages(buildStages, 'build');
-  return result;
+  return await runStages(buildStages, 'build');
 }
 
 async function main(): Promise<void> {
