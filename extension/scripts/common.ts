@@ -49,3 +49,13 @@ export function isMainModule(importMetaUrl: string): boolean {
 export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+export async function runInitialBuild(): Promise<void> {
+  logger.info('Running initial build...');
+  const { build } = await import('./build.js');
+  try {
+    await build();
+  } catch (error) {
+    exitWithError('Initial build failed', error);
+  }
+}
