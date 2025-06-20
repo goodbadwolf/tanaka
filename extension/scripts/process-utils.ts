@@ -11,9 +11,12 @@ export interface ManagedProcess {
 export class ProcessManager {
   private processes: Map<string, ChildProcess> = new Map();
 
-  spawn(config: ManagedProcess, options: SpawnOptions = { stdio: 'inherit', shell: true }): ChildProcess {
+  spawn(
+    config: ManagedProcess,
+    options: SpawnOptions = { stdio: 'inherit', shell: true },
+  ): ChildProcess {
     logger.info(`Starting ${config.name}...`);
-    
+
     const proc = spawn(config.command, config.args, options);
     this.processes.set(config.name, proc);
 

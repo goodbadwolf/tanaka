@@ -9,10 +9,9 @@
     "build": "tsx scripts/build.ts",
     "watch": "tsx scripts/watch.ts",
     "dev": "tsx scripts/dev.ts",
-    "start": "web-ext run --source-dir dist",
-    "lint": "eslint src/**/*.ts",
-    "lint:fix": "eslint src/**/*.ts --fix",
-    "format": "prettier --write 'src/**/*.{ts,html,css}' 'manifest.json'",
+    "lint": "eslint 'src/**/*.ts' 'scripts/**/*.ts'",
+    "lint:fix": "eslint 'src/**/*.ts' 'scripts/**/*.ts' --fix",
+    "format": "prettier --write 'src/**/*.{ts,html,css}' 'scripts/**/*.ts' 'manifest.json'",
     "typecheck": "tsc --noEmit"
   },
   "keywords": [
@@ -21,7 +20,7 @@
     "tabs",
     "sync"
   ],
-  "author": "",
+  "author": "Manish Mathai <manish@manishmathai.com>",
   "license": "MIT",
   "packageManager": "pnpm@10.11.0",
   "devDependencies": {
