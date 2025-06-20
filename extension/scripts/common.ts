@@ -1,8 +1,6 @@
 import pino from 'pino';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { Result, ok, err } from 'neverthrow';
-import chalk from 'chalk';
 
 export const logger = pino({
   transport: {
@@ -20,34 +18,6 @@ export const projectRoot = join(__dirname, '..');
 export const DIST_DIR = join(projectRoot, 'dist');
 export const ICONS_DIR = join(projectRoot, 'icons');
 export const MANIFEST_FILE = join(projectRoot, 'manifest.json');
-
-export interface Stage {
-  name: string;
-  fn: () => Result<void, Error> | Promise<Result<void, Error>>;
-}
-
-export async function runStages(
-  stages: Stage[],
-  description: string,
-): Promise<Result<void, Error>> {
-  logger.info(`Starting ${description} (${stages.length} stages)`);
-
-  for (let i = 0; i < stages.length; i++) {
-    const stage = stages[i];
-    logger.info(
-      `Running stage ${chalk.greenBright(`${i + 1}/${stages.length}`)}: ${chalk.whiteBright.bold(stage.name)}`,
-    );
-    const result = await stage.fn();
-
-    if (result.isErr()) {
-      logger.error({ err: result.error }, `Stage '${stage.name}' failed`);
-      return err(result.error);
-    }
-  }
-
-  logger.info(`Finished ${description}!`);
-  return ok(undefined);
-}
 
 export function setupProcessHandlers(cleanup: () => void): void {
   process.on('SIGINT', () => {
