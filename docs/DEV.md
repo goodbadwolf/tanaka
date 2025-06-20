@@ -67,7 +67,7 @@ cd tanaka/server && cargo test && cargo build
 # Extension deps
 cd ../extension && pnpm install && pnpm run build
 # For live testing:
-web-ext run --firefox=nightly
+pnpm run start
 ```
 
 ---
@@ -177,7 +177,7 @@ pnpm run lint
 pnpm run dev
 
 # Run Firefox with extension loaded
-pnpm run firefox
+pnpm run start
 ```
 
 ---
@@ -185,7 +185,7 @@ pnpm run firefox
 ## 9. Running the Complete System
 
 1. Start the server: `cd server && cargo run`
-2. Load extension in Firefox: `cd extension && pnpm run firefox`
+2. Load extension in Firefox: `cd extension && pnpm run dev`
 3. Configure extension to point to server (default: https://localhost:443)
    - See “Local Development (TLS Alternatives)” above for HTTPS setups.
 
