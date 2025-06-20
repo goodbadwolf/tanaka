@@ -44,3 +44,12 @@ export function viteWatchConfig(): ManagedProcess {
     errorMessage: 'Failed to start vite watch',
   };
 }
+
+export function webExtConfig(): ManagedProcess {
+  return {
+    name: 'web-ext',
+    command: 'web-ext',
+    args: ['run', '--source-dir', 'dist'],
+    errorMessage: 'Failed to start web-ext',
+  };
+}
