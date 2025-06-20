@@ -32,6 +32,7 @@ When making commits in this repository, follow these simple conventions:
 - Keep commit messages concise - if the title clearly explains the change, skip redundant bullet points
 - Don't explain what's obvious from the diff (e.g., "uncommented X" when diff shows commented lines becoming uncommented)
 - Focus on the "why" rather than the "what" when adding details
+- Use precise, technical verbs: for example "harden" (for security/robustness improvements) over generic "improve"
 
 #### Examples
 
@@ -67,6 +68,7 @@ git diff --cached
 ```
 
 Use `git add -p` (patch mode) to:
+
 - Stage only specific parts of a file
 - Split large changes into logical commits
 - Keep commits focused on one change
