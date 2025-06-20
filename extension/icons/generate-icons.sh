@@ -1,4 +1,11 @@
 #!/bin/bash
+set -euo pipefail
+
+# Ensure ImageMagick 'convert' is available
+if ! command -v convert >/dev/null 2>&1; then
+  echo "Error: 'convert' (ImageMagick) not found; please install it." >&2
+  exit 1
+fi
 
 # Generate simple placeholder icons for Tanaka extension
 # These are basic colored squares with "T" letter
