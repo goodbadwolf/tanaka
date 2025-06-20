@@ -1,17 +1,27 @@
 #!/usr/bin/env -S npx tsx
-import { runStages, exitWithError, isMainModule } from './common.js';
-import { buildStages } from './build-stages.js';
+import { ok, Result } from 'neverthrow';
+import { runStages, exitWithError, isMainModule, Stage } from './common.js';
+import { buildCode, copyIcons, copyManifest, verifyBuildOutput } from './stages.js';
 
-export async function build(): Promise<void> {
+export const buildStages: Stage[] = [buildCode, verifyBuildOutput, copyManifest, copyIcons];
+
+export async function build(): Promise<Result<void, Error>> {
   const result = await runStages(buildStages, 'build process');
-  
+
   if (result.isErr()) {
     exitWithError('Build failed', result.error);
   }
+
+  return ok(undefined);
 }
 
 if (isMainModule(import.meta.url)) {
-  build().catch(error => {
-    exitWithError('Unexpected error', error);
+  build().then((result) => {
+    result.match(
+      () => {},
+      (error) => {
+        exitWithError('Unexpected error', error);
+      },
+    );
   });
 }

@@ -2,6 +2,7 @@ import pino from 'pino';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Result, ok, err } from 'neverthrow';
+import chalk from 'chalk';
 
 export const logger = pino({
   transport: {
@@ -9,9 +10,9 @@ export const logger = pino({
     options: {
       colorize: true,
       ignore: 'pid,hostname',
-      translateTime: false
-    }
-  }
+      translateTime: false,
+    },
+  },
 });
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -25,21 +26,26 @@ export interface Stage {
   fn: () => Result<void, Error> | Promise<Result<void, Error>>;
 }
 
-export async function runStages(stages: Stage[], description: string): Promise<Result<void, Error>> {
+export async function runStages(
+  stages: Stage[],
+  description: string,
+): Promise<Result<void, Error>> {
   logger.info(`Starting ${description} (${stages.length} stages)`);
-  
+
   for (let i = 0; i < stages.length; i++) {
     const stage = stages[i];
-    logger.info(`Running stage ${i + 1}/${stages.length}: ${stage.name}`);
+    logger.info(
+      `Running stage ${chalk.greenBright(`${i + 1}/${stages.length}`)}: ${chalk.whiteBright.bold(stage.name)}`,
+    );
     const result = await stage.fn();
-    
+
     if (result.isErr()) {
       logger.error({ err: result.error }, `Stage '${stage.name}' failed`);
       return err(result.error);
     }
   }
-  
-  logger.info(`${description} complete!`);
+
+  logger.info(`Finished ${description}!`);
   return ok(undefined);
 }
 
@@ -71,5 +77,5 @@ export function isMainModule(importMetaUrl: string): boolean {
 }
 
 export function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }

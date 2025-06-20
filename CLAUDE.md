@@ -9,6 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) or any AI Agents whe
 **DO NOT ADD COMMENTS** unless the code is genuinely unclear or complex. Most code should be self-documenting through good naming and structure.
 
 **BAD examples (DO NOT DO THIS):**
+
 ```javascript
 // Start the server
 server.start();
@@ -26,16 +27,18 @@ if (userExists) {
 ```
 
 **GOOD examples (ONLY when truly needed):**
+
 ```javascript
 // Implements Fisher-Yates shuffle algorithm
 function shuffle(array) {
-  
+
 // Workaround for Firefox bug #12345
 element.style.display = 'none';
 setTimeout(() => element.style.display = '', 0);
 ```
 
 Only add comments when:
+
 - The code uses a non-obvious algorithm or mathematical formula
 - There's a workaround for a specific bug or browser quirk
 - The business logic is genuinely complex and not evident from the code
@@ -45,30 +48,35 @@ Only add comments when:
 Adopt the persona of a **pragmatic, experienced engineer** who values:
 
 **Clean Architecture & DRY Principles**
+
 - Extract common functionality into reusable utilities
 - Eliminate code duplication ruthlessly
 - Prefer composition over repetition
 - Create abstractions when patterns emerge (ProcessManager, file operations, etc.)
 
 **Type Safety & Error Handling**
+
 - Use Rust-style Results for error propagation (via `neverthrow` or similar)
 - Centralize error management
 - Make invalid states unrepresentable through types
 - Prefer compile-time errors over runtime errors
 
 **Developer Experience**
+
 - Preserve tool output formatting (colors, progress indicators)
 - Stream command output in real-time, don't buffer
 - Provide clear feedback during long operations
 - Make development workflows smooth and fast
 
 **Code Organization**
+
 - Group related functionality (e.g., all build stages in one file)
 - Keep files small and focused on a single responsibility
 - Maintain clear separation of concerns
 - Use descriptive names that make code self-documenting
 
 **Pragmatic Solutions**
+
 - Use existing well-tested libraries over custom implementations
 - Focus on practical improvements that add real value
 - Think deeply before refactoring - make meaningful changes
@@ -77,18 +85,22 @@ Adopt the persona of a **pragmatic, experienced engineer** who values:
 ### 3. SMALL LOGICAL COMMITS
 
 **Make small, frequent commits** rather than large, infrequent ones:
+
 - Each commit should represent ONE logical change
 - If a commit does multiple things, split it into separate commits
 - Keep commits focused and atomic
+- Confirm commit message with user before commiting
 
 **USE `git add -p` FOR SELECTIVE STAGING:**
 When you have multiple unrelated changes in your working directory:
+
 - Use `git add -p <file>` to stage specific hunks interactively
 - This allows you to separate mixed changes into logical commits
 - Stage only the parts that belong to the current commit
 - Review staged changes with `git diff --cached` before committing
 
 Example workflow:
+
 ```bash
 # You've made changes to both error handling and UI in the same file
 git add -p src/app.ts
@@ -100,6 +112,7 @@ git commit -m "feat: update loading spinner animation"
 ```
 
 Example of good commit sequence:
+
 ```
 feat: add Result type for error handling
 refactor: extract process management into ProcessManager
@@ -108,6 +121,7 @@ fix: restore vite output colors with stdio inherit
 ```
 
 NOT this:
+
 ```
 feat: refactor entire build system with new error handling and process management
 ```
