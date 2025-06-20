@@ -1,18 +1,12 @@
 #!/usr/bin/env -S npx tsx
-import { logger, setupProcessHandlers, exitWithError, isMainModule, sleep } from './common.js';
-import { build } from './build.js';
+import { logger, setupProcessHandlers, exitWithError, isMainModule, sleep, runInitialBuild } from './common.js';
 import { ProcessManager } from './process-utils.js';
 import { viteWatchConfig } from './vite-utils.js';
 
 async function dev(): Promise<void> {
   logger.info('Starting development mode...');
 
-  logger.info('Running initial build...');
-  try {
-    await build();
-  } catch (error) {
-    exitWithError('Initial build failed', error);
-  }
+  await runInitialBuild();
 
   const pm = new ProcessManager();
   pm.spawn(viteWatchConfig());
