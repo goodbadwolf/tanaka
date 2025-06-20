@@ -21,12 +21,12 @@ export default defineConfig({
   },
   plugins: [
     {
-      name: 'copy-manifest',
+      name: 'move-popup',
       writeBundle() {
-        fs.copyFileSync('manifest.json', 'dist/manifest.json');
         // Move popup.html to root of dist
         if (fs.existsSync('dist/src/popup.html')) {
           fs.copyFileSync('dist/src/popup.html', 'dist/popup.html');
+          fs.rmSync('dist/src', { recursive: true });
         }
       }
     }
