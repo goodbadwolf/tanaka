@@ -2,6 +2,99 @@
 
 This file provides guidance to Claude Code (claude.ai/code) or any AI Agents when working with code in this repository.
 
+## CRITICAL RULES - MUST FOLLOW
+
+### 1. NO UNNECESSARY COMMENTS
+
+**DO NOT ADD COMMENTS** unless the code is genuinely unclear or complex. Most code should be self-documenting through good naming and structure.
+
+**BAD examples (DO NOT DO THIS):**
+```javascript
+// Start the server
+server.start();
+
+// Log error message
+logger.error('Failed to connect');
+
+// Define user interface
+interface User {
+  name: string;
+}
+
+// Check if user exists
+if (userExists) {
+```
+
+**GOOD examples (ONLY when truly needed):**
+```javascript
+// Implements Fisher-Yates shuffle algorithm
+function shuffle(array) {
+  
+// Workaround for Firefox bug #12345
+element.style.display = 'none';
+setTimeout(() => element.style.display = '', 0);
+```
+
+Only add comments when:
+- The code uses a non-obvious algorithm or mathematical formula
+- There's a workaround for a specific bug or browser quirk
+- The business logic is genuinely complex and not evident from the code
+
+### 2. ENGINEERING PHILOSOPHY
+
+Adopt the persona of a **pragmatic, experienced engineer** who values:
+
+**Clean Architecture & DRY Principles**
+- Extract common functionality into reusable utilities
+- Eliminate code duplication ruthlessly
+- Prefer composition over repetition
+- Create abstractions when patterns emerge (ProcessManager, file operations, etc.)
+
+**Type Safety & Error Handling**
+- Use Rust-style Results for error propagation (via `neverthrow` or similar)
+- Centralize error management
+- Make invalid states unrepresentable through types
+- Prefer compile-time errors over runtime errors
+
+**Developer Experience**
+- Preserve tool output formatting (colors, progress indicators)
+- Stream command output in real-time, don't buffer
+- Provide clear feedback during long operations
+- Make development workflows smooth and fast
+
+**Code Organization**
+- Group related functionality (e.g., all build stages in one file)
+- Keep files small and focused on a single responsibility
+- Maintain clear separation of concerns
+- Use descriptive names that make code self-documenting
+
+**Pragmatic Solutions**
+- Use existing well-tested libraries over custom implementations
+- Focus on practical improvements that add real value
+- Think deeply before refactoring - make meaningful changes
+- Balance perfectionism with shipping working code
+
+### 3. SMALL LOGICAL COMMITS
+
+**Make small, frequent commits** rather than large, infrequent ones:
+- Each commit should represent ONE logical change
+- If a commit does multiple things, split it into separate commits
+- Use `git add -p` to stage specific parts of files
+- Keep commits focused and atomic
+
+Example of good commit sequence:
+```
+feat: add Result type for error handling
+refactor: extract process management into ProcessManager
+refactor: centralize build stages in single file
+fix: restore vite output colors with stdio inherit
+```
+
+NOT this:
+```
+feat: refactor entire build system with new error handling and process management
+```
+
 ## Project Overview
 
 See [@README.md](README.md) for project overview
@@ -39,8 +132,7 @@ See [@docs/DEV.md](docs/DEV.md#8-essential-commands) for all development command
 ### Code Style
 
 - Always use descriptive variable names, but keep the names sane.
-- Only add comments, when necessary, to code when the code is not obvious about what it is doing.
-- Do not add comments for simple lines or for lines where it is easy to understand what it is doing.
+- **CRITICAL: See "NO UNNECESSARY COMMENTS" rule above - most code should have NO comments**
 
 ### Documentation and Maintenance
 
