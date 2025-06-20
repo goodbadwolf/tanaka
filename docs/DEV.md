@@ -167,11 +167,23 @@ cargo clippy
 # Install dependencies
 pnpm install
 
-# Build extension
-pnpm run build
+# Generate icons (if you update icon.svg)
+pnpm run gen-icons
 
-# Run linter
+# Format code (Prettier)
+pnpm run format
+
+# Run lint checks
 pnpm run lint
+
+# Fix lint errors
+pnpm run lint:fix
+
+# Type-check
+pnpm run typecheck
+
+# Build extension (copies manifest & icons via prebuild)
+pnpm run build
 
 # Development mode with hot reload
 pnpm run dev

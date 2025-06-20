@@ -1,26 +1,37 @@
 import { spawn } from 'node:child_process';
-import { projectRoot } from './common.js';
+import { logger, projectRoot } from './common.js';
 import { ManagedProcess } from './process-utils.js';
-import { Result, ok, err } from 'neverthrow';
+import { createLineTransformer } from './stream-utils.js';
+import { err, ok, Result } from 'neverthrow';
 
 export async function viteBuild(): Promise<Result<void, Error>> {
-  return new Promise<Result<void, Error>>((resolve) => {
-    const proc = spawn('vite', ['build'], {
+  return new Promise((resolve) => {
+    logger.info('Running vite build...');
+    const childProcess = spawn('vite', ['build'], {
       cwd: projectRoot,
-      stdio: 'inherit',
-      shell: true
+      shell: true,
+      stdio: 'pipe',
+      env: { ...process.env, FORCE_COLOR: '1' },
     });
 
-    proc.on('error', (error) => {
-      resolve(err(new Error(`Vite build failed: ${error.message}`)));
-    });
+    childProcess.stdout.pipe(createLineTransformer((line) => {
+      logger.info(line);
+    }));
 
-    proc.on('exit', (code) => {
+    childProcess.stderr.pipe(createLineTransformer((line) => {
+      logger.error(line);
+    }));
+
+    childProcess.on('close', (code) => {
       if (code === 0) {
         resolve(ok(undefined));
       } else {
-        resolve(err(new Error(`Vite build exited with code ${code}`)));
+        resolve(err(new Error(`Build failed with exit code ${code}`)));
       }
+    });
+
+    childProcess.on('error', (error) => {
+      resolve(err(new Error(`Build failed: ${error.message}`)));
     });
   });
 }
@@ -30,6 +41,6 @@ export function viteWatchConfig(): ManagedProcess {
     name: 'vite watch',
     command: 'vite',
     args: ['build', '--watch'],
-    errorMessage: 'Failed to start vite watch'
+    errorMessage: 'Failed to start vite watch',
   };
 }
