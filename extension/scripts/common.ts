@@ -1,6 +1,7 @@
 import pino from 'pino';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { build, BuildOptions } from './build.js';
 
 export const logger = pino({
   transport: {
@@ -50,11 +51,13 @@ export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export async function runInitialBuild(): Promise<void> {
+export async function runInitialBuild(options: BuildOptions): Promise<void> {
   logger.info('Running initial build...');
-  const { build } = await import('./build.js');
   try {
-    await build();
+    await build({
+      shouldBuildCode: options.shouldBuildCode,
+      shouldCopyStaticAssets: options.shouldCopyStaticAssets,
+    });
   } catch (error) {
     exitWithError('Initial build failed', error);
   }
