@@ -80,6 +80,7 @@ See [@docs/DEV.md](docs/DEV.md#8-essential-commands) for all development command
 ### Project Organization
 
 When working with this codebase:
+
 - Keep language/framework-specific files in their respective directories (e.g., extension-related files in `extension/`, server-related files in `server/`)
 - Repository-level tools (like git hooks) belong at the repository root
 - Run commands from the appropriate directory context based on where the tools are installed
@@ -99,7 +100,7 @@ When working with this codebase:
 
 ### Memory
 
-- After compacting, read the docs and CLAUDE.md to refresh your memory
+- After compacting, read the docs and @CLAUDE.md to refresh your instructions.
 - When you encounter patterns or lessons that would be helpful to remember, proactively suggest adding them to CLAUDE.md or relevant documentation
 
 ### Git Workflow
