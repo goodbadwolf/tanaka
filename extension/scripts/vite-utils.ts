@@ -14,13 +14,17 @@ export async function viteBuild(): Promise<Result<void, Error>> {
       env: { ...process.env, FORCE_COLOR: '1' },
     });
 
-    childProcess.stdout.pipe(createLineTransformer((line) => {
-      logger.info(line);
-    }));
+    childProcess.stdout.pipe(
+      createLineTransformer((line) => {
+        logger.info(line);
+      }),
+    );
 
-    childProcess.stderr.pipe(createLineTransformer((line) => {
-      logger.error(line);
-    }));
+    childProcess.stderr.pipe(
+      createLineTransformer((line) => {
+        logger.error(line);
+      }),
+    );
 
     childProcess.on('close', (code) => {
       if (code === 0) {

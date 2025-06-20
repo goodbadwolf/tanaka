@@ -6,7 +6,7 @@ export default defineConfig({
   publicDir: false,
   build: {
     outDir: 'dist',
-    emptyOutDir: true,
+    emptyOutDir: false,
     rollupOptions: {
       input: {
         background: resolve(__dirname, 'src/background.ts'),
@@ -28,7 +28,7 @@ export default defineConfig({
           fs.copyFileSync('dist/src/popup.html', 'dist/popup.html');
           fs.rmSync('dist/src', { recursive: true });
         }
-      }
-    }
-  ]
+      },
+    },
+  ],
 });

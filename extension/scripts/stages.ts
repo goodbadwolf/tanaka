@@ -10,7 +10,7 @@ export interface Stage {
   fn: () => Promise<Result<void, Error>>;
 }
 
-function compositeStage(name: string, stages: Stage[]): Stage {
+export function compositeStage(name: string, stages: Stage[]): Stage {
   return {
     name,
     fn: async () => {
@@ -19,7 +19,7 @@ function compositeStage(name: string, stages: Stage[]): Stage {
         if (result.isErr()) return result;
       }
       return ok(undefined);
-    }
+    },
   };
 }
 
