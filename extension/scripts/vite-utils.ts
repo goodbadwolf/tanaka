@@ -1,7 +1,7 @@
 import { spawn } from 'node:child_process';
+import { createInterface } from 'node:readline';
 import { logger, projectRoot } from './common.js';
 import { ManagedProcess } from './process-utils.js';
-import { createLineTransformer } from './stream-utils.js';
 import { err, ok, Result } from 'neverthrow';
 
 export async function viteBuild(): Promise<Result<void, Error>> {
@@ -14,19 +14,20 @@ export async function viteBuild(): Promise<Result<void, Error>> {
       env: { ...process.env, FORCE_COLOR: '1' },
     });
 
-    childProcess.stdout.pipe(
-      createLineTransformer((line) => {
-        logger.info(line);
-      }),
-    );
+    const rlOut = createInterface({ input: childProcess.stdout });
+    const rlErr = createInterface({ input: childProcess.stderr });
 
-    childProcess.stderr.pipe(
-      createLineTransformer((line) => {
-        logger.error(line);
-      }),
-    );
+    rlOut.on('line', (line) => {
+      logger.info(line);
+    });
+
+    rlErr.on('line', (line) => {
+      logger.error(line);
+    });
 
     childProcess.on('close', (code) => {
+      rlOut.close();
+      rlErr.close();
       if (code === 0) {
         resolve(ok(undefined));
       } else {
@@ -35,6 +36,8 @@ export async function viteBuild(): Promise<Result<void, Error>> {
     });
 
     childProcess.on('error', (error) => {
+      rlOut.close();
+      rlErr.close();
       resolve(err(new Error(`Build failed: ${error.message}`)));
     });
   });
