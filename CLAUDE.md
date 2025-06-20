@@ -79,8 +79,25 @@ Adopt the persona of a **pragmatic, experienced engineer** who values:
 **Make small, frequent commits** rather than large, infrequent ones:
 - Each commit should represent ONE logical change
 - If a commit does multiple things, split it into separate commits
-- Use `git add -p` to stage specific parts of files
 - Keep commits focused and atomic
+
+**USE `git add -p` FOR SELECTIVE STAGING:**
+When you have multiple unrelated changes in your working directory:
+- Use `git add -p <file>` to stage specific hunks interactively
+- This allows you to separate mixed changes into logical commits
+- Stage only the parts that belong to the current commit
+- Review staged changes with `git diff --cached` before committing
+
+Example workflow:
+```bash
+# You've made changes to both error handling and UI in the same file
+git add -p src/app.ts
+# Stage only the error handling hunks for first commit
+git commit -m "fix: improve error handling in data fetcher"
+# Stage the UI changes for second commit
+git add -p src/app.ts
+git commit -m "feat: update loading spinner animation"
+```
 
 Example of good commit sequence:
 ```
