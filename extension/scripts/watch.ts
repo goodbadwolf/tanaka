@@ -2,14 +2,13 @@
 import {
   logger,
   setupProcessHandlers,
-  exitWithError,
-  isMainModule,
   runInitialBuild,
+  runCLI,
 } from './common.js';
 import { ProcessManager } from './process-utils.js';
 import { viteWatchConfig } from './vite-utils.js';
 
-export async function watch(): Promise<void> {
+async function watch(): Promise<void> {
   logger.info('Starting watch mode...');
 
   await runInitialBuild();
@@ -19,8 +18,4 @@ export async function watch(): Promise<void> {
   setupProcessHandlers(() => pm.killAll());
 }
 
-if (isMainModule(import.meta.url)) {
-  watch().catch((error) => {
-    exitWithError('Failed to start watch mode', error);
-  });
-}
+runCLI(watch, import.meta.url);

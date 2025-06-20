@@ -1,6 +1,6 @@
 #!/usr/bin/env -S npx tsx
 import { Result } from 'neverthrow';
-import { setupProcessHandlers, exitWithError, isMainModule, sleep } from './common.js';
+import { setupProcessHandlers, exitWithError, sleep, runCLI } from './common.js';
 import { ProcessManager } from './process-utils.js';
 import { copyStaticAssets, runStages, Stage } from './stages.js';
 import { viteWatchConfig, webExtConfig } from './vite-utils.js';
@@ -30,8 +30,4 @@ async function dev(): Promise<void> {
   setupProcessHandlers(() => pm.killAll());
 }
 
-if (isMainModule(import.meta.url)) {
-  dev().catch((error) => {
-    exitWithError('Failed to start development mode', error);
-  });
-}
+runCLI(dev, import.meta.url);

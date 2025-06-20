@@ -1,6 +1,6 @@
 #!/usr/bin/env -S npx tsx
 import { ok, Result } from 'neverthrow';
-import { exitWithError, isMainModule } from './common.js';
+import { exitWithError, runCLI } from './common.js';
 import { runStages, Stage, buildCode, copyIcons, copyManifest } from './stages.js';
 
 export async function build(): Promise<Result<void, Error>> {
@@ -9,10 +9,11 @@ export async function build(): Promise<Result<void, Error>> {
   return result;
 }
 
-if (isMainModule(import.meta.url)) {
-  build().then((result) => {
-    if (result.isErr()) {
-      exitWithError('Build failed', result.error);
-    }
-  });
+async function main(): Promise<void> {
+  const result = await build();
+  if (result.isErr()) {
+    exitWithError('Build failed', result.error);
+  }
 }
+
+runCLI(main, import.meta.url);

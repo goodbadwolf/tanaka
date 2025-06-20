@@ -73,3 +73,14 @@ export async function runInitialBuild(): Promise<void> {
     exitWithError('Initial build failed', error);
   }
 }
+
+export function runCLI(
+  main: () => Promise<void>,
+  importMetaUrl: string
+): void {
+  if (isMainModule(importMetaUrl)) {
+    main().catch(error => {
+      exitWithError('Unexpected error', error);
+    });
+  }
+}
