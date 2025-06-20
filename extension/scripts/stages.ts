@@ -1,8 +1,37 @@
 import { join } from 'node:path';
-import { DIST_DIR, ICONS_DIR, MANIFEST_FILE, Stage } from './common.js';
+import { DIST_DIR, ICONS_DIR, MANIFEST_FILE, logger } from './common.js';
 import { copyFiles, ensureDirectoryExists } from './file-utils.js';
 import { viteBuild } from './vite-utils.js';
-import { Result } from 'neverthrow';
+import { Result, ok, err } from 'neverthrow';
+import chalk from 'chalk';
+
+export interface Stage {
+  name: string;
+  fn: () => Result<void, Error> | Promise<Result<void, Error>>;
+}
+
+export async function runStages(
+  stages: Stage[],
+  description: string,
+): Promise<Result<void, Error>> {
+  logger.info(`Starting ${description} (${stages.length} stages)`);
+
+  for (let i = 0; i < stages.length; i++) {
+    const stage = stages[i];
+    logger.info(
+      `Running stage ${chalk.greenBright(`${i + 1}/${stages.length}`)}: ${chalk.whiteBright.bold(stage.name)}`,
+    );
+    const result = await stage.fn();
+
+    if (result.isErr()) {
+      logger.error({ err: result.error }, `Stage '${stage.name}' failed`);
+      return err(result.error);
+    }
+  }
+
+  logger.info(`Finished ${description}!`);
+  return ok(undefined);
+}
 
 export const buildCode: Stage = {
   name: 'Build Code',
