@@ -6,7 +6,7 @@
 
   "permissions": ["tabs", "storage", "windows"],
 
-  "host_permissions": ["https://localhost/*", "https://*/*"],
+  "host_permissions": ["https://localhost/*", "https://127.0.0.1/*"],
 
   "background": {
     "scripts": ["background.js"],
