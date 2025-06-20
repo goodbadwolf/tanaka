@@ -1,7 +1,7 @@
 import pino from 'pino';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { build, BuildOptions } from './build.js';
+import { build } from './build.js';
 
 export const logger = pino({
   transport: {
@@ -24,13 +24,23 @@ export function setupProcessHandlers(cleanup: () => void): void {
   process.on('SIGINT', () => {
     logger.info('Received SIGINT, cleaning up...');
     cleanup();
-    process.exit(0);
+    process.exitCode = 0;
   });
 
   process.on('SIGTERM', () => {
     logger.info('Received SIGTERM, cleaning up...');
     cleanup();
-    process.exit(0);
+    process.exitCode = 0;
+  });
+
+  process.on('unhandledRejection', (reason, promise) => {
+    logger.error({ err: reason }, 'Unhandled promise rejection');
+    process.exitCode = 1;
+  });
+
+  process.on('uncaughtException', (error) => {
+    logger.error({ err: error }, 'Uncaught exception');
+    process.exitCode = 1;
   });
 }
 
@@ -40,7 +50,8 @@ export function exitWithError(message: string, error?: any): never {
   } else {
     logger.error(message);
   }
-  process.exit(1);
+  process.exitCode = 1;
+  throw new Error(message);
 }
 
 export function isMainModule(importMetaUrl: string): boolean {
@@ -51,13 +62,13 @@ export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export async function runInitialBuild(options: BuildOptions): Promise<void> {
+export async function runInitialBuild(): Promise<void> {
   logger.info('Running initial build...');
   try {
-    await build({
-      shouldBuildCode: options.shouldBuildCode,
-      shouldCopyStaticAssets: options.shouldCopyStaticAssets,
-    });
+    const result = await build();
+    if (result.isErr()) {
+      exitWithError('Initial build failed', result.error);
+    }
   } catch (error) {
     exitWithError('Initial build failed', error);
   }

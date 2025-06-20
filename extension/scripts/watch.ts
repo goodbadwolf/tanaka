@@ -12,10 +12,7 @@ import { viteWatchConfig } from './vite-utils.js';
 export async function watch(): Promise<void> {
   logger.info('Starting watch mode...');
 
-  await runInitialBuild({
-    shouldBuildCode: false,
-    shouldCopyStaticAssets: true,
-  });
+  await runInitialBuild();
 
   const pm = new ProcessManager();
   pm.spawn(viteWatchConfig());
