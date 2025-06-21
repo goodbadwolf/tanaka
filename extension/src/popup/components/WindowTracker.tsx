@@ -1,4 +1,3 @@
-import { h } from 'preact';
 import { useWindowTracking } from '../hooks/useWindowTracking';
 
 export function WindowTracker() {
