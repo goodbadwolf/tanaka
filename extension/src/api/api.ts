@@ -28,10 +28,7 @@ export class TanakaAPI {
   private baseUrl: URL;
   private token: string;
 
-  constructor(
-    baseUrl: string = DEFAULT_CONFIG.serverUrl,
-    token: string = DEFAULT_CONFIG.authToken,
-  ) {
+  constructor(baseUrl: string = DEFAULT_CONFIG.serverUrl, token: string = '') {
     try {
       this.baseUrl = new URL(baseUrl);
     } catch {

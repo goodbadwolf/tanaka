@@ -1,7 +1,14 @@
 import browser from 'webextension-polyfill';
 import { type MessageResponse } from './core.js';
 import { TanakaAPI } from './api/api.js';
-import { WindowTracker, SyncManager, TabEventHandler, ConfigManager, MessageHandler } from './sync';
+import {
+  WindowTracker,
+  SyncManager,
+  TabEventHandler,
+  ConfigManager,
+  MessageHandler,
+  UserSettingsManager,
+} from './sync';
 
 class BackgroundService {
   private readonly api: TanakaAPI;
@@ -9,6 +16,7 @@ class BackgroundService {
   private readonly syncManager: SyncManager;
   private readonly tabEventHandler: TabEventHandler;
   private readonly configManager: ConfigManager;
+  private readonly userSettingsManager: UserSettingsManager;
   private readonly messageHandler: MessageHandler;
 
   constructor() {
@@ -16,16 +24,23 @@ class BackgroundService {
     this.windowTracker = new WindowTracker();
     this.syncManager = new SyncManager(this.api, this.windowTracker);
     this.tabEventHandler = new TabEventHandler(this.windowTracker, this.syncManager);
-    this.configManager = new ConfigManager(this.api);
+    this.configManager = new ConfigManager();
+    this.userSettingsManager = new UserSettingsManager();
     this.messageHandler = new MessageHandler(
       this.windowTracker,
       this.syncManager,
       this.configManager,
+      this.userSettingsManager,
+      this.api,
     );
   }
 
   async initialize(): Promise<void> {
-    await this.configManager.loadConfig();
+    const [config, settings] = await Promise.all([
+      this.configManager.load(),
+      this.userSettingsManager.load(),
+    ]);
+    this.api.updateConfig(config.serverUrl, settings.authToken);
     this.setupListeners();
     console.log('Tanaka background service initialized');
   }
