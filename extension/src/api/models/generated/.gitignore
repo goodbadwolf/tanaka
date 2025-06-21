@@ -1,4 +1,0 @@
-# Generated TypeScript types from Rust
-*.ts
-!index.ts
-!.gitignore

@@ -1,5 +1,5 @@
 import browser from 'webextension-polyfill';
-import type { Tab, SyncRequest, SyncResponse } from './models/generated';
+import type { Tab, SyncRequest, SyncResponse } from './models';
 
 export type { Tab };
 
