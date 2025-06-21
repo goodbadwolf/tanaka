@@ -10,14 +10,14 @@ pub async fn sync_handler(
     // Store incoming tabs
     for tab in request.tabs {
         query(
-            r#"
+            r"
             INSERT INTO tabs (id, window_id, tab_data, updated_at)
             VALUES (?1, ?2, ?3, ?4)
             ON CONFLICT(id) DO UPDATE SET
                 window_id = excluded.window_id,
                 tab_data = excluded.tab_data,
                 updated_at = excluded.updated_at
-            "#,
+            ",
         )
         .bind(&tab.id)
         .bind(&tab.window_id)
@@ -25,20 +25,20 @@ pub async fn sync_handler(
         .bind(tab.updated_at)
         .execute(&pool)
         .await
-        .map_err(|e| format!("Database error: {}", e))?;
+        .map_err(|e| format!("Database error: {e}"))?;
     }
 
     // Fetch all tabs
     let rows = query(
-        r#"
+        r"
         SELECT id, window_id, tab_data, updated_at
         FROM tabs
         ORDER BY updated_at DESC
-        "#,
+        ",
     )
     .fetch_all(&pool)
     .await
-    .map_err(|e| format!("Database error: {}", e))?;
+    .map_err(|e| format!("Database error: {e}"))?;
 
     let tabs: Vec<Tab> = rows
         .into_iter()
