@@ -5,7 +5,7 @@ import { rspackWatchConfig } from './rspack-utils.js';
 
 async function dev(): Promise<void> {
   const pm = new ProcessManager();
-  
+
   // Start Rspack in watch mode
   const watchConfig = rspackWatchConfig('development');
   pm.spawn(watchConfig);

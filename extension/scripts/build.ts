@@ -12,7 +12,7 @@ async function main(): Promise<void> {
   }
 
   const mode = modeArg.split('=')[1];
-  
+
   const result = await rspackBuild(mode);
   if (result.isErr()) {
     exitWithError('Build failed', result.error);

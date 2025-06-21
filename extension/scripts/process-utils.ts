@@ -18,7 +18,7 @@ export class ProcessManager {
   ): ChildProcess {
     logger.info(`Starting ${config.name}...`);
 
-    const spawnOptions = config.env 
+    const spawnOptions = config.env
       ? { ...options, env: { ...process.env, ...config.env } }
       : options;
 
