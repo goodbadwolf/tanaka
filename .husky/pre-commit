@@ -1,1 +1,2 @@
+pnpm run lint:md
 cd extension && pnpm exec lint-staged
