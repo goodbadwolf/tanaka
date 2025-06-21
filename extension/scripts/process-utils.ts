@@ -59,3 +59,12 @@ export class ProcessManager {
     });
   }
 }
+
+export function webExtConfig(): ManagedProcess {
+  return {
+    name: 'web-ext',
+    command: 'web-ext',
+    args: ['run', '--source-dir', 'dist'],
+    errorMessage: 'Failed to start web-ext',
+  };
+}

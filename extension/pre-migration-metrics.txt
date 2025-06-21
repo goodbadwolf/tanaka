@@ -1,0 +1,23 @@
+# Pre-Migration Metrics
+
+## Build Time
+Production build completed in: 184ms
+
+## Bundle Sizes
+8.0K	dist/background.js
+ 20K	dist/background.js.map
+ 12K	dist/browser-polyfill-DMmbowld.js
+ 52K	dist/browser-polyfill-DMmbowld.js.map
+ 16K	dist/icons
+4.0K	dist/index-BoOsyVcS.js
+4.0K	dist/index-BoOsyVcS.js.map
+4.0K	dist/manifest.json
+4.0K	dist/modulepreload-polyfill-B5Qt9EMX.js
+4.0K	dist/modulepreload-polyfill-B5Qt9EMX.js.map
+ 16K	dist/popup
+ 16K	dist/settings
+
+## Total Size
+160K	dist
+
+## Build Date: Sat Jun 21 00:51:52 PDT 2025

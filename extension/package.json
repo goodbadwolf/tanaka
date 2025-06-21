@@ -37,7 +37,6 @@
   "packageManager": "pnpm@10.11.0",
   "devDependencies": {
     "@eslint/js": "^9.29.0",
-    "@preact/preset-vite": "^2.10.1",
     "@rspack/cli": "^0.5.9",
     "@rspack/core": "^0.5.9",
     "@rspack/plugin-html": "^0.5.8",
