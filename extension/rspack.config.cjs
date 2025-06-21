@@ -12,8 +12,8 @@ module.exports = defineConfig({
 
   entry: {
     background: './src/background.ts',
-    'popup/popup': './src/popup/popup.ts',
-    'settings/settings': './src/settings/settings.ts',
+    'popup/popup': './src/popup/popup.tsx',
+    'settings/settings': './src/settings/settings.tsx',
   },
 
   output: {
@@ -31,6 +31,8 @@ module.exports = defineConfig({
     alias: {
       '@': resolve(__dirname, 'src'),
       '@env': resolve(__dirname, `src/config/environments/${buildEnv}.ts`),
+      'react': 'preact/compat',
+      'react-dom': 'preact/compat',
     },
   },
 
@@ -51,6 +53,7 @@ module.exports = defineConfig({
               transform: {
                 react: {
                   runtime: 'automatic',
+                  importSource: 'preact',
                   development: isDev,
                   refresh: isDev,
                 },
