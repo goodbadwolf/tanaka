@@ -1,5 +1,5 @@
 import browser from 'webextension-polyfill';
-import type { TanakaAPI } from '../api/api.js';
+import type { TanakaAPI } from '../api';
 
 export interface Config {
   serverUrl: string;
