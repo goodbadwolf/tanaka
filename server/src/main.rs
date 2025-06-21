@@ -4,6 +4,8 @@ use std::net::SocketAddr;
 use tower_http::trace::TraceLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
+mod db;
+
 #[derive(Serialize)]
 struct HealthResponse {
     status: String,
@@ -19,6 +21,10 @@ async fn main() {
         )
         .with(tracing_subscriber::fmt::layer())
         .init();
+
+    // Initialize database
+    let _db_pool = db::init_db().await.expect("Failed to initialize database");
+    tracing::info!("Database initialized");
 
     let app = Router::new()
         .route("/health", get(health))
