@@ -1,6 +1,7 @@
 const { defineConfig } = require('@rspack/cli');
 const { rspack } = require('@rspack/core');
 const RefreshPlugin = require('@rspack/plugin-react-refresh');
+const HtmlRspackPlugin = require('html-rspack-plugin');
 const { resolve } = require('path');
 
 const isDev = process.env.NODE_ENV === 'development';
@@ -44,7 +45,6 @@ module.exports = defineConfig({
         use: {
           loader: 'builtin:swc-loader',
           options: {
-            sourceMap: true,
             jsc: {
               parser: {
                 syntax: 'typescript',
@@ -79,14 +79,14 @@ module.exports = defineConfig({
   plugins: [
     isDev && new RefreshPlugin(),
     
-    new rspack.HtmlRspackPlugin({
+    new HtmlRspackPlugin({
       template: './src/popup/popup.html',
       filename: 'popup/popup.html',
       chunks: ['popup/popup'],
       inject: true,
     }),
 
-    new rspack.HtmlRspackPlugin({
+    new HtmlRspackPlugin({
       template: './src/settings/settings.html',
       filename: 'settings/settings.html',
       chunks: ['settings/settings'],
