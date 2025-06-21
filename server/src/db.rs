@@ -1,6 +1,9 @@
 use sqlx::{sqlite::SqlitePoolOptions, SqlitePool};
 
 pub async fn init_db() -> Result<SqlitePool, sqlx::Error> {
+    // Create database file if it doesn't exist
+    let _ = tokio::fs::File::create("tabs.db").await;
+    
     let pool = SqlitePoolOptions::new()
         .max_connections(5)
         .connect("sqlite:tabs.db")

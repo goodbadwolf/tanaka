@@ -31,8 +31,8 @@ async fn main() {
 
     let app = Router::new()
         .route("/health", get(health))
-        .route("/sync", post(sync::sync_handler))
-            .route_layer(middleware::from_fn(auth::auth_middleware))
+        .route("/sync", post(sync::sync_handler)
+            .route_layer(middleware::from_fn(auth::auth_middleware)))
         .layer(TraceLayer::new_for_http())
         .with_state(db_pool);
 
