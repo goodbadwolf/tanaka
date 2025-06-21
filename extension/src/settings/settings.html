@@ -7,42 +7,7 @@
     <link rel="stylesheet" href="settings.css" />
   </head>
   <body>
-    <div class="settings-container">
-      <header>
-        <h1>Tanaka Settings</h1>
-      </header>
-
-      <main>
-        <section class="settings-section">
-          <h2>Authentication</h2>
-          <p class="section-description">
-            Configure your authentication token to connect to the Tanaka server.
-          </p>
-
-          <div class="form-group">
-            <label for="auth-token">Auth Token</label>
-            <input type="password" id="auth-token" placeholder="Your authentication token" />
-            <p class="field-help">Contact your administrator to obtain an auth token.</p>
-          </div>
-
-          <button id="save-auth" class="btn-primary">Save Authentication</button>
-        </section>
-
-        <section class="settings-section">
-          <h2>Server Information</h2>
-          <p class="server-info" id="server-info"></p>
-        </section>
-
-        <section class="settings-section">
-          <h2>About</h2>
-          <p>Tanaka keeps your Firefox browsing entangled across every computer you use.</p>
-          <p class="version">Version: <span id="version"></span></p>
-        </section>
-      </main>
-
-      <div class="status-message" id="status"></div>
-    </div>
-
-    <script type="module" src="settings.ts"></script>
+    <div id="root"></div>
+    <script type="module" src="settings.tsx"></script>
   </body>
 </html>
