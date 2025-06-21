@@ -5,7 +5,7 @@ use axum::{
 };
 use serde::Serialize;
 use std::net::SocketAddr;
-use tower_http::trace::TraceLayer;
+use tower_http::{cors::CorsLayer, trace::TraceLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 mod auth;
@@ -39,6 +39,7 @@ async fn main() {
             "/sync",
             post(sync::sync_handler).route_layer(middleware::from_fn(auth::auth_middleware)),
         )
+        .layer(CorsLayer::permissive()) // Allow all origins for development
         .layer(TraceLayer::new_for_http())
         .with_state(db_pool);
 

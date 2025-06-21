@@ -3,6 +3,9 @@ import type { Message, MessageResponse } from './core.js';
 
 const trackWindowCheckbox = document.getElementById('track-window') as HTMLInputElement;
 const statusDiv = document.getElementById('status') as HTMLDivElement;
+const serverUrlInput = document.getElementById('server-url') as HTMLInputElement;
+const serverTokenInput = document.getElementById('server-token') as HTMLInputElement;
+const saveConfigButton = document.getElementById('save-config') as HTMLButtonElement;
 
 // Get current window tracking status
 async function updateUI() {
@@ -50,5 +53,41 @@ trackWindowCheckbox.addEventListener('change', async () => {
   }
 });
 
+// Load configuration from storage
+async function loadConfig() {
+  const config = await browser.storage.local.get(['serverUrl', 'authToken']);
+  serverUrlInput.value = (config.serverUrl as string) || 'http://localhost:3000';
+  serverTokenInput.value = (config.authToken as string) || '';
+}
+
+// Save configuration to storage
+saveConfigButton.addEventListener('click', async () => {
+  const serverUrl = serverUrlInput.value.trim();
+  const authToken = serverTokenInput.value.trim();
+
+  if (!serverUrl) {
+    statusDiv.innerHTML = '<p style="color: red;">Server URL is required</p>';
+    return;
+  }
+
+  if (!authToken) {
+    statusDiv.innerHTML = '<p style="color: red;">Auth token is required</p>';
+    return;
+  }
+
+  try {
+    await browser.storage.local.set({ serverUrl, authToken });
+    statusDiv.innerHTML = '<p style="color: green;">Configuration saved</p>';
+
+    // Notify background script about config change
+    const message: Message = { type: 'CONFIG_UPDATED' };
+    await browser.runtime.sendMessage(message);
+  } catch (error) {
+    console.error('Error saving configuration:', error);
+    statusDiv.innerHTML = '<p style="color: red;">Failed to save configuration</p>';
+  }
+});
+
 // Initialize UI
 updateUI();
+loadConfig();
