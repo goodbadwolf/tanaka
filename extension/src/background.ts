@@ -1,13 +1,7 @@
 import browser from 'webextension-polyfill';
 import { type MessageResponse } from './core.js';
 import { TanakaAPI } from './api/api.js';
-import {
-  WindowTracker,
-  SyncManager,
-  TabEventHandler,
-  ConfigManager,
-  MessageHandler,
-} from './sync/index.js';
+import { WindowTracker, SyncManager, TabEventHandler, ConfigManager, MessageHandler } from './sync';
 
 class BackgroundService {
   private readonly api: TanakaAPI;
