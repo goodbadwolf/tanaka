@@ -1,6 +1,5 @@
 import browser from 'webextension-polyfill';
 import type { Tab, SyncRequest, SyncResponse } from './models';
-import { DEFAULT_CONFIG } from '../config/defaults';
 
 export type { Tab };
 
@@ -26,30 +25,21 @@ export class APIError extends Error {
 
 export class TanakaAPI {
   private baseUrl: URL;
-  private token: string;
+  private token: string = 'unset-token';
 
-  constructor(baseUrl: string = DEFAULT_CONFIG.serverUrl, token: string = '') {
+  constructor(baseUrl: string) {
     try {
       this.baseUrl = new URL(baseUrl);
     } catch {
       throw new APIError(`Invalid server URL: ${baseUrl}`);
     }
-    this.token = token;
   }
 
-  updateConfig(baseUrl: string, token: string) {
-    if (!baseUrl) {
-      throw new APIError('Invalid base URL');
-    }
+  setAuthToken(token: string) {
     if (!token) {
       throw new APIError('Invalid token');
     }
 
-    try {
-      this.baseUrl = new URL(baseUrl);
-    } catch {
-      throw new APIError(`Invalid server URL: ${baseUrl}`);
-    }
     this.token = token;
   }
 

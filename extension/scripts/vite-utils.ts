@@ -4,10 +4,10 @@ import { logger, projectRoot } from './common.js';
 import { ManagedProcess } from './process-utils.js';
 import { err, ok, Result } from 'neverthrow';
 
-export async function viteBuild(): Promise<Result<void, Error>> {
+export async function viteBuild(mode: string): Promise<Result<void, Error>> {
   return new Promise((resolve) => {
-    logger.info('Running vite build...');
-    const childProcess = spawn('vite', ['build'], {
+    logger.info(`Running vite build in ${mode} mode...`);
+    const childProcess = spawn('vite', ['build', '--mode', mode], {
       cwd: projectRoot,
       shell: true,
       stdio: 'pipe',
@@ -43,11 +43,15 @@ export async function viteBuild(): Promise<Result<void, Error>> {
   });
 }
 
-export function viteWatchConfig(): ManagedProcess {
+export function viteWatchConfig(mode?: string): ManagedProcess {
+  const args = ['build', '--watch'];
+  if (mode) {
+    args.push('--mode', mode);
+  }
   return {
     name: 'vite watch',
     command: 'vite',
-    args: ['build', '--watch'],
+    args,
     errorMessage: 'Failed to start vite watch',
   };
 }

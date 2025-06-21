@@ -62,6 +62,13 @@ h1 {
   font-weight: 600;
 }
 
+.server-info {
+  margin: 0 0 12px 0;
+  font-size: 12px;
+  color: #666;
+  font-style: italic;
+}
+
 .form-group {
   margin-bottom: 12px;
 }

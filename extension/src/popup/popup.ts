@@ -1,11 +1,11 @@
 import browser from 'webextension-polyfill';
 import type { Message, MessageResponse } from '../core.js';
+import { getConfig } from '../config/index.js';
 
 const trackWindowCheckbox = document.getElementById('track-window') as HTMLInputElement;
 const statusDiv = document.getElementById('status') as HTMLDivElement;
-const serverUrlInput = document.getElementById('server-url') as HTMLInputElement;
-const serverTokenInput = document.getElementById('server-token') as HTMLInputElement;
-const saveConfigButton = document.getElementById('save-config') as HTMLButtonElement;
+const authTokenInput = document.getElementById('auth-token') as HTMLInputElement;
+const saveAuthButton = document.getElementById('save-auth') as HTMLButtonElement;
 
 // Get current window tracking status
 async function updateUI() {
@@ -53,22 +53,22 @@ trackWindowCheckbox.addEventListener('change', async () => {
   }
 });
 
-// Load configuration from storage
-async function loadConfig() {
-  const config = await browser.storage.local.get(['serverUrl', 'authToken']);
-  serverUrlInput.value = (config.serverUrl as string) || 'http://localhost:3000';
-  serverTokenInput.value = (config.authToken as string) || '';
+// Load authentication settings
+async function loadAuth() {
+  const settings = await browser.storage.local.get(['authToken']);
+  authTokenInput.value = (settings.authToken as string) || '';
+
+  // Show server URL for information
+  const serverInfo = document.createElement('p');
+  serverInfo.className = 'server-info';
+  serverInfo.textContent = `Server: ${getConfig().serverUrl}`;
+  const configDiv = document.querySelector('.config');
+  configDiv?.insertBefore(serverInfo, authTokenInput.parentElement);
 }
 
-// Save configuration to storage
-saveConfigButton.addEventListener('click', async () => {
-  const serverUrl = serverUrlInput.value.trim();
-  const authToken = serverTokenInput.value.trim();
-
-  if (!serverUrl) {
-    statusDiv.innerHTML = '<p style="color: red;">Server URL is required</p>';
-    return;
-  }
+// Save authentication
+saveAuthButton.addEventListener('click', async () => {
+  const authToken = authTokenInput.value.trim();
 
   if (!authToken) {
     statusDiv.innerHTML = '<p style="color: red;">Auth token is required</p>';
@@ -76,25 +76,18 @@ saveConfigButton.addEventListener('click', async () => {
   }
 
   try {
-    new URL(serverUrl);
-  } catch {
-    statusDiv.innerHTML = '<p style="color: red;">Invalid URL format</p>';
-    return;
-  }
-
-  try {
-    await browser.storage.local.set({ serverUrl, authToken });
-    statusDiv.innerHTML = '<p style="color: green;">Configuration saved</p>';
+    await browser.storage.local.set({ authToken });
+    statusDiv.innerHTML = '<p style="color: green;">Authentication saved</p>';
 
     // Notify background script about config change
     const message: Message = { type: 'CONFIG_UPDATED' };
     await browser.runtime.sendMessage(message);
   } catch (error) {
-    console.error('Error saving configuration:', error);
-    statusDiv.innerHTML = '<p style="color: red;">Failed to save configuration</p>';
+    console.error('Error saving authentication:', error);
+    statusDiv.innerHTML = '<p style="color: red;">Failed to save authentication</p>';
   }
 });
 
 // Initialize UI
 updateUI();
-loadConfig();
+loadAuth();

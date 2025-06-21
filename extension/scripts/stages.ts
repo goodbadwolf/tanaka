@@ -23,30 +23,38 @@ export function compositeStage(name: string, stages: Stage[]): Stage {
   };
 }
 
-export const buildCode: Stage = {
-  name: 'Build Code',
-  fn: viteBuild,
-};
+export function createBuildCodeStage(mode: string): Stage {
+  return {
+    name: `Build Code (${mode})`,
+    fn: () => viteBuild(mode),
+  };
+}
 
-export const copyManifest: Stage = {
-  name: 'Copy manifest',
-  fn: async (): Promise<Result<void, Error>> =>
-    copyFiles([{ source: MANIFEST_FILE, destination: join(DIST_DIR, 'manifest.json') }]),
-};
+export function createCopyManifestStage(): Stage {
+  return {
+    name: 'Copy manifest',
+    fn: async (): Promise<Result<void, Error>> =>
+      copyFiles([{ source: MANIFEST_FILE, destination: join(DIST_DIR, 'manifest.json') }]),
+  };
+}
 
-export const copyIcons: Stage = {
-  name: 'Copy icons',
-  fn: async (): Promise<Result<void, Error>> =>
-    copyFiles([
-      {
-        source: ICONS_DIR,
-        destination: join(DIST_DIR, 'icons'),
-        filter: (filename) => filename.endsWith('.png'),
-      },
-    ]),
-};
+export function createCopyIconsStage(): Stage {
+  return {
+    name: 'Copy icons',
+    fn: async (): Promise<Result<void, Error>> =>
+      copyFiles([
+        {
+          source: ICONS_DIR,
+          destination: join(DIST_DIR, 'icons'),
+          filter: (filename) => filename.endsWith('.png'),
+        },
+      ]),
+  };
+}
 
-export const copyStaticAssets = compositeStage('Copy static assets', [copyManifest, copyIcons]);
+export function createCopyStaticAssetsStage(): Stage {
+  return compositeStage('Copy static assets', [createCopyManifestStage(), createCopyIconsStage()]);
+}
 
 export async function runStages(
   stages: Stage[],
