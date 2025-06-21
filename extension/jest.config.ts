@@ -27,7 +27,7 @@ const config: Config = {
     '^react$': 'preact/compat',
     '^react-dom$': 'preact/compat',
     '^react/jsx-runtime$': 'preact/jsx-runtime',
-    '\\.(css|less|scss|sass)$': '<rootDir>/src/__mocks__/styleMock.js',
+    '\\.(css|less|scss|sass)$': '<rootDir>/src/__mocks__/styleMock.ts',
   },
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
   testMatch: [
