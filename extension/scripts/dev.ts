@@ -1,9 +1,8 @@
 #!/usr/bin/env -S npx tsx
 import { setupProcessHandlers, exitWithError, sleep, runCLI } from './common.js';
-import { ProcessManager } from './process-utils.js';
+import { ProcessManager, webExtConfig } from './process-utils.js';
 import { runStages, Stage, createCopyStaticAssetsStage } from './stages.js';
 import { rspackWatchConfig } from './rspack-utils.js';
-import { webExtConfig } from './vite-utils.js';
 
 async function dev(): Promise<void> {
   const pm = new ProcessManager();
