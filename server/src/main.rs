@@ -1,10 +1,12 @@
-use axum::{routing::get, Json, Router};
+use axum::{routing::{get, post}, Json, Router};
 use serde::Serialize;
 use std::net::SocketAddr;
 use tower_http::trace::TraceLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 mod db;
+mod models;
+mod sync;
 
 #[derive(Serialize)]
 struct HealthResponse {
@@ -23,12 +25,14 @@ async fn main() {
         .init();
 
     // Initialize database
-    let _db_pool = db::init_db().await.expect("Failed to initialize database");
+    let db_pool = db::init_db().await.expect("Failed to initialize database");
     tracing::info!("Database initialized");
 
     let app = Router::new()
         .route("/health", get(health))
-        .layer(TraceLayer::new_for_http());
+        .route("/sync", post(sync::sync_handler))
+        .layer(TraceLayer::new_for_http())
+        .with_state(db_pool);
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
     tracing::info!("Starting Tanaka server on {}", addr);
