@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WindowTracker } from './WindowTracker.js';
+import { WindowTracker } from '../sync/WindowTracker.js';
 
 describe('WindowTracker', () => {
   let tracker: WindowTracker;
