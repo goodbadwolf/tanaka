@@ -1,5 +1,5 @@
 import browser from 'webextension-polyfill';
-import type { Message, MessageResponse } from './core.js';
+import type { Message, MessageResponse } from '../core.js';
 
 const trackWindowCheckbox = document.getElementById('track-window') as HTMLInputElement;
 const statusDiv = document.getElementById('status') as HTMLDivElement;
@@ -72,6 +72,13 @@ saveConfigButton.addEventListener('click', async () => {
 
   if (!authToken) {
     statusDiv.innerHTML = '<p style="color: red;">Auth token is required</p>';
+    return;
+  }
+
+  try {
+    new URL(serverUrl);
+  } catch {
+    statusDiv.innerHTML = '<p style="color: red;">Invalid URL format</p>';
     return;
   }
 

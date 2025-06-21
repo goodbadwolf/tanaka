@@ -1,11 +1,9 @@
 import browser from 'webextension-polyfill';
 import { asMessage, type MessageResponse } from './core.js';
-import { TanakaAPI, browserTabToSyncTab, type Tab } from './api.js';
+import { TanakaAPI, browserTabToSyncTab, type Tab } from './api/api.js';
 
-// Initialize API client
 const api = new TanakaAPI();
 
-// Load config on startup
 async function loadConfig() {
   const config = await browser.storage.local.get(['serverUrl', 'authToken']);
   const serverUrl = (config.serverUrl as string) || 'http://localhost:3000';
@@ -13,16 +11,12 @@ async function loadConfig() {
   api.updateConfig(serverUrl, authToken);
 }
 
-// Load initial config
 loadConfig();
 
-// Track which windows are being synced
 const trackedWindows = new Set<number>();
 
-// Sync state
 let syncInterval: number | null = null;
 
-// Collect all tabs from tracked windows
 async function collectTrackedTabs() {
   const tabs: Parameters<typeof browserTabToSyncTab>[0][] = [];
 
@@ -40,7 +34,6 @@ async function collectTrackedTabs() {
     .filter((tab): tab is Tab => tab !== null);
 }
 
-// Sync tabs with server
 async function syncWithServer() {
   if (trackedWindows.size === 0) return;
 
@@ -53,20 +46,16 @@ async function syncWithServer() {
   }
 }
 
-// Start periodic sync
 function startSync() {
   if (syncInterval) return;
 
-  // Initial sync
   syncWithServer();
 
-  // Sync every 5 seconds
   syncInterval = window.setInterval(() => {
     syncWithServer();
   }, 5000);
 }
 
-// Stop periodic sync
 function stopSync() {
   if (syncInterval) {
     clearInterval(syncInterval);
@@ -74,7 +63,6 @@ function stopSync() {
   }
 }
 
-// Tab event handlers
 browser.tabs.onCreated.addListener(async (tab) => {
   if (tab.windowId && trackedWindows.has(tab.windowId)) {
     console.log('Tab created:', tab);
@@ -103,7 +91,6 @@ browser.tabs.onMoved.addListener(async (tabId, moveInfo) => {
   }
 });
 
-// Window event handlers
 browser.windows.onRemoved.addListener(async (windowId) => {
   if (trackedWindows.has(windowId)) {
     trackedWindows.delete(windowId);
@@ -117,7 +104,6 @@ browser.windows.onRemoved.addListener(async (windowId) => {
   }
 });
 
-// Message handler for popup
 browser.runtime.onMessage.addListener(async (message: unknown): Promise<MessageResponse> => {
   const msg = asMessage(message);
   if (!msg) {
