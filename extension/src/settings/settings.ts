@@ -1,5 +1,6 @@
 import browser from 'webextension-polyfill';
 import { getConfig } from '../config/index.js';
+import './settings.css';
 
 const authTokenInput = document.getElementById('auth-token') as HTMLInputElement;
 const saveAuthButton = document.getElementById('save-auth') as HTMLButtonElement;
