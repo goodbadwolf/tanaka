@@ -1,5 +1,5 @@
 import browser from 'webextension-polyfill';
-import type { Tab, SyncRequest, SyncResponse } from '../types/generated';
+import type { Tab, SyncRequest, SyncResponse } from './models/generated';
 
 export type { Tab };
 
@@ -125,9 +125,9 @@ export function browserTabToSyncTab(tab: browser.Tabs.Tab, windowId: number): Ta
 
   return {
     id: `tab-${tab.id}`,
-    window_id: `window-${windowId}`,
+    windowId: `window-${windowId}`,
     data: JSON.stringify(tabData),
-    updated_at: Date.now(),
+    updatedAt: Date.now(),
   };
 }
 
