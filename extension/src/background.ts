@@ -38,8 +38,25 @@ class BackgroundService {
     this.tabEventHandler.setupListeners();
 
     browser.runtime.onMessage.addListener(async (message: unknown): Promise<MessageResponse> => {
+      // Handle SETTINGS_UPDATED directly in background service
+      if (
+        typeof message === 'object' &&
+        message !== null &&
+        'type' in message &&
+        message.type === 'SETTINGS_UPDATED'
+      ) {
+        await this.reinitializeWithNewSettings();
+        return { success: true };
+      }
+
       return this.messageHandler.handleMessage(message);
     });
+  }
+
+  private async reinitializeWithNewSettings(): Promise<void> {
+    const settings = await this.userSettingsManager.load();
+    this.api.setAuthToken(settings.authToken);
+    console.log('Reinitialized with updated settings');
   }
 }
 

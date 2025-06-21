@@ -2,7 +2,8 @@ export type Message =
   | { type: 'TRACK_WINDOW'; windowId: number }
   | { type: 'UNTRACK_WINDOW'; windowId: number }
   | { type: 'GET_TRACKED_WINDOWS' }
-  | { type: 'CONFIG_UPDATED' };
+  | { type: 'CONFIG_UPDATED' }
+  | { type: 'SETTINGS_UPDATED' };
 
 export type MessageResponse = { windowIds: number[] } | { success: boolean } | { error: string };
 
@@ -22,6 +23,7 @@ export function asMessage(value: unknown): Message | null {
       return null;
     case 'GET_TRACKED_WINDOWS':
     case 'CONFIG_UPDATED':
+    case 'SETTINGS_UPDATED':
       return msg as Message;
     default:
       return null;

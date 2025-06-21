@@ -1,11 +1,9 @@
 import browser from 'webextension-polyfill';
 import type { Message, MessageResponse } from '../core.js';
-import { getConfig } from '../config/index.js';
 
 const trackWindowCheckbox = document.getElementById('track-window') as HTMLInputElement;
 const statusDiv = document.getElementById('status') as HTMLDivElement;
-const authTokenInput = document.getElementById('auth-token') as HTMLInputElement;
-const saveAuthButton = document.getElementById('save-auth') as HTMLButtonElement;
+const openSettingsLink = document.getElementById('open-settings') as HTMLAnchorElement;
 
 // Get current window tracking status
 async function updateUI() {
@@ -20,10 +18,17 @@ async function updateUI() {
 
   if ('windowIds' in response) {
     trackWindowCheckbox.checked = response.windowIds.includes(currentWindow.id);
+    updateStatus(trackWindowCheckbox.checked);
   } else if ('error' in response) {
     console.error('Error getting tracked windows:', response.error);
-    statusDiv.textContent = 'Error: ' + response.error;
+    statusDiv.innerHTML = `<p style="color: red;">Error: ${response.error}</p>`;
   }
+}
+
+function updateStatus(isTracked: boolean) {
+  statusDiv.innerHTML = isTracked
+    ? '<p style="color: green;">✓ This window is being synced</p>'
+    : '<p>This window is not being synced</p>';
 }
 
 // Handle checkbox change
@@ -43,51 +48,20 @@ trackWindowCheckbox.addEventListener('change', async () => {
 
   if ('error' in response) {
     console.error('Error updating window tracking:', response.error);
-    statusDiv.textContent = 'Error: ' + response.error;
+    statusDiv.innerHTML = `<p style="color: red;">Error: ${response.error}</p>`;
     // Revert checkbox state on error
     trackWindowCheckbox.checked = !trackWindowCheckbox.checked;
   } else {
-    statusDiv.textContent = trackWindowCheckbox.checked
-      ? 'This window is being synced'
-      : 'This window is not being synced';
+    updateStatus(trackWindowCheckbox.checked);
   }
 });
 
-// Load authentication settings
-async function loadAuth() {
-  const settings = await browser.storage.local.get(['authToken']);
-  authTokenInput.value = (settings.authToken as string) || '';
-
-  // Show server URL for information
-  const serverInfo = document.createElement('p');
-  serverInfo.className = 'server-info';
-  serverInfo.textContent = `Server: ${getConfig().serverUrl}`;
-  const configDiv = document.querySelector('.config');
-  configDiv?.insertBefore(serverInfo, authTokenInput.parentElement);
-}
-
-// Save authentication
-saveAuthButton.addEventListener('click', async () => {
-  const authToken = authTokenInput.value.trim();
-
-  if (!authToken) {
-    statusDiv.innerHTML = '<p style="color: red;">Auth token is required</p>';
-    return;
-  }
-
-  try {
-    await browser.storage.local.set({ authToken });
-    statusDiv.innerHTML = '<p style="color: green;">Authentication saved</p>';
-
-    // Notify background script about config change
-    const message: Message = { type: 'CONFIG_UPDATED' };
-    await browser.runtime.sendMessage(message);
-  } catch (error) {
-    console.error('Error saving authentication:', error);
-    statusDiv.innerHTML = '<p style="color: red;">Failed to save authentication</p>';
-  }
+// Open settings
+openSettingsLink.addEventListener('click', (e) => {
+  e.preventDefault();
+  browser.runtime.openOptionsPage();
+  window.close();
 });
 
 // Initialize UI
 updateUI();
-loadAuth();
