@@ -16,22 +16,39 @@ interface SyncResponse {
 }
 
 export class TanakaAPI {
-  private serverUrl: string;
+  private baseUrl: URL;
   private token: string;
 
-  constructor(serverUrl: string = 'http://localhost:3000', token: string = 'tanaka-secret-token') {
-    this.serverUrl = serverUrl.replace(/\/$/, ''); // Remove trailing slash
+  constructor(baseUrl: string = 'http://localhost:3000', token: string = 'tanaka-secret-token') {
+    try {
+      this.baseUrl = new URL(baseUrl);
+    } catch {
+      throw new Error(`Invalid server URL: ${baseUrl}`);
+    }
     this.token = token;
   }
 
-  updateConfig(serverUrl: string, token: string) {
-    this.serverUrl = serverUrl.replace(/\/$/, ''); // Remove trailing slash
+  updateConfig(baseUrl: string, token: string) {
+    if (!baseUrl) {
+      throw new Error('Invalid base URL');
+    }
+    if (!token) {
+      throw new Error('Invalid token');
+    }
+
+    try {
+      this.baseUrl = new URL(baseUrl);
+    } catch {
+      throw new Error(`Invalid server URL: ${baseUrl}`);
+    }
     this.token = token;
   }
 
   async syncTabs(tabs: Tab[]): Promise<Tab[]> {
+    const url = new URL('/sync', this.baseUrl);
+
     try {
-      const response = await fetch(`${this.serverUrl}/sync`, {
+      const response = await fetch(url.toString(), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -53,8 +70,10 @@ export class TanakaAPI {
   }
 
   async checkHealth(): Promise<boolean> {
+    const url = new URL('/health', this.baseUrl);
+
     try {
-      const response = await fetch(`${this.serverUrl}/health`);
+      const response = await fetch(url.toString());
       return response.ok;
     } catch {
       return false;

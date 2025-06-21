@@ -10,7 +10,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         background: resolve(__dirname, 'src/background.ts'),
-        popup: resolve(__dirname, 'src/popup.html'),
+        popup: resolve(__dirname, 'src/popup/popup.html'),
       },
       output: {
         entryFileNames: '[name].js',
@@ -24,8 +24,8 @@ export default defineConfig({
       name: 'move-popup',
       writeBundle() {
         // Move popup.html to root of dist
-        if (fs.existsSync('dist/src/popup.html')) {
-          fs.copyFileSync('dist/src/popup.html', 'dist/popup.html');
+        if (fs.existsSync('dist/src/popup/popup.html')) {
+          fs.copyFileSync('dist/src/popup/popup.html', 'dist/popup.html');
           fs.rmSync('dist/src', { recursive: true });
         }
       },
