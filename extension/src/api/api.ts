@@ -1,4 +1,9 @@
 import browser from 'webextension-polyfill';
+import type { Tab } from '../types/generated/Tab';
+import type { SyncRequest } from '../types/generated/SyncRequest';
+import type { SyncResponse } from '../types/generated/SyncResponse';
+
+export type { Tab };
 
 export interface TabData {
   url: string;
@@ -7,21 +12,6 @@ export interface TabData {
   index: number;
   pinned: boolean;
   active: boolean;
-}
-
-export interface Tab {
-  id: string;
-  window_id: string;
-  data: string;
-  updated_at: number;
-}
-
-interface SyncRequest {
-  tabs: Tab[];
-}
-
-interface SyncResponse {
-  tabs: Tab[];
 }
 
 export class APIError extends Error {

@@ -9,10 +9,13 @@
     "build": "tsx scripts/build.ts",
     "watch": "tsx scripts/watch.ts",
     "dev": "tsx scripts/dev.ts",
-    "lint": "eslint 'src/**/*.ts' 'scripts/**/*.ts'",
-    "lint:fix": "eslint 'src/**/*.ts' 'scripts/**/*.ts' --fix",
-    "format": "prettier --write 'src/**/*.{ts,html,css}' 'scripts/**/*.ts' 'manifest.json'",
-    "typecheck": "tsc --noEmit"
+    "lint": "eslint 'src/**/*.ts' 'src/**/*.test.ts' 'scripts/**/*.ts'",
+    "lint:fix": "eslint 'src/**/*.ts' 'src/**/*.test.ts' 'scripts/**/*.ts' --fix",
+    "format": "prettier --write 'src/**/*.{ts,html,css}' 'src/**/*.test.ts' 'scripts/**/*.ts' 'manifest.json'",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "quality-check": "pnpm run lint && pnpm run lint:fix && pnpm run format && pnpm run typecheck && pnpm run test"
   },
   "keywords": [
     "firefox",
@@ -44,6 +47,7 @@
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.34.1",
     "vite": "^6.3.5",
+    "vitest": "^3.2.4",
     "web-ext": "^8.8.0",
     "webextension-polyfill": "^0.12.0"
   },
