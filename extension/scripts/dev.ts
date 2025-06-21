@@ -2,11 +2,12 @@
 import { setupProcessHandlers, exitWithError, sleep, runCLI } from './common.js';
 import { ProcessManager } from './process-utils.js';
 import { runStages, Stage, createCopyStaticAssetsStage } from './stages.js';
-import { viteWatchConfig, webExtConfig } from './vite-utils.js';
+import { rspackWatchConfig } from './rspack-utils.js';
+import { webExtConfig } from './vite-utils.js';
 
 async function dev(): Promise<void> {
   const pm = new ProcessManager();
-  const watchConfig = viteWatchConfig();
+  const watchConfig = rspackWatchConfig('development');
   pm.spawn(watchConfig);
 
   await sleep(2000);

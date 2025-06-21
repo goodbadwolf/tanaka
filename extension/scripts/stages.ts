@@ -1,7 +1,7 @@
 import { join } from 'node:path';
 import { DIST_DIR, ICONS_DIR, MANIFEST_FILE, logger } from './common.js';
 import { copyFiles } from './file-utils.js';
-import { viteBuild } from './vite-utils.js';
+import { rspackBuild } from './rspack-utils.js';
 import { Result, ok, err } from 'neverthrow';
 import chalk from 'chalk';
 
@@ -26,7 +26,7 @@ export function compositeStage(name: string, stages: Stage[]): Stage {
 export function createBuildCodeStage(mode: string): Stage {
   return {
     name: `Build Code (${mode})`,
-    fn: () => viteBuild(mode),
+    fn: () => rspackBuild(mode),
   };
 }
 
