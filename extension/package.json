@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Firefox extension for cross-device tab synchronization",
   "private": true,
+  "type": "module",
   "scripts": {
     "gen-icons": "sh icons/generate-icons.sh",
     "build:dev": "tsx scripts/build.ts --mode=development",
