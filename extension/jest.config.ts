@@ -1,5 +1,6 @@
-/** @type {import('jest').Config} */
-module.exports = {
+import type { Config } from 'jest';
+
+const config: Config = {
   testEnvironment: 'jsdom',
   extensionsToTreatAsEsm: ['.ts', '.tsx'],
   transform: {
@@ -38,3 +39,5 @@ module.exports = {
     '!src/test-setup.ts',
   ],
 };
+
+export default config;
