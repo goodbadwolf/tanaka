@@ -7,7 +7,7 @@
   "scripts": {
     "lint:md": "markdownlint-cli2 '*.md' 'docs/*.md' '!repomix-output.txt.md'",
     "lint:md:fix": "markdownlint-cli2 --fix '*.md' 'docs/*.md' '!repomix-output.txt.md'",
-    "generate:types": "cd server && cargo test export_typescript_types -- --nocapture"
+    "gen:api-models": "cd server && TS_RS_EXPORT_DIR=../../extension/src/types/generated cargo test && ./scripts/generate-index.sh ../../extension/src/types/generated"
   },
   "devDependencies": {
     "markdownlint-cli2": "^0.18.1"
