@@ -7,14 +7,14 @@ import { err, ok, Result } from 'neverthrow';
 export async function rspackBuild(mode: string): Promise<Result<void, Error>> {
   return new Promise((resolve) => {
     logger.info(`Running rspack build in ${mode} mode...`);
-    
+
     const env = {
       ...process.env,
       NODE_ENV: 'production',
       BUILD_ENV: mode,
       FORCE_COLOR: '1',
     };
-    
+
     const childProcess = spawn('rspack', ['build'], {
       cwd: projectRoot,
       shell: true,
@@ -55,11 +55,11 @@ export function rspackWatchConfig(mode?: string): ManagedProcess {
   const env: Record<string, string> = {
     NODE_ENV: 'development',
   };
-  
+
   if (mode) {
     env.BUILD_ENV = mode;
   }
-  
+
   return {
     name: 'rspack watch',
     command: 'rspack',
@@ -73,11 +73,11 @@ export function rspackServeConfig(mode?: string): ManagedProcess {
   const env: Record<string, string> = {
     NODE_ENV: 'development',
   };
-  
+
   if (mode) {
     env.BUILD_ENV = mode;
   }
-  
+
   return {
     name: 'rspack serve',
     command: 'rspack',

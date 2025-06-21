@@ -23,7 +23,7 @@ export function useSettings() {
 
   const saveAuthToken = useCallback(async (token: string) => {
     const trimmedToken = token.trim();
-    
+
     if (!trimmedToken) {
       setSaveStatus({
         type: 'error',
@@ -39,7 +39,7 @@ export function useSettings() {
     try {
       await browser.storage.local.set({ authToken: trimmedToken });
       await browser.runtime.sendMessage({ type: 'SETTINGS_UPDATED' });
-      
+
       setSaveStatus({
         type: 'success',
         message: 'Authentication saved successfully',
