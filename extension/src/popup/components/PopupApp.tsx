@@ -1,4 +1,3 @@
-import { h } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 import { WindowTracker } from './WindowTracker';
 import browser from 'webextension-polyfill';

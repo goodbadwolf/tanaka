@@ -14,7 +14,7 @@ export function useSettings() {
   // Load current settings
   useEffect(() => {
     const loadSettings = async () => {
-      const result = await browser.storage.local.get(['authToken']);
+      const result = await browser.storage.local.get(['authToken']) as { authToken?: string };
       setAuthToken(result.authToken || '');
     };
 

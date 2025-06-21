@@ -1,4 +1,3 @@
-import { h } from 'preact';
 import { useSettings } from '../hooks/useSettings';
 import { getConfig } from '../../config/index.js';
 import browser from 'webextension-polyfill';
