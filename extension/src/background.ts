@@ -1,6 +1,6 @@
 import browser from 'webextension-polyfill';
 import * as Y from 'yjs';
-import type { Message, MessageResponse } from './types.js';
+import type { Message, MessageResponse } from './core.js';
 
 // Initialize Yjs document for tab state
 const doc = new Y.Doc();
