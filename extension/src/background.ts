@@ -1,6 +1,6 @@
 import browser from 'webextension-polyfill';
 import * as Y from 'yjs';
-import type { Message, MessageResponse } from './core.js';
+import { asMessage, type MessageResponse } from './core.js';
 
 // Initialize Yjs document for tab state
 const doc = new Y.Doc();
@@ -54,11 +54,10 @@ browser.windows.onRemoved.addListener(async (windowId) => {
 
 // Message handler for popup
 browser.runtime.onMessage.addListener(async (message: unknown): Promise<MessageResponse> => {
-  if (typeof message !== 'object' || message === null || !('type' in message)) {
+  const msg = asMessage(message);
+  if (!msg) {
     return { error: 'Invalid message format' };
   }
-
-  const msg = message as Message;
 
   switch (msg.type) {
     case 'TRACK_WINDOW':
