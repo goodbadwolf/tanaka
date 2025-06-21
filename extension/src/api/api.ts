@@ -1,5 +1,14 @@
 import browser from 'webextension-polyfill';
 
+export interface TabData {
+  url: string;
+  title: string;
+  favIconUrl: string;
+  index: number;
+  pinned: boolean;
+  active: boolean;
+}
+
 export interface Tab {
   id: string;
   window_id: string;
@@ -15,6 +24,17 @@ interface SyncResponse {
   tabs: Tab[];
 }
 
+export class APIError extends Error {
+  constructor(
+    message: string,
+    public readonly status?: number,
+    public readonly statusText?: string,
+  ) {
+    super(message);
+    this.name = 'APIError';
+  }
+}
+
 export class TanakaAPI {
   private baseUrl: URL;
   private token: string;
@@ -23,45 +43,69 @@ export class TanakaAPI {
     try {
       this.baseUrl = new URL(baseUrl);
     } catch {
-      throw new Error(`Invalid server URL: ${baseUrl}`);
+      throw new APIError(`Invalid server URL: ${baseUrl}`);
     }
     this.token = token;
   }
 
   updateConfig(baseUrl: string, token: string) {
     if (!baseUrl) {
-      throw new Error('Invalid base URL');
+      throw new APIError('Invalid base URL');
     }
     if (!token) {
-      throw new Error('Invalid token');
+      throw new APIError('Invalid token');
     }
 
     try {
       this.baseUrl = new URL(baseUrl);
     } catch {
-      throw new Error(`Invalid server URL: ${baseUrl}`);
+      throw new APIError(`Invalid server URL: ${baseUrl}`);
     }
     this.token = token;
   }
 
-  async syncTabs(tabs: Tab[]): Promise<Tab[]> {
-    const url = new URL('/sync', this.baseUrl);
+  private getHeaders(additionalHeaders: Record<string, string> = {}): Record<string, string> {
+    return {
+      Authorization: `Bearer ${this.token}`,
+      ...additionalHeaders,
+    };
+  }
 
+  private async request<T>(path: string, options: RequestInit = {}): Promise<T> {
+    const url = new URL(path, this.baseUrl);
+
+    const response = await fetch(url.toString(), {
+      ...options,
+      headers: {
+        ...this.getHeaders(options.headers as Record<string, string>),
+      },
+    });
+
+    if (!response.ok) {
+      throw new APIError(
+        `Server error: ${response.status} ${response.statusText}`,
+        response.status,
+        response.statusText,
+      );
+    }
+
+    if (response.headers.get('content-type')?.includes('application/json')) {
+      return response.json() as Promise<T>;
+    }
+
+    return response as unknown as T;
+  }
+
+  async syncTabs(tabs: Tab[]): Promise<Tab[]> {
     try {
-      const response = await fetch(url.toString(), {
+      const data = await this.request<SyncResponse>('/sync', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.token}`,
         },
         body: JSON.stringify({ tabs } as SyncRequest),
       });
 
-      if (!response.ok) {
-        throw new Error(`Server error: ${response.status} ${response.statusText}`);
-      }
-
-      const data: SyncResponse = await response.json();
       return data.tabs;
     } catch (error) {
       console.error('Sync failed:', error);
@@ -70,32 +114,39 @@ export class TanakaAPI {
   }
 
   async checkHealth(): Promise<boolean> {
-    const url = new URL('/health', this.baseUrl);
-
     try {
-      const response = await fetch(url.toString());
-      return response.ok;
+      await this.request('/health');
+      return true;
     } catch {
       return false;
     }
   }
 }
 
-// Convert browser tab to our Tab format
 export function browserTabToSyncTab(tab: browser.Tabs.Tab, windowId: number): Tab | null {
   if (!tab.id || !tab.url) return null;
+
+  const tabData: TabData = {
+    url: tab.url,
+    title: tab.title || '',
+    favIconUrl: tab.favIconUrl || '',
+    index: tab.index,
+    pinned: tab.pinned,
+    active: tab.active,
+  };
 
   return {
     id: `tab-${tab.id}`,
     window_id: `window-${windowId}`,
-    data: JSON.stringify({
-      url: tab.url,
-      title: tab.title || '',
-      favIconUrl: tab.favIconUrl || '',
-      index: tab.index,
-      pinned: tab.pinned,
-      active: tab.active,
-    }),
+    data: JSON.stringify(tabData),
     updated_at: Date.now(),
   };
+}
+
+export function parseSyncTab(tab: Tab): TabData | null {
+  try {
+    return JSON.parse(tab.data) as TabData;
+  } catch {
+    return null;
+  }
 }
