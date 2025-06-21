@@ -6,6 +6,7 @@ export interface ManagedProcess {
   command: string;
   args: string[];
   errorMessage: string;
+  env?: Record<string, string>;
 }
 
 export class ProcessManager {
@@ -17,7 +18,11 @@ export class ProcessManager {
   ): ChildProcess {
     logger.info(`Starting ${config.name}...`);
 
-    const proc = spawn(config.command, config.args, options);
+    const spawnOptions = config.env 
+      ? { ...options, env: { ...process.env, ...config.env } }
+      : options;
+
+    const proc = spawn(config.command, config.args, spawnOptions);
     this.processes.set(config.name, proc);
 
     proc.on('error', (error) => {
