@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from '@jest/globals';
-import { WindowTracker } from '../sync/window-tracker';
+import { WindowTracker } from '../window-tracker';
 
 describe('WindowTracker', () => {
   let tracker: WindowTracker;

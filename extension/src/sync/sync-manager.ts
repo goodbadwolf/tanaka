@@ -1,6 +1,6 @@
 import browser from 'webextension-polyfill';
-import { TanakaAPI, browserTabToSyncTab, type Tab } from '../api/api.js';
-import type { WindowTracker } from './window-tracker.js';
+import { TanakaAPI, browserTabToSyncTab, type Tab } from '../api/api';
+import type { WindowTracker } from './window-tracker';
 
 export class SyncManager {
   private syncInterval: number | null = null;

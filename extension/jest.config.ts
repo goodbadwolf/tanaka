@@ -20,7 +20,7 @@ const config: Config = {
     }],
   },
   transformIgnorePatterns: [
-    'node_modules/(?!(preact|@testing-library/preact)/)',
+    'node_modules/(?!(preact|@testing-library)/)',
   ],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
@@ -28,6 +28,11 @@ const config: Config = {
     '^react-dom$': 'preact/compat',
     '^react/jsx-runtime$': 'preact/jsx-runtime',
     '\\.(css|less|scss|sass)$': '<rootDir>/src/__mocks__/styleMock.ts',
+    '@testing-library/preact': '<rootDir>/src/__mocks__/@testing-library/preact.tsx',
+    '^preact/hooks$': '<rootDir>/src/__mocks__/preact/hooks.ts',
+    '^preact/compat$': '<rootDir>/src/__mocks__/preact/compat.ts',
+    '^preact/jsx-runtime$': '<rootDir>/src/__mocks__/preact/jsx-runtime.ts',
+    '^preact$': '<rootDir>/src/__mocks__/preact.ts',
   },
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
   testMatch: [
