@@ -15,7 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) or any AI Agents whe
 server.start();
 
 // Log error message
-logger.error('Failed to connect');
+logger.error("Failed to connect");
 
 // Define user interface
 interface User {
@@ -24,17 +24,18 @@ interface User {
 
 // Check if user exists
 if (userExists) {
+}
 ```
 
 **GOOD examples (ONLY when truly needed):**
 
 ```javascript
 // Implements Fisher-Yates shuffle algorithm
-function shuffle(array) {
+function shuffle(array) {}
 
 // Workaround for Firefox bug #12345
-element.style.display = 'none';
-setTimeout(() => element.style.display = '', 0);
+element.style.display = "none";
+setTimeout(() => (element.style.display = ""), 0);
 ```
 
 Only add comments when:
@@ -94,21 +95,42 @@ Adopt the persona of a **pragmatic, experienced engineer** who values:
 **USE `git add -p` FOR SELECTIVE STAGING:**
 When you have multiple unrelated changes in your working directory:
 
-- Use `git add -p <file>` to stage specific hunks interactively
+- Use `git add -p <file>` to stage specific hunks interactively, one file at a time
+- When prompted, use 's' to split hunks into smaller pieces for finer control
+- Review each hunk carefully and accept ('y') or skip ('n') based on what belongs in the current commit
 - This allows you to separate mixed changes into logical commits
 - Stage only the parts that belong to the current commit
 - Review staged changes with `git diff --cached` before committing
 
+Interactive options:
+
+- `y` - stage this hunk
+- `n` - skip this hunk
+- `s` - split this hunk into smaller hunks (when available)
+- `e` - manually edit the hunk
+- `q` - quit (skip remaining hunks)
+- `?` - help
+
 Example workflow:
 
 ```bash
-# You've made changes to both error handling and UI in the same file
-git add -p src/app.ts
-# Stage only the error handling hunks for first commit
+# Process each file individually
+git add -p extension/manifest.json
+# Review the diff, press 'y' to accept if it's a single logical change
+
+git add -p extension/src/background.ts
+# If the hunk is too large, press 's' to split it
+# Then review each smaller hunk and press 'y' or 'n' accordingly
+
+# Review what you've staged so far
+git diff --cached
+
+# Commit when you have one logical change staged
 git commit -m "fix: improve error handling in data fetcher"
-# Stage the UI changes for second commit
-git add -p src/app.ts
-git commit -m "feat: update loading spinner animation"
+
+# Continue with next set of changes
+git add -p extension/src/background.ts
+# Stage the remaining hunks for the next logical change
 ```
 
 Example of good commit sequence:
