@@ -1,33 +1,52 @@
 import browser from 'webextension-polyfill';
+import type { Message, MessageResponse } from './types.js';
 
 const trackWindowCheckbox = document.getElementById('track-window') as HTMLInputElement;
-const _statusDiv = document.getElementById('status') as HTMLDivElement;
+const statusDiv = document.getElementById('status') as HTMLDivElement;
 
 // Get current window tracking status
 async function updateUI() {
   const currentWindow = await browser.windows.getCurrent();
-  const response = await browser.runtime.sendMessage({
-    type: 'GET_TRACKED_WINDOWS',
-  });
+  if (!currentWindow.id) {
+    console.error('Current window has no ID');
+    return;
+  }
 
-  const trackedWindows = response.windowIds || [];
-  trackWindowCheckbox.checked = trackedWindows.includes(currentWindow.id);
+  const message: Message = { type: 'GET_TRACKED_WINDOWS' };
+  const response = (await browser.runtime.sendMessage(message)) as MessageResponse;
+
+  if ('windowIds' in response) {
+    trackWindowCheckbox.checked = response.windowIds.includes(currentWindow.id);
+  } else if ('error' in response) {
+    console.error('Error getting tracked windows:', response.error);
+    statusDiv.textContent = 'Error: ' + response.error;
+  }
 }
 
 // Handle checkbox change
 trackWindowCheckbox.addEventListener('change', async () => {
   const currentWindow = await browser.windows.getCurrent();
+  if (!currentWindow.id) {
+    console.error('Current window has no ID');
+    trackWindowCheckbox.checked = !trackWindowCheckbox.checked;
+    return;
+  }
 
-  if (trackWindowCheckbox.checked) {
-    await browser.runtime.sendMessage({
-      type: 'TRACK_WINDOW',
-      windowId: currentWindow.id,
-    });
+  const message: Message = trackWindowCheckbox.checked
+    ? { type: 'TRACK_WINDOW', windowId: currentWindow.id }
+    : { type: 'UNTRACK_WINDOW', windowId: currentWindow.id };
+
+  const response = (await browser.runtime.sendMessage(message)) as MessageResponse;
+
+  if ('error' in response) {
+    console.error('Error updating window tracking:', response.error);
+    statusDiv.textContent = 'Error: ' + response.error;
+    // Revert checkbox state on error
+    trackWindowCheckbox.checked = !trackWindowCheckbox.checked;
   } else {
-    await browser.runtime.sendMessage({
-      type: 'UNTRACK_WINDOW',
-      windowId: currentWindow.id,
-    });
+    statusDiv.textContent = trackWindowCheckbox.checked
+      ? 'This window is being synced'
+      : 'This window is not being synced';
   }
 });
 

@@ -43,7 +43,7 @@ export function setupProcessHandlers(cleanup: () => void): void {
   });
 }
 
-export function exitWithError(message: string, error?: any): never {
+export function exitWithError(message: string, error?: unknown): never {
   if (error) {
     logger.error({ err: error }, message);
   } else {
