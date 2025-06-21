@@ -2,11 +2,11 @@
 import { Result } from 'neverthrow';
 import { setupProcessHandlers, exitWithError, sleep, runCLI } from './common.js';
 import { ProcessManager } from './process-utils.js';
-import { copyStaticAssets, runStages, Stage } from './stages.js';
+import { runStages, Stage, createCopyStaticAssetsStage } from './stages.js';
 import { viteWatchConfig, webExtConfig } from './vite-utils.js';
 
 async function preDev(): Promise<Result<void, Error>> {
-  const devStages: Stage[] = [copyStaticAssets];
+  const devStages: Stage[] = [createCopyStaticAssetsStage()];
   const result = await runStages(devStages, 'pre-dev');
   return result;
 }
