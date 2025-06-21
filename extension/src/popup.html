@@ -18,6 +18,19 @@
         </label>
       </div>
 
+      <div class="config">
+        <h2>Server Configuration</h2>
+        <div class="form-group">
+          <label for="server-url">Server URL</label>
+          <input type="text" id="server-url" placeholder="http://localhost:3000" />
+        </div>
+        <div class="form-group">
+          <label for="server-token">Auth Token</label>
+          <input type="password" id="server-token" placeholder="Your token" />
+        </div>
+        <button id="save-config" class="save-btn">Save Configuration</button>
+      </div>
+
       <div class="status" id="status">
         <p>Not connected to server</p>
       </div>
