@@ -1,12 +1,15 @@
 import browser from 'webextension-polyfill';
 import * as Y from 'yjs';
+import type { Message, MessageResponse } from './types.js';
 
 // Initialize Yjs document for tab state
 const doc = new Y.Doc();
-const _tabsMap = doc.getMap('tabs');
-const _windowsMap = doc.getMap('windows');
+const tabsMap = doc.getMap('tabs');
+const windowsMap = doc.getMap('windows');
 
 // TODO: Use tabsMap and windowsMap for syncing state
+void tabsMap;
+void windowsMap;
 
 // Track which windows are being synced
 const trackedWindows = new Set<number>();
@@ -50,17 +53,23 @@ browser.windows.onRemoved.addListener(async (windowId) => {
 });
 
 // Message handler for popup
-browser.runtime.onMessage.addListener(async (message: any) => {
-  switch (message.type) {
+browser.runtime.onMessage.addListener(async (message: unknown): Promise<MessageResponse> => {
+  if (typeof message !== 'object' || message === null || !('type' in message)) {
+    return { error: 'Invalid message format' };
+  }
+
+  const msg = message as Message;
+
+  switch (msg.type) {
     case 'TRACK_WINDOW':
-      trackedWindows.add(message.windowId);
-      console.log('Now tracking window:', message.windowId);
+      trackedWindows.add(msg.windowId);
+      console.log('Now tracking window:', msg.windowId);
       // TODO: Add window to Yjs doc and sync
       return { success: true };
 
     case 'UNTRACK_WINDOW':
-      trackedWindows.delete(message.windowId);
-      console.log('Stopped tracking window:', message.windowId);
+      trackedWindows.delete(msg.windowId);
+      console.log('Stopped tracking window:', msg.windowId);
       // TODO: Remove window from Yjs doc and sync
       return { success: true };
 
