@@ -1,6 +1,6 @@
 import browser from 'webextension-polyfill';
-import type { WindowTracker } from './WindowTracker.js';
-import type { SyncManager } from './SyncManager.js';
+import type { WindowTracker } from './window-tracker.js';
+import type { SyncManager } from './sync-manager.js';
 
 export class TabEventHandler {
   constructor(
