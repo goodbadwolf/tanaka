@@ -6,7 +6,7 @@ import { err, ok, Result } from 'neverthrow';
 
 export async function rspackBuild(mode: string): Promise<Result<void, Error>> {
   return new Promise((resolve) => {
-    logger.info(`Running rspack build in ${mode} mode...`);
+    logger.info(`Starting build (${mode} mode)...`);
 
     const env = {
       ...process.env,
@@ -37,6 +37,7 @@ export async function rspackBuild(mode: string): Promise<Result<void, Error>> {
       rlOut.close();
       rlErr.close();
       if (code === 0) {
+        logger.info('Build completed successfully!');
         resolve(ok(undefined));
       } else {
         resolve(err(new Error(`Build failed with exit code ${code}`)));
