@@ -1,0 +1,67 @@
+import { asMessage, type Message, type MessageResponse } from '../core.js';
+import type { WindowTracker } from './WindowTracker.js';
+import type { SyncManager } from './SyncManager.js';
+import type { ConfigManager } from './ConfigManager.js';
+
+export class MessageHandler {
+  constructor(
+    private readonly windowTracker: WindowTracker,
+    private readonly syncManager: SyncManager,
+    private readonly configManager: ConfigManager,
+  ) {}
+
+  async handleMessage(message: unknown): Promise<MessageResponse> {
+    const msg = asMessage(message);
+    if (!msg) {
+      return { error: 'Invalid message format' };
+    }
+
+    switch (msg.type) {
+      case 'TRACK_WINDOW':
+        return this.handleTrackWindow(msg);
+
+      case 'UNTRACK_WINDOW':
+        return this.handleUntrackWindow(msg);
+
+      case 'GET_TRACKED_WINDOWS':
+        return this.handleGetTrackedWindows();
+
+      case 'CONFIG_UPDATED':
+        return this.handleConfigUpdated();
+
+      default:
+        return { error: 'Unknown message type' };
+    }
+  }
+
+  private handleTrackWindow(msg: Message & { type: 'TRACK_WINDOW' }): MessageResponse {
+    this.windowTracker.track(msg.windowId);
+    console.log('Now tracking window:', msg.windowId);
+    this.syncManager.start();
+    return { success: true };
+  }
+
+  private async handleUntrackWindow(
+    msg: Message & { type: 'UNTRACK_WINDOW' },
+  ): Promise<MessageResponse> {
+    this.windowTracker.untrack(msg.windowId);
+    console.log('Stopped tracking window:', msg.windowId);
+
+    if (this.windowTracker.getTrackedCount() === 0) {
+      this.syncManager.stop();
+    } else {
+      await this.syncManager.syncNow();
+    }
+    return { success: true };
+  }
+
+  private handleGetTrackedWindows(): MessageResponse {
+    return { windowIds: this.windowTracker.getTrackedWindows() };
+  }
+
+  private async handleConfigUpdated(): Promise<MessageResponse> {
+    await this.configManager.loadConfig();
+    console.log('Configuration updated');
+    return { success: true };
+  }
+}
