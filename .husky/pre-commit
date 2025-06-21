@@ -1,3 +1,3 @@
 pnpm run lint:md
 cd extension && pnpm exec lint-staged
-cd ../server && cargo fmt -- --check && cargo clippy -- -D warnings
+cd ../server && cargo fmt -- --check && cargo clippy --all-targets --all-features -- -D warnings

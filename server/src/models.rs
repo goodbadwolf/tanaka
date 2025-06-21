@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 pub struct Tab {
     pub id: String,
     pub window_id: String,
-    pub tab_data: String,
+    pub data: String,
     pub updated_at: i64,
 }
 
