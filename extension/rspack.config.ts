@@ -1,13 +1,15 @@
-const { defineConfig } = require('@rspack/cli');
-const { rspack } = require('@rspack/core');
-const RefreshPlugin = require('@rspack/plugin-react-refresh');
-const HtmlRspackPlugin = require('html-rspack-plugin');
-const { resolve } = require('path');
+import { defineConfig } from '@rspack/cli';
+import { rspack } from '@rspack/core';
+import RefreshPlugin from '@rspack/plugin-react-refresh';
+import HtmlRspackPlugin from 'html-rspack-plugin';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
 const isDev = process.env.NODE_ENV === 'development';
 const buildEnv = process.env.BUILD_ENV || 'development';
 
-module.exports = defineConfig({
+export default defineConfig({
   context: __dirname,
   mode: isDev ? 'development' : 'production',
 
