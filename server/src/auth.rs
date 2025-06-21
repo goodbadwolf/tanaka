@@ -1,6 +1,6 @@
 use axum::{extract::Request, http::StatusCode, middleware::Next, response::Response};
 
-const BEARER_TOKEN: &str = "tanaka-secret-token"; // Test comment
+const BEARER_TOKEN: &str = "tanaka-secret-token";
 
 pub async fn auth_middleware(req: Request, next: Next) -> Result<Response, StatusCode> {
     let auth_header = req
