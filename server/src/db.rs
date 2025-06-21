@@ -1,7 +1,6 @@
 use sqlx::{sqlite::SqlitePoolOptions, SqlitePool};
 
 pub async fn init_db() -> Result<SqlitePool, sqlx::Error> {
-    // Create database file if it doesn't exist
     let _ = tokio::fs::File::create("tabs.db").await;
 
     let pool = SqlitePoolOptions::new()
@@ -9,7 +8,6 @@ pub async fn init_db() -> Result<SqlitePool, sqlx::Error> {
         .connect("sqlite:tabs.db")
         .await?;
 
-    // Set WAL mode and busy timeout
     sqlx::query("PRAGMA journal_mode = WAL")
         .execute(&pool)
         .await?;
@@ -18,7 +16,6 @@ pub async fn init_db() -> Result<SqlitePool, sqlx::Error> {
         .execute(&pool)
         .await?;
 
-    // Create tables
     sqlx::query(
         r"
         CREATE TABLE IF NOT EXISTS tabs (
