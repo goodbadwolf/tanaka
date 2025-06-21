@@ -1,5 +1,6 @@
 import browser from 'webextension-polyfill';
 import type { Tab, SyncRequest, SyncResponse } from './models';
+import { DEFAULT_CONFIG } from '../config/defaults';
 
 export type { Tab };
 
@@ -27,7 +28,10 @@ export class TanakaAPI {
   private baseUrl: URL;
   private token: string;
 
-  constructor(baseUrl: string = 'http://localhost:3000', token: string = 'tanaka-secret-token') {
+  constructor(
+    baseUrl: string = DEFAULT_CONFIG.serverUrl,
+    token: string = DEFAULT_CONFIG.authToken,
+  ) {
     try {
       this.baseUrl = new URL(baseUrl);
     } catch {

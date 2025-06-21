@@ -1,5 +1,6 @@
 import browser from 'webextension-polyfill';
 import type { TanakaAPI } from '../api';
+import { DEFAULT_CONFIG } from '../config/defaults';
 
 export interface Config {
   serverUrl: string;
@@ -7,16 +8,13 @@ export interface Config {
 }
 
 export class ConfigManager {
-  private static readonly DEFAULT_SERVER_URL = 'http://localhost:3000';
-  private static readonly DEFAULT_AUTH_TOKEN = 'tanaka-secret-token';
-
   constructor(private readonly api: TanakaAPI) {}
 
   async loadConfig(): Promise<Config> {
     const stored = await browser.storage.local.get(['serverUrl', 'authToken']);
     const config: Config = {
-      serverUrl: (stored.serverUrl as string) || ConfigManager.DEFAULT_SERVER_URL,
-      authToken: (stored.authToken as string) || ConfigManager.DEFAULT_AUTH_TOKEN,
+      serverUrl: (stored.serverUrl as string) || DEFAULT_CONFIG.serverUrl,
+      authToken: (stored.authToken as string) || DEFAULT_CONFIG.authToken,
     };
 
     this.api.updateConfig(config.serverUrl, config.authToken);

@@ -16,3 +16,7 @@ Thumbs.db
 
 # Generated TypeScript types from Rust
 src/api/models/generated/*.ts
+
+# Environment variables
+.env
+.env.local
