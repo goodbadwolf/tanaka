@@ -2,20 +2,23 @@
 name = "tanaka-server"
 version = "0.1.0"
 edition = "2021"
-
-# Aliases for common commands
-[alias]
-check-all = "clippy -- -D warnings"
-fmt-check = "fmt -- --check"
+description = "CRDT-based tab synchronization server for Firefox"
+license = "MIT"
+repository = "https://github.com/goodbadwolf/tanaka"
+readme = "../README.md"
+keywords = ["sync", "tabs", "crdt", "firefox"]
+categories = ["web-programming::http-server"]
 
 [lints.clippy]
 all = { level = "warn", priority = -1 }
 pedantic = { level = "warn", priority = -1 }
 nursery = { level = "warn", priority = -1 }
+cargo = { level = "warn", priority = -1 }
 # Allow some common patterns
 module_name_repetitions = "allow"
 must_use_candidate = "allow"
-struct_field_names = "allow"
+# Allow multiple versions of dependencies (not under our control)
+multiple_crate_versions = "allow"
 
 [dependencies]
 axum = { version = "0.7", features = ["json"] }

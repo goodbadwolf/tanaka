@@ -24,7 +24,7 @@ pub async fn init_db() -> Result<SqlitePool, sqlx::Error> {
         CREATE TABLE IF NOT EXISTS tabs (
             id TEXT PRIMARY KEY,
             window_id TEXT NOT NULL,
-            tab_data TEXT NOT NULL,
+            data TEXT NOT NULL,
             updated_at INTEGER NOT NULL
         )
         ",
