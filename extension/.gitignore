@@ -20,3 +20,7 @@ src/api/models/generated/*.ts
 # Rspack
 .rspack/
 rspack-bundle-analyzer/
+
+# Migration artifacts
+dist-backup-vite/
+bundle-sizes-before.txt
