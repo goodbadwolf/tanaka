@@ -170,6 +170,7 @@ For installation and setup instructions, see [@docs/INSTALL.md](docs/INSTALL.md)
 - Run `cargo fmt` and `pnpm run lint` before suggesting code changes
 - Prefer editing existing files over creating new ones
 - When modifying extension code, ensure compatibility with Firefox WebExtension APIs
+- TypeScript types are generated from Rust models using ts-rs - import from `types/generated`
 
 ### Project Structure
 
@@ -237,6 +238,8 @@ When working with this codebase:
 - To modify tab sync behavior: Look at `/extension/src/sync/`
 - For configuration changes: Update both `server/config/example.toml` and docs
 - When adding dependencies: Update `Cargo.toml` or `package.json` appropriately
+- To generate TypeScript types from Rust models: Run `pnpm run gen:api-models`
+- To add new shared types: Add `#[derive(TS)]` and `#[ts(export)]` to Rust structs in `/server/src/models.rs`
 
 ### Misc
 
