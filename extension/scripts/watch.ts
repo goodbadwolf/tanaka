@@ -7,7 +7,8 @@ async function watch(): Promise<void> {
   logger.info('Starting watch mode...');
 
   const pm = new ProcessManager();
-  const mode = process.argv.find((arg) => arg.startsWith('--mode='))?.split('=')[1] || 'development';
+  const mode =
+    process.argv.find((arg) => arg.startsWith('--mode='))?.split('=')[1] || 'development';
   pm.spawn(rspackWatchConfig(mode));
   setupProcessHandlers(() => pm.killAll());
 }
