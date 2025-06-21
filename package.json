@@ -7,7 +7,7 @@
   "scripts": {
     "lint:md": "markdownlint-cli2 '*.md' 'docs/*.md' '!repomix-output.txt.md'",
     "lint:md:fix": "markdownlint-cli2 --fix '*.md' 'docs/*.md' '!repomix-output.txt.md'",
-    "generate:types": "cd server && cargo run --bin generate_types"
+    "generate:types": "cd server && cargo test export_typescript_types -- --nocapture"
   },
   "devDependencies": {
     "markdownlint-cli2": "^0.18.1"
