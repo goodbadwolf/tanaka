@@ -10,7 +10,7 @@ export interface ManagedProcess {
 }
 
 export class ProcessManager {
-  private processes: Map<string, ChildProcess> = new Map();
+  private processes = new Map<string, ChildProcess>();
 
   spawn(
     config: ManagedProcess,

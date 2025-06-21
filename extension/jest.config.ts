@@ -1,5 +1,6 @@
-/** @type {import('jest').Config} */
-module.exports = {
+import type { Config } from 'jest';
+
+const config: Config = {
   testEnvironment: 'jsdom',
   extensionsToTreatAsEsm: ['.ts', '.tsx'],
   transform: {
@@ -26,7 +27,7 @@ module.exports = {
     '^react$': 'preact/compat',
     '^react-dom$': 'preact/compat',
     '^react/jsx-runtime$': 'preact/jsx-runtime',
-    '\\.(css|less|scss|sass)$': '<rootDir>/src/__mocks__/styleMock.js',
+    '\\.(css|less|scss|sass)$': '<rootDir>/src/__mocks__/styleMock.ts',
   },
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
   testMatch: [
@@ -38,3 +39,5 @@ module.exports = {
     '!src/test-setup.ts',
   ],
 };
+
+export default config;

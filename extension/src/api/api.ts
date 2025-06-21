@@ -25,7 +25,7 @@ export class APIError extends Error {
 
 export class TanakaAPI {
   private baseUrl: URL;
-  private token: string = 'unset-token';
+  private token = 'unset-token';
 
   constructor(baseUrl: string) {
     try {
