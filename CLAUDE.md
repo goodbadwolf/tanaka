@@ -229,3 +229,32 @@ When working with this codebase:
 ### Git Workflow
 
 Refer to [@docs/GIT.md](docs/GIT.md) for git workflow guidelines
+
+### Git Staging Best Practices
+
+**NEVER use `git add -A` or `git add .`** - these commands can stage unrelated changes accidentally.
+
+Instead:
+- Stage files individually with their full paths: `git add /path/to/file1 /path/to/file2`
+- Use `git add -p <file>` for selective staging when you have mixed changes
+- Always review staged changes with `git diff --cached` before committing
+
+**Good example:**
+```bash
+# Stage specific files
+git add /Users/manish/projects/tanaka/extension/src/background.ts
+git add /Users/manish/projects/tanaka/extension/src/core.ts
+
+# Review what's staged
+git diff --cached
+
+# Then commit
+git commit -m "refactor: simplify message validation"
+```
+
+**Bad example:**
+```bash
+# DON'T DO THIS - stages everything including unintended files
+git add -A
+git commit -m "refactor: simplify message validation"
+```
