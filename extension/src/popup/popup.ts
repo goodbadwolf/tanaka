@@ -1,5 +1,6 @@
 import browser from 'webextension-polyfill';
 import type { Message, MessageResponse } from '../core.js';
+import './popup.css';
 
 const trackWindowCheckbox = document.getElementById('track-window') as HTMLInputElement;
 const statusDiv = document.getElementById('status') as HTMLDivElement;
