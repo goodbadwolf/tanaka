@@ -1,13 +1,17 @@
 import { asMessage, type Message, type MessageResponse } from '../core.js';
 import type { WindowTracker } from './WindowTracker.js';
 import type { SyncManager } from './SyncManager.js';
-import type { ConfigManager } from './ConfigManager.js';
+import type { ConfigManager } from './config.js';
+import type { UserSettingsManager } from './user-settings.js';
+import type { TanakaAPI } from '../api';
 
 export class MessageHandler {
   constructor(
     private readonly windowTracker: WindowTracker,
     private readonly syncManager: SyncManager,
     private readonly configManager: ConfigManager,
+    private readonly userSettingsManager: UserSettingsManager,
+    private readonly api: TanakaAPI,
   ) {}
 
   async handleMessage(message: unknown): Promise<MessageResponse> {
@@ -60,7 +64,11 @@ export class MessageHandler {
   }
 
   private async handleConfigUpdated(): Promise<MessageResponse> {
-    await this.configManager.loadConfig();
+    const [config, settings] = await Promise.all([
+      this.configManager.load(),
+      this.userSettingsManager.load(),
+    ]);
+    this.api.updateConfig(config.serverUrl, settings.authToken);
     console.log('Configuration updated');
     return { success: true };
   }
