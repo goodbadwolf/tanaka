@@ -3,6 +3,8 @@ import type { Config } from 'jest';
 const config: Config = {
   testEnvironment: 'jsdom',
   extensionsToTreatAsEsm: ['.ts', '.tsx'],
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
+  resolver: '<rootDir>/jest.resolver.cjs',
   transform: {
     '^.+\\.(t|j)sx?$': ['@swc/jest', {
       jsc: {
@@ -24,6 +26,8 @@ const config: Config = {
   ],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
+    '^@env$': '<rootDir>/src/__mocks__/@env.ts',
+    '^.*/sync$': '<rootDir>/src/__mocks__/sync.ts',
     '^react$': 'preact/compat',
     '^react-dom$': 'preact/compat',
     '^react/jsx-runtime$': 'preact/jsx-runtime',
