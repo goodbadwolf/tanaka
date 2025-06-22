@@ -261,6 +261,7 @@ When working with this codebase:
    - Pass dependencies as constructor parameters or function arguments
    - Avoid hardcoded dependencies or global imports within classes
    - This allows easy mocking during tests
+
    ```typescript
    // Good - dependencies injected
    class SyncManager {
@@ -291,6 +292,7 @@ When working with this codebase:
 ### Test Development Workflow
 
 **When modifying existing code:**
+
 1. **Run existing tests first** to understand current behavior
 2. **Read the tests** before changing code - they document expected behavior
 3. **Update tests BEFORE changing implementation** (TDD approach)
@@ -298,6 +300,7 @@ When working with this codebase:
 5. **Refactor tests** if the code structure changes significantly
 
 **When adding new features:**
+
 1. **Write interface/API first** - how will this be used?
 2. **Write tests for the interface** - what should it do?
 3. **Implement the simplest solution** that makes tests pass
@@ -312,6 +315,7 @@ When working with this codebase:
    - Focus on public APIs and observable behavior
 
 2. **Use Descriptive Test Names**
+
    ```typescript
    // Good
    it('should return error when API responds with 500')
@@ -321,6 +325,7 @@ When working with this codebase:
    ```
 
 3. **Arrange-Act-Assert Pattern**
+
    ```typescript
    it('should track window when TRACK_WINDOW message received', () => {
      // Arrange
@@ -350,6 +355,7 @@ When working with this codebase:
 ### Code Design for Testability
 
 1. **Constructor Injection Pattern**
+
    ```typescript
    // Testable design
    class BackgroundService {

@@ -2,6 +2,30 @@
 node_modules/
 .pnpm-debug.log*
 
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Editor directories
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# System files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
 # Repomix
 .repomix/
 repomix-output.*
@@ -10,5 +34,7 @@ repomix-output.*
 AGENTS.md
 .claude/
 
-# Local
-.DS_Store
+# Environment variables
+.env
+.env.local
+.env.*.local
