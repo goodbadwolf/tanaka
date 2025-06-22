@@ -196,8 +196,10 @@ See [@docs/DEV.md](docs/DEV.md#8-essential-commands) for all development command
 
 ### Testing and Validation
 
-- Always run tests before suggesting code changes: `cargo test` for server, `pnpm run lint` for extension
-- When fixing bugs, check if similar issues exist in related code
+- Always run tests before suggesting code changes: `cargo test` for server, `npm test` for extension
+- When fixing bugs, write a test that reproduces the bug first
+- When adding features, write tests BEFORE implementation (TDD)
+- Update related tests when modifying existing code
 - Validate that changes work with both server and extension components
 
 ### Documentation Maintenance
@@ -251,41 +253,154 @@ When working with this codebase:
 - After compacting, read the docs and @CLAUDE.md to refresh your instructions.
 - When you encounter patterns or lessons that would be helpful to remember, proactively suggest adding them to CLAUDE.md or relevant documentation
 
-### Testing Best Practices
+### Writing Testable Code
 
-When adding tests to the extension:
+**Core Principles:**
 
-1. **Mock Organization**: Create mocks in `src/__mocks__/` directory matching the module structure (e.g., `@env.ts`, `sync.ts`)
+1. **Dependency Injection**
+   - Pass dependencies as constructor parameters or function arguments
+   - Avoid hardcoded dependencies or global imports within classes
+   - This allows easy mocking during tests
+   ```typescript
+   // Good - dependencies injected
+   class SyncManager {
+     constructor(private api: TanakaAPI, private tracker: WindowTracker) {}
+   }
+   
+   // Bad - hardcoded dependencies
+   class SyncManager {
+     private api = new TanakaAPI('https://hardcoded.com');
+   }
+   ```
 
-2. **Jest Configuration**:
-   - Use `jest.resolver.cjs` (not `.js`) to handle `.js` extensions in TypeScript imports
-   - Add `moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx']` to jest.config.ts
-   - Map special modules in `moduleNameMapper` (e.g., `'^@env$': '<rootDir>/src/__mocks__/@env.ts'`)
+2. **Single Responsibility**
+   - Each class/function should do ONE thing well
+   - Makes tests focused and easier to write
+   - If a test needs many mocks, the code might be doing too much
 
-3. **Mocking Browser APIs**:
-   - Mock `webextension-polyfill` at the top of test files before any imports
-   - Type browser mocks as `any` to avoid complex type issues
-   - Store event listeners during setup for testing: `let onTabCreatedListener: (tab: browser.Tabs.Tab) => Promise<void>;`
+3. **Pure Functions**
+   - Prefer pure functions that return values based on inputs
+   - Avoid side effects where possible
+   - Side effects should be isolated to specific methods
 
-4. **TypeScript Mock Types**:
-   - Use `as unknown as jest.Mocked<Type>` for complex mocks to avoid type errors
-   - Avoid typing jest.fn with generics like `jest.fn<Promise<void>, []>()` - it causes issues
-   - Simple `jest.fn().mockResolvedValue()` works better than complex typing
+4. **Interface Segregation**
+   - Define minimal interfaces for dependencies
+   - Test against interfaces, not concrete implementations
+   - Makes mocking simpler and tests more maintainable
 
-5. **Test Organization**:
-   - Place tests in `__tests__` folders next to the source files
-   - Name test files with `.test.ts` extension
-   - Group related tests using describe blocks
+### Test Development Workflow
 
-6. **Common Pitfalls**:
-   - Jest may have issues with ES modules from preact - create manual mocks
-   - TypeScript may complain about `mockResolvedValue` expecting `never` - this is a known Jest typing issue
-   - When tests pass but TypeScript complains, consider using `--no-verify` for test commits
+**When modifying existing code:**
+1. **Run existing tests first** to understand current behavior
+2. **Read the tests** before changing code - they document expected behavior
+3. **Update tests BEFORE changing implementation** (TDD approach)
+4. **Add tests for new behavior** before implementing it
+5. **Refactor tests** if the code structure changes significantly
 
-7. **Coverage Goals**:
-   - Aim for high coverage in core business logic (sync, API, etc.)
-   - Entry point files (popup.tsx, settings.tsx) are less critical for unit tests
-   - 60%+ overall coverage is a good target for extensions
+**When adding new features:**
+1. **Write interface/API first** - how will this be used?
+2. **Write tests for the interface** - what should it do?
+3. **Implement the simplest solution** that makes tests pass
+4. **Refactor** while keeping tests green
+5. **Add edge case tests** after basic functionality works
+
+### Test Quality Guidelines
+
+1. **Test Behavior, Not Implementation**
+   - Test WHAT the code does, not HOW it does it
+   - Tests shouldn't break when refactoring internals
+   - Focus on public APIs and observable behavior
+
+2. **Use Descriptive Test Names**
+   ```typescript
+   // Good
+   it('should return error when API responds with 500')
+   
+   // Bad  
+   it('should handle errors')
+   ```
+
+3. **Arrange-Act-Assert Pattern**
+   ```typescript
+   it('should track window when TRACK_WINDOW message received', () => {
+     // Arrange
+     const windowId = 123;
+     const message = { type: 'TRACK_WINDOW', windowId };
+     
+     // Act
+     const result = messageHandler.handleMessage(message);
+     
+     // Assert
+     expect(mockTracker.track).toHaveBeenCalledWith(windowId);
+     expect(result).toEqual({ success: true });
+   });
+   ```
+
+4. **Keep Tests Independent**
+   - Each test should be able to run in isolation
+   - Don't rely on test execution order
+   - Clean up state in beforeEach/afterEach
+
+5. **Test Edge Cases**
+   - Null/undefined inputs
+   - Empty arrays/objects
+   - Error conditions
+   - Boundary values
+
+### Code Design for Testability
+
+1. **Constructor Injection Pattern**
+   ```typescript
+   // Testable design
+   class BackgroundService {
+     constructor(
+       private api: TanakaAPI,
+       private windowTracker: WindowTracker,
+       private syncManager: SyncManager
+     ) {}
+   }
+   
+   // In tests
+   const mockApi = createMockApi();
+   const service = new BackgroundService(mockApi, mockTracker, mockManager);
+   ```
+
+2. **Factory Functions**
+   - Use factories to create complex objects
+   - Makes it easy to create test doubles
+   - Centralizes object creation logic
+
+3. **Avoid Static Methods**
+   - Static methods are hard to mock
+   - Use instance methods or pure functions instead
+
+4. **Return Early, Fail Fast**
+   - Validate inputs at the beginning
+   - Makes error cases easier to test
+   - Reduces nested logic complexity
+
+### When NOT to Test
+
+1. **Third-party library internals** - Trust they work
+2. **Simple getters/setters** - Unless they have logic
+3. **Framework glue code** - Focus on your business logic
+4. **Console.log statements** - Mock console in tests
+5. **Private methods directly** - Test through public API
+
+### Test Maintenance
+
+1. **Update tests when requirements change** - Tests are living documentation
+2. **Delete obsolete tests** - Don't keep tests for deleted features
+3. **Refactor tests** - Apply same quality standards as production code
+4. **Review test coverage** - But don't chase 100% blindly
+5. **Run tests before committing** - Always ensure tests pass
+
+### Red-Green-Refactor Cycle
+
+1. **Red**: Write a failing test for new functionality
+2. **Green**: Write minimal code to make the test pass
+3. **Refactor**: Improve the code while keeping tests green
+4. **Repeat**: Continue for next piece of functionality
 
 ### Git Workflow
 
