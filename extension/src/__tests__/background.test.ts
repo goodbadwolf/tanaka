@@ -9,7 +9,6 @@ jest.mock('../sync');
 // Import mocked dependencies
 import browser from 'webextension-polyfill';
 import { TanakaAPI } from '../api/api';
-import { getConfig } from '../config/index';
 import {
   WindowTracker,
   SyncManager,
@@ -87,7 +86,7 @@ describe('BackgroundService', () => {
     mockUserSettingsManager = {
       load: jest.fn().mockResolvedValue({
         authToken: 'test-token',
-        serverUrl: 'https://test.tanaka.com',
+        syncInterval: 5000,
       }),
     } as any;
     MockedUserSettingsManager.mockImplementation(() => mockUserSettingsManager);
@@ -180,7 +179,7 @@ describe('BackgroundService', () => {
       // Update the mock to return a different token
       mockUserSettingsManager.load.mockResolvedValue({
         authToken: 'new-test-token',
-        serverUrl: 'https://test.tanaka.com',
+        syncInterval: 5000,
       });
 
       const message = { type: 'SETTINGS_UPDATED' };

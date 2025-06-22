@@ -36,7 +36,7 @@ describe('MessageHandler', () => {
       getTrackedCount: jest.fn(),
       isTracked: jest.fn(),
       clear: jest.fn(),
-    } as jest.Mocked<WindowTracker>;
+    } as unknown as jest.Mocked<WindowTracker>;
 
     // Mock SyncManager
     mockSyncManager = {
@@ -44,7 +44,7 @@ describe('MessageHandler', () => {
       stop: jest.fn(),
       syncNow: jest.fn().mockResolvedValue(undefined),
       isRunning: jest.fn(),
-    } as jest.Mocked<SyncManager>;
+    } as unknown as jest.Mocked<SyncManager>;
 
     messageHandler = new MessageHandler(mockWindowTracker, mockSyncManager);
   });

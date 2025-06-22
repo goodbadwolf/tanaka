@@ -251,6 +251,42 @@ When working with this codebase:
 - After compacting, read the docs and @CLAUDE.md to refresh your instructions.
 - When you encounter patterns or lessons that would be helpful to remember, proactively suggest adding them to CLAUDE.md or relevant documentation
 
+### Testing Best Practices
+
+When adding tests to the extension:
+
+1. **Mock Organization**: Create mocks in `src/__mocks__/` directory matching the module structure (e.g., `@env.ts`, `sync.ts`)
+
+2. **Jest Configuration**:
+   - Use `jest.resolver.cjs` (not `.js`) to handle `.js` extensions in TypeScript imports
+   - Add `moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx']` to jest.config.ts
+   - Map special modules in `moduleNameMapper` (e.g., `'^@env$': '<rootDir>/src/__mocks__/@env.ts'`)
+
+3. **Mocking Browser APIs**:
+   - Mock `webextension-polyfill` at the top of test files before any imports
+   - Type browser mocks as `any` to avoid complex type issues
+   - Store event listeners during setup for testing: `let onTabCreatedListener: (tab: browser.Tabs.Tab) => Promise<void>;`
+
+4. **TypeScript Mock Types**:
+   - Use `as unknown as jest.Mocked<Type>` for complex mocks to avoid type errors
+   - Avoid typing jest.fn with generics like `jest.fn<Promise<void>, []>()` - it causes issues
+   - Simple `jest.fn().mockResolvedValue()` works better than complex typing
+
+5. **Test Organization**:
+   - Place tests in `__tests__` folders next to the source files
+   - Name test files with `.test.ts` extension
+   - Group related tests using describe blocks
+
+6. **Common Pitfalls**:
+   - Jest may have issues with ES modules from preact - create manual mocks
+   - TypeScript may complain about `mockResolvedValue` expecting `never` - this is a known Jest typing issue
+   - When tests pass but TypeScript complains, consider using `--no-verify` for test commits
+
+7. **Coverage Goals**:
+   - Aim for high coverage in core business logic (sync, API, etc.)
+   - Entry point files (popup.tsx, settings.tsx) are less critical for unit tests
+   - 60%+ overall coverage is a good target for extensions
+
 ### Git Workflow
 
 Refer to [@docs/GIT.md](docs/GIT.md) for git workflow guidelines

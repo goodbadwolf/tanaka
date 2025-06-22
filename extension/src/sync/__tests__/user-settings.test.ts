@@ -8,11 +8,7 @@ import { UserSettingsManager, type UserSettings } from '../user-settings';
 
 describe('UserSettingsManager', () => {
   let userSettingsManager: UserSettingsManager;
-  let mockStorage: {
-    get: jest.Mock;
-    set: jest.Mock;
-    remove: jest.Mock;
-  };
+  let mockStorage: any;
 
   beforeEach(() => {
     jest.clearAllMocks();
