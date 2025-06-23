@@ -468,6 +468,7 @@ function handleMessage(message: BackgroundMessage): Promise<unknown> {
 ```typescript
 import { Result, ok, err } from "neverthrow";
 
+<<<<<<< HEAD
 enum SyncError {
   NetworkFailure = "NETWORK_FAILURE",
   InvalidData = "INVALID_DATA",
@@ -536,6 +537,15 @@ type BackgroundMessage =
 4. **Loading**: Lazy load non-critical features
 5. **Storage**: Batch writes instead of multiple small writes
 6. **Monitoring**: Use performance marks for critical operations
+=======
+- After compacting, read the docs and @CLAUDE.md to refresh your instructions.
+- When you encounter patterns or lessons that would be helpful to remember, proactively suggest adding them to CLAUDE.md or relevant documentation
+- **ALWAYS** run linting, formatting, and type checking before committing:
+  - TypeScript: `pnpm run lint` and `pnpm run typecheck` in the extension directory
+  - Rust: `cargo fmt` and `cargo clippy` in the server directory
+  - Markdown: `pnpm run lint:md` will run automatically on commit via git hooks
+  - If markdown linting fails, fix the issues (usually missing blank lines around code blocks/lists) before retrying
+>>>>>>> a206e65 (docs: add pre-commit checklist memory to CLAUDE.md)
 
 ### Writing Testable Code
 
@@ -671,6 +681,31 @@ class SyncManager {
 ### Git Workflow
 
 Refer to @docs/GIT.md for git workflow guidelines
+
+**Pre-commit Checklist:**
+
+Before committing any changes, ALWAYS run:
+
+1. **TypeScript (in extension directory):**
+
+   ```bash
+   pnpm run lint        # ESLint checks
+   pnpm run typecheck   # TypeScript type checking
+   pnpm run format      # Prettier formatting (optional)
+   ```
+
+2. **Rust (in server directory):**
+
+   ```bash
+   cargo fmt            # Format code
+   cargo clippy         # Linting
+   cargo test           # Run tests
+   ```
+
+3. **Markdown:**
+   - `pnpm run lint:md` runs automatically via git hooks
+   - If it fails, fix issues (usually missing blank lines around code blocks/lists)
+   - Common fix: Add blank lines before/after code blocks and lists
 
 ### Git Staging Best Practices
 
