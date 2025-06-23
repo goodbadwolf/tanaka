@@ -150,15 +150,15 @@ feat: refactor entire build system with new error handling and process managemen
 
 ## Project Overview
 
-See [@README.md](README.md) for project overview
+See @README.md for project overview
 
 ## Architecture
 
-For architecture, development setup, commands, testing details and practical developer guidance (commands, running the system, configuration, testing, security, and coding style), see [@docs/DEV.md](docs/DEV.md).
+For architecture, development setup, commands, testing details and practical developer guidance (commands, running the system, configuration, testing, security, and coding style), see @docs/DEV.md.
 
 ## Installation
 
-For installation and setup instructions, see [@docs/INSTALL.md](docs/INSTALL.md).
+For installation and setup instructions, see @docs/INSTALL.md.
 
 ## AI Agent Guidelines
 
@@ -181,7 +181,7 @@ For installation and setup instructions, see [@docs/INSTALL.md](docs/INSTALL.md)
 
 ### Essential Commands
 
-See [@docs/DEV.md](docs/DEV.md#8-essential-commands) for all development commands.
+See @docs/DEV.md for all development commands.
 
 ### Code Style
 
@@ -196,7 +196,7 @@ See [@docs/DEV.md](docs/DEV.md#8-essential-commands) for all development command
 
 ### Testing and Validation
 
-- Always run tests before suggesting code changes: `cargo test` for server, `npm test` for extension
+- Always run tests before suggesting code changes: `cargo test` for server, `pnpm test` for extension
 - When fixing bugs, write a test that reproduces the bug first
 - When adding features, write tests BEFORE implementation (TDD)
 - Update related tests when modifying existing code
@@ -206,7 +206,7 @@ See [@docs/DEV.md](docs/DEV.md#8-essential-commands) for all development command
 
 - When cleaning up docs, check for redundancy across README.md, CLAUDE.md, and docs/
 - Keep configuration examples only in INSTALL.md
-- Use `[@path](link name)` syntax for internal markdown links
+- Use `@path` syntax for importing markdown files
 - Remove `$` prefix from commands for easier copy-paste
 - AGENTS.md is a symlink to CLAUDE.md (changes affect both)
 
@@ -410,7 +410,7 @@ When working with this codebase:
 
 ### Git Workflow
 
-Refer to [@docs/GIT.md](docs/GIT.md) for git workflow guidelines
+Refer to @docs/GIT.md for git workflow guidelines
 
 ### Git Staging Best Practices
 
