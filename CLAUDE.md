@@ -211,7 +211,257 @@ When working with this codebase:
 - **Generate TS types**: Run `pnpm run gen:api-models`
 - **Add shared types**: Add `#[derive(TS)]` and `#[ts(export)]` to Rust structs in `/server/src/models.rs`
 
+<<<<<<< HEAD
 ### Technical Patterns
+=======
+### Error Handling Examples
+
+Following the Rust-style Result pattern mentioned in the engineering philosophy:
+
+**TypeScript Extension Code:**
+
+```typescript
+import { Result, ok, err } from 'neverthrow';
+
+// Define domain-specific error types
+enum SyncError {
+  NetworkFailure = 'NETWORK_FAILURE',
+  InvalidData = 'INVALID_DATA',
+  AuthError = 'AUTH_ERROR',
+  ServerError = 'SERVER_ERROR'
+}
+
+// Function returning Result type
+async function syncTabs(tabs: Tab[]): Promise<Result<SyncResponse, SyncError>> {
+  if (!tabs.length) {
+    return err(SyncError.InvalidData);
+  }
+
+  try {
+    const response = await api.sync(tabs);
+    if (!response.ok) {
+      return err(response.status === 401 ? SyncError.AuthError : SyncError.ServerError);
+    }
+    return ok(response.data);
+  } catch (e) {
+    return err(SyncError.NetworkFailure);
+  }
+}
+
+// Using the Result
+const result = await syncTabs(tabs);
+result
+  .map(data => updateLocalState(data))
+  .mapErr(error => {
+    switch (error) {
+      case SyncError.NetworkFailure:
+        showRetryNotification();
+        break;
+      case SyncError.AuthError:
+        redirectToSettings();
+        break;
+      default:
+        logError(error);
+    }
+  });
+
+// Chain operations safely
+const processedData = await fetchData()
+  .andThen(validateData)
+  .andThen(transformData)
+  .mapErr(handleError);
+```
+
+**Centralized Error Handler:**
+
+```typescript
+// errors.ts
+export class ErrorHandler {
+  private static errorHandlers = new Map<string, (error: any) => void>();
+
+  static register(errorType: string, handler: (error: any) => void) {
+    this.errorHandlers.set(errorType, handler);
+  }
+
+  static handle(error: unknown): Result<never, string> {
+    const errorType = this.identifyError(error);
+    const handler = this.errorHandlers.get(errorType);
+    
+    if (handler) {
+      handler(error);
+      return err(errorType);
+    }
+    
+    console.error('Unhandled error:', error);
+    return err('UNKNOWN_ERROR');
+  }
+
+  private static identifyError(error: unknown): string {
+    if (error instanceof TypeError) return 'TYPE_ERROR';
+    if (error instanceof NetworkError) return 'NETWORK_ERROR';
+    return 'UNKNOWN_ERROR';
+  }
+}
+```
+
+### TypeScript-Specific Guidelines
+
+**Working with Generated Types from ts-rs:**
+
+```typescript
+// Import generated types from the specific path
+import type { Tab, Window, SyncUpdate } from '../types/generated';
+import type { ApiResponse, ErrorResponse } from '../types/generated/api';
+
+// NEVER redefine types that are generated
+// BAD:
+interface Tab {  // Don't do this - use the generated type
+  id: string;
+  url: string;
+}
+
+// GOOD:
+import type { Tab } from '../types/generated';
+
+// Extend generated types when needed
+interface TabWithMetadata extends Tab {
+  lastAccessed: number;
+  syncStatus: 'pending' | 'synced' | 'error';
+}
+
+// Use type guards for runtime validation
+function isValidTab(obj: unknown): obj is Tab {
+  return (
+    typeof obj === 'object' &&
+    obj !== null &&
+    'id' in obj &&
+    'url' in obj &&
+    typeof (obj as Tab).id === 'string'
+  );
+}
+
+// When the Rust API changes, regenerate types immediately
+// Run: pnpm run gen:api-models
+// Then fix any TypeScript compilation errors
+```
+
+**Type-Safe Message Passing:**
+
+```typescript
+// Define discriminated unions for messages
+type BackgroundMessage =
+  | { type: 'TRACK_WINDOW'; windowId: number }
+  | { type: 'UNTRACK_WINDOW'; windowId: number }
+  | { type: 'SYNC_NOW' }
+  | { type: 'GET_STATUS' };
+
+// Type-safe message handler
+function handleMessage(message: BackgroundMessage): Promise<unknown> {
+  switch (message.type) {
+    case 'TRACK_WINDOW':
+      return trackWindow(message.windowId);
+    case 'UNTRACK_WINDOW':
+      return untrackWindow(message.windowId);
+    case 'SYNC_NOW':
+      return syncImmediately();
+    case 'GET_STATUS':
+      return getStatus();
+    // TypeScript ensures all cases are handled
+  }
+}
+```
+
+### Performance Considerations
+
+**Extension Performance Guidelines:**
+
+1. **Minimize Background Script Memory:**
+
+   ```typescript
+   // BAD: Keeping all tabs in memory
+   class TabManager {
+     private allTabs: Tab[] = [];  // Can grow unbounded
+   }
+
+   // GOOD: Use browser storage or indexed storage
+   class TabManager {
+     async getTabs(): Promise<Tab[]> {
+       const stored = await browser.storage.local.get('tabs');
+       return stored.tabs || [];
+     }
+   }
+   ```
+
+2. **Debounce Frequent Events:**
+
+   ```typescript
+   // Debounce tab update events to avoid API spam
+   const debouncedSync = debounce(syncTabs, 1000);
+   
+   browser.tabs.onUpdated.addListener((tabId, changeInfo) => {
+     if (changeInfo.url) {
+       debouncedSync();
+     }
+   });
+   ```
+
+3. **Use Web Workers for Heavy Processing:**
+
+   ```typescript
+   // For CRDT operations or large data transformations
+   const worker = new Worker('crdt-worker.js');
+   worker.postMessage({ type: 'MERGE', updates });
+   worker.onmessage = (e) => {
+     if (e.data.type === 'MERGED') {
+       applyMergedState(e.data.result);
+     }
+   };
+   ```
+
+4. **Lazy Load Non-Critical Features:**
+
+   ```typescript
+   // Only load sync UI when user opens popup
+   async function initializePopup() {
+     const { SyncUI } = await import('./sync-ui');
+     const ui = new SyncUI();
+     ui.render();
+   }
+   ```
+
+5. **Efficient Storage Usage:**
+
+   ```typescript
+   // Use browser.storage efficiently
+   // BAD: Multiple small writes
+   await browser.storage.local.set({ tab1: data1 });
+   await browser.storage.local.set({ tab2: data2 });
+
+   // GOOD: Batch writes
+   await browser.storage.local.set({ 
+     tab1: data1,
+     tab2: data2 
+   });
+   ```
+
+6. **Monitor Performance:**
+
+   ```typescript
+   // Add performance marks for critical operations
+   performance.mark('sync-start');
+   await syncOperation();
+   performance.mark('sync-end');
+   performance.measure('sync-duration', 'sync-start', 'sync-end');
+   
+   // Log slow operations
+   const measure = performance.getEntriesByName('sync-duration')[0];
+   if (measure.duration > 1000) {
+     console.warn(`Slow sync: ${measure.duration}ms`);
+   }
+   ```
+
+### Misc
+>>>>>>> 077ea20 (docs: enhance developer and AI agent documentation)
 
 #### Error Handling (Result Pattern)
 
