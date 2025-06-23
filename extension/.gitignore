@@ -1,18 +1,5 @@
-# Dependencies
-node_modules/
-.pnpm-debug.log*
-
 # Build output
 dist/
-*.log
-
-# Editor
-.vscode/
-.idea/
-
-# System
-.DS_Store
-Thumbs.db
 
 # Generated TypeScript types from Rust
 src/api/models/generated/*.ts
@@ -21,6 +8,13 @@ src/api/models/generated/*.ts
 .rspack/
 rspack-bundle-analyzer/
 
-# Migration artifacts
-dist-backup-vite/
-bundle-sizes-before.txt
+# Testing artifacts
+coverage/
+.nyc_output/
+
+# TypeScript
+*.tsbuildinfo
+
+# Extension specific
+*.xpi
+web-ext-artifacts/

@@ -1,6 +1,15 @@
+# Rust build output
 target/
 
 # Database files
 *.db
 *.db-shm
 *.db-wal
+
+# Rust specific
+**/*.rs.bk
+*.pdb
+
+# Config files with secrets
+config/*.toml
+!config/example.toml
