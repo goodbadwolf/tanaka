@@ -14,16 +14,9 @@ This file provides guidance to Claude Code (claude.ai/code) or any AI Agents whe
 // Start the server
 server.start();
 
-// Log error message
-logger.error("Failed to connect");
-
 // Define user interface
 interface User {
   name: string;
-}
-
-// Check if user exists
-if (userExists) {
 }
 ```
 
@@ -90,7 +83,7 @@ Adopt the persona of a **pragmatic, experienced engineer** who values:
 - Each commit should represent ONE logical change
 - If a commit does multiple things, split it into separate commits
 - Keep commits focused and atomic
-- Confirm commit message with user before commiting
+- Confirm commit message with user before committing
 
 **USE `git add -p` FOR SELECTIVE STAGING:**
 When you have multiple unrelated changes in your working directory:
@@ -98,40 +91,10 @@ When you have multiple unrelated changes in your working directory:
 - Use `git add -p <file>` to stage specific hunks interactively, one file at a time
 - When prompted, use 's' to split hunks into smaller pieces for finer control
 - Review each hunk carefully and accept ('y') or skip ('n') based on what belongs in the current commit
-- This allows you to separate mixed changes into logical commits
 - Stage only the parts that belong to the current commit
 - Review staged changes with `git diff --cached` before committing
 
-Interactive options:
-
-- `y` - stage this hunk
-- `n` - skip this hunk
-- `s` - split this hunk into smaller hunks (when available)
-- `e` - manually edit the hunk
-- `q` - quit (skip remaining hunks)
-- `?` - help
-
-Example workflow:
-
-```bash
-# Process each file individually
-git add -p extension/manifest.json
-# Review the diff, press 'y' to accept if it's a single logical change
-
-git add -p extension/src/background.ts
-# If the hunk is too large, press 's' to split it
-# Then review each smaller hunk and press 'y' or 'n' accordingly
-
-# Review what you've staged so far
-git diff --cached
-
-# Commit when you have one logical change staged
-git commit -m "fix: improve error handling in data fetcher"
-
-# Continue with next set of changes
-git add -p extension/src/background.ts
-# Stage the remaining hunks for the next logical change
-```
+Interactive options: `y` (stage), `n` (skip), `s` (split), `e` (edit), `q` (quit), `?` (help)
 
 Example of good commit sequence:
 
@@ -148,29 +111,23 @@ NOT this:
 feat: refactor entire build system with new error handling and process management
 ```
 
-## Project Overview
+## Project Context
 
-See @README.md for project overview
-
-## Architecture
-
-For architecture, development setup, commands, testing details and practical developer guidance (commands, running the system, configuration, testing, security, and coding style), see @docs/DEV.md.
-
-## Installation
-
-For installation and setup instructions, see @docs/INSTALL.md.
+- **Overview**: See @README.md
+- **Architecture & Dev Guide**: See @docs/DEV.md
+- **Installation**: See @docs/INSTALL.md
 
 ## AI Agent Guidelines
 
 ### Working with this Codebase
 
-- This is a Firefox WebExtension written in TypeScript with a Rust backend server
-- The extension uses Yjs for CRDT-based tab synchronization
-- Always check existing patterns in neighboring files before implementing new features
+- Firefox WebExtension (TypeScript) + Rust backend server
+- Extension uses Yjs for CRDT-based tab synchronization
+- TypeScript types generated from Rust models using ts-rs - import from `types/generated`
+- Always check existing patterns in neighboring files before implementing
 - Run `cargo fmt` and `pnpm run lint` before suggesting code changes
 - Prefer editing existing files over creating new ones
-- When modifying extension code, ensure compatibility with Firefox WebExtension APIs
-- TypeScript types are generated from Rust models using ts-rs - import from `types/generated`
+- Ensure Firefox WebExtension API compatibility
 
 ### Project Structure
 
@@ -179,80 +136,44 @@ For installation and setup instructions, see @docs/INSTALL.md.
   - `/server/config` - Example configuration files
 - `/docs` - Project documentation
 
-### Essential Commands
+### Pre-commit Checklist
 
-See @docs/DEV.md for all development commands.
+**ALWAYS run before committing:**
 
-### Code Style
+1. **TypeScript** (in extension directory):
 
-- Always use descriptive variable names, but keep the names sane.
-- **CRITICAL: See "NO UNNECESSARY COMMENTS" rule above - most code should have NO comments**
+   ```bash
+   pnpm run lint        # ESLint checks
+   pnpm run typecheck   # TypeScript type checking
+   pnpm run format      # Prettier formatting (optional)
+   ```
 
-### Documentation and Maintenance
+2. **Rust** (in server directory):
 
-- As part of a commit or major changes to the code, scan the docs and update them based on the changes if necessary
-- When updating documentation, ensure README.md reflects any new features or changed behavior
-- Keep CLAUDE.md updated with new conventions or frequently used commands
+   ```bash
+   cargo fmt            # Format code
+   cargo clippy         # Linting
+   cargo test           # Run tests
+   ```
 
-### Testing and Validation
-
-- Always run tests before suggesting code changes: `cargo test` for server, `pnpm test` for extension
-- When fixing bugs, write a test that reproduces the bug first
-- When adding features, write tests BEFORE implementation (TDD)
-- Update related tests when modifying existing code
-- Validate that changes work with both server and extension components
-
-### Documentation Maintenance
-
-- When cleaning up docs, check for redundancy across README.md, CLAUDE.md, and docs/
-- Keep configuration examples only in INSTALL.md
-- Use `@path` syntax for importing markdown files
-- Remove `$` prefix from commands for easier copy-paste
-- AGENTS.md is a symlink to CLAUDE.md (changes affect both)
-
-### Common String Replacement Issues
-
-- Multi-line replacements often fail due to hidden characters
-- For complex deletions, use `sed` instead of Edit tool
-- Always verify exact content before attempting replacements
-- On macOS, use `od -c` instead of `cat -A` (BSD vs GNU tools)
-
-### Bash Command Best Practices
-
-- Avoid `cd` in bash commands - it fails with "no such file or directory" in subshells
-- Use full paths instead: `/Users/manish/projects/tanaka/extension` not just `extension`
-- When running pnpm/npm commands, stay in the correct directory context
-- File operations (mv, rm, ls) need full paths when not in the expected directory
-- Check current working directory context before running commands
-
-### Project Organization
-
-When working with this codebase:
-
-- Keep language/framework-specific files in their respective directories (e.g., extension-related files in `extension/`, server-related files in `server/`)
-- Repository-level tools (like git hooks) belong at the repository root
-- Run commands from the appropriate directory context based on where the tools are installed
-- Always verify file contents after moving or modifying them
+3. **Markdown**: Auto-runs via git hooks. Fix missing blank lines around code blocks/lists if it fails.
 
 ### Common Tasks
 
-- To add a new API endpoint: Check existing routes in `/server/src/routes/`
-- To modify tab sync behavior: Look at `/extension/src/sync/`
-- For configuration changes: Update both `server/config/example.toml` and docs
-- When adding dependencies: Update `Cargo.toml` or `package.json` appropriately
-- To generate TypeScript types from Rust models: Run `pnpm run gen:api-models`
-- To add new shared types: Add `#[derive(TS)]` and `#[ts(export)]` to Rust structs in `/server/src/models.rs`
+- **New API endpoint**: Check `/server/src/routes/`
+- **Modify tab sync**: Look at `/extension/src/sync/`
+- **Config changes**: Update `server/config/example.toml` and docs
+- **Add dependencies**: Update `Cargo.toml` or `package.json`
+- **Generate TS types**: Run `pnpm run gen:api-models`
+- **Add shared types**: Add `#[derive(TS)]` and `#[ts(export)]` to Rust structs in `/server/src/models.rs`
 
-### Error Handling Examples
+### Technical Patterns
 
-Following the Rust-style Result pattern mentioned in the engineering philosophy:
-
-**TypeScript Extension Code:**
+#### Error Handling (Result Pattern)
 
 ```typescript
 import { Result, ok, err } from 'neverthrow';
 
-// Define domain-specific error types
 enum SyncError {
   NetworkFailure = 'NETWORK_FAILURE',
   InvalidData = 'INVALID_DATA',
@@ -260,12 +181,9 @@ enum SyncError {
   ServerError = 'SERVER_ERROR'
 }
 
-// Function returning Result type
 async function syncTabs(tabs: Tab[]): Promise<Result<SyncResponse, SyncError>> {
-  if (!tabs.length) {
-    return err(SyncError.InvalidData);
-  }
-
+  if (!tabs.length) return err(SyncError.InvalidData);
+  
   try {
     const response = await api.sync(tabs);
     if (!response.ok) {
@@ -277,88 +195,25 @@ async function syncTabs(tabs: Tab[]): Promise<Result<SyncResponse, SyncError>> {
   }
 }
 
-// Using the Result
-const result = await syncTabs(tabs);
-result
-  .map(data => updateLocalState(data))
-  .mapErr(error => {
-    switch (error) {
-      case SyncError.NetworkFailure:
-        showRetryNotification();
-        break;
-      case SyncError.AuthError:
-        redirectToSettings();
-        break;
-      default:
-        logError(error);
-    }
-  });
-
 // Chain operations safely
-const processedData = await fetchData()
-  .andThen(validateData)
-  .andThen(transformData)
+const result = await syncTabs(tabs)
+  .map(data => updateLocalState(data))
   .mapErr(handleError);
 ```
 
-**Centralized Error Handler:**
+#### TypeScript Guidelines
 
 ```typescript
-// errors.ts
-export class ErrorHandler {
-  private static errorHandlers = new Map<string, (error: any) => void>();
+// Import generated types (NEVER redefine)
+import type { Tab, Window } from '../types/generated';
 
-  static register(errorType: string, handler: (error: any) => void) {
-    this.errorHandlers.set(errorType, handler);
-  }
-
-  static handle(error: unknown): Result<never, string> {
-    const errorType = this.identifyError(error);
-    const handler = this.errorHandlers.get(errorType);
-    
-    if (handler) {
-      handler(error);
-      return err(errorType);
-    }
-    
-    console.error('Unhandled error:', error);
-    return err('UNKNOWN_ERROR');
-  }
-
-  private static identifyError(error: unknown): string {
-    if (error instanceof TypeError) return 'TYPE_ERROR';
-    if (error instanceof NetworkError) return 'NETWORK_ERROR';
-    return 'UNKNOWN_ERROR';
-  }
-}
-```
-
-### TypeScript-Specific Guidelines
-
-**Working with Generated Types from ts-rs:**
-
-```typescript
-// Import generated types from the specific path
-import type { Tab, Window, SyncUpdate } from '../types/generated';
-import type { ApiResponse, ErrorResponse } from '../types/generated/api';
-
-// NEVER redefine types that are generated
-// BAD:
-interface Tab {  // Don't do this - use the generated type
-  id: string;
-  url: string;
-}
-
-// GOOD:
-import type { Tab } from '../types/generated';
-
-// Extend generated types when needed
+// Extend when needed
 interface TabWithMetadata extends Tab {
   lastAccessed: number;
   syncStatus: 'pending' | 'synced' | 'error';
 }
 
-// Use type guards for runtime validation
+// Type guards for runtime validation
 function isValidTab(obj: unknown): obj is Tab {
   return (
     typeof obj === 'object' &&
@@ -369,353 +224,113 @@ function isValidTab(obj: unknown): obj is Tab {
   );
 }
 
-// When the Rust API changes, regenerate types immediately
-// Run: pnpm run gen:api-models
-// Then fix any TypeScript compilation errors
-```
-
-**Type-Safe Message Passing:**
-
-```typescript
-// Define discriminated unions for messages
+// Discriminated unions for messages
 type BackgroundMessage =
   | { type: 'TRACK_WINDOW'; windowId: number }
   | { type: 'UNTRACK_WINDOW'; windowId: number }
   | { type: 'SYNC_NOW' }
   | { type: 'GET_STATUS' };
-
-// Type-safe message handler
-function handleMessage(message: BackgroundMessage): Promise<unknown> {
-  switch (message.type) {
-    case 'TRACK_WINDOW':
-      return trackWindow(message.windowId);
-    case 'UNTRACK_WINDOW':
-      return untrackWindow(message.windowId);
-    case 'SYNC_NOW':
-      return syncImmediately();
-    case 'GET_STATUS':
-      return getStatus();
-    // TypeScript ensures all cases are handled
-  }
-}
 ```
 
-### Performance Considerations
+#### Performance Best Practices
 
-**Extension Performance Guidelines:**
-
-1. **Minimize Background Script Memory:**
-
-   ```typescript
-   // BAD: Keeping all tabs in memory
-   class TabManager {
-     private allTabs: Tab[] = [];  // Can grow unbounded
-   }
-
-   // GOOD: Use browser storage or indexed storage
-   class TabManager {
-     async getTabs(): Promise<Tab[]> {
-       const stored = await browser.storage.local.get('tabs');
-       return stored.tabs || [];
-     }
-   }
-   ```
-
-2. **Debounce Frequent Events:**
-
-   ```typescript
-   // Debounce tab update events to avoid API spam
-   const debouncedSync = debounce(syncTabs, 1000);
-   
-   browser.tabs.onUpdated.addListener((tabId, changeInfo) => {
-     if (changeInfo.url) {
-       debouncedSync();
-     }
-   });
-   ```
-
-3. **Use Web Workers for Heavy Processing:**
-
-   ```typescript
-   // For CRDT operations or large data transformations
-   const worker = new Worker('crdt-worker.js');
-   worker.postMessage({ type: 'MERGE', updates });
-   worker.onmessage = (e) => {
-     if (e.data.type === 'MERGED') {
-       applyMergedState(e.data.result);
-     }
-   };
-   ```
-
-4. **Lazy Load Non-Critical Features:**
-
-   ```typescript
-   // Only load sync UI when user opens popup
-   async function initializePopup() {
-     const { SyncUI } = await import('./sync-ui');
-     const ui = new SyncUI();
-     ui.render();
-   }
-   ```
-
-5. **Efficient Storage Usage:**
-
-   ```typescript
-   // Use browser.storage efficiently
-   // BAD: Multiple small writes
-   await browser.storage.local.set({ tab1: data1 });
-   await browser.storage.local.set({ tab2: data2 });
-
-   // GOOD: Batch writes
-   await browser.storage.local.set({ 
-     tab1: data1,
-     tab2: data2 
-   });
-   ```
-
-6. **Monitor Performance:**
-
-   ```typescript
-   // Add performance marks for critical operations
-   performance.mark('sync-start');
-   await syncOperation();
-   performance.mark('sync-end');
-   performance.measure('sync-duration', 'sync-start', 'sync-end');
-   
-   // Log slow operations
-   const measure = performance.getEntriesByName('sync-duration')[0];
-   if (measure.duration > 1000) {
-     console.warn(`Slow sync: ${measure.duration}ms`);
-   }
-   ```
-
-### Misc
-
-- AGENTS.md (used by OpenAI's Codex) is a symlink for CLAUDE.md (used by Anthropic's Claude)
-- The project uses semantic versioning - update versions in `manifest.json` and `Cargo.toml`
-
-### Memory
-
-- After compacting, read the docs and @CLAUDE.md to refresh your instructions.
-- When you encounter patterns or lessons that would be helpful to remember, proactively suggest adding them to CLAUDE.md or relevant documentation
-- **ALWAYS** run linting, formatting, and type checking before committing:
-  - TypeScript: `pnpm run lint` and `pnpm run typecheck` in the extension directory
-  - Rust: `cargo fmt` and `cargo clippy` in the server directory
-  - Markdown: `pnpm run lint:md` will run automatically on commit via git hooks
-  - If markdown linting fails, fix the issues (usually missing blank lines around code blocks/lists) before retrying
+1. **Memory**: Use browser storage instead of keeping all data in memory
+2. **Events**: Debounce frequent events (tab updates, etc.)
+3. **Heavy ops**: Use Web Workers for CRDT operations
+4. **Loading**: Lazy load non-critical features
+5. **Storage**: Batch writes instead of multiple small writes
+6. **Monitoring**: Use performance marks for critical operations
 
 ### Writing Testable Code
 
 **Core Principles:**
 
-1. **Dependency Injection**
-   - Pass dependencies as constructor parameters or function arguments
-   - Avoid hardcoded dependencies or global imports within classes
-   - This allows easy mocking during tests
+- Dependency injection for easy mocking
+- Single responsibility per class/function
+- Prefer pure functions
+- Test interfaces, not implementations
 
-   ```typescript
-   // Good - dependencies injected
-   class SyncManager {
-     constructor(private api: TanakaAPI, private tracker: WindowTracker) {}
-   }
-   
-   // Bad - hardcoded dependencies
-   class SyncManager {
-     private api = new TanakaAPI('https://hardcoded.com');
-   }
-   ```
+```typescript
+// Good - dependencies injected
+class SyncManager {
+  constructor(private api: TanakaAPI, private tracker: WindowTracker) {}
+}
 
-2. **Single Responsibility**
-   - Each class/function should do ONE thing well
-   - Makes tests focused and easier to write
-   - If a test needs many mocks, the code might be doing too much
+// Bad - hardcoded dependencies
+class SyncManager {
+  private api = new TanakaAPI('https://hardcoded.com');
+}
+```
 
-3. **Pure Functions**
-   - Prefer pure functions that return values based on inputs
-   - Avoid side effects where possible
-   - Side effects should be isolated to specific methods
+**TDD Workflow:**
 
-4. **Interface Segregation**
-   - Define minimal interfaces for dependencies
-   - Test against interfaces, not concrete implementations
-   - Makes mocking simpler and tests more maintainable
+1. Write failing test
+2. Write minimal code to pass
+3. Refactor while keeping tests green
+4. Focus on behavior, not implementation
 
-### Test Development Workflow
+**Test Quality:**
 
-**When modifying existing code:**
+- Descriptive test names
+- Arrange-Act-Assert pattern
+- Independent tests (no shared state)
+- Test edge cases
 
-1. **Run existing tests first** to understand current behavior
-2. **Read the tests** before changing code - they document expected behavior
-3. **Update tests BEFORE changing implementation** (TDD approach)
-4. **Add tests for new behavior** before implementing it
-5. **Refactor tests** if the code structure changes significantly
+### Common Issues & Solutions
 
-**When adding new features:**
+#### Bash Commands
 
-1. **Write interface/API first** - how will this be used?
-2. **Write tests for the interface** - what should it do?
-3. **Implement the simplest solution** that makes tests pass
-4. **Refactor** while keeping tests green
-5. **Add edge case tests** after basic functionality works
+- Avoid `cd` - it fails with "no such file or directory" in subshells
+- Use full paths: `/Users/manish/projects/tanaka/extension`
+- File operations need full paths when not in expected directory
 
-### Test Quality Guidelines
+#### String Replacements
 
-1. **Test Behavior, Not Implementation**
-   - Test WHAT the code does, not HOW it does it
-   - Tests shouldn't break when refactoring internals
-   - Focus on public APIs and observable behavior
+- Multi-line replacements often fail due to hidden characters
+- Use `sed` for complex deletions
+- On macOS, use `od -c` instead of `cat -A` (BSD vs GNU tools)
 
-2. **Use Descriptive Test Names**
+#### Documentation
 
-   ```typescript
-   // Good
-   it('should return error when API responds with 500')
-   
-   // Bad  
-   it('should handle errors')
-   ```
+- Check for redundancy across README.md, CLAUDE.md, and docs/
+- Keep config examples only in INSTALL.md
+- AGENTS.md is a symlink to CLAUDE.md (changes affect both)
 
-3. **Arrange-Act-Assert Pattern**
+### Project Organization
 
-   ```typescript
-   it('should track window when TRACK_WINDOW message received', () => {
-     // Arrange
-     const windowId = 123;
-     const message = { type: 'TRACK_WINDOW', windowId };
-     
-     // Act
-     const result = messageHandler.handleMessage(message);
-     
-     // Assert
-     expect(mockTracker.track).toHaveBeenCalledWith(windowId);
-     expect(result).toEqual({ success: true });
-   });
-   ```
+- Keep language/framework-specific files in their respective directories
+- Repository-level tools (like git hooks) belong at the repository root
+- Run commands from the appropriate directory context
+- Always verify file contents after moving or modifying them
 
-4. **Keep Tests Independent**
-   - Each test should be able to run in isolation
-   - Don't rely on test execution order
-   - Clean up state in beforeEach/afterEach
+### Memory
 
-5. **Test Edge Cases**
-   - Null/undefined inputs
-   - Empty arrays/objects
-   - Error conditions
-   - Boundary values
+- After compacting, read the docs and @CLAUDE.md to refresh your instructions
+- Proactively suggest adding patterns/lessons to documentation
+- Always run pre-commit checks (see checklist above)
+- Fix markdown linting issues (usually missing blank lines)
 
-### Code Design for Testability
+### Git Best Practices
 
-1. **Constructor Injection Pattern**
+- Refer to @docs/GIT.md for commit message format
+- Use `git add -p` for selective staging
+- Stage files individually with full paths: `git add /path/to/file1 /path/to/file2`
+- NEVER use `git add -A` or `git add .`
+- Review with `git diff --cached` before committing
 
-   ```typescript
-   // Testable design
-   class BackgroundService {
-     constructor(
-       private api: TanakaAPI,
-       private windowTracker: WindowTracker,
-       private syncManager: SyncManager
-     ) {}
-   }
-   
-   // In tests
-   const mockApi = createMockApi();
-   const service = new BackgroundService(mockApi, mockTracker, mockManager);
-   ```
-
-2. **Factory Functions**
-   - Use factories to create complex objects
-   - Makes it easy to create test doubles
-   - Centralizes object creation logic
-
-3. **Avoid Static Methods**
-   - Static methods are hard to mock
-   - Use instance methods or pure functions instead
-
-4. **Return Early, Fail Fast**
-   - Validate inputs at the beginning
-   - Makes error cases easier to test
-   - Reduces nested logic complexity
-
-### When NOT to Test
-
-1. **Third-party library internals** - Trust they work
-2. **Simple getters/setters** - Unless they have logic
-3. **Framework glue code** - Focus on your business logic
-4. **Console.log statements** - Mock console in tests
-5. **Private methods directly** - Test through public API
-
-### Test Maintenance
-
-1. **Update tests when requirements change** - Tests are living documentation
-2. **Delete obsolete tests** - Don't keep tests for deleted features
-3. **Refactor tests** - Apply same quality standards as production code
-4. **Review test coverage** - But don't chase 100% blindly
-5. **Run tests before committing** - Always ensure tests pass
-
-### Red-Green-Refactor Cycle
-
-1. **Red**: Write a failing test for new functionality
-2. **Green**: Write minimal code to make the test pass
-3. **Refactor**: Improve the code while keeping tests green
-4. **Repeat**: Continue for next piece of functionality
-
-### Git Workflow
-
-Refer to @docs/GIT.md for git workflow guidelines
-
-**Pre-commit Checklist:**
-
-Before committing any changes, ALWAYS run:
-
-1. **TypeScript (in extension directory):**
-
-   ```bash
-   pnpm run lint        # ESLint checks
-   pnpm run typecheck   # TypeScript type checking
-   pnpm run format      # Prettier formatting (optional)
-   ```
-
-2. **Rust (in server directory):**
-
-   ```bash
-   cargo fmt            # Format code
-   cargo clippy         # Linting
-   cargo test           # Run tests
-   ```
-
-3. **Markdown:**
-   - `pnpm run lint:md` runs automatically via git hooks
-   - If it fails, fix issues (usually missing blank lines around code blocks/lists)
-   - Common fix: Add blank lines before/after code blocks and lists
-
-### Git Staging Best Practices
-
-**NEVER use `git add -A` or `git add .`** - these commands can stage unrelated changes accidentally.
-
-Instead:
-
-- Stage files individually with their full paths: `git add /path/to/file1 /path/to/file2`
-- Use `git add -p <file>` for selective staging when you have mixed changes
-- Always review staged changes with `git diff --cached` before committing
-
-**Good example:**
+Example:
 
 ```bash
-# Stage specific files
 git add /Users/manish/projects/tanaka/extension/src/background.ts
-git add /Users/manish/projects/tanaka/extension/src/core.ts
-
-# Review what's staged
 git diff --cached
-
-# Then commit
 git commit -m "refactor: simplify message validation"
 ```
 
-**Bad example:**
+### Essential Commands
 
-```bash
-# DON'T DO THIS - stages everything including unintended files
-git add -A
-git commit -m "refactor: simplify message validation"
-```
+See @docs/DEV.md for all development commands.
+
+### Misc
+
+- AGENTS.md (used by OpenAI's Codex) is a symlink for CLAUDE.md
+- The project uses semantic versioning - update versions in `manifest.json` and `Cargo.toml`
