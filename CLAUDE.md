@@ -113,15 +113,9 @@ feat: refactor entire build system with new error handling and process managemen
 
 ## Project Context
 
-See @README.md for project overview
-
-## Architecture
-
-For architecture, development setup, commands, testing details and practical developer guidance (commands, running the system, configuration, testing, security, and coding style), see @docs/DEV.md.
-
-## Installation
-
-For installation and setup instructions, see @docs/INSTALL.md.
+- **Overview**: See @README.md
+- **Architecture & Dev Guide**: See @docs/DEV.md
+- **Installation**: See @docs/INSTALL.md
 
 ## AI Agent Guidelines
 
@@ -144,7 +138,7 @@ For installation and setup instructions, see @docs/INSTALL.md.
 
 ### Pre-commit Checklist
 
-See @docs/DEV.md for all development commands.
+**ALWAYS run before committing:**
 
 1. **TypeScript** (in extension directory):
 
@@ -162,45 +156,7 @@ See @docs/DEV.md for all development commands.
    cargo test           # Run tests
    ```
 
-### Testing and Validation
-
-- Always run tests before suggesting code changes: `cargo test` for server, `pnpm test` for extension
-- When fixing bugs, write a test that reproduces the bug first
-- When adding features, write tests BEFORE implementation (TDD)
-- Update related tests when modifying existing code
-- Validate that changes work with both server and extension components
-
-### Documentation Maintenance
-
-- When cleaning up docs, check for redundancy across README.md, CLAUDE.md, and docs/
-- Keep configuration examples only in INSTALL.md
-- Use `@path` syntax for importing markdown files
-- Remove `$` prefix from commands for easier copy-paste
-- AGENTS.md is a symlink to CLAUDE.md (changes affect both)
-
-### Common String Replacement Issues
-
-- Multi-line replacements often fail due to hidden characters
-- For complex deletions, use `sed` instead of Edit tool
-- Always verify exact content before attempting replacements
-- On macOS, use `od -c` instead of `cat -A` (BSD vs GNU tools)
-
-### Bash Command Best Practices
-
-- Avoid `cd` in bash commands - it fails with "no such file or directory" in subshells
-- Use full paths instead: `/Users/manish/projects/tanaka/extension` not just `extension`
-- When running pnpm/npm commands, stay in the correct directory context
-- File operations (mv, rm, ls) need full paths when not in the expected directory
-- Check current working directory context before running commands
-
-### Project Organization
-
-When working with this codebase:
-
-- Keep language/framework-specific files in their respective directories (e.g., extension-related files in `extension/`, server-related files in `server/`)
-- Repository-level tools (like git hooks) belong at the repository root
-- Run commands from the appropriate directory context based on where the tools are installed
-- Always verify file contents after moving or modifying them
+3. **Markdown**: Auto-runs via git hooks. Fix missing blank lines around code blocks/lists if it fails.
 
 ### Common Tasks
 
@@ -212,18 +168,19 @@ When working with this codebase:
 - **Add shared types**: Add `#[derive(TS)]` and `#[ts(export)]` to Rust structs in `/server/src/models.rs`
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 ### Technical Patterns
 =======
 ### Error Handling Examples
+=======
+### Technical Patterns
+>>>>>>> 9a47c30 (refactor: compact CLAUDE.md while preserving essential details)
 
-Following the Rust-style Result pattern mentioned in the engineering philosophy:
-
-**TypeScript Extension Code:**
+#### Error Handling (Result Pattern)
 
 ```typescript
 import { Result, ok, err } from 'neverthrow';
 
-// Define domain-specific error types
 enum SyncError {
   NetworkFailure = 'NETWORK_FAILURE',
   InvalidData = 'INVALID_DATA',
@@ -231,12 +188,9 @@ enum SyncError {
   ServerError = 'SERVER_ERROR'
 }
 
-// Function returning Result type
 async function syncTabs(tabs: Tab[]): Promise<Result<SyncResponse, SyncError>> {
-  if (!tabs.length) {
-    return err(SyncError.InvalidData);
-  }
-
+  if (!tabs.length) return err(SyncError.InvalidData);
+  
   try {
     const response = await api.sync(tabs);
     if (!response.ok) {
@@ -248,88 +202,25 @@ async function syncTabs(tabs: Tab[]): Promise<Result<SyncResponse, SyncError>> {
   }
 }
 
-// Using the Result
-const result = await syncTabs(tabs);
-result
-  .map(data => updateLocalState(data))
-  .mapErr(error => {
-    switch (error) {
-      case SyncError.NetworkFailure:
-        showRetryNotification();
-        break;
-      case SyncError.AuthError:
-        redirectToSettings();
-        break;
-      default:
-        logError(error);
-    }
-  });
-
 // Chain operations safely
-const processedData = await fetchData()
-  .andThen(validateData)
-  .andThen(transformData)
+const result = await syncTabs(tabs)
+  .map(data => updateLocalState(data))
   .mapErr(handleError);
 ```
 
-**Centralized Error Handler:**
+#### TypeScript Guidelines
 
 ```typescript
-// errors.ts
-export class ErrorHandler {
-  private static errorHandlers = new Map<string, (error: any) => void>();
+// Import generated types (NEVER redefine)
+import type { Tab, Window } from '../types/generated';
 
-  static register(errorType: string, handler: (error: any) => void) {
-    this.errorHandlers.set(errorType, handler);
-  }
-
-  static handle(error: unknown): Result<never, string> {
-    const errorType = this.identifyError(error);
-    const handler = this.errorHandlers.get(errorType);
-    
-    if (handler) {
-      handler(error);
-      return err(errorType);
-    }
-    
-    console.error('Unhandled error:', error);
-    return err('UNKNOWN_ERROR');
-  }
-
-  private static identifyError(error: unknown): string {
-    if (error instanceof TypeError) return 'TYPE_ERROR';
-    if (error instanceof NetworkError) return 'NETWORK_ERROR';
-    return 'UNKNOWN_ERROR';
-  }
-}
-```
-
-### TypeScript-Specific Guidelines
-
-**Working with Generated Types from ts-rs:**
-
-```typescript
-// Import generated types from the specific path
-import type { Tab, Window, SyncUpdate } from '../types/generated';
-import type { ApiResponse, ErrorResponse } from '../types/generated/api';
-
-// NEVER redefine types that are generated
-// BAD:
-interface Tab {  // Don't do this - use the generated type
-  id: string;
-  url: string;
-}
-
-// GOOD:
-import type { Tab } from '../types/generated';
-
-// Extend generated types when needed
+// Extend when needed
 interface TabWithMetadata extends Tab {
   lastAccessed: number;
   syncStatus: 'pending' | 'synced' | 'error';
 }
 
-// Use type guards for runtime validation
+// Type guards for runtime validation
 function isValidTab(obj: unknown): obj is Tab {
   return (
     typeof obj === 'object' &&
@@ -340,39 +231,17 @@ function isValidTab(obj: unknown): obj is Tab {
   );
 }
 
-// When the Rust API changes, regenerate types immediately
-// Run: pnpm run gen:api-models
-// Then fix any TypeScript compilation errors
-```
-
-**Type-Safe Message Passing:**
-
-```typescript
-// Define discriminated unions for messages
+// Discriminated unions for messages
 type BackgroundMessage =
   | { type: 'TRACK_WINDOW'; windowId: number }
   | { type: 'UNTRACK_WINDOW'; windowId: number }
   | { type: 'SYNC_NOW' }
   | { type: 'GET_STATUS' };
-
-// Type-safe message handler
-function handleMessage(message: BackgroundMessage): Promise<unknown> {
-  switch (message.type) {
-    case 'TRACK_WINDOW':
-      return trackWindow(message.windowId);
-    case 'UNTRACK_WINDOW':
-      return untrackWindow(message.windowId);
-    case 'SYNC_NOW':
-      return syncImmediately();
-    case 'GET_STATUS':
-      return getStatus();
-    // TypeScript ensures all cases are handled
-  }
-}
 ```
 
-### Performance Considerations
+#### Performance Best Practices
 
+<<<<<<< HEAD
 **Extension Performance Guidelines:**
 
 1. **Minimize Background Script Memory:**
@@ -531,12 +400,15 @@ type BackgroundMessage =
 
 #### Performance Best Practices
 
+=======
+>>>>>>> 9a47c30 (refactor: compact CLAUDE.md while preserving essential details)
 1. **Memory**: Use browser storage instead of keeping all data in memory
 2. **Events**: Debounce frequent events (tab updates, etc.)
 3. **Heavy ops**: Use Web Workers for CRDT operations
 4. **Loading**: Lazy load non-critical features
 5. **Storage**: Batch writes instead of multiple small writes
 6. **Monitoring**: Use performance marks for critical operations
+<<<<<<< HEAD
 =======
 - After compacting, read the docs and @CLAUDE.md to refresh your instructions.
 - When you encounter patterns or lessons that would be helpful to remember, proactively suggest adding them to CLAUDE.md or relevant documentation
@@ -546,6 +418,8 @@ type BackgroundMessage =
   - Markdown: `pnpm run lint:md` will run automatically on commit via git hooks
   - If markdown linting fails, fix the issues (usually missing blank lines around code blocks/lists) before retrying
 >>>>>>> a206e65 (docs: add pre-commit checklist memory to CLAUDE.md)
+=======
+>>>>>>> 9a47c30 (refactor: compact CLAUDE.md while preserving essential details)
 
 ### Writing Testable Code
 
@@ -564,7 +438,11 @@ class SyncManager {
 
 // Bad - hardcoded dependencies
 class SyncManager {
+<<<<<<< HEAD
   private api = new TanakaAPI("https://hardcoded.com");
+=======
+  private api = new TanakaAPI('https://hardcoded.com');
+>>>>>>> 9a47c30 (refactor: compact CLAUDE.md while preserving essential details)
 }
 ```
 
@@ -624,6 +502,7 @@ class SyncManager {
 - NEVER use `git add -A` or `git add .`
 - Review with `git diff --cached` before committing
 
+<<<<<<< HEAD
   ```typescript
   // Testable design
   class BackgroundService {
@@ -718,6 +597,9 @@ Instead:
 - Always review staged changes with `git diff --cached` before committing
 
 **Good example:**
+=======
+Example:
+>>>>>>> 9a47c30 (refactor: compact CLAUDE.md while preserving essential details)
 
 ```bash
 git add /Users/manish/projects/tanaka/extension/src/background.ts
