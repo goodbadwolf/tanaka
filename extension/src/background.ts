@@ -1,24 +1,26 @@
 import 'reflect-metadata';
-import browser from 'webextension-polyfill';
-import { type MessageResponse } from './core.js';
 import { container } from './di/container.js';
+import { type MessageResponse } from './core.js';
+import type { IBrowser } from './browser/core.js';
 import { TanakaAPI } from './api/api.js';
 import { debugLog } from './utils/logger.js';
 import { SyncManager, TabEventHandler, MessageHandler, UserSettingsManager } from './sync';
 
-class BackgroundService {
+export class BackgroundService {
+  private readonly browser: IBrowser;
   private readonly api: TanakaAPI;
   private readonly syncManager: SyncManager;
   private readonly tabEventHandler: TabEventHandler;
   private readonly userSettingsManager: UserSettingsManager;
   private readonly messageHandler: MessageHandler;
 
-  constructor() {
-    this.api = container.resolve(TanakaAPI);
-    this.syncManager = container.resolve(SyncManager);
-    this.tabEventHandler = container.resolve(TabEventHandler);
-    this.userSettingsManager = container.resolve(UserSettingsManager);
-    this.messageHandler = container.resolve(MessageHandler);
+  constructor(serviceContainer: typeof container) {
+    this.browser = serviceContainer.resolve<IBrowser>('IBrowser');
+    this.api = serviceContainer.resolve<TanakaAPI>(TanakaAPI);
+    this.syncManager = serviceContainer.resolve(SyncManager);
+    this.tabEventHandler = serviceContainer.resolve(TabEventHandler);
+    this.userSettingsManager = serviceContainer.resolve(UserSettingsManager);
+    this.messageHandler = serviceContainer.resolve(MessageHandler);
   }
 
   async initialize(): Promise<void> {
@@ -31,20 +33,22 @@ class BackgroundService {
   private setupListeners(): void {
     this.tabEventHandler.setupListeners();
 
-    browser.runtime.onMessage.addListener(async (message: unknown): Promise<MessageResponse> => {
-      // Handle SETTINGS_UPDATED directly in background service
-      if (
-        typeof message === 'object' &&
-        message !== null &&
-        'type' in message &&
-        message.type === 'SETTINGS_UPDATED'
-      ) {
-        await this.reinitializeWithNewSettings();
-        return { success: true };
-      }
+    this.browser.runtime.onMessage.addListener(
+      async (message: unknown): Promise<MessageResponse> => {
+        // Handle SETTINGS_UPDATED directly in background service
+        if (
+          typeof message === 'object' &&
+          message !== null &&
+          'type' in message &&
+          message.type === 'SETTINGS_UPDATED'
+        ) {
+          await this.reinitializeWithNewSettings();
+          return { success: true };
+        }
 
-      return this.messageHandler.handleMessage(message);
-    });
+        return this.messageHandler.handleMessage(message);
+      },
+    );
   }
 
   private async reinitializeWithNewSettings(): Promise<void> {
@@ -58,7 +62,15 @@ class BackgroundService {
 
     debugLog('Reinitialized with updated settings');
   }
+
+  cleanup(): void {
+    this.tabEventHandler.cleanup();
+    this.syncManager.stop();
+  }
 }
 
-const backgroundService = new BackgroundService();
-backgroundService.initialize();
+// Only create and initialize if this is the main script
+if (typeof module === 'undefined') {
+  const backgroundService = new BackgroundService(container);
+  backgroundService.initialize();
+}
