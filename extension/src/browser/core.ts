@@ -48,9 +48,6 @@ export interface IBrowser {
   runtime: IRuntime;
 }
 
-// Re-export commonly used types from webextension-polyfill
-export type { Tabs, Windows, Runtime } from 'webextension-polyfill';
-
 // Export specific nested types that are commonly used
 export type Tab = Tabs.Tab;
 export type Window = Windows.Window;
