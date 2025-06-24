@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import '@testing-library/jest-dom';
 
 // Mock browser APIs for all tests
 jest.mock('webextension-polyfill', () => ({

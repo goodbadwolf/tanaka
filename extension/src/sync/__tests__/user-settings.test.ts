@@ -1,4 +1,4 @@
-import { createTestContainer } from '../../di/container';
+import { createTestContainer } from '../../test/test-container';
 import { UserSettingsManager } from '../user-settings';
 import { createMockBrowser } from '../../browser/__mocks__';
 import type { IBrowser } from '../../browser/core';

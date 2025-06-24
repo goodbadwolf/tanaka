@@ -40,11 +40,3 @@ container.register<MessageHandler>(MessageHandler, {
 });
 
 export { container };
-
-// Export a factory function for creating test containers
-export function createTestContainer() {
-  // Dynamic import is needed here to avoid circular dependency issues in tests
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { container: testContainer } = require('tsyringe');
-  return testContainer;
-}
