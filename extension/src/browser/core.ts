@@ -47,3 +47,10 @@ export interface IBrowser {
   localStorage: ILocalStorage;
   runtime: IRuntime;
 }
+
+export type Tab = Tabs.Tab;
+export type Window = Windows.Window;
+export type MessageSender = Runtime.MessageSender;
+export type OnRemovedRemoveInfoType = Tabs.OnRemovedRemoveInfoType;
+export type OnUpdatedChangeInfoType = Tabs.OnUpdatedChangeInfoType;
+export type OnMovedMoveInfoType = Tabs.OnMovedMoveInfoType;
