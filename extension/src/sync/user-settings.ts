@@ -1,5 +1,5 @@
-import browser from 'webextension-polyfill';
-import { injectable } from 'tsyringe';
+import { injectable, inject } from 'tsyringe';
+import type { IBrowser } from '../browser/core.js';
 
 const USER_SETTINGS_DEFAULTS = {
   authToken: 'unset-token',
@@ -12,8 +12,10 @@ const USER_SETTINGS_KEYS = Object.keys(USER_SETTINGS_DEFAULTS) as (keyof UserSet
 
 @injectable()
 export class UserSettingsManager {
+  constructor(@inject('IBrowser') private readonly browser: IBrowser) {}
+
   async load(): Promise<UserSettings> {
-    const stored = await browser.storage.local.get(USER_SETTINGS_KEYS);
+    const stored = await this.browser.localStorage.get(USER_SETTINGS_KEYS);
 
     return {
       ...USER_SETTINGS_DEFAULTS,
@@ -22,10 +24,10 @@ export class UserSettingsManager {
   }
 
   async save(settings: Partial<UserSettings>): Promise<void> {
-    await browser.storage.local.set(settings);
+    await this.browser.localStorage.set(settings);
   }
 
   async clear(): Promise<void> {
-    await browser.storage.local.remove(USER_SETTINGS_KEYS);
+    await this.browser.localStorage.remove(USER_SETTINGS_KEYS);
   }
 }
