@@ -1,6 +1,6 @@
 import { createContext, ComponentChildren } from 'preact';
 import { useContext } from 'preact/hooks';
-import { container as defaultContainer } from '../di/container';
+import { container as defaultContainer } from './container';
 import type { DependencyContainer } from 'tsyringe';
 
 const DIContext = createContext<DependencyContainer>(defaultContainer);

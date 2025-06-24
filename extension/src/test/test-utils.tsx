@@ -1,6 +1,6 @@
 import { render as preactRender } from '@testing-library/preact';
 import { ComponentChildren } from 'preact';
-import { DIProvider } from '../di/DIContext';
+import { DIProvider } from '../di/provider';
 import { createTestContainer } from '../di/container';
 import type { DependencyContainer } from 'tsyringe';
 import type { IBrowser } from '../browser/core';
