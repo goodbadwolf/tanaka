@@ -5,8 +5,8 @@
   "description": "Root-level tooling for Tanaka project",
   "packageManager": "pnpm@10.11.0",
   "scripts": {
-    "lint:md": "markdownlint-cli2 '*.md' 'docs/*.md' '!repomix-output.txt.md' '!docs/MIGRATION*.md'",
-    "lint:md:fix": "markdownlint-cli2 --fix '*.md' 'docs/*.md' '!repomix-output.txt.md'",
+    "lint:md": "markdownlint-cli2 '*.md' 'docs/*.md' '!repomix-output.txt.md' '!docs/MIGRATION*.md' '!docs/TESTING-UPGRADE.md'",
+    "lint:md:fix": "markdownlint-cli2 --fix '*.md' 'docs/*.md' '!repomix-output.txt.md' '!docs/MIGRATION*.md' '!docs/TESTING-UPGRADE.md'",
     "gen:api-models": "cd server && ./scripts/generate-api-models.sh"
   },
   "devDependencies": {
