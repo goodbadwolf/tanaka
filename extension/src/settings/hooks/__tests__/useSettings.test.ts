@@ -1,10 +1,11 @@
 import { describe, it, expect, jest, beforeEach, afterEach } from '@jest/globals';
+import { renderHook, act } from '@testing-library/preact';
 
 // Mock browser
 jest.mock('webextension-polyfill');
 
 import browser from 'webextension-polyfill';
-import { useSettings } from './useSettings';
+import { useSettings } from '../useSettings';
 
 describe('useSettings', () => {
   const mockBrowser = jest.mocked(browser);
@@ -19,20 +20,22 @@ describe('useSettings', () => {
   });
 
   it('should return initial state', () => {
-    const result = useSettings();
+    const { result } = renderHook(() => useSettings());
 
-    expect(result.authToken).toBe('');
-    expect(result.isSaving).toBe(false);
-    expect(result.saveStatus).toBeNull();
-    expect(typeof result.saveAuthToken).toBe('function');
+    expect(result.current.authToken).toBe('');
+    expect(result.current.isSaving).toBe(false);
+    expect(result.current.saveStatus).toBeNull();
+    expect(typeof result.current.saveAuthToken).toBe('function');
   });
 
   it('should validate empty auth token', async () => {
-    const result = useSettings();
+    const { result } = renderHook(() => useSettings());
 
-    await result.saveAuthToken('');
+    act(() => {
+      result.current.saveAuthToken('');
+    });
 
-    expect(result.saveStatus).toEqual({
+    expect(result.current.saveStatus).toEqual({
       type: 'error',
       message: 'Auth token is required',
     });
@@ -40,11 +43,13 @@ describe('useSettings', () => {
   });
 
   it('should validate whitespace-only auth token', async () => {
-    const result = useSettings();
+    const { result } = renderHook(() => useSettings());
 
-    await result.saveAuthToken('   ');
+    act(() => {
+      result.current.saveAuthToken('   ');
+    });
 
-    expect(result.saveStatus).toEqual({
+    expect(result.current.saveStatus).toEqual({
       type: 'error',
       message: 'Auth token is required',
     });
@@ -55,9 +60,11 @@ describe('useSettings', () => {
     mockBrowser.storage.local.set.mockResolvedValue(undefined);
     mockBrowser.runtime.sendMessage.mockResolvedValue(undefined);
 
-    const result = useSettings();
+    const { result } = renderHook(() => useSettings());
 
-    await result.saveAuthToken('valid-token');
+    await act(async () => {
+      await result.current.saveAuthToken('valid-token');
+    });
 
     expect(mockBrowser.storage.local.set).toHaveBeenCalledWith({
       authToken: 'valid-token',
@@ -65,15 +72,21 @@ describe('useSettings', () => {
     expect(mockBrowser.runtime.sendMessage).toHaveBeenCalledWith({
       type: 'SETTINGS_UPDATED',
     });
+    expect(result.current.saveStatus).toEqual({
+      type: 'success',
+      message: 'Authentication saved successfully',
+    });
   });
 
   it('should trim auth token before saving', async () => {
     mockBrowser.storage.local.set.mockResolvedValue(undefined);
     mockBrowser.runtime.sendMessage.mockResolvedValue(undefined);
 
-    const result = useSettings();
+    const { result } = renderHook(() => useSettings());
 
-    await result.saveAuthToken('  valid-token  ');
+    await act(async () => {
+      await result.current.saveAuthToken('  valid-token  ');
+    });
 
     expect(mockBrowser.storage.local.set).toHaveBeenCalledWith({
       authToken: 'valid-token',
@@ -84,26 +97,32 @@ describe('useSettings', () => {
     const error = new Error('Storage error');
     mockBrowser.storage.local.set.mockRejectedValue(error);
 
-    const result = useSettings();
+    const { result } = renderHook(() => useSettings());
 
-    await result.saveAuthToken('valid-token');
+    await act(async () => {
+      await result.current.saveAuthToken('valid-token');
+    });
 
-    expect(result.saveStatus).toEqual({
+    expect(result.current.saveStatus).toEqual({
       type: 'error',
       message: 'Failed to save authentication',
     });
   });
 
   it('should clear status message after timeout', async () => {
-    const result = useSettings();
+    const { result } = renderHook(() => useSettings());
 
-    await result.saveAuthToken('');
+    act(() => {
+      result.current.saveAuthToken('');
+    });
 
-    expect(result.saveStatus).not.toBeNull();
+    expect(result.current.saveStatus).not.toBeNull();
 
     // Fast-forward time
-    jest.advanceTimersByTime(3000);
+    act(() => {
+      jest.advanceTimersByTime(3000);
+    });
 
-    expect(result.saveStatus).toBeNull();
+    expect(result.current.saveStatus).toBeNull();
   });
 });

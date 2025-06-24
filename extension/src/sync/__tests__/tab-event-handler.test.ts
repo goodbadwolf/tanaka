@@ -1,7 +1,8 @@
-import { describe, it, expect, jest, beforeEach, afterEach } from '@jest/globals';
+import { describe, it, expect, jest, beforeEach } from '@jest/globals';
 
 // Mock webextension-polyfill before imports
 jest.mock('webextension-polyfill');
+jest.mock('../../utils/logger');
 
 import browser from 'webextension-polyfill';
 import { TabEventHandler } from '../tab-event-handler';
@@ -12,7 +13,6 @@ describe('TabEventHandler', () => {
   let tabEventHandler: TabEventHandler;
   let mockWindowTracker: jest.Mocked<WindowTracker>;
   let mockSyncManager: jest.Mocked<SyncManager>;
-  let consoleLogSpy: ReturnType<typeof jest.spyOn>;
 
   // Event listeners
   let onTabCreatedListener: (tab: browser.Tabs.Tab) => Promise<void>;
@@ -33,9 +33,6 @@ describe('TabEventHandler', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-
-    // Setup console spy
-    consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
 
     // Mock browser event listeners
     const mockBrowser = browser;
@@ -109,10 +106,6 @@ describe('TabEventHandler', () => {
     tabEventHandler = new TabEventHandler(mockWindowTracker, mockSyncManager);
   });
 
-  afterEach(() => {
-    consoleLogSpy.mockRestore();
-  });
-
   describe('setupListeners', () => {
     it('should register all event listeners', () => {
       tabEventHandler.setupListeners();
@@ -138,7 +131,8 @@ describe('TabEventHandler', () => {
         await onTabCreatedListener(tab);
 
         expect(mockWindowTracker.isTracked).toHaveBeenCalledWith(123);
-        expect(consoleLogSpy).toHaveBeenCalledWith('Tab created:', tab);
+        const { debugLog } = await import('../../utils/logger');
+        expect(debugLog).toHaveBeenCalledWith('Tab created:', tab);
         expect(mockSyncManager.syncNow).toHaveBeenCalled();
       });
 
@@ -170,7 +164,8 @@ describe('TabEventHandler', () => {
         await onTabRemovedListener(1, removeInfo);
 
         expect(mockWindowTracker.isTracked).toHaveBeenCalledWith(123);
-        expect(consoleLogSpy).toHaveBeenCalledWith('Tab removed:', 1);
+        const { debugLog } = await import('../../utils/logger');
+        expect(debugLog).toHaveBeenCalledWith('Tab removed:', 1);
         expect(mockSyncManager.syncNow).toHaveBeenCalled();
       });
 
@@ -194,7 +189,8 @@ describe('TabEventHandler', () => {
         await onTabUpdatedListener(1, changeInfo, tab);
 
         expect(mockWindowTracker.isTracked).toHaveBeenCalledWith(123);
-        expect(consoleLogSpy).toHaveBeenCalledWith('Tab updated:', 1, changeInfo);
+        const { debugLog } = await import('../../utils/logger');
+        expect(debugLog).toHaveBeenCalledWith('Tab updated:', 1, changeInfo);
         expect(mockSyncManager.syncNow).toHaveBeenCalled();
       });
 
@@ -227,7 +223,8 @@ describe('TabEventHandler', () => {
         await onTabMovedListener(1, moveInfo);
 
         expect(mockWindowTracker.isTracked).toHaveBeenCalledWith(123);
-        expect(consoleLogSpy).toHaveBeenCalledWith('Tab moved:', 1, moveInfo);
+        const { debugLog } = await import('../../utils/logger');
+        expect(debugLog).toHaveBeenCalledWith('Tab moved:', 1, moveInfo);
         expect(mockSyncManager.syncNow).toHaveBeenCalled();
       });
 
@@ -250,7 +247,8 @@ describe('TabEventHandler', () => {
 
         expect(mockWindowTracker.isTracked).toHaveBeenCalledWith(123);
         expect(mockWindowTracker.untrack).toHaveBeenCalledWith(123);
-        expect(consoleLogSpy).toHaveBeenCalledWith('Tracked window removed:', 123);
+        const { debugLog } = await import('../../utils/logger');
+        expect(debugLog).toHaveBeenCalledWith('Tracked window removed:', 123);
         expect(mockSyncManager.syncNow).toHaveBeenCalled();
         expect(mockSyncManager.stop).not.toHaveBeenCalled();
       });

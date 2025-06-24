@@ -2,6 +2,9 @@ import { describe, it, expect, jest, beforeEach } from '@jest/globals';
 import { TanakaAPI, APIError, browserTabToSyncTab, parseSyncTab } from '../api';
 import type { Tab } from '../models';
 
+// Mock logger
+jest.mock('../../utils/logger');
+
 // Mock fetch globally
 (globalThis as { fetch: typeof fetch }).fetch = jest.fn() as jest.MockedFunction<typeof fetch>;
 
@@ -24,7 +27,7 @@ describe('TanakaAPI', () => {
 
     it('should throw APIError with invalid URL', () => {
       expect(() => new TanakaAPI('not-a-url')).toThrow(APIError);
-      expect(() => new TanakaAPI('not-a-url')).toThrow('Invalid server URL');
+      expect(() => new TanakaAPI('not-a-url')).toThrow('Invalid server base URL');
     });
   });
 
@@ -85,14 +88,13 @@ describe('TanakaAPI', () => {
     });
 
     it('should log and rethrow errors', async () => {
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
       const error = new Error('Network error');
       mockFetch.mockRejectedValueOnce(error);
 
       await expect(api.syncTabs([])).rejects.toThrow('Network error');
-      expect(consoleErrorSpy).toHaveBeenCalledWith('Sync failed:', error);
 
-      consoleErrorSpy.mockRestore();
+      const { debugError } = await import('../../utils/logger');
+      expect(debugError).toHaveBeenCalledWith('Sync failed:', error);
     });
   });
 

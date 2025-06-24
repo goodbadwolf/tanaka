@@ -2,11 +2,13 @@ import { describe, it, expect, jest, beforeEach, afterEach } from '@jest/globals
 
 // Mock webextension-polyfill before any imports that use it
 jest.mock('webextension-polyfill');
+jest.mock('../../utils/logger');
 
 import { SyncManager } from '../sync-manager';
 import { TanakaAPI } from '../../api/api';
 import { WindowTracker } from '../window-tracker';
 import browser from 'webextension-polyfill';
+import { debugLog, debugError } from '../../utils/logger';
 
 // Mock API
 jest.mock('../../api/api');
@@ -22,8 +24,8 @@ describe('SyncManager', () => {
   let mockApi: jest.Mocked<TanakaAPI>;
   let mockWindowTracker: jest.Mocked<WindowTracker>;
   let mockBrowser: MockBrowser;
-  let consoleLogSpy: ReturnType<typeof jest.spyOn>;
-  let consoleErrorSpy: ReturnType<typeof jest.spyOn>;
+  let mockDebugLog: jest.MockedFunction<typeof debugLog>;
+  let mockDebugError: jest.MockedFunction<typeof debugError>;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -43,16 +45,15 @@ describe('SyncManager', () => {
 
     mockApi.syncTabs = jest.fn();
 
-    consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
-    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    // Mock logger functions
+    mockDebugLog = jest.mocked(debugLog);
+    mockDebugError = jest.mocked(debugError);
 
     syncManager = new SyncManager(mockApi, mockWindowTracker);
   });
 
   afterEach(() => {
     jest.useRealTimers();
-    consoleLogSpy.mockRestore();
-    consoleErrorSpy.mockRestore();
   });
 
   describe('syncNow', () => {
@@ -91,7 +92,7 @@ describe('SyncManager', () => {
           expect.objectContaining({ id: 'tab-3', windowId: 'window-2' }),
         ]),
       );
-      expect(consoleLogSpy).toHaveBeenCalledWith('Synced 3 local tabs, received 0 total tabs');
+      expect(mockDebugLog).toHaveBeenCalledWith('Synced 3 local tabs, received 0 total tabs');
     });
 
     it('should handle errors when querying tabs', async () => {
@@ -103,7 +104,7 @@ describe('SyncManager', () => {
 
       await syncManager.syncNow();
 
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
+      expect(mockDebugError).toHaveBeenCalledWith(
         'Failed to get tabs for window 1:',
         expect.any(Error),
       );
@@ -120,7 +121,7 @@ describe('SyncManager', () => {
 
       await syncManager.syncNow();
 
-      expect(consoleErrorSpy).toHaveBeenCalledWith('Sync failed:', error);
+      expect(mockDebugError).toHaveBeenCalledWith('Sync failed:', error);
     });
 
     it('should filter out tabs without windowId', async () => {

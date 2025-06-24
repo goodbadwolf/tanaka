@@ -107,18 +107,25 @@ When developing locally, you may not need production certificates. You can:
 ## 5. Running tests & lint
 
 ```bash
-# Rust
+# Rust Server
+cd ../server
 cargo fmt --all && cargo clippy --all-targets -- -D warnings
 cargo test
 
-# TypeScript
-pnpm run lint
+# Extension (TypeScript)
+cd ../extension
+pnpm install
+pnpm run lint        # ESLint checks
+pnpm run typecheck   # TypeScript type checking
+pnpm run test        # Jest unit & UI tests
+pnpm run test:watch  # Watch mode
 ```
 
 ### Testing Strategy
 
 - **Rust Server**: Unit tests for core logic, integration tests for API endpoints
-- **Extension**: Linting only (manual testing in Firefox required)
+- **Extension**: Automated unit/UI tests via Jest covering sync logic, messaging,
+  background service, hooks, and UI components
 - **End-to-End**: Manual testing with multiple Firefox instances
 
 ---

@@ -3,6 +3,7 @@
 declare module '@env' {
   export const config: {
     readonly serverUrl: string;
+    readonly environment: string;
   };
 }
 
