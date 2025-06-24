@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'preact/hooks';
-import { Browser } from '../browser/index.js';
+import { useService } from '../di/provider.js';
+import type { IBrowser } from '../browser/core.js';
 import { getConfig } from '../config/index.js';
 
 interface ExtensionState {
@@ -9,9 +10,8 @@ interface ExtensionState {
   error: string | null;
 }
 
-const browser = new Browser();
-
 export function useExtensionState() {
+  const browser = useService<IBrowser>('IBrowser');
   const [isLoading, setIsLoading] = useState(true);
   const [isConfigured, setIsConfigured] = useState(false);
   const [serverUrl, setServerUrl] = useState('');
@@ -40,7 +40,7 @@ export function useExtensionState() {
     };
 
     loadExtensionState();
-  }, []);
+  }, [browser]);
 
   return {
     isLoading,
