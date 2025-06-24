@@ -34,14 +34,8 @@ container.register<SyncManager>(SyncManager, {
   },
 });
 
-// Register TabEventHandler with factory
-container.register<TabEventHandler>(TabEventHandler, {
-  useFactory: (dependencyContainer) => {
-    const windowTracker = dependencyContainer.resolve(WindowTracker);
-    const syncManager = dependencyContainer.resolve(SyncManager);
-    return new TabEventHandler(windowTracker, syncManager);
-  },
-});
+// Register TabEventHandler as singleton
+container.registerSingleton<TabEventHandler>(TabEventHandler);
 
 // Register MessageHandler with factory
 container.register<MessageHandler>(MessageHandler, {
