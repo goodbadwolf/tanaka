@@ -28,7 +28,10 @@ h1 {
   color: #1a1a1a;
 }
 
-.settings-section {
+.settings-section,
+.auth-section,
+.sync-section,
+.server-info {
   background: white;
   border-radius: 8px;
   padding: 24px;
@@ -36,7 +39,10 @@ h1 {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.settings-section h2 {
+.settings-section h2,
+.auth-section h2,
+.sync-section h2,
+.server-info h2 {
   font-size: 18px;
   font-weight: 600;
   margin-bottom: 8px;
@@ -73,13 +79,19 @@ h1 {
   border-color: #0066cc;
 }
 
-.field-help {
+.field-help,
+.help-text {
   margin-top: 6px;
   font-size: 13px;
   color: #666;
 }
 
-.btn-primary {
+.form-actions {
+  margin-top: 24px;
+}
+
+.btn-primary,
+button[type='submit'] {
   background: #0066cc;
   color: white;
   border: none;
@@ -91,12 +103,19 @@ h1 {
   transition: background 0.2s;
 }
 
-.btn-primary:hover {
+.btn-primary:hover,
+button[type='submit']:hover:not(:disabled) {
   background: #0052a3;
 }
 
-.btn-primary:active {
+.btn-primary:active,
+button[type='submit']:active:not(:disabled) {
   background: #004085;
+}
+
+button[type='submit']:disabled {
+  background: #ccc;
+  cursor: not-allowed;
 }
 
 .server-info {

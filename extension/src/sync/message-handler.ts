@@ -30,10 +30,12 @@ export class MessageHandler {
     }
   }
 
-  private handleTrackWindow(msg: Message & { type: 'TRACK_WINDOW' }): MessageResponse {
+  private async handleTrackWindow(
+    msg: Message & { type: 'TRACK_WINDOW' },
+  ): Promise<MessageResponse> {
     this.windowTracker.track(msg.windowId);
     debugLog('Now tracking window:', msg.windowId);
-    this.syncManager.start();
+    await this.syncManager.start();
     return { success: true };
   }
 
