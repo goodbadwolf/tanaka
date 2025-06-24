@@ -1,6 +1,11 @@
 import { injectable, inject } from 'tsyringe';
-import type { Tabs } from 'webextension-polyfill';
-import type { IBrowser } from '../browser/core.js';
+import type {
+  IBrowser,
+  Tab,
+  OnRemovedRemoveInfoType,
+  OnUpdatedChangeInfoType,
+  OnMovedMoveInfoType,
+} from '../browser/core.js';
 import { WindowTracker } from './window-tracker.js';
 import { SyncManager } from './sync-manager.js';
 import { debugLog } from '../utils/logger.js';
@@ -46,7 +51,7 @@ export class TabEventHandler {
     this.unsubscribers = [];
   }
 
-  private async handleTabCreated(tab: Tabs.Tab): Promise<void> {
+  private async handleTabCreated(tab: Tab): Promise<void> {
     if (tab.windowId && this.windowTracker.isTracked(tab.windowId)) {
       debugLog('Tab created:', tab);
       await this.syncManager.syncNow();
@@ -55,7 +60,7 @@ export class TabEventHandler {
 
   private async handleTabRemoved(
     tabId: number,
-    removeInfo: Tabs.OnRemovedRemoveInfoType,
+    removeInfo: OnRemovedRemoveInfoType,
   ): Promise<void> {
     if (this.windowTracker.isTracked(removeInfo.windowId)) {
       debugLog('Tab removed:', tabId);
@@ -65,8 +70,8 @@ export class TabEventHandler {
 
   private async handleTabUpdated(
     tabId: number,
-    changeInfo: Tabs.OnUpdatedChangeInfoType,
-    tab: Tabs.Tab,
+    changeInfo: OnUpdatedChangeInfoType,
+    tab: Tab,
   ): Promise<void> {
     if (tab.windowId && this.windowTracker.isTracked(tab.windowId) && changeInfo.url) {
       debugLog('Tab updated:', tabId, changeInfo);
@@ -74,7 +79,7 @@ export class TabEventHandler {
     }
   }
 
-  private async handleTabMoved(tabId: number, moveInfo: Tabs.OnMovedMoveInfoType): Promise<void> {
+  private async handleTabMoved(tabId: number, moveInfo: OnMovedMoveInfoType): Promise<void> {
     if (this.windowTracker.isTracked(moveInfo.windowId)) {
       debugLog('Tab moved:', tabId, moveInfo);
       await this.syncManager.syncNow();
