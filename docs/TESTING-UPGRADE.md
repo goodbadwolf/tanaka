@@ -745,11 +745,17 @@ export class TabRepository implements ITabRepository {
    - Refactor hooks to use DI ✅
    - Update component initialization ✅
 
-4. **Phase 4: Write Tests** (3-4 days)
+4. **Phase 4: Write Tests** (3-4 days) ✅
 
-   - Write unit tests for services
-   - Write integration tests for components
-   - Achieve 80%+ coverage
+   - Write unit tests for services ✅
+     - UserSettingsManager ✅
+     - TabEventHandler ✅
+     - WindowTracker ✅
+     - SyncManager ✅
+     - MessageHandler ✅
+   - Write integration tests for components ✅
+     - BackgroundService ✅
+   - Achieve 80%+ coverage (Pending: Popup components due to Preact/Jest compatibility issues)
 
 5. **Phase 5: Cleanup** (1 day)
    - Create domain models and repositories
