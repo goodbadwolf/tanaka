@@ -49,9 +49,14 @@ describe('SyncManager', () => {
 
   beforeEach(() => {
     jest.useFakeTimers();
-    // Mock window.setInterval
-    (globalThis as { window?: unknown }).window = { setInterval: jest.fn(setInterval) };
+    // Mock window.setInterval to use Jest's fake timers
+    (globalThis as { window?: unknown }).window = {
+      setInterval: jest.fn((callback: unknown, delay: unknown) =>
+        setInterval(callback as TimerHandler, delay as number),
+      ),
+    };
     testContainer = container.createChildContainer();
+    testContainer.clearInstances();
     mockBrowser = createMockBrowser();
 
     testContainer.register<IBrowser>('IBrowser', {
@@ -59,8 +64,8 @@ describe('SyncManager', () => {
     });
 
     mockWindowTracker = {
-      getTrackedCount: jest.fn().mockReturnValue(0),
-      getTrackedWindows: jest.fn().mockReturnValue([]),
+      getTrackedCount: jest.fn(),
+      getTrackedWindows: jest.fn(),
       isTracked: jest.fn(),
       track: jest.fn(),
       untrack: jest.fn(),
@@ -102,6 +107,7 @@ describe('SyncManager', () => {
 
       await syncManager.syncNow();
 
+      expect(mockWindowTracker.getTrackedCount).toHaveBeenCalled();
       expect(mockWindowTracker.getTrackedWindows).not.toHaveBeenCalled();
       expect(mockApi.syncTabs).not.toHaveBeenCalled();
     });
@@ -193,7 +199,7 @@ describe('SyncManager', () => {
   });
 
   describe('start', () => {
-    it.skip('loads settings and starts periodic sync', async () => {
+    it('loads settings and starts periodic sync', async () => {
       (mockWindowTracker.getTrackedCount as jest.Mock).mockReturnValue(1);
       (mockWindowTracker.getTrackedWindows as jest.Mock).mockReturnValue([100]);
       (mockBrowser.tabs.query as jest.Mock).mockImplementation(() =>
@@ -204,17 +210,26 @@ describe('SyncManager', () => {
 
       await syncManager.start();
 
+      // The initial syncNow is not awaited, so we need to flush promises
+      await Promise.resolve();
+
       expect(mockSettingsManager.load).toHaveBeenCalled();
       expect(mockApi.syncTabs).toHaveBeenCalledTimes(1);
 
+      // Advance timer and run the interval callback
       jest.advanceTimersByTime(5000);
+      // The interval callback calls syncNow() but doesn't await it, so we need multiple promise flushes
+      await Promise.resolve(); // For the interval callback to start
+      await Promise.resolve(); // For the syncNow promise to resolve
       expect(mockApi.syncTabs).toHaveBeenCalledTimes(2);
 
       jest.advanceTimersByTime(5000);
+      await Promise.resolve();
+      await Promise.resolve();
       expect(mockApi.syncTabs).toHaveBeenCalledTimes(3);
     });
 
-    it.skip('uses custom sync interval from settings', async () => {
+    it('uses custom sync interval from settings', async () => {
       (mockSettingsManager.load as jest.Mock).mockImplementation(() =>
         Promise.resolve({
           authToken: 'test-token',
@@ -230,15 +245,20 @@ describe('SyncManager', () => {
       );
 
       await syncManager.start();
+      await Promise.resolve();
 
       jest.advanceTimersByTime(5000);
+      await Promise.resolve();
+      await Promise.resolve();
       expect(mockApi.syncTabs).toHaveBeenCalledTimes(1); // Only initial sync
 
       jest.advanceTimersByTime(5000);
+      await Promise.resolve();
+      await Promise.resolve();
       expect(mockApi.syncTabs).toHaveBeenCalledTimes(2); // Now the interval fires
     });
 
-    it.skip('does not start multiple intervals', async () => {
+    it('does not start multiple intervals', async () => {
       (mockWindowTracker.getTrackedCount as jest.Mock).mockReturnValue(1);
       (mockWindowTracker.getTrackedWindows as jest.Mock).mockReturnValue([100]);
       (mockBrowser.tabs.query as jest.Mock).mockImplementation(() =>
@@ -248,15 +268,20 @@ describe('SyncManager', () => {
       );
 
       await syncManager.start();
+      await Promise.resolve();
+
       await syncManager.start();
+      await Promise.resolve();
 
       jest.advanceTimersByTime(5000);
-      expect(mockApi.syncTabs).toHaveBeenCalledTimes(3); // 2 initial + 1 interval
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(mockApi.syncTabs).toHaveBeenCalledTimes(2); // 1 initial + 1 interval (second start() returns early)
     });
   });
 
   describe('stop', () => {
-    it.skip('clears the sync interval', async () => {
+    it('clears the sync interval', async () => {
       (mockWindowTracker.getTrackedCount as jest.Mock).mockReturnValue(1);
       (mockWindowTracker.getTrackedWindows as jest.Mock).mockReturnValue([100]);
       (mockBrowser.tabs.query as jest.Mock).mockImplementation(() =>
@@ -266,9 +291,12 @@ describe('SyncManager', () => {
       );
 
       await syncManager.start();
+      await Promise.resolve();
       syncManager.stop();
 
       jest.advanceTimersByTime(10000);
+      await Promise.resolve();
+      await Promise.resolve();
       expect(mockApi.syncTabs).toHaveBeenCalledTimes(1); // Only initial sync
     });
 
@@ -278,7 +306,7 @@ describe('SyncManager', () => {
   });
 
   describe('restart', () => {
-    it.skip('stops and starts sync with updated settings', async () => {
+    it('stops and starts sync with updated settings', async () => {
       (mockWindowTracker.getTrackedCount as jest.Mock).mockReturnValue(1);
       (mockWindowTracker.getTrackedWindows as jest.Mock).mockReturnValue([100]);
       (mockBrowser.tabs.query as jest.Mock).mockImplementation(() =>
@@ -288,7 +316,11 @@ describe('SyncManager', () => {
       );
 
       await syncManager.start();
+      await Promise.resolve();
+
       jest.advanceTimersByTime(5000);
+      await Promise.resolve();
+      await Promise.resolve();
       expect(mockApi.syncTabs).toHaveBeenCalledTimes(2);
 
       // Change settings
@@ -300,9 +332,12 @@ describe('SyncManager', () => {
       );
 
       await syncManager.restart();
+      await Promise.resolve();
       expect(mockApi.syncTabs).toHaveBeenCalledTimes(3); // One more from restart
 
       jest.advanceTimersByTime(3000);
+      await Promise.resolve();
+      await Promise.resolve();
       expect(mockApi.syncTabs).toHaveBeenCalledTimes(4); // New interval fires
     });
   });
