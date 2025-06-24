@@ -1,6 +1,8 @@
 import { useSettings } from '../hooks/useSettings';
 import { getConfig } from '../../config/index.js';
-import browser from 'webextension-polyfill';
+import { Browser } from '../../browser/index.js';
+
+const browser = new Browser();
 
 export function SettingsApp() {
   const { settings, isSaving, saveStatus, saveSettings } = useSettings();

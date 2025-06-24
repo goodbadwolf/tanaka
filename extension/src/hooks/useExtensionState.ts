@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'preact/hooks';
-import browser from 'webextension-polyfill';
+import { Browser } from '../browser/index.js';
 import { getConfig } from '../config/index.js';
 
 interface ExtensionState {
@@ -8,6 +8,8 @@ interface ExtensionState {
   serverUrl: string;
   error: string | null;
 }
+
+const browser = new Browser();
 
 export function useExtensionState() {
   const [isLoading, setIsLoading] = useState(true);
@@ -24,7 +26,7 @@ export function useExtensionState() {
         setServerUrl(configServerUrl);
 
         // Check if auth token exists
-        const result = (await browser.storage.local.get(['authToken'])) as { authToken?: string };
+        const result = (await browser.localStorage.get(['authToken'])) as { authToken?: string };
         const hasAuthToken = Boolean(result.authToken);
 
         // Extension is configured if both server URL and auth token exist

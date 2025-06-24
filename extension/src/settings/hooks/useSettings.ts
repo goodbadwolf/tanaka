@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useState } from 'preact/hooks';
-import browser from 'webextension-polyfill';
+import { Browser } from '../../browser/index.js';
 import { debugError } from '../../utils/logger';
 import { UserSettingsManager, type UserSettings } from '../../sync/user-settings';
 import { container } from '../../di/container';
+
+const browser = new Browser();
 
 interface SaveStatus {
   type: 'success' | 'error';
