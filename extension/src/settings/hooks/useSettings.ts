@@ -1,19 +1,17 @@
 import { useCallback, useEffect, useState } from 'preact/hooks';
-import { Browser } from '../../browser/index.js';
+import { useService } from '../../di/provider.js';
+import type { IBrowser } from '../../browser/core.js';
 import { debugError } from '../../utils/logger';
 import { UserSettingsManager, type UserSettings } from '../../sync/user-settings';
-import { container } from '../../di/container';
-
-const browser = new Browser();
 
 interface SaveStatus {
   type: 'success' | 'error';
   message: string;
 }
 
-export function useSettings(settingsManager?: UserSettingsManager) {
-  // Use injected instance or resolve from container
-  const manager = settingsManager || container.resolve(UserSettingsManager);
+export function useSettings() {
+  const browser = useService<IBrowser>('IBrowser');
+  const manager = useService<UserSettingsManager>(UserSettingsManager);
   const [settings, setSettings] = useState<UserSettings | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<SaveStatus | null>(null);
@@ -81,7 +79,7 @@ export function useSettings(settingsManager?: UserSettingsManager) {
         setTimeout(() => setSaveStatus(null), 3000);
       }
     },
-    [settings, manager],
+    [settings, manager, browser],
   );
 
   return {

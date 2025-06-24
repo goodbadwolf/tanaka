@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from 'preact/hooks';
-import { Browser } from '../../browser/index.js';
+import { useService } from '../../di/provider.js';
+import type { IBrowser } from '../../browser/core.js';
 import type { Message, MessageResponse } from '../../core.js';
 
-const browser = new Browser();
-
 export function useWindowTracking() {
+  const browser = useService<IBrowser>('IBrowser');
   const [isTracked, setIsTracked] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -40,7 +40,7 @@ export function useWindowTracking() {
     };
 
     checkTrackingStatus();
-  }, []);
+  }, [browser]);
 
   const toggleTracking = useCallback(async () => {
     if (!windowId || isLoading) return;
@@ -67,7 +67,7 @@ export function useWindowTracking() {
     } finally {
       setIsLoading(false);
     }
-  }, [windowId, isTracked, isLoading]);
+  }, [windowId, isTracked, isLoading, browser]);
 
   return {
     isTracked,
