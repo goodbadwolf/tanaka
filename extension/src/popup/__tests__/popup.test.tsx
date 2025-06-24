@@ -13,20 +13,18 @@ jest.mock('preact', () => ({
 // Mock the debug import
 jest.mock('preact/debug', () => ({}));
 
+import { render } from 'preact';
+
 describe('popup entry point', () => {
-  let mockRender: jest.MockedFunction<any>;
+  const mockRender = render as jest.MockedFunction<typeof render>;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     // Mock document elements
     const mockRootElement = document.createElement('div');
     mockRootElement.id = 'root';
     jest.spyOn(document, 'getElementById').mockReturnValue(mockRootElement);
-    
-    // Get mocked render
-    const preact = jest.requireMock('preact');
-    mockRender = preact.render as jest.MockedFunction<any>;
   });
 
   it('should render PopupApp to root element', async () => {
@@ -35,14 +33,14 @@ describe('popup entry point', () => {
 
     expect(document.getElementById).toHaveBeenCalledWith('root');
     expect(mockRender).toHaveBeenCalled();
-    
+
     const renderCall = mockRender.mock.calls[0];
-    expect(renderCall[1]?.id).toBe('root');
+    expect((renderCall[1] as HTMLElement)?.id).toBe('root');
   });
 
   it('should handle missing root element gracefully', async () => {
     jest.spyOn(document, 'getElementById').mockReturnValue(null);
-    
+
     // Import should not throw even with null root
     await expect(import('../popup')).resolves.not.toThrow();
   });

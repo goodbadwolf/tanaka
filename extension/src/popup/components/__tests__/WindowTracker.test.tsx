@@ -3,13 +3,15 @@ import { render, fireEvent } from '@testing-library/preact';
 import { WindowTracker } from '../WindowTracker';
 
 // Mock the hook
-jest.mock('../../hooks/useWindowTracking');
+jest.mock('../../hooks/useWindowTracking', () => ({
+  useWindowTracking: jest.fn(),
+}));
 
 import { useWindowTracking } from '../../hooks/useWindowTracking';
 
 describe('WindowTracker', () => {
-  const mockToggleTracking = jest.fn();
-  const mockUseWindowTracking = useWindowTracking as jest.MockedFunction<typeof useWindowTracking>;
+  const mockToggleTracking = jest.fn(() => Promise.resolve());
+  const mockUseWindowTracking = jest.mocked(useWindowTracking);
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -24,11 +26,11 @@ describe('WindowTracker', () => {
     });
 
     const { getByRole, getByText } = render(<WindowTracker />);
-    
+
     const checkbox = getByRole('checkbox') as HTMLInputElement;
     expect(checkbox.checked).toBe(false);
     expect(checkbox.disabled).toBe(false);
-    
+
     expect(getByText('This window is not being synced')).toBeTruthy();
   });
 
@@ -41,10 +43,10 @@ describe('WindowTracker', () => {
     });
 
     const { getByRole, getByText } = render(<WindowTracker />);
-    
+
     const checkbox = getByRole('checkbox') as HTMLInputElement;
     expect(checkbox.checked).toBe(true);
-    
+
     expect(getByText('✓ This window is being synced')).toBeTruthy();
   });
 
@@ -57,7 +59,7 @@ describe('WindowTracker', () => {
     });
 
     const { getByRole } = render(<WindowTracker />);
-    
+
     const checkbox = getByRole('checkbox') as HTMLInputElement;
     expect(checkbox.disabled).toBe(true);
   });
@@ -72,7 +74,7 @@ describe('WindowTracker', () => {
     });
 
     const { getByText } = render(<WindowTracker />);
-    
+
     expect(getByText(`Error: ${errorMessage}`)).toBeTruthy();
   });
 
@@ -85,10 +87,10 @@ describe('WindowTracker', () => {
     });
 
     const { getByRole } = render(<WindowTracker />);
-    
+
     const checkbox = getByRole('checkbox');
     fireEvent.click(checkbox);
-    
+
     expect(mockToggleTracking).toHaveBeenCalledTimes(1);
   });
 
@@ -101,7 +103,7 @@ describe('WindowTracker', () => {
     });
 
     const { getByText } = render(<WindowTracker />);
-    
+
     expect(getByText('Sync this window')).toBeTruthy();
   });
 });
