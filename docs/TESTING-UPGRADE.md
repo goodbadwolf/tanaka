@@ -781,8 +781,9 @@ The result will be a professional-grade codebase that's a pleasure to work with 
 
 ```
 main
-├── feat/testing-abstractions       # Phase 1: Create all abstractions and interfaces
-├── feat/testing-services          # Phase 2: Refactor services to use abstractions
+├── feat/testing-abstractions       # Phase 1: Create all abstractions and interfaces ✅
+├── feat/testing-services          # Phase 2: Refactor services to use abstractions ✅
+├── feat/remove-browser-imports    # Phase 2.5: Remove direct browser polyfill imports
 ├── feat/testing-components        # Phase 3: Update React components and hooks
 ├── feat/testing-suite             # Phase 4: Implement comprehensive test suite
 └── feat/testing-cleanup           # Phase 5: Final cleanup and documentation
@@ -818,44 +819,64 @@ main
    - Added test coverage thresholds (80%)
    - Configured test environment and mocks
 
-#### Branch: `feat/testing-services`
+#### Branch: `feat/testing-services` ✅ COMPLETED
 **Purpose**: Refactor all services to use dependency injection and abstractions
 
+**Completed Commits**:
+1. ✅ `refactor: update UserSettingsManager to use injected browser`
+   - Modified `/extension/src/sync/user-settings.ts`
+   - Added constructor injection for `IBrowser`
+   - Replaced direct `browser.storage.local` with `this.browser.localStorage`
+   - Updated all methods to use injected dependency
+
+2. ✅ `refactor: update TabEventHandler to use injected browser`
+   - Modified `/extension/src/sync/tab-event-handler.ts`
+   - Added constructor injection for `IBrowser`
+   - Stored event handler references for proper cleanup
+   - Replaced all `browser.tabs` and `browser.windows` calls
+   - Added cleanup() method for removing event listeners
+
+3. ✅ `refactor: update WindowTracker to use injected browser`
+   - No changes needed - WindowTracker doesn't use browser APIs
+   - Kept as in-memory state tracker
+
+4. ✅ `refactor: update MessageHandler to use injected browser`
+   - No changes needed - MessageHandler doesn't use browser APIs directly
+
+5. ✅ `refactor: update API client to use injected browser`
+   - Modified `/extension/src/api/api.ts`
+   - Removed direct browser import, using only types
+   - Updated function signatures to use Tabs type directly
+
+6. ✅ `refactor: create BackgroundService class for better testability`
+   - Refactored `/extension/src/background.ts`
+   - Created `BackgroundService` class with DI container injection
+   - Added cleanup() method
+   - Kept module check for backward compatibility
+
+#### Branch: `feat/remove-browser-imports`
+**Purpose**: Remove all direct browser polyfill imports and centralize browser API access
+
 **Commits**:
-1. `refactor: update UserSettingsManager to use injected browser`
-   - Modify `/extension/src/sync/user-settings.ts`
-   - Add constructor injection for `IBrowser`
-   - Replace direct `browser.storage.local` with `this.browser.localStorage`
-   - Update all methods to use injected dependency
+1. `refactor: add browser API type re-exports to core.ts`
+   - Modify `/extension/src/browser/core.ts`
+   - Re-export commonly used types from 'webextension-polyfill'
+   - Add type aliases for better naming consistency
 
-2. `refactor: update TabEventHandler to use injected browser`
-   - Modify `/extension/src/sync/tab-event-handler.ts`
-   - Add constructor injection for `IBrowser`
-   - Store event handler references for proper cleanup
-   - Replace all `browser.tabs` and `browser.windows` calls
+2. `refactor: remove browser polyfill imports from remaining files`
+   - Search for all `import.*webextension-polyfill` outside src/browser
+   - Replace with imports from `../browser/core` or `IBrowser`
+   - Update type references to use centralized exports
+   - Files to check:
+     - Any remaining service files
+     - Hook files
+     - Component files
+     - Utility files
 
-3. `refactor: update WindowTracker to use injected browser`
-   - Modify `/extension/src/sync/window-tracker.ts`
-   - Inject `IBrowser` dependency
-   - Update storage calls to use `localStorage`
-   - Maintain same public interface
-
-4. `refactor: update MessageHandler to use injected browser`
-   - Modify `/extension/src/sync/message-handler.ts`
-   - Add `IBrowser` injection
-   - Update `browser.tabs.query` and `browser.windows.getCurrent` calls
-   - Ensure all message responses work correctly
-
-5. `refactor: update API client to use injected browser`
-   - Modify `/extension/src/api/api.ts` if it uses browser APIs
-   - Inject dependencies as needed
-   - Update any direct browser API usage
-
-6. `refactor: create BackgroundService class for better testability`
-   - Refactor `/extension/src/background.ts`
-   - Extract initialization into `BackgroundService` class
-   - Inject all dependencies through constructor
-   - Keep existing entry point for backward compatibility
+3. `refactor: update browser API usage to use injected instances`
+   - Ensure all browser API calls go through injected dependencies
+   - No direct browser.* calls outside of src/browser directory
+   - Verify all functionality still works correctly
 
 #### Branch: `feat/testing-components`
 **Purpose**: Update all React components and hooks to use dependency injection
