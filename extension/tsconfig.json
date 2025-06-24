@@ -23,5 +23,13 @@
     "types": ["webextension-polyfill", "firefox-webext-browser"]
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/test/**/*",
+    "src/**/__tests__/**/*",
+    "src/**/__mocks__/**/*"
+  ]
 }
