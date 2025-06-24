@@ -115,7 +115,8 @@ describe('TabEventHandler', () => {
 
     beforeEach(() => {
       tabEventHandler.setupListeners();
-      tabCreatedHandler = (mockBrowser.tabs.onCreated.addListener as jest.Mock).mock.calls[0][0];
+      tabCreatedHandler = (mockBrowser.tabs.onCreated.addListener as jest.Mock).mock
+        .calls[0][0] as (tab: Tab) => Promise<void>;
     });
 
     it('syncs when tab is created in tracked window', async () => {
@@ -153,7 +154,8 @@ describe('TabEventHandler', () => {
 
     beforeEach(() => {
       tabEventHandler.setupListeners();
-      tabRemovedHandler = (mockBrowser.tabs.onRemoved.addListener as jest.Mock).mock.calls[0][0];
+      tabRemovedHandler = (mockBrowser.tabs.onRemoved.addListener as jest.Mock).mock
+        .calls[0][0] as (tabId: number, removeInfo: OnRemovedRemoveInfoType) => Promise<void>;
     });
 
     it('syncs when tab is removed from tracked window', async () => {
@@ -186,7 +188,12 @@ describe('TabEventHandler', () => {
 
     beforeEach(() => {
       tabEventHandler.setupListeners();
-      tabUpdatedHandler = (mockBrowser.tabs.onUpdated.addListener as jest.Mock).mock.calls[0][0];
+      tabUpdatedHandler = (mockBrowser.tabs.onUpdated.addListener as jest.Mock).mock
+        .calls[0][0] as (
+        tabId: number,
+        changeInfo: OnUpdatedChangeInfoType,
+        tab: Tab,
+      ) => Promise<void>;
     });
 
     it('syncs when tab URL is updated in tracked window', async () => {
@@ -237,7 +244,10 @@ describe('TabEventHandler', () => {
 
     beforeEach(() => {
       tabEventHandler.setupListeners();
-      tabMovedHandler = (mockBrowser.tabs.onMoved.addListener as jest.Mock).mock.calls[0][0];
+      tabMovedHandler = (mockBrowser.tabs.onMoved.addListener as jest.Mock).mock.calls[0][0] as (
+        tabId: number,
+        moveInfo: OnMovedMoveInfoType,
+      ) => Promise<void>;
     });
 
     it('syncs when tab is moved in tracked window', async () => {
@@ -267,7 +277,7 @@ describe('TabEventHandler', () => {
     beforeEach(() => {
       tabEventHandler.setupListeners();
       windowRemovedHandler = (mockBrowser.windows.onRemoved.addListener as jest.Mock).mock
-        .calls[0][0];
+        .calls[0][0] as (windowId: number) => Promise<void>;
     });
 
     it('untracks window and stops sync when last tracked window is removed', async () => {
