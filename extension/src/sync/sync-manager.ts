@@ -1,6 +1,7 @@
 import browser from 'webextension-polyfill';
 import { TanakaAPI, browserTabToSyncTab, type Tab } from '../api/api';
 import type { WindowTracker } from './window-tracker';
+import { debugLog, debugError } from '../utils/logger';
 
 export class SyncManager {
   private syncInterval: number | null = null;
@@ -17,9 +18,9 @@ export class SyncManager {
     try {
       const localTabs = await this.collectTrackedTabs();
       const allTabs = await this.api.syncTabs(localTabs);
-      console.log(`Synced ${localTabs.length} local tabs, received ${allTabs.length} total tabs`);
+      debugLog(`Synced ${localTabs.length} local tabs, received ${allTabs.length} total tabs`);
     } catch (error) {
-      console.error('Sync failed:', error);
+      debugError('Sync failed:', error);
     }
   }
 
@@ -52,7 +53,7 @@ export class SyncManager {
         const windowTabs = await browser.tabs.query({ windowId });
         tabs.push(...windowTabs);
       } catch (error) {
-        console.error(`Failed to get tabs for window ${windowId}:`, error);
+        debugError(`Failed to get tabs for window ${windowId}:`, error);
       }
     }
 

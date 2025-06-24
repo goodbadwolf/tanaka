@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'preact/hooks';
 import browser from 'webextension-polyfill';
+import { debugError } from '../../utils/logger';
 
 interface SaveStatus {
   type: 'success' | 'error';
@@ -46,7 +47,7 @@ export function useSettings() {
       });
       setAuthToken(trimmedToken);
     } catch (error) {
-      console.error('Error saving authentication:', error);
+      debugError('Error saving authentication:', error);
       setSaveStatus({
         type: 'error',
         message: 'Failed to save authentication',

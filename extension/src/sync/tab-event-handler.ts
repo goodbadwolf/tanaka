@@ -1,6 +1,7 @@
 import browser from 'webextension-polyfill';
 import type { WindowTracker } from './window-tracker.js';
 import type { SyncManager } from './sync-manager.js';
+import { debugLog } from '../utils/logger.js';
 
 export class TabEventHandler {
   constructor(
@@ -18,7 +19,7 @@ export class TabEventHandler {
 
   private async handleTabCreated(tab: browser.Tabs.Tab): Promise<void> {
     if (tab.windowId && this.windowTracker.isTracked(tab.windowId)) {
-      console.log('Tab created:', tab);
+      debugLog('Tab created:', tab);
       await this.syncManager.syncNow();
     }
   }
@@ -28,7 +29,7 @@ export class TabEventHandler {
     removeInfo: browser.Tabs.OnRemovedRemoveInfoType,
   ): Promise<void> {
     if (this.windowTracker.isTracked(removeInfo.windowId)) {
-      console.log('Tab removed:', tabId);
+      debugLog('Tab removed:', tabId);
       await this.syncManager.syncNow();
     }
   }
@@ -39,7 +40,7 @@ export class TabEventHandler {
     tab: browser.Tabs.Tab,
   ): Promise<void> {
     if (tab.windowId && this.windowTracker.isTracked(tab.windowId) && changeInfo.url) {
-      console.log('Tab updated:', tabId, changeInfo);
+      debugLog('Tab updated:', tabId, changeInfo);
       await this.syncManager.syncNow();
     }
   }
@@ -49,7 +50,7 @@ export class TabEventHandler {
     moveInfo: browser.Tabs.OnMovedMoveInfoType,
   ): Promise<void> {
     if (this.windowTracker.isTracked(moveInfo.windowId)) {
-      console.log('Tab moved:', tabId, moveInfo);
+      debugLog('Tab moved:', tabId, moveInfo);
       await this.syncManager.syncNow();
     }
   }
@@ -57,7 +58,7 @@ export class TabEventHandler {
   private async handleWindowRemoved(windowId: number): Promise<void> {
     if (this.windowTracker.isTracked(windowId)) {
       this.windowTracker.untrack(windowId);
-      console.log('Tracked window removed:', windowId);
+      debugLog('Tracked window removed:', windowId);
 
       if (this.windowTracker.getTrackedCount() === 0) {
         this.syncManager.stop();

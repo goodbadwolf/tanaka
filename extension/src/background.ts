@@ -2,6 +2,7 @@ import browser from 'webextension-polyfill';
 import { type MessageResponse } from './core.js';
 import { TanakaAPI } from './api/api.js';
 import { getConfig } from './config/index.js';
+import { debugLog } from './utils/logger.js';
 import {
   WindowTracker,
   SyncManager,
@@ -31,7 +32,7 @@ class BackgroundService {
     const settings = await this.userSettingsManager.load();
     this.api.setAuthToken(settings.authToken);
     this.setupListeners();
-    console.log('Tanaka background service initialized');
+    debugLog('Tanaka background service initialized');
   }
 
   private setupListeners(): void {
@@ -56,7 +57,7 @@ class BackgroundService {
   private async reinitializeWithNewSettings(): Promise<void> {
     const settings = await this.userSettingsManager.load();
     this.api.setAuthToken(settings.authToken);
-    console.log('Reinitialized with updated settings');
+    debugLog('Reinitialized with updated settings');
   }
 }
 
