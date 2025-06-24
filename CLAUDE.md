@@ -167,14 +167,7 @@ feat: refactor entire build system with new error handling and process managemen
 - **Generate TS types**: Run `pnpm run gen:api-models`
 - **Add shared types**: Add `#[derive(TS)]` and `#[ts(export)]` to Rust structs in `/server/src/models.rs`
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 ### Technical Patterns
-=======
-### Error Handling Examples
-=======
-### Technical Patterns
->>>>>>> 9a47c30 (refactor: compact CLAUDE.md while preserving essential details)
 
 #### Error Handling (Result Pattern)
 
@@ -241,185 +234,12 @@ type BackgroundMessage =
 
 #### Performance Best Practices
 
-<<<<<<< HEAD
-**Extension Performance Guidelines:**
-
-1. **Minimize Background Script Memory:**
-
-   ```typescript
-   // BAD: Keeping all tabs in memory
-   class TabManager {
-     private allTabs: Tab[] = [];  // Can grow unbounded
-   }
-
-   // GOOD: Use browser storage or indexed storage
-   class TabManager {
-     async getTabs(): Promise<Tab[]> {
-       const stored = await browser.storage.local.get('tabs');
-       return stored.tabs || [];
-     }
-   }
-   ```
-
-2. **Debounce Frequent Events:**
-
-   ```typescript
-   // Debounce tab update events to avoid API spam
-   const debouncedSync = debounce(syncTabs, 1000);
-   
-   browser.tabs.onUpdated.addListener((tabId, changeInfo) => {
-     if (changeInfo.url) {
-       debouncedSync();
-     }
-   });
-   ```
-
-3. **Use Web Workers for Heavy Processing:**
-
-   ```typescript
-   // For CRDT operations or large data transformations
-   const worker = new Worker('crdt-worker.js');
-   worker.postMessage({ type: 'MERGE', updates });
-   worker.onmessage = (e) => {
-     if (e.data.type === 'MERGED') {
-       applyMergedState(e.data.result);
-     }
-   };
-   ```
-
-4. **Lazy Load Non-Critical Features:**
-
-   ```typescript
-   // Only load sync UI when user opens popup
-   async function initializePopup() {
-     const { SyncUI } = await import('./sync-ui');
-     const ui = new SyncUI();
-     ui.render();
-   }
-   ```
-
-5. **Efficient Storage Usage:**
-
-   ```typescript
-   // Use browser.storage efficiently
-   // BAD: Multiple small writes
-   await browser.storage.local.set({ tab1: data1 });
-   await browser.storage.local.set({ tab2: data2 });
-
-   // GOOD: Batch writes
-   await browser.storage.local.set({ 
-     tab1: data1,
-     tab2: data2 
-   });
-   ```
-
-6. **Monitor Performance:**
-
-   ```typescript
-   // Add performance marks for critical operations
-   performance.mark('sync-start');
-   await syncOperation();
-   performance.mark('sync-end');
-   performance.measure('sync-duration', 'sync-start', 'sync-end');
-   
-   // Log slow operations
-   const measure = performance.getEntriesByName('sync-duration')[0];
-   if (measure.duration > 1000) {
-     console.warn(`Slow sync: ${measure.duration}ms`);
-   }
-   ```
-
-### Misc
->>>>>>> 077ea20 (docs: enhance developer and AI agent documentation)
-
-#### Error Handling (Result Pattern)
-
-```typescript
-import { Result, ok, err } from "neverthrow";
-
-<<<<<<< HEAD
-enum SyncError {
-  NetworkFailure = "NETWORK_FAILURE",
-  InvalidData = "INVALID_DATA",
-  AuthError = "AUTH_ERROR",
-  ServerError = "SERVER_ERROR",
-}
-
-async function syncTabs(tabs: Tab[]): Promise<Result<SyncResponse, SyncError>> {
-  if (!tabs.length) return err(SyncError.InvalidData);
-
-  try {
-    const response = await api.sync(tabs);
-    if (!response.ok) {
-      return err(
-        response.status === 401 ? SyncError.AuthError : SyncError.ServerError
-      );
-    }
-    return ok(response.data);
-  } catch (e) {
-    return err(SyncError.NetworkFailure);
-  }
-}
-
-// Chain operations safely
-const result = await syncTabs(tabs)
-  .map((data) => updateLocalState(data))
-  .mapErr(handleError);
-```
-
-#### TypeScript Guidelines
-
-```typescript
-// Import generated types (NEVER redefine)
-import type { Tab, Window } from "../types/generated";
-
-// Extend when needed
-interface TabWithMetadata extends Tab {
-  lastAccessed: number;
-  syncStatus: "pending" | "synced" | "error";
-}
-
-// Type guards for runtime validation
-function isValidTab(obj: unknown): obj is Tab {
-  return (
-    typeof obj === "object" &&
-    obj !== null &&
-    "id" in obj &&
-    "url" in obj &&
-    typeof (obj as Tab).id === "string"
-  );
-}
-
-// Discriminated unions for messages
-type BackgroundMessage =
-  | { type: "TRACK_WINDOW"; windowId: number }
-  | { type: "UNTRACK_WINDOW"; windowId: number }
-  | { type: "SYNC_NOW" }
-  | { type: "GET_STATUS" };
-```
-
-#### Performance Best Practices
-
-=======
->>>>>>> 9a47c30 (refactor: compact CLAUDE.md while preserving essential details)
 1. **Memory**: Use browser storage instead of keeping all data in memory
 2. **Events**: Debounce frequent events (tab updates, etc.)
 3. **Heavy ops**: Use Web Workers for CRDT operations
 4. **Loading**: Lazy load non-critical features
 5. **Storage**: Batch writes instead of multiple small writes
 6. **Monitoring**: Use performance marks for critical operations
-<<<<<<< HEAD
-=======
-- After compacting, read the docs and @CLAUDE.md to refresh your instructions.
-- When you encounter patterns or lessons that would be helpful to remember, proactively suggest adding them to CLAUDE.md or relevant documentation
-- **ALWAYS** run linting, formatting, and type checking before committing:
-  - TypeScript: `pnpm run lint` and `pnpm run typecheck` in the extension directory
-  - Rust: `cargo fmt` and `cargo clippy` in the server directory
-  - Markdown: `pnpm run lint:md` will run automatically on commit via git hooks
-  - If markdown linting fails, fix the issues (usually missing blank lines around code blocks/lists) before retrying
->>>>>>> a206e65 (docs: add pre-commit checklist memory to CLAUDE.md)
-=======
->>>>>>> 9a47c30 (refactor: compact CLAUDE.md while preserving essential details)
 
 ### Writing Testable Code
 
@@ -438,11 +258,7 @@ class SyncManager {
 
 // Bad - hardcoded dependencies
 class SyncManager {
-<<<<<<< HEAD
-  private api = new TanakaAPI("https://hardcoded.com");
-=======
   private api = new TanakaAPI('https://hardcoded.com');
->>>>>>> 9a47c30 (refactor: compact CLAUDE.md while preserving essential details)
 }
 ```
 
@@ -502,104 +318,7 @@ class SyncManager {
 - NEVER use `git add -A` or `git add .`
 - Review with `git diff --cached` before committing
 
-<<<<<<< HEAD
-  ```typescript
-  // Testable design
-  class BackgroundService {
-    constructor(
-      private api: TanakaAPI,
-      private windowTracker: WindowTracker,
-      private syncManager: SyncManager
-    ) {}
-  }
-
-  // In tests
-  const mockApi = createMockApi();
-  const service = new BackgroundService(mockApi, mockTracker, mockManager);
-  ```
-
-2. **Factory Functions**
-
-   - Use factories to create complex objects
-   - Makes it easy to create test doubles
-   - Centralizes object creation logic
-
-3. **Avoid Static Methods**
-
-   - Static methods are hard to mock
-   - Use instance methods or pure functions instead
-
-4. **Return Early, Fail Fast**
-   - Validate inputs at the beginning
-   - Makes error cases easier to test
-   - Reduces nested logic complexity
-
-### When NOT to Test
-
-1. **Third-party library internals** - Trust they work
-2. **Simple getters/setters** - Unless they have logic
-3. **Framework glue code** - Focus on your business logic
-4. **Console.log statements** - Mock console in tests
-5. **Private methods directly** - Test through public API
-
-### Test Maintenance
-
-1. **Update tests when requirements change** - Tests are living documentation
-2. **Delete obsolete tests** - Don't keep tests for deleted features
-3. **Refactor tests** - Apply same quality standards as production code
-4. **Review test coverage** - But don't chase 100% blindly
-5. **Run tests before committing** - Always ensure tests pass
-
-### Red-Green-Refactor Cycle
-
-1. **Red**: Write a failing test for new functionality
-2. **Green**: Write minimal code to make the test pass
-3. **Refactor**: Improve the code while keeping tests green
-4. **Repeat**: Continue for next piece of functionality
-
-### Git Workflow
-
-Refer to @docs/GIT.md for git workflow guidelines
-
-**Pre-commit Checklist:**
-
-Before committing any changes, ALWAYS run:
-
-1. **TypeScript (in extension directory):**
-
-   ```bash
-   pnpm run lint        # ESLint checks
-   pnpm run typecheck   # TypeScript type checking
-   pnpm run format      # Prettier formatting (optional)
-   ```
-
-2. **Rust (in server directory):**
-
-   ```bash
-   cargo fmt            # Format code
-   cargo clippy         # Linting
-   cargo test           # Run tests
-   ```
-
-3. **Markdown:**
-   - `pnpm run lint:md` runs automatically via git hooks
-   - If it fails, fix issues (usually missing blank lines around code blocks/lists)
-   - Common fix: Add blank lines before/after code blocks and lists
-
-### Git Staging Best Practices
-
-**NEVER use `git add -A` or `git add .`** - these commands can stage unrelated changes accidentally.
-
-Instead:
-
-- Stage files individually with their full paths: `git add /path/to/file1 /path/to/file2`
-- Use `git add -p <file>` for selective staging when you have mixed changes
-- Always review staged changes with `git diff --cached` before committing
-
-**Good example:**
-=======
 Example:
->>>>>>> 9a47c30 (refactor: compact CLAUDE.md while preserving essential details)
 
 ```bash
 git add /Users/manish/projects/tanaka/extension/src/background.ts
