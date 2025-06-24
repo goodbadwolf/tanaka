@@ -1,10 +1,10 @@
 import { useSettings } from '../hooks/useSettings';
 import { getConfig } from '../../config/index.js';
-import { Browser } from '../../browser/index.js';
-
-const browser = new Browser();
+import { useService } from '../../di/provider.js';
+import type { IBrowser } from '../../browser/core.js';
 
 export function SettingsApp() {
+  const browser = useService<IBrowser>('IBrowser');
   const { settings, isSaving, saveStatus, saveSettings } = useSettings();
   const config = getConfig();
   const manifest = browser.runtime.getManifest();

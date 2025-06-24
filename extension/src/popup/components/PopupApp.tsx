@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'preact/hooks';
 import { WindowTracker } from './WindowTracker';
-import { Browser } from '../../browser/index.js';
-
-const browser = new Browser();
+import { useService } from '../../di/provider.js';
+import type { IBrowser } from '../../browser/core.js';
 
 export function PopupApp() {
+  const browser = useService<IBrowser>('IBrowser');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -25,7 +25,7 @@ export function PopupApp() {
     };
 
     initializePopup();
-  }, []);
+  }, [browser]);
 
   if (isLoading) {
     return (
