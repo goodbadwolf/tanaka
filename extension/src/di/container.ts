@@ -24,15 +24,8 @@ container.register<TanakaAPI>(TanakaAPI, {
   useFactory: () => new TanakaAPI(getConfig().serverUrl),
 });
 
-// Register SyncManager with factory
-container.register<SyncManager>(SyncManager, {
-  useFactory: (dependencyContainer) => {
-    const api = dependencyContainer.resolve(TanakaAPI);
-    const windowTracker = dependencyContainer.resolve(WindowTracker);
-    const userSettingsManager = dependencyContainer.resolve(UserSettingsManager);
-    return new SyncManager(api, windowTracker, userSettingsManager);
-  },
-});
+// Register SyncManager as singleton
+container.registerSingleton<SyncManager>(SyncManager);
 
 // Register TabEventHandler as singleton
 container.registerSingleton<TabEventHandler>(TabEventHandler);

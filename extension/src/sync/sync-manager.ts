@@ -1,17 +1,20 @@
-import browser from 'webextension-polyfill';
+import { injectable, inject } from 'tsyringe';
+import type { IBrowser } from '../browser/core';
 import { TanakaAPI, browserTabToSyncTab, type Tab } from '../api/api';
-import type { WindowTracker } from './window-tracker';
-import type { UserSettingsManager } from './user-settings';
+import { WindowTracker } from './window-tracker';
+import { UserSettingsManager } from './user-settings';
 import { debugLog, debugError } from '../utils/logger';
 
+@injectable()
 export class SyncManager {
   private syncInterval: number | null = null;
   private currentIntervalMs = 5000;
 
   constructor(
-    private readonly api: TanakaAPI,
-    private readonly windowTracker: WindowTracker,
-    private readonly settingsManager: UserSettingsManager,
+    @inject('IBrowser') private readonly browser: IBrowser,
+    @inject(TanakaAPI) private readonly api: TanakaAPI,
+    @inject(WindowTracker) private readonly windowTracker: WindowTracker,
+    @inject(UserSettingsManager) private readonly settingsManager: UserSettingsManager,
   ) {}
 
   async syncNow(): Promise<void> {
@@ -61,7 +64,7 @@ export class SyncManager {
 
     for (const windowId of this.windowTracker.getTrackedWindows()) {
       try {
-        const windowTabs = await browser.tabs.query({ windowId });
+        const windowTabs = await this.browser.tabs.query({ windowId });
         tabs.push(...windowTabs);
       } catch (error) {
         debugError(`Failed to get tabs for window ${windowId}:`, error);

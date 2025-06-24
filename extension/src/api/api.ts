@@ -1,4 +1,4 @@
-import browser from 'webextension-polyfill';
+import type { Tabs } from 'webextension-polyfill';
 import type { Tab, SyncRequest, SyncResponse } from './models';
 import { debugError } from '../utils/logger';
 
@@ -103,7 +103,7 @@ export class TanakaAPI {
   }
 }
 
-export function browserTabToSyncTab(tab: browser.Tabs.Tab, windowId: number): Tab | null {
+export function browserTabToSyncTab(tab: Tabs.Tab, windowId: number): Tab | null {
   if (!tab.id || !tab.url) return null;
 
   const tabData: TabData = {
