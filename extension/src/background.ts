@@ -1,31 +1,24 @@
+import 'reflect-metadata';
 import browser from 'webextension-polyfill';
 import { type MessageResponse } from './core.js';
+import { container } from './di/container.js';
 import { TanakaAPI } from './api/api.js';
-import { getConfig } from './config/index.js';
 import { debugLog } from './utils/logger.js';
-import {
-  WindowTracker,
-  SyncManager,
-  TabEventHandler,
-  MessageHandler,
-  UserSettingsManager,
-} from './sync';
+import { SyncManager, TabEventHandler, MessageHandler, UserSettingsManager } from './sync';
 
 class BackgroundService {
   private readonly api: TanakaAPI;
-  private readonly windowTracker: WindowTracker;
   private readonly syncManager: SyncManager;
   private readonly tabEventHandler: TabEventHandler;
   private readonly userSettingsManager: UserSettingsManager;
   private readonly messageHandler: MessageHandler;
 
   constructor() {
-    this.api = new TanakaAPI(getConfig().serverUrl);
-    this.windowTracker = new WindowTracker();
-    this.syncManager = new SyncManager(this.api, this.windowTracker);
-    this.tabEventHandler = new TabEventHandler(this.windowTracker, this.syncManager);
-    this.userSettingsManager = new UserSettingsManager();
-    this.messageHandler = new MessageHandler(this.windowTracker, this.syncManager);
+    this.api = container.resolve(TanakaAPI);
+    this.syncManager = container.resolve(SyncManager);
+    this.tabEventHandler = container.resolve(TabEventHandler);
+    this.userSettingsManager = container.resolve(UserSettingsManager);
+    this.messageHandler = container.resolve(MessageHandler);
   }
 
   async initialize(): Promise<void> {
@@ -57,6 +50,12 @@ class BackgroundService {
   private async reinitializeWithNewSettings(): Promise<void> {
     const settings = await this.userSettingsManager.load();
     this.api.setAuthToken(settings.authToken);
+
+    // Restart sync manager with new interval if it's running
+    if (this.syncManager.isRunning()) {
+      await this.syncManager.restart();
+    }
+
     debugLog('Reinitialized with updated settings');
   }
 }

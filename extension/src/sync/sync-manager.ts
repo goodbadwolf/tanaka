@@ -1,11 +1,13 @@
 import browser from 'webextension-polyfill';
 import { TanakaAPI, browserTabToSyncTab, type Tab } from '../api/api';
 import type { WindowTracker } from './window-tracker';
+import { UserSettingsManager } from './user-settings';
 import { debugLog, debugError } from '../utils/logger';
 
 export class SyncManager {
   private syncInterval: number | null = null;
-  private readonly SYNC_INTERVAL_MS = 5000;
+  private currentIntervalMs = 5000;
+  private readonly settingsManager = new UserSettingsManager();
 
   constructor(
     private readonly api: TanakaAPI,
@@ -24,14 +26,18 @@ export class SyncManager {
     }
   }
 
-  start(): void {
+  async start(): Promise<void> {
     if (this.syncInterval) return;
+
+    // Load settings and use syncInterval
+    const settings = await this.settingsManager.load();
+    this.currentIntervalMs = settings.syncInterval;
 
     this.syncNow();
 
     this.syncInterval = window.setInterval(() => {
       this.syncNow();
-    }, this.SYNC_INTERVAL_MS);
+    }, this.currentIntervalMs);
   }
 
   stop(): void {
@@ -39,6 +45,11 @@ export class SyncManager {
       clearInterval(this.syncInterval);
       this.syncInterval = null;
     }
+  }
+
+  async restart(): Promise<void> {
+    this.stop();
+    await this.start();
   }
 
   isRunning(): boolean {

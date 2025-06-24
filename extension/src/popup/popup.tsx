@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { render } from 'preact';
 import { PopupApp } from './components/PopupApp';
 import './popup.css';
@@ -8,4 +9,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // Render the Preact app
-render(<PopupApp />, document.getElementById('root')!);
+const root = document.getElementById('root');
+if (root) {
+  render(<PopupApp />, root);
+}

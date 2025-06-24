@@ -1,4 +1,5 @@
 import browser from 'webextension-polyfill';
+import { injectable } from 'tsyringe';
 
 const USER_SETTINGS_DEFAULTS = {
   authToken: 'unset-token',
@@ -9,6 +10,7 @@ export type UserSettings = typeof USER_SETTINGS_DEFAULTS;
 
 const USER_SETTINGS_KEYS = Object.keys(USER_SETTINGS_DEFAULTS) as (keyof UserSettings)[];
 
+@injectable()
 export class UserSettingsManager {
   async load(): Promise<UserSettings> {
     const stored = await browser.storage.local.get(USER_SETTINGS_KEYS);
