@@ -1,4 +1,4 @@
-import { describe, it, expect, jest, beforeEach, afterEach } from '@jest/globals';
+import { describe, it, expect, jest, beforeEach } from '@jest/globals';
 import { MessageHandler } from '../message-handler';
 import type { WindowTracker } from '../window-tracker';
 import type { SyncManager } from '../sync-manager';
@@ -16,17 +16,16 @@ jest.mock('../../core', () => ({
   }),
 }));
 
+// Mock logger
+jest.mock('../../utils/logger');
+
 describe('MessageHandler', () => {
   let messageHandler: MessageHandler;
   let mockWindowTracker: jest.Mocked<WindowTracker>;
   let mockSyncManager: jest.Mocked<SyncManager>;
-  let consoleLogSpy: ReturnType<typeof jest.spyOn>;
 
   beforeEach(() => {
     jest.clearAllMocks();
-
-    // Setup console spy
-    consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
 
     // Mock WindowTracker
     mockWindowTracker = {
@@ -49,10 +48,6 @@ describe('MessageHandler', () => {
     messageHandler = new MessageHandler(mockWindowTracker, mockSyncManager);
   });
 
-  afterEach(() => {
-    consoleLogSpy.mockRestore();
-  });
-
   describe('handleMessage', () => {
     it('should return error for invalid message format', async () => {
       const result = await messageHandler.handleMessage(null);
@@ -71,7 +66,8 @@ describe('MessageHandler', () => {
       const result = await messageHandler.handleMessage(message);
 
       expect(mockWindowTracker.track).toHaveBeenCalledWith(123);
-      expect(consoleLogSpy).toHaveBeenCalledWith('Now tracking window:', 123);
+      const { debugLog } = await import('../../utils/logger');
+      expect(debugLog).toHaveBeenCalledWith('Now tracking window:', 123);
       expect(mockSyncManager.start).toHaveBeenCalled();
       expect(result).toEqual({ success: true });
     });
@@ -94,7 +90,8 @@ describe('MessageHandler', () => {
       const result = await messageHandler.handleMessage(message);
 
       expect(mockWindowTracker.untrack).toHaveBeenCalledWith(123);
-      expect(consoleLogSpy).toHaveBeenCalledWith('Stopped tracking window:', 123);
+      const { debugLog } = await import('../../utils/logger');
+      expect(debugLog).toHaveBeenCalledWith('Stopped tracking window:', 123);
       expect(mockSyncManager.syncNow).toHaveBeenCalled();
       expect(mockSyncManager.stop).not.toHaveBeenCalled();
       expect(result).toEqual({ success: true });

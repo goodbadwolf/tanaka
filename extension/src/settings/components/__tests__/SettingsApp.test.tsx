@@ -3,7 +3,7 @@ import { render } from '@testing-library/preact';
 import { SettingsApp } from '../SettingsApp';
 
 // Mock hooks
-jest.mock('../hooks/useSettings', () => ({
+jest.mock('../../hooks/useSettings', () => ({
   useSettings: jest.fn(() => ({
     authToken: 'test-token',
     isSaving: false,
@@ -13,7 +13,7 @@ jest.mock('../hooks/useSettings', () => ({
 }));
 
 // Mock config
-jest.mock('../../config/index.js', () => ({
+jest.mock('../../../config/index', () => ({
   getConfig: jest.fn(() => ({
     serverUrl: 'https://test.server.com',
   })),

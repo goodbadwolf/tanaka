@@ -6,7 +6,7 @@ Migration strategy using **Rspack** (Rust-based webpack alternative) instead of 
 
 ## Why Rspack for Tanaka
 
-### Advantages over Vite:
+### Advantages over Vite
 
 1. **Webpack Compatibility**: Easier migration path, mature plugin ecosystem
 2. **Rust Performance**: 5-10x faster than webpack, comparable to Vite

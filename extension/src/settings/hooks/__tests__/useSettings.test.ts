@@ -31,8 +31,8 @@ describe('useSettings', () => {
   it('should validate empty auth token', async () => {
     const { result } = renderHook(() => useSettings());
 
-    await act(async () => {
-      await result.current.saveAuthToken('');
+    act(() => {
+      result.current.saveAuthToken('');
     });
 
     expect(result.current.saveStatus).toEqual({
@@ -45,8 +45,8 @@ describe('useSettings', () => {
   it('should validate whitespace-only auth token', async () => {
     const { result } = renderHook(() => useSettings());
 
-    await act(async () => {
-      await result.current.saveAuthToken('   ');
+    act(() => {
+      result.current.saveAuthToken('   ');
     });
 
     expect(result.current.saveStatus).toEqual({
@@ -112,8 +112,8 @@ describe('useSettings', () => {
   it('should clear status message after timeout', async () => {
     const { result } = renderHook(() => useSettings());
 
-    await act(async () => {
-      await result.current.saveAuthToken('');
+    act(() => {
+      result.current.saveAuthToken('');
     });
 
     expect(result.current.saveStatus).not.toBeNull();
