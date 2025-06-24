@@ -7,6 +7,13 @@ import { SyncManager } from '../sync/sync-manager';
 import { TabEventHandler } from '../sync/tab-event-handler';
 import { MessageHandler } from '../sync/message-handler';
 import { getConfig } from '../config';
+import { Browser } from '../browser';
+import type { IBrowser } from '../browser/core';
+
+// Register browser adapter
+container.register<IBrowser>('IBrowser', {
+  useClass: Browser,
+});
 
 // Register singleton instances
 container.registerSingleton<UserSettingsManager>(UserSettingsManager);
@@ -45,3 +52,9 @@ container.register<MessageHandler>(MessageHandler, {
 });
 
 export { container };
+
+// Export a factory function for creating test containers
+export function createTestContainer(): typeof container {
+  const testContainer = container.createChildContainer();
+  return testContainer;
+}
