@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'preact/hooks';
-import browser from 'webextension-polyfill';
+import { Browser } from '../../browser/index.js';
 import type { Message, MessageResponse } from '../../core.js';
+
+const browser = new Browser();
 
 export function useWindowTracking() {
   const [isTracked, setIsTracked] = useState(false);

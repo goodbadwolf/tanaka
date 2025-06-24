@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'preact/hooks';
 import { WindowTracker } from './WindowTracker';
-import browser from 'webextension-polyfill';
+import { Browser } from '../../browser/index.js';
+
+const browser = new Browser();
 
 export function PopupApp() {
   const [isLoading, setIsLoading] = useState(true);
@@ -50,7 +52,7 @@ export function PopupApp() {
     <div className="container">
       <h1>Tanaka</h1>
       <p className="subtitle">Tab Synchronization</p>
-      
+
       <WindowTracker />
 
       <div className="footer">
