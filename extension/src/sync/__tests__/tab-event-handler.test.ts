@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { container } from 'tsyringe';
+import { createTestContainer } from '../../test/test-container';
 import { TabEventHandler } from '../tab-event-handler';
 import { WindowTracker } from '../window-tracker';
 import { SyncManager } from '../sync-manager';
@@ -21,10 +21,10 @@ describe('TabEventHandler', () => {
   let mockBrowser: IBrowser;
   let mockWindowTracker: WindowTracker;
   let mockSyncManager: SyncManager;
-  let testContainer: typeof container;
+  let testContainer: ReturnType<typeof createTestContainer>;
 
   beforeEach(() => {
-    testContainer = container.createChildContainer();
+    testContainer = createTestContainer();
     mockBrowser = createMockBrowser();
 
     testContainer.register<IBrowser>('IBrowser', {

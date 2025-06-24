@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { container } from 'tsyringe';
+import { createTestContainer } from '../../test/test-container';
 import { SyncManager } from '../sync-manager';
 import { WindowTracker } from '../window-tracker';
 import { UserSettingsManager } from '../user-settings';
@@ -45,7 +45,7 @@ describe('SyncManager', () => {
   let mockWindowTracker: WindowTracker;
   let mockSettingsManager: UserSettingsManager;
   let mockApi: TanakaAPI;
-  let testContainer: typeof container;
+  let testContainer: ReturnType<typeof createTestContainer>;
 
   beforeEach(() => {
     jest.useFakeTimers();
@@ -55,7 +55,7 @@ describe('SyncManager', () => {
         setInterval(callback as TimerHandler, delay as number),
       ),
     };
-    testContainer = container.createChildContainer();
+    testContainer = createTestContainer();
     testContainer.clearInstances();
     mockBrowser = createMockBrowser();
 

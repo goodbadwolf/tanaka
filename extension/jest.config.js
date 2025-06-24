@@ -1,9 +1,16 @@
 export default {
   preset: 'ts-jest',
   testEnvironment: 'jsdom',
+  transform: {
+    '^.+\\.tsx?$': ['ts-jest', {
+      tsconfig: 'tsconfig.test.json'
+    }]
+  },
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '\\.css$': '<rootDir>/src/test/__mocks__/styleMock.js',
+    '^(\\.{1,2}/.*)\\.js$': '$1',
+    '^@env$': '<rootDir>/src/test/__mocks__/@env.ts',
   },
   setupFilesAfterEnv: ['<rootDir>/src/test/setup.ts'],
   collectCoverageFrom: [
