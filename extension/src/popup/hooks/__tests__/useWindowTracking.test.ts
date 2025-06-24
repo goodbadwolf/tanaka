@@ -1,5 +1,5 @@
 import { describe, it, expect, jest, beforeEach } from '@jest/globals';
-import { useWindowTracking } from '../hooks/useWindowTracking';
+import { useWindowTracking } from '../useWindowTracking';
 
 // Mock browser
 jest.mock('webextension-polyfill');
