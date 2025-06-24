@@ -29,7 +29,8 @@ container.register<SyncManager>(SyncManager, {
   useFactory: (dependencyContainer) => {
     const api = dependencyContainer.resolve(TanakaAPI);
     const windowTracker = dependencyContainer.resolve(WindowTracker);
-    return new SyncManager(api, windowTracker);
+    const userSettingsManager = dependencyContainer.resolve(UserSettingsManager);
+    return new SyncManager(api, windowTracker, userSettingsManager);
   },
 });
 

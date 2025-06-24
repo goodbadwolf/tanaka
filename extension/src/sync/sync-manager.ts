@@ -1,17 +1,17 @@
 import browser from 'webextension-polyfill';
 import { TanakaAPI, browserTabToSyncTab, type Tab } from '../api/api';
 import type { WindowTracker } from './window-tracker';
-import { UserSettingsManager } from './user-settings';
+import type { UserSettingsManager } from './user-settings';
 import { debugLog, debugError } from '../utils/logger';
 
 export class SyncManager {
   private syncInterval: number | null = null;
   private currentIntervalMs = 5000;
-  private readonly settingsManager = new UserSettingsManager();
 
   constructor(
     private readonly api: TanakaAPI,
     private readonly windowTracker: WindowTracker,
+    private readonly settingsManager: UserSettingsManager,
   ) {}
 
   async syncNow(): Promise<void> {
