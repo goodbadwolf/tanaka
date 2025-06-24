@@ -1,7 +1,8 @@
 import browser from 'webextension-polyfill';
 import type { Tab, SyncRequest, SyncResponse } from './models';
+import { debugError } from '../utils/logger';
 
-export type { Tab };
+export type { Tab, SyncRequest, SyncResponse };
 
 export interface TabData {
   url: string;
@@ -31,7 +32,7 @@ export class TanakaAPI {
     try {
       this.baseUrl = new URL(baseUrl);
     } catch {
-      throw new APIError(`Invalid server URL: ${baseUrl}`);
+      throw new APIError(`Invalid server base URL: ${baseUrl}`);
     }
   }
 
@@ -41,6 +42,32 @@ export class TanakaAPI {
     }
 
     this.token = token;
+  }
+
+  async syncTabs(tabs: Tab[]): Promise<Tab[]> {
+    try {
+      const data = await this.request<SyncResponse>('/sync', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ tabs } satisfies SyncRequest),
+      });
+
+      return data.tabs;
+    } catch (error) {
+      debugError('Sync failed:', error);
+      throw error;
+    }
+  }
+
+  async checkHealth(): Promise<boolean> {
+    try {
+      await this.request('/health');
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   private getHeaders(additionalHeaders: Record<string, string> = {}): Record<string, string> {
@@ -73,32 +100,6 @@ export class TanakaAPI {
     }
 
     return response as unknown as T;
-  }
-
-  async syncTabs(tabs: Tab[]): Promise<Tab[]> {
-    try {
-      const data = await this.request<SyncResponse>('/sync', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ tabs } as SyncRequest),
-      });
-
-      return data.tabs;
-    } catch (error) {
-      console.error('Sync failed:', error);
-      throw error;
-    }
-  }
-
-  async checkHealth(): Promise<boolean> {
-    try {
-      await this.request('/health');
-      return true;
-    } catch {
-      return false;
-    }
   }
 }
 

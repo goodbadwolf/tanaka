@@ -8,7 +8,7 @@ import { UserSettingsManager, type UserSettings } from '../user-settings';
 
 describe('UserSettingsManager', () => {
   let userSettingsManager: UserSettingsManager;
-  let mockStorage: any;
+  let mockStorage: jest.Mocked<typeof browser.storage.local>;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -16,12 +16,12 @@ describe('UserSettingsManager', () => {
     // Mock browser.storage.local
     mockStorage = {
       get: jest.fn(),
-      set: jest.fn().mockResolvedValue(undefined),
-      remove: jest.fn().mockResolvedValue(undefined),
-    };
-    
-    const mockBrowser = browser as any;
-    mockBrowser.storage = {
+      set: jest.fn(() => Promise.resolve()),
+      remove: jest.fn(() => Promise.resolve()),
+    } as unknown as jest.Mocked<typeof browser.storage.local>;
+
+    const mockBrowser = browser;
+    (mockBrowser.storage as unknown) = {
       local: mockStorage,
     };
 

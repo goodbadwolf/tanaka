@@ -1,6 +1,7 @@
 import { asMessage, type Message, type MessageResponse } from '../core.js';
 import type { WindowTracker } from './window-tracker.js';
 import type { SyncManager } from './sync-manager.js';
+import { debugLog } from '../utils/logger.js';
 
 export class MessageHandler {
   constructor(
@@ -31,7 +32,7 @@ export class MessageHandler {
 
   private handleTrackWindow(msg: Message & { type: 'TRACK_WINDOW' }): MessageResponse {
     this.windowTracker.track(msg.windowId);
-    console.log('Now tracking window:', msg.windowId);
+    debugLog('Now tracking window:', msg.windowId);
     this.syncManager.start();
     return { success: true };
   }
@@ -40,7 +41,7 @@ export class MessageHandler {
     msg: Message & { type: 'UNTRACK_WINDOW' },
   ): Promise<MessageResponse> {
     this.windowTracker.untrack(msg.windowId);
-    console.log('Stopped tracking window:', msg.windowId);
+    debugLog('Stopped tracking window:', msg.windowId);
 
     if (this.windowTracker.getTrackedCount() === 0) {
       this.syncManager.stop();

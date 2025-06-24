@@ -23,10 +23,12 @@ const MockedWindowTracker = WindowTracker as jest.MockedClass<typeof WindowTrack
 const MockedSyncManager = SyncManager as jest.MockedClass<typeof SyncManager>;
 const MockedTabEventHandler = TabEventHandler as jest.MockedClass<typeof TabEventHandler>;
 const MockedMessageHandler = MessageHandler as jest.MockedClass<typeof MessageHandler>;
-const MockedUserSettingsManager = UserSettingsManager as jest.MockedClass<typeof UserSettingsManager>;
+const MockedUserSettingsManager = UserSettingsManager as jest.MockedClass<
+  typeof UserSettingsManager
+>;
 
 describe('BackgroundService', () => {
-  let mockBrowser: any;
+  let mockBrowser: typeof browser;
   let mockApi: jest.Mocked<TanakaAPI>;
   let mockWindowTracker: jest.Mocked<WindowTracker>;
   let mockSyncManager: jest.Mocked<SyncManager>;
@@ -36,7 +38,7 @@ describe('BackgroundService', () => {
   let consoleLogSpy: ReturnType<typeof jest.spyOn>;
 
   // Store message listener for testing
-  let messageListener: (message: unknown) => Promise<any>;
+  let messageListener: (message: unknown) => Promise<unknown>;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -45,12 +47,16 @@ describe('BackgroundService', () => {
     consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
 
     // Mock browser runtime
-    mockBrowser = browser as any;
-    mockBrowser.runtime = {
-      onMessage: {
-        addListener: jest.fn((listener: any) => {
-          messageListener = listener;
-        }),
+    mockBrowser = browser;
+    (mockBrowser as unknown) = {
+      ...mockBrowser,
+      runtime: {
+        ...mockBrowser.runtime,
+        onMessage: {
+          addListener: jest.fn((listener: (message: unknown) => Promise<unknown>) => {
+            messageListener = listener;
+          }),
+        },
       },
     };
 
@@ -59,36 +65,37 @@ describe('BackgroundService', () => {
     // Mock API
     mockApi = {
       setAuthToken: jest.fn(),
-    } as any;
+    } as unknown as jest.Mocked<TanakaAPI>;
     MockedTanakaAPI.mockImplementation(() => mockApi);
 
     // Mock WindowTracker
-    mockWindowTracker = {} as any;
+    mockWindowTracker = {} as unknown as jest.Mocked<WindowTracker>;
     MockedWindowTracker.mockImplementation(() => mockWindowTracker);
 
     // Mock SyncManager
-    mockSyncManager = {} as any;
+    mockSyncManager = {} as unknown as jest.Mocked<SyncManager>;
     MockedSyncManager.mockImplementation(() => mockSyncManager);
 
     // Mock TabEventHandler
     mockTabEventHandler = {
       setupListeners: jest.fn(),
-    } as any;
+    } as unknown as jest.Mocked<TabEventHandler>;
     MockedTabEventHandler.mockImplementation(() => mockTabEventHandler);
 
     // Mock MessageHandler
     mockMessageHandler = {
       handleMessage: jest.fn(),
-    } as any;
+    } as unknown as jest.Mocked<MessageHandler>;
     MockedMessageHandler.mockImplementation(() => mockMessageHandler);
 
     // Mock UserSettingsManager
     mockUserSettingsManager = {
-      load: jest.fn().mockResolvedValue({
-        authToken: 'test-token',
-        syncInterval: 5000,
-      }),
-    } as any;
+      load: jest.fn(),
+    } as unknown as jest.Mocked<UserSettingsManager>;
+    mockUserSettingsManager.load.mockResolvedValue({
+      authToken: 'test-token',
+      syncInterval: 5000,
+    });
     MockedUserSettingsManager.mockImplementation(() => mockUserSettingsManager);
   });
 
@@ -104,7 +111,7 @@ describe('BackgroundService', () => {
       await import('../background');
 
       // Allow async initialization to complete
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await new Promise((resolve) => setTimeout(resolve, 0));
 
       expect(MockedTanakaAPI).toHaveBeenCalledWith('https://test.tanaka.com');
       expect(MockedWindowTracker).toHaveBeenCalled();
@@ -116,7 +123,7 @@ describe('BackgroundService', () => {
 
     it('should load user settings and set auth token', async () => {
       await import('../background');
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await new Promise((resolve) => setTimeout(resolve, 0));
 
       expect(mockUserSettingsManager.load).toHaveBeenCalled();
       expect(mockApi.setAuthToken).toHaveBeenCalledWith('test-token');
@@ -124,7 +131,7 @@ describe('BackgroundService', () => {
 
     it('should setup listeners', async () => {
       await import('../background');
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await new Promise((resolve) => setTimeout(resolve, 0));
 
       expect(mockTabEventHandler.setupListeners).toHaveBeenCalled();
       expect(mockBrowser.runtime.onMessage.addListener).toHaveBeenCalled();
@@ -132,7 +139,7 @@ describe('BackgroundService', () => {
 
     it('should log initialization message', async () => {
       await import('../background');
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await new Promise((resolve) => setTimeout(resolve, 0));
 
       expect(consoleLogSpy).toHaveBeenCalledWith('Tanaka background service initialized');
     });
@@ -141,7 +148,7 @@ describe('BackgroundService', () => {
   describe('message handling', () => {
     beforeEach(async () => {
       await import('../background');
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await new Promise((resolve) => setTimeout(resolve, 0));
     });
 
     it('should handle SETTINGS_UPDATED message', async () => {

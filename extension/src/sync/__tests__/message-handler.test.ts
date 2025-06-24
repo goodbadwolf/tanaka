@@ -42,7 +42,7 @@ describe('MessageHandler', () => {
     mockSyncManager = {
       start: jest.fn(),
       stop: jest.fn(),
-      syncNow: jest.fn().mockResolvedValue(undefined),
+      syncNow: jest.fn(() => Promise.resolve()),
       isRunning: jest.fn(),
     } as unknown as jest.Mocked<SyncManager>;
 
@@ -114,7 +114,7 @@ describe('MessageHandler', () => {
     it('should handle sync errors gracefully', async () => {
       mockWindowTracker.getTrackedCount.mockReturnValue(2);
       mockSyncManager.syncNow.mockRejectedValue(new Error('Sync failed'));
-      
+
       const message = { type: 'UNTRACK_WINDOW', windowId: 123 };
       await expect(messageHandler.handleMessage(message)).rejects.toThrow('Sync failed');
     });

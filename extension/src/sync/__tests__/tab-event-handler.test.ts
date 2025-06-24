@@ -16,13 +16,19 @@ describe('TabEventHandler', () => {
 
   // Event listeners
   let onTabCreatedListener: (tab: browser.Tabs.Tab) => Promise<void>;
-  let onTabRemovedListener: (tabId: number, removeInfo: browser.Tabs.OnRemovedRemoveInfoType) => Promise<void>;
+  let onTabRemovedListener: (
+    tabId: number,
+    removeInfo: browser.Tabs.OnRemovedRemoveInfoType,
+  ) => Promise<void>;
   let onTabUpdatedListener: (
     tabId: number,
     changeInfo: browser.Tabs.OnUpdatedChangeInfoType,
-    tab: browser.Tabs.Tab
+    tab: browser.Tabs.Tab,
   ) => Promise<void>;
-  let onTabMovedListener: (tabId: number, moveInfo: browser.Tabs.OnMovedMoveInfoType) => Promise<void>;
+  let onTabMovedListener: (
+    tabId: number,
+    moveInfo: browser.Tabs.OnMovedMoveInfoType,
+  ) => Promise<void>;
   let onWindowRemovedListener: (windowId: number) => Promise<void>;
 
   beforeEach(() => {
@@ -32,32 +38,51 @@ describe('TabEventHandler', () => {
     consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
 
     // Mock browser event listeners
-    const mockBrowser = browser as any;
-    mockBrowser.tabs = {
+    const mockBrowser = browser;
+    (mockBrowser.tabs as unknown) = {
       onCreated: {
-        addListener: jest.fn((listener: any) => {
+        addListener: jest.fn((listener: (tab: browser.Tabs.Tab) => Promise<void>) => {
           onTabCreatedListener = listener;
         }),
       },
       onRemoved: {
-        addListener: jest.fn((listener: any) => {
-          onTabRemovedListener = listener;
-        }),
+        addListener: jest.fn(
+          (
+            listener: (
+              tabId: number,
+              removeInfo: browser.Tabs.OnRemovedRemoveInfoType,
+            ) => Promise<void>,
+          ) => {
+            onTabRemovedListener = listener;
+          },
+        ),
       },
       onUpdated: {
-        addListener: jest.fn((listener: any) => {
-          onTabUpdatedListener = listener;
-        }),
+        addListener: jest.fn(
+          (
+            listener: (
+              tabId: number,
+              changeInfo: browser.Tabs.OnUpdatedChangeInfoType,
+              tab: browser.Tabs.Tab,
+            ) => Promise<void>,
+          ) => {
+            onTabUpdatedListener = listener;
+          },
+        ),
       },
       onMoved: {
-        addListener: jest.fn((listener: any) => {
-          onTabMovedListener = listener;
-        }),
+        addListener: jest.fn(
+          (
+            listener: (tabId: number, moveInfo: browser.Tabs.OnMovedMoveInfoType) => Promise<void>,
+          ) => {
+            onTabMovedListener = listener;
+          },
+        ),
       },
     };
-    mockBrowser.windows = {
+    (mockBrowser.windows as unknown) = {
       onRemoved: {
-        addListener: jest.fn((listener: any) => {
+        addListener: jest.fn((listener: (windowId: number) => Promise<void>) => {
           onWindowRemovedListener = listener;
         }),
       },
@@ -77,7 +102,7 @@ describe('TabEventHandler', () => {
     mockSyncManager = {
       start: jest.fn(),
       stop: jest.fn(),
-      syncNow: jest.fn().mockResolvedValue(undefined),
+      syncNow: jest.fn(() => Promise.resolve()),
       isRunning: jest.fn(),
     } as unknown as jest.Mocked<SyncManager>;
 
