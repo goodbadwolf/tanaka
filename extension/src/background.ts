@@ -1,9 +1,9 @@
 import 'reflect-metadata';
-import { container } from './di/container.js';
-import { type MessageResponse } from './core.js';
-import type { IBrowser } from './browser/core.js';
-import { TanakaAPI } from './api/api.js';
-import { debugLog } from './utils/logger.js';
+import { container } from './di/container';
+import { type MessageResponse } from './core';
+import type { IBrowser } from './browser/core';
+import { TanakaAPI } from './api/api';
+import { debugLog } from './utils/logger';
 import { SyncManager, TabEventHandler, MessageHandler, UserSettingsManager } from './sync';
 
 export class BackgroundService {

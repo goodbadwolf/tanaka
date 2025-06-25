@@ -1,7 +1,7 @@
 import { useEffect } from 'preact/hooks';
-import { getConfig } from '../../config/index.js';
-import { useService } from '../../di/provider.js';
-import type { IBrowser } from '../../browser/core.js';
+import { getConfig } from '../../config/index';
+import { useService } from '../../di/provider';
+import type { IBrowser } from '../../browser/core';
 import {
   settings,
   isLoading,

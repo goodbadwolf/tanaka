@@ -1,7 +1,7 @@
 import { useEffect } from 'preact/hooks';
 import { WindowTracker } from './WindowTracker';
-import { useService } from '../../di/provider.js';
-import type { IBrowser } from '../../browser/core.js';
+import { useService } from '../../di/provider';
+import type { IBrowser } from '../../browser/core';
 import { isLoading, error, initializePopup } from '../../store/popup';
 import { LoadingSpinner, ErrorMessage } from '../../components';
 
@@ -19,7 +19,14 @@ export function PopupApp() {
     return (
       <div className="container">
         <h1>Tanaka</h1>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px',
+          }}
+        >
           <LoadingSpinner size="medium" />
           <span style={{ marginLeft: '8px' }}>Loading...</span>
         </div>
@@ -32,11 +39,7 @@ export function PopupApp() {
       <div className="container">
         <h1>Tanaka</h1>
         <p className="subtitle">Tab Synchronization</p>
-        <ErrorMessage
-          type="error"
-          message={errorMessage}
-          dismissible={false}
-        />
+        <ErrorMessage type="error" message={errorMessage} dismissible={false} />
       </div>
     );
   }

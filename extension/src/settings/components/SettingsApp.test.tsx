@@ -4,7 +4,7 @@ import { resetSettings, settings, setLoadingState, updateSettings } from '../../
 import { container } from '../../di/container';
 
 // Mock the config module
-jest.mock('../../config/index.js', () => ({
+jest.mock('../../config/index', () => ({
   getConfig: () => ({ serverUrl: 'https://test.tanaka.com' }),
 }));
 
