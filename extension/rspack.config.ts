@@ -2,12 +2,14 @@ import { defineConfig } from '@rspack/cli';
 import { rspack } from '@rspack/core';
 import RefreshPlugin from '@rspack/plugin-react-refresh';
 import HtmlRspackPlugin from 'html-rspack-plugin';
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const isDev = process.env.NODE_ENV === 'development';
 const buildEnv = process.env.BUILD_ENV || 'development';
+const isAnalyze = process.env.RSPACK_BUNDLE_ANALYZE === 'true';
 
 export default defineConfig({
   context: __dirname,
@@ -110,6 +112,14 @@ export default defineConfig({
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
       'process.env.BUILD_ENV': JSON.stringify(buildEnv),
       __APP_VERSION__: JSON.stringify(process.env.npm_package_version),
+    }),
+
+    isAnalyze && new BundleAnalyzerPlugin({
+      analyzerMode: 'static',
+      reportFilename: 'bundle-report.html',
+      openAnalyzer: true,
+      generateStatsFile: true,
+      statsFilename: 'bundle-stats.json',
     }),
   ].filter(Boolean),
 
