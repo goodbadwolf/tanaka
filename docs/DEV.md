@@ -139,17 +139,9 @@ pnpm run test:watch  # Watch mode
 
 ---
 
-## 7. Helpful commands
-
-| Task                    | Command                                                                          |
-| ----------------------- | -------------------------------------------------------------------------------- |
-| Rebuild + run server    | `cargo watch -x run`                                                             |
-| Sign extension manually | `web-ext sign --channel=unlisted --api-key=$AMO_ISSUER --api-secret=$AMO_SECRET` |
-| Backup SQLite file      | `sqlite3 tabs.db ".backup 'tabs-$(date +%s).db'"`                                |
-
 ---
 
-## 8. Essential Commands
+## 7. Essential Commands
 
 ```bash
 # Server Development (Rust)
@@ -189,28 +181,36 @@ pnpm run lint:fix
 # Type-check
 pnpm run typecheck
 
-# Build extension (copies manifest & icons via prebuild)
-pnpm run build
+# Build extension for different environments
+pnpm run build:dev      # Development build
+pnpm run build:staging  # Staging build
+pnpm run build:prod     # Production build
 
-# Development mode with hot reload
+# Development mode with hot reload (Rspack)
 pnpm run dev
 
 # Run Firefox with extension loaded
 pnpm run start
+
+# Bundle analysis
+pnpm run analyze
+
+# Watch mode (rebuilds on file changes)
+pnpm run watch
 ```
 
 ---
 
-## 9. Running the Complete System
+## 8. Running the Complete System
 
 1. Start the server: `cd server && cargo run`
 2. Load extension in Firefox: `cd extension && pnpm run dev`
-3. Configure extension to point to server (default: https://localhost:443)
+3. Configure extension to point to server (default: http://localhost:8000 for development)
    - See “Local Development (TLS Alternatives)” above for HTTPS setups.
 
 ---
 
-## 10. Security Considerations
+## 9. Security Considerations
 
 - All communication uses TLS
 - Authentication via shared bearer token
@@ -219,9 +219,9 @@ pnpm run start
 
 ---
 
-## 11. Debugging WebExtension Issues
+## 10. Debugging WebExtension Issues
 
-### 11.1 Extension Debugging Tools
+### 10.1 Extension Debugging Tools
 
 **Browser Console vs Extension Console:**
 
@@ -230,7 +230,7 @@ pnpm run start
   - Shows background script errors and console logs
   - Allows setting breakpoints in background scripts
 
-### 11.2 Common Debugging Techniques
+### 10.2 Common Debugging Techniques
 
 **1. Enable Verbose Logging:**
 
@@ -276,7 +276,7 @@ browser.runtime.onMessage.addListener((message, sender) => {
 });
 ```
 
-### 11.3 Performance Profiling
+### 10.3 Performance Profiling
 
 ```javascript
 // Profile slow operations
@@ -288,7 +288,7 @@ console.timeEnd('sync-operation');
 console.log('Memory:', performance.memory);
 ```
 
-### 11.4 Testing CRDT State
+### 10.4 Testing CRDT State
 
 ```typescript
 // Inspect Yjs document state
@@ -299,9 +299,9 @@ console.log('Pending updates:', Y.encodeStateAsUpdate(doc));
 
 ---
 
-## 12. Security Best Practices
+## 11. Security Best Practices
 
-### 12.1 WebExtension Security
+### 11.1 WebExtension Security
 
 **Content Security Policy:**
 
@@ -353,7 +353,7 @@ await browser.storage.local.set({
 });
 ```
 
-### 12.2 API Communication Security
+### 11.2 API Communication Security
 
 **Always Use HTTPS:**
 
@@ -382,7 +382,7 @@ async function fetchWithTimeout(url: string, options: RequestInit = {}) {
 }
 ```
 
-### 12.3 Permission Management
+### 11.3 Permission Management
 
 **Request Minimal Permissions:**
 
@@ -410,9 +410,9 @@ if (!hasTabsPermission) {
 
 ---
 
-## 13. Troubleshooting Common Issues
+## 12. Troubleshooting Common Issues
 
-### 13.1 Extension Not Loading
+### 12.1 Extension Not Loading
 
 **Problem:** Extension doesn't appear in Firefox after installation
 
@@ -423,7 +423,7 @@ if (!hasTabsPermission) {
 3. Check browser console for manifest parsing errors
 4. Ensure all listed resources exist (icons, scripts)
 
-### 13.2 Server Connection Failures
+### 12.2 Server Connection Failures
 
 **Problem:** Extension can't connect to server
 
@@ -456,7 +456,7 @@ if (!hasTabsPermission) {
    # Check extension settings in about:addons
    ```
 
-### 13.3 Sync Not Working
+### 12.3 Sync Not Working
 
 **Problem:** Tabs not syncing between devices
 
@@ -473,7 +473,7 @@ if (!hasTabsPermission) {
 - Check SQLite database integrity: `sqlite3 tabs.db "PRAGMA integrity_check;"`
 - Ensure both devices have same server URL and token
 
-### 13.4 High Memory Usage
+### 12.4 High Memory Usage
 
 **Problem:** Extension consuming too much memory
 
@@ -507,7 +507,7 @@ if (!hasTabsPermission) {
    }
    ```
 
-### 13.5 Build Failures
+### 12.5 Build Failures
 
 **TypeScript Build Issues:**
 
@@ -536,7 +536,7 @@ cargo update
 cargo check --all-targets
 ```
 
-### 13.6 Performance Issues
+### 12.6 Performance Issues
 
 **Slow Extension Startup:**
 
@@ -550,7 +550,7 @@ cargo check --all-targets
 - Throttle/debounce frequent events
 - Profile with Firefox Performance tool
 
-### 13.7 Development Environment Issues
+### 12.7 Development Environment Issues
 
 **pnpm not found:**
 

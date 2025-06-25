@@ -37,7 +37,7 @@ When making commits in this repository, follow these simple conventions:
 #### Examples
 
 ```
-feat: add websocket support for real-time sync
+feat: add server-side push events for real-time sync
 fix: prevent duplicate tab creation on fast clicks
 docs: update installation instructions for macOS
 refactor: extract sync logic into separate module

@@ -116,6 +116,7 @@ feat: refactor entire build system with new error handling and process managemen
 - **Overview**: See @README.md
 - **Architecture & Dev Guide**: See @docs/DEV.md
 - **Installation**: See @docs/INSTALL.md
+- **Roadmap**: See @docs/ROADMAP-v0.5-v1.0.md
 
 ## AI Agent Guidelines
 
@@ -158,6 +159,18 @@ feat: refactor entire build system with new error handling and process managemen
 
 3. **Markdown**: Auto-runs via git hooks. Fix missing blank lines around code blocks/lists if it fails.
 
+4. **Documentation**: Review and update if needed:
+   - README.md - feature status, version roadmap
+   - DEV.md - new commands, architecture changes
+   - ROADMAP*.md - task completion status
+   - GIT.md - if commit conventions change
+
+5. **Roadmap Tracking** (IMPORTANT for active development):
+   - When working on roadmap items, include doc updates in the same commit
+   - Update ROADMAP-v0.5-v1.0.md: mark items complete, update metrics
+   - Update ROADMAP-v0.5-v1.0-STEPS.md: check off commits, add deviation notes
+   - Example: `git add src/feature.ts docs/ROADMAP*.md && git commit`
+
 ### Common Tasks
 
 - **New API endpoint**: Check `/server/src/routes/`
@@ -172,22 +185,24 @@ feat: refactor entire build system with new error handling and process managemen
 #### Error Handling (Result Pattern)
 
 ```typescript
-import { Result, ok, err } from 'neverthrow';
+import { Result, ok, err } from "neverthrow";
 
 enum SyncError {
-  NetworkFailure = 'NETWORK_FAILURE',
-  InvalidData = 'INVALID_DATA',
-  AuthError = 'AUTH_ERROR',
-  ServerError = 'SERVER_ERROR'
+  NetworkFailure = "NETWORK_FAILURE",
+  InvalidData = "INVALID_DATA",
+  AuthError = "AUTH_ERROR",
+  ServerError = "SERVER_ERROR",
 }
 
 async function syncTabs(tabs: Tab[]): Promise<Result<SyncResponse, SyncError>> {
   if (!tabs.length) return err(SyncError.InvalidData);
-  
+
   try {
     const response = await api.sync(tabs);
     if (!response.ok) {
-      return err(response.status === 401 ? SyncError.AuthError : SyncError.ServerError);
+      return err(
+        response.status === 401 ? SyncError.AuthError : SyncError.ServerError
+      );
     }
     return ok(response.data);
   } catch (e) {
@@ -197,7 +212,7 @@ async function syncTabs(tabs: Tab[]): Promise<Result<SyncResponse, SyncError>> {
 
 // Chain operations safely
 const result = await syncTabs(tabs)
-  .map(data => updateLocalState(data))
+  .map((data) => updateLocalState(data))
   .mapErr(handleError);
 ```
 
@@ -205,31 +220,31 @@ const result = await syncTabs(tabs)
 
 ```typescript
 // Import generated types (NEVER redefine)
-import type { Tab, Window } from '../types/generated';
+import type { Tab, Window } from "../types/generated";
 
 // Extend when needed
 interface TabWithMetadata extends Tab {
   lastAccessed: number;
-  syncStatus: 'pending' | 'synced' | 'error';
+  syncStatus: "pending" | "synced" | "error";
 }
 
 // Type guards for runtime validation
 function isValidTab(obj: unknown): obj is Tab {
   return (
-    typeof obj === 'object' &&
+    typeof obj === "object" &&
     obj !== null &&
-    'id' in obj &&
-    'url' in obj &&
-    typeof (obj as Tab).id === 'string'
+    "id" in obj &&
+    "url" in obj &&
+    typeof (obj as Tab).id === "string"
   );
 }
 
 // Discriminated unions for messages
 type BackgroundMessage =
-  | { type: 'TRACK_WINDOW'; windowId: number }
-  | { type: 'UNTRACK_WINDOW'; windowId: number }
-  | { type: 'SYNC_NOW' }
-  | { type: 'GET_STATUS' };
+  | { type: "TRACK_WINDOW"; windowId: number }
+  | { type: "UNTRACK_WINDOW"; windowId: number }
+  | { type: "SYNC_NOW" }
+  | { type: "GET_STATUS" };
 ```
 
 #### Performance Best Practices
@@ -258,7 +273,7 @@ class SyncManager {
 
 // Bad - hardcoded dependencies
 class SyncManager {
-  private api = new TanakaAPI('https://hardcoded.com');
+  private api = new TanakaAPI("https://hardcoded.com");
 }
 ```
 
@@ -296,6 +311,27 @@ class SyncManager {
 - Keep config examples only in INSTALL.md
 - AGENTS.md is a symlink to CLAUDE.md (changes affect both)
 
+### Rollback Procedures
+
+#### Emergency Rollback (for major migrations)
+
+If critical issues are found during a major refactor:
+
+```bash
+git checkout main
+git branch -D <feature-branch>
+git checkout <pre-migration-tag> -- .
+pnpm install  # or cargo build for server
+pnpm build:prod
+```
+
+#### Partial Rollback
+
+- Identify failing components/modules
+- Revert specific files while keeping other improvements
+- Document issues for future retry
+- Consider feature flags for gradual rollout
+
 ### Project Organization
 
 - Keep language/framework-specific files in their respective directories
@@ -309,6 +345,8 @@ class SyncManager {
 - Proactively suggest adding patterns/lessons to documentation
 - Always run pre-commit checks (see checklist above)
 - Fix markdown linting issues (usually missing blank lines)
+- **Documentation Updates**: Always check and update relevant documentation (README.md, DEV.md, ROADMAP*.md) when making major changes
+- **Before Pull Requests**: Review all docs for accuracy - feature status, version numbers, commands, and technical details must match the code
 
 ### Git Best Practices
 
