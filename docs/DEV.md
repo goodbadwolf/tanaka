@@ -48,7 +48,27 @@ This guide explains how Tanaka is wired together, how to get a local dev setup
 
 ### Installation Steps
 
-For automated setup, run: `./scripts/setup.sh`
+For automated setup:
+```bash
+make setup                                  # Install all prerequisites
+make setup-dry-run                          # Preview what would be installed
+uv run scripts/setup.py --help              # See all setup options
+uv run scripts/setup.py --include rust,node # Install only Rust and Node.js
+uv run scripts/setup.py --exclude pnpm      # Install everything except pnpm
+```
+
+For development tools:
+```bash
+uv sync --dev                               # Install Python dev dependencies
+
+# Run scripts via Makefile
+make lint                                   # Run all linters
+make lint-md                                # Lint markdown files
+make lint-python                            # Lint Python scripts
+make format                                 # Fix all formatting issues
+make gen-api-models                         # Generate TypeScript API models
+make help                                   # Show all available commands
+```
 
 Or install manually:
 

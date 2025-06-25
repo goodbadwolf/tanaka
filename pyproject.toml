@@ -1,0 +1,50 @@
+[project]
+name = "tanaka"
+version = "0.1.0"
+description = "Tanaka - Firefox tab synchronization across devices"
+requires-python = ">=3.12"
+
+[project.optional-dependencies]
+dev = ["ruff>=0.1.0", "black>=23.0.0", "mypy>=1.0.0", "pymarkdownlnt>=0.9.0"]
+
+
+[tool.uv]
+dev-dependencies = [
+    "ruff>=0.1.0",
+    "black>=23.0.0",
+    "mypy>=1.0.0",
+    "pymarkdownlnt>=0.9.0",
+]
+
+# Scripts are defined as shell aliases or Makefile targets
+# since uv doesn't support [tool.uv.scripts] yet
+
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+indent-width = 4
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "UP", # pyupgrade
+]
+ignore = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
