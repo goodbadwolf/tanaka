@@ -15,10 +15,11 @@ export async function waitForSignal<T>(
       reject(new Error('Signal wait timeout'));
     }, timeout);
 
-    const dispose = effect(() => {
+    let dispose: (() => void) | null = null;
+    dispose = effect(() => {
       if (predicate(sig.value)) {
         clearTimeout(timeoutId);
-        dispose();
+        if (dispose) dispose();
         resolve(sig.value);
       }
     });
@@ -34,38 +35,33 @@ export function flushSignalUpdates() {
 export function mockSignalStorage() {
   const storage: Record<string, string> = {};
 
-  const mockStorage = {
+  return {
     getItem: jest.fn((key: string) => storage[key] || null),
     setItem: jest.fn((key: string, value: string) => {
       storage[key] = value;
     }),
     removeItem: jest.fn((key: string) => {
-      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-      delete storage[key];
+      Reflect.deleteProperty(storage, key);
     }),
     clear: jest.fn(() => {
-      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-      Object.keys(storage).forEach((key) => delete storage[key]);
+      Object.keys(storage).forEach((key) => {
+        Reflect.deleteProperty(storage, key);
+      });
+    }),
+    get: jest.fn(async (keys: string[]) => {
+      const result: Record<string, string | undefined> = {};
+      for (const key of keys) {
+        result[key] = storage[key];
+      }
+      return result;
+    }),
+    set: jest.fn(async (data: Record<string, unknown>) => {
+      for (const [key, value] of Object.entries(data)) {
+        storage[key] = String(value);
+      }
     }),
     get storage() {
       return { ...storage };
     },
-    get: jest.fn(async (keys: string[]) => {
-      const result: Record<string, unknown> = {};
-      keys.forEach((key) => {
-        const value = storage[key];
-        if (value !== undefined) {
-          result[key] = value;
-        }
-      });
-      return result;
-    }),
-    set: jest.fn(async (data: Record<string, unknown>) => {
-      Object.entries(data).forEach(([key, value]) => {
-        storage[key] = String(value);
-      });
-    }),
   };
-
-  return mockStorage;
 }
