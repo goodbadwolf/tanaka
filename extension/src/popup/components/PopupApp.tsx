@@ -1,49 +1,42 @@
-import { useEffect, useState } from 'preact/hooks';
+import { useEffect } from 'preact/hooks';
 import { WindowTracker } from './WindowTracker';
 import { useService } from '../../di/provider.js';
 import type { IBrowser } from '../../browser/core.js';
+import { isLoading, error, initializePopup } from '../../store/popup';
+import { LoadingSpinner, ErrorMessage } from '../../components';
 
 export function PopupApp() {
   const browser = useService<IBrowser>('IBrowser');
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Initialize popup
-    const initializePopup = async () => {
-      try {
-        // Check if we can access the windows API
-        const currentWindow = await browser.windows.getCurrent();
-        if (!currentWindow.id) {
-          throw new Error('Unable to get current window');
-        }
-        setIsLoading(false);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
-        setIsLoading(false);
-      }
-    };
-
-    initializePopup();
+    initializePopup(browser);
   }, [browser]);
 
-  if (isLoading) {
+  const loading = isLoading.value;
+  const errorMessage = error.value;
+
+  if (loading) {
     return (
       <div className="container">
         <h1>Tanaka</h1>
-        <p className="subtitle">Loading...</p>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+          <LoadingSpinner size="medium" />
+          <span style={{ marginLeft: '8px' }}>Loading...</span>
+        </div>
       </div>
     );
   }
 
-  if (error) {
+  if (errorMessage) {
     return (
       <div className="container">
         <h1>Tanaka</h1>
         <p className="subtitle">Tab Synchronization</p>
-        <div className="error">
-          <p>Error: {error}</p>
-        </div>
+        <ErrorMessage
+          type="error"
+          message={errorMessage}
+          dismissible={false}
+        />
       </div>
     );
   }
