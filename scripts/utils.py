@@ -32,9 +32,7 @@ def run_command(
     """
     logger.info(f"Running: {' '.join(cmd)}")
     try:
-        return subprocess.run(
-            cmd, cwd=cwd, check=check, capture_output=False, text=True, env=env
-        )
+        return subprocess.run(cmd, cwd=cwd, check=check, capture_output=False, text=True, env=env)
     except FileNotFoundError:
         logger.error(f"Command not found: {cmd[0]}")
         raise

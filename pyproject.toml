@@ -51,8 +51,8 @@ quote-style = "double"
 indent-style = "space"
 
 [tool.black]
-line-length = 88
-target-version = ['py38']
+line-length = 120
+target-version = ['py312']
 
 [tool.mypy]
 python_version = "3.12"
