@@ -27,6 +27,8 @@ export interface InputProps {
   inputClassName?: string;
   ariaLabel?: string;
   ariaDescribedBy?: string;
+  min?: string;
+  max?: string;
 }
 
 export function Input({
@@ -54,6 +56,8 @@ export function Input({
   inputClassName = '',
   ariaLabel,
   ariaDescribedBy,
+  min,
+  max,
 }: InputProps) {
   const [internalValue, setInternalValue] = useState(defaultValue);
   const [validationError, setValidationError] = useState<string | undefined>();
@@ -71,46 +75,38 @@ export function Input({
 
   const handleChange = (e: JSX.TargetedEvent<HTMLInputElement>) => {
     const newValue = (e.target as HTMLInputElement).value;
-    
+
     if (controlledValue === undefined) {
       setInternalValue(newValue);
     }
-    
+
     if (validate && touched) {
       setValidationError(validate(newValue));
     }
-    
+
     onChange?.(newValue);
   };
 
   const handleBlur = (e: JSX.TargetedFocusEvent<HTMLInputElement>) => {
     setTouched(true);
-    
+
     if (validate && value) {
       setValidationError(validate(value));
     }
-    
+
     onBlur?.(e);
   };
 
-  const containerClasses = [
-    styles.container,
-    fullWidth && styles.fullWidth,
-    className,
-  ]
+  const containerClasses = [styles.container, fullWidth && styles.fullWidth, className]
     .filter(Boolean)
     .join(' ');
 
-  const inputClasses = [
-    styles.input,
-    styles[size],
-    hasError && styles.error,
-    inputClassName,
-  ]
+  const inputClasses = [styles.input, styles[size], hasError && styles.error, inputClassName]
     .filter(Boolean)
     .join(' ');
 
-  const inputId = id || (label ? `input-${name || Math.random().toString(36).substr(2, 9)}` : undefined);
+  const inputId =
+    id || (label ? `input-${name || Math.random().toString(36).substr(2, 9)}` : undefined);
   const errorId = hasError && errorMessage ? `${inputId}-error` : undefined;
   const helperId = helperText ? `${inputId}-helper` : undefined;
 
@@ -119,10 +115,14 @@ export function Input({
       {label && (
         <label htmlFor={inputId} className={styles.label}>
           {label}
-          {required && <span className={styles.required} aria-label="required">*</span>}
+          {required && (
+            <span className={styles.required} aria-label="required">
+              *
+            </span>
+          )}
         </label>
       )}
-      
+
       <input
         id={inputId}
         type={type}
@@ -140,15 +140,19 @@ export function Input({
         onKeyDown={onKeyDown}
         aria-label={ariaLabel || label}
         aria-invalid={hasError}
-        aria-describedby={[errorId, helperId, ariaDescribedBy].filter(Boolean).join(' ') || undefined}
+        aria-describedby={
+          [errorId, helperId, ariaDescribedBy].filter(Boolean).join(' ') || undefined
+        }
+        min={min}
+        max={max}
       />
-      
+
       {hasError && errorMessage && (
         <span id={errorId} className={styles.errorText} role="alert">
           {errorMessage}
         </span>
       )}
-      
+
       {helperText && !hasError && (
         <span id={helperId} className={styles.helperText}>
           {helperText}

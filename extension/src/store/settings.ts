@@ -80,9 +80,9 @@ export function setSaveStatus(status: { type: 'success' | 'error'; message: stri
   }
 }
 
-export async function loadSettings(
-  storage: { get: (keys: string[]) => Promise<Record<string, any>> }
-): Promise<void> {
+export async function loadSettings(storage: {
+  get: (keys: string[]) => Promise<Record<string, unknown>>;
+}): Promise<void> {
   setLoadingState(true);
   try {
     const stored = await storage.get(['authToken', 'syncInterval']);
@@ -107,7 +107,7 @@ export async function loadSettings(
 
 export async function saveSettings(
   updates: Partial<UserSettings>,
-  storage: { set: (data: Record<string, any>) => Promise<void> }
+  storage: { set: (data: Record<string, unknown>) => Promise<void> },
 ): Promise<void> {
   if ('authToken' in updates && !updates.authToken?.trim()) {
     setSaveStatus({
@@ -155,9 +155,9 @@ export function resetSettings() {
 
 let persistenceEffect: (() => void) | null = null;
 
-export function enablePersistence(
-  storage: { set: (data: Record<string, any>) => Promise<void> }
-) {
+export function enablePersistence(storage: {
+  set: (data: Record<string, unknown>) => Promise<void>;
+}) {
   if (persistenceEffect) {
     persistenceEffect();
   }
@@ -165,7 +165,7 @@ export function enablePersistence(
   persistenceEffect = effect(() => {
     const currentSettings = settings.value;
     if (!settingsState.value.isLoading) {
-      storage.set(currentSettings).catch((error) => {
+      storage.set({ ...currentSettings }).catch((error) => {
         console.error('Failed to persist settings:', error);
       });
     }

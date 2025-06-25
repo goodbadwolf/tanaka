@@ -22,7 +22,7 @@ export const syncStatus = signal<SyncStatus>({
 export const isAnySyncing = computed(() => syncStatus.value.syncing);
 
 export const trackedWindowCount = computed(() => {
-  return Array.from(trackedWindows.value.values()).filter(w => w.tracked).length;
+  return Array.from(trackedWindows.value.values()).filter((w) => w.tracked).length;
 });
 
 export const allTrackedWindowIds = computed(() => {
