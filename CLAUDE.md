@@ -368,6 +368,10 @@ git commit -m "refactor: simplify message validation"
 
 See @docs/DEV.md for all development commands.
 
+### Server Development
+
+For server improvement roadmap and architectural patterns, see [@docs/SERVER-ROADMAP-v1.0.md](docs/SERVER-ROADMAP-v1.0.md).
+
 ### Misc
 
 - AGENTS.md (used by OpenAI's Codex) is a symlink for CLAUDE.md
