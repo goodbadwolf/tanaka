@@ -46,6 +46,8 @@ This guide explains how Tanaka is wired together, how to get a local dev setup
 | SQLite  | 3.40+        |
 | Firefox | 126+         |
 
+Run `scripts/setup.sh` from the project root to install these tools automatically, or install them manually. Then run:
+
 Install Rust via `rustup`, then:
 
 ```bash
