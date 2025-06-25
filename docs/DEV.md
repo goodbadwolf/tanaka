@@ -46,14 +46,36 @@ This guide explains how Tanaka is wired together, how to get a local dev setup
 | SQLite  | 3.40+   |
 | Firefox | 126+    |
 
-Install Rust via `rustup`, then:
+### Installation Steps
+
+1. **Install Rust** via `rustup`:
 
 ```bash
-# Install SQLx CLI for database migrations (optional)
-cargo install sqlx-cli --no-default-features --features sqlite
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
 
-# Enable pnpm through Node.js corepack
-corepack enable  # enables pnpm
+1. **Install Node.js** using nvm:
+
+```bash
+# Install nvm (if not already installed)
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+
+# Install and use Node.js 24+
+nvm install 24
+nvm alias default 24
+nvm use 24
+```
+
+1. **Install pnpm** globally via npm:
+
+```bash
+npm install -g pnpm
+```
+
+1. **Install SQLx CLI** for database migrations (optional):
+
+```bash
+cargo install sqlx-cli --no-default-features --features sqlite
 ```
 
 ---
