@@ -53,8 +53,6 @@ def lint_markdown(fix: bool = False, patterns_to_ignore: set[str] = None) -> int
         "uv",
         "run",
         "pymarkdown",
-        "--config",
-        ".pymarkdown.json",
         action,
     ] + md_files
 

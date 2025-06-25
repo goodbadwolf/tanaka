@@ -59,3 +59,25 @@ python_version = "3.12"
 warn_return_any = true
 warn_unused_configs = true
 ignore_missing_imports = true
+
+[tool.pymarkdown]
+# Disable line length restrictions (MD013)
+plugins.line-length.enabled = false
+
+# Configure ordered list style to use incremental numbers (MD029)
+plugins.ol-prefix.style = "ordered"
+
+# Disable blank lines around fenced code blocks requirement (MD031)
+plugins.blanks-around-fences.enabled = false
+
+# Allow bare URLs (MD034)
+plugins.no-bare-urls.enabled = false
+
+# Allow emphasis on its own line (MD036)
+plugins.no-emphasis-as-heading.enabled = false
+
+# Don't require language specification for code blocks (MD040)
+plugins.fenced-code-language.enabled = false
+
+# Don't require first line to be a top-level heading (MD041)
+plugins.first-line-heading.enabled = false
