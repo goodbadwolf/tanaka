@@ -1,12 +1,24 @@
+import tsJestPreset from 'ts-jest/presets/default-esm/jest-preset.js';
+
 export default {
-  preset: 'ts-jest',
+  ...tsJestPreset,
   testEnvironment: 'jsdom',
   transform: {
+    ...tsJestPreset.transform,
     '^.+\\.tsx?$': ['ts-jest', {
-      tsconfig: 'tsconfig.test.json'
+      tsconfig: 'tsconfig.test.json',
+      useESM: true
     }]
   },
+  globals: {
+    'ts-jest': {
+      tsconfig: 'tsconfig.test.json',
+      useESM: true,
+      diagnostics: false
+    }
+  },
   moduleNameMapper: {
+    '^preact/jsx-runtime$': '<rootDir>/node_modules/preact/jsx-runtime/dist/jsxRuntime.js',
     '^@/(.*)$': '<rootDir>/src/$1',
     '\\.css$': '<rootDir>/src/test/__mocks__/styleMock.js',
     '^(\\.{1,2}/.*)\\.js$': '$1',
