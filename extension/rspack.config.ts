@@ -51,8 +51,11 @@ export default defineConfig({
               parser: {
                 syntax: 'typescript',
                 tsx: true,
+                decorators: true,
               },
               transform: {
+                legacyDecorator: true,
+                decoratorMetadata: true,
                 react: {
                   runtime: 'automatic',
                   importSource: 'preact',
@@ -60,6 +63,7 @@ export default defineConfig({
                   refresh: isDev,
                 },
               },
+              target: 'es2020',
             },
           },
         },
@@ -111,6 +115,29 @@ export default defineConfig({
 
   optimization: {
     minimize: !isDev,
+    minimizer: !isDev ? [
+      new rspack.SwcJsMinimizerRspackPlugin({
+        minimizerOptions: {
+          format: {
+            comments: false,
+          },
+          compress: {
+            passes: 2,
+            drop_console: buildEnv === 'production',
+            drop_debugger: true,
+            pure_funcs: buildEnv === 'production' ? ['console.log', 'console.info', 'console.debug'] : [],
+          },
+          mangle: {
+            toplevel: true,
+            keep_classnames: false,
+            keep_fnames: false,
+          },
+        },
+      }),
+    ] : [],
+    sideEffects: false, // Enable tree shaking
+    usedExports: true, // Mark used exports
+    innerGraph: true, // Enable inner graph optimizations
     runtimeChunk: false,
     splitChunks: {
       chunks: 'all',
