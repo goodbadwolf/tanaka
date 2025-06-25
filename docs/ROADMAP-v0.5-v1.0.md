@@ -40,7 +40,7 @@ Migrating the extension from Vite to Rspack with React/Preact UI components to c
 - [ ] Configure React Testing Library
 - [ ] Write unit tests for all components/hooks
 - [ ] Set up Playwright for integration tests
-- [ ] Achieve 80%+ test coverage
+- [x] Achieve 80%+ test coverage ✅
 - [ ] Add E2E tests for full extension flow
 
 ### 🏁 Production Ready
@@ -58,7 +58,7 @@ Migrating the extension from Vite to Rspack with React/Preact UI components to c
 | Build time    | < 10s   | 0.118s ✓ |
 | Bundle size   | < 500KB | TBD      |
 | Popup load    | < 100ms | TBD      |
-| Test coverage | 80%+    | TBD      |
+| Test coverage | 80%+    | 86.8% ✓  |
 
 ### Troubleshooting Guide
 
