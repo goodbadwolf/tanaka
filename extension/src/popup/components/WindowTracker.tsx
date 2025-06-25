@@ -1,7 +1,12 @@
 import { useEffect, useState } from 'preact/hooks';
 import { useService } from '../../di/provider.js';
 import type { IBrowser } from '../../browser/core.js';
-import { trackedWindows, toggleWindowTracking, isWindowTracked } from '../../store/extension';
+import {
+  trackedWindows,
+  toggleWindowTracking,
+  isWindowTracked,
+  trackWindow,
+} from '../../store/extension';
 import { LoadingSpinner } from '../../components';
 
 export function WindowTracker() {
@@ -27,14 +32,14 @@ export function WindowTracker() {
         const message = { type: 'GET_TRACKED_WINDOWS' };
         const response = (await browser.runtime.sendMessage(message)) as {
           windowIds?: number[];
-          titles?: Record<number, string>;
+          titles?: string[];
           error?: string;
         };
 
         if (response.windowIds && response.titles) {
           // Initialize the tracked windows state
           const windowsMap = new Map();
-          response.windowIds.forEach((id: number, index: number) => {
+          response.windowIds?.forEach((id: number, index: number) => {
             windowsMap.set(id, {
               id,
               title: response.titles?.[index],
@@ -63,14 +68,21 @@ export function WindowTracker() {
       const wasTracked = isWindowTracked(currentWindowId);
 
       // Optimistically update the UI
-      toggleWindowTracking(currentWindowId);
+      if (wasTracked) {
+        toggleWindowTracking(currentWindowId);
+      } else {
+        trackWindow(currentWindowId);
+      }
 
       // Send message to background
       const message = wasTracked
         ? { type: 'UNTRACK_WINDOW', windowId: currentWindowId }
         : { type: 'TRACK_WINDOW', windowId: currentWindowId };
 
-      const response = (await browser.runtime.sendMessage(message)) as { error?: string };
+      const response = (await browser.runtime.sendMessage(message)) as {
+        success?: boolean;
+        error?: string;
+      };
 
       if (response.error) {
         // Revert on error

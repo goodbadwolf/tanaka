@@ -55,7 +55,7 @@ export function mockSignalStorage() {
       }
       return result;
     }),
-    set: jest.fn(async (data: Record<string, unknown>) => {
+    set: jest.fn(async (data: Record<string, unknown>): Promise<void> => {
       for (const [key, value] of Object.entries(data)) {
         storage[key] = String(value);
       }

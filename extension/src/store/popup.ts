@@ -42,7 +42,9 @@ export function setCurrentWindow(windowId: number | null) {
   });
 }
 
-export async function initializePopup(browser: Browser): Promise<void> {
+export async function initializePopup(browser: {
+  windows: { getCurrent: () => Promise<{ id?: number }> };
+}): Promise<void> {
   try {
     setLoadingState(true);
     setError(null);

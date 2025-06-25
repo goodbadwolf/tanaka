@@ -114,7 +114,7 @@ describe('Settings Store', () => {
 
       await saveSettings({ authToken: 'new-token' }, mockStorage);
 
-      expect(mockStorage.setItem).toHaveBeenCalledWith('authToken', 'new-token');
+      expect(mockStorage.set).toHaveBeenCalledWith({ authToken: 'new-token' });
       expect(authToken.value).toBe('new-token');
       expect(saveStatus.value).toEqual({
         type: 'success',
@@ -127,7 +127,7 @@ describe('Settings Store', () => {
 
       await saveSettings({ authToken: '  token-with-spaces  ' }, mockStorage);
 
-      expect(mockStorage.setItem).toHaveBeenCalledWith('authToken', 'token-with-spaces');
+      expect(mockStorage.set).toHaveBeenCalledWith({ authToken: 'token-with-spaces' });
       expect(authToken.value).toBe('token-with-spaces');
     });
 
@@ -142,7 +142,7 @@ describe('Settings Store', () => {
         type: 'error',
         message: 'Auth token is required',
       });
-      expect(mockStorage.setItem).not.toHaveBeenCalled();
+      expect(mockStorage.set).not.toHaveBeenCalled();
     });
 
     it('handles save errors', async () => {
@@ -218,8 +218,10 @@ describe('Settings Store', () => {
 
       await waitForSignal(settings, () => true);
 
-      expect(mockStorage.setItem).toHaveBeenCalledWith('authToken', 'auto-saved');
-      expect(mockStorage.setItem).toHaveBeenCalledWith('syncInterval', 5000);
+      expect(mockStorage.set).toHaveBeenCalledWith({
+        authToken: 'auto-saved',
+        syncInterval: 5000,
+      });
 
       dispose();
     });
@@ -233,7 +235,7 @@ describe('Settings Store', () => {
 
       await waitForSignal(settings, () => true);
 
-      expect(mockStorage.setItem).not.toHaveBeenCalled();
+      expect(mockStorage.set).not.toHaveBeenCalled();
 
       dispose();
     });

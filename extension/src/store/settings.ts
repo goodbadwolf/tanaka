@@ -29,7 +29,7 @@ export const authToken = computed(() => settingsState.value.settings.authToken);
 export const syncInterval = computed(() => settingsState.value.settings.syncInterval);
 export const isAuthenticated = computed(() => {
   const token = authToken.value;
-  return token && token !== 'unset-token' && token.trim().length > 0;
+  return !!(token && token !== 'unset-token' && token.trim().length > 0);
 });
 
 export const isLoading = computed(() => settingsState.value.isLoading);
@@ -86,10 +86,18 @@ export async function loadSettings(storage: {
   setLoadingState(true);
   try {
     const stored = await storage.get(['authToken', 'syncInterval']);
-    const loadedSettings = {
+    const loadedSettings: UserSettings = {
       ...USER_SETTINGS_DEFAULTS,
-      ...stored,
     };
+    if (stored.authToken !== undefined && stored.authToken !== null) {
+      loadedSettings.authToken = String(stored.authToken);
+    }
+    if (stored.syncInterval !== undefined && stored.syncInterval !== null) {
+      loadedSettings.syncInterval =
+        typeof stored.syncInterval === 'string'
+          ? parseInt(stored.syncInterval, 10) || USER_SETTINGS_DEFAULTS.syncInterval
+          : Number(stored.syncInterval) || USER_SETTINGS_DEFAULTS.syncInterval;
+    }
     settingsState.value = {
       ...settingsState.value,
       settings: loadedSettings,

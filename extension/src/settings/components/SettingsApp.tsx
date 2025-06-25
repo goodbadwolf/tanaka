@@ -40,12 +40,12 @@ export function SettingsApp() {
           authToken: authTokenInput.value,
           syncInterval: parseInt(syncIntervalInput.value, 10) * 1000,
         },
-        browser.localStorage
+        browser.localStorage,
       );
 
       // Notify background script
       await browser.runtime.sendMessage({ type: 'SETTINGS_UPDATED' });
-    } catch (error) {
+    } catch {
       // Error is already handled by the store
     }
   };
@@ -58,7 +58,14 @@ export function SettingsApp() {
           <p className="version">Version {manifest.version}</p>
         </header>
         <main>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '40px',
+            }}
+          >
             <LoadingSpinner size="large" />
             <span style={{ marginLeft: '12px' }}>Loading settings...</span>
           </div>
@@ -86,7 +93,9 @@ export function SettingsApp() {
               name="authToken"
               type="password"
               label="Auth Token"
-              defaultValue={currentSettings.authToken === 'unset-token' ? '' : currentSettings.authToken}
+              defaultValue={
+                currentSettings.authToken === 'unset-token' ? '' : currentSettings.authToken
+              }
               placeholder="Enter your authentication token"
               disabled={saving}
               helperText="This token is used to authenticate with the Tanaka server"
@@ -103,8 +112,6 @@ export function SettingsApp() {
               defaultValue={(currentSettings.syncInterval / 1000).toString()}
               disabled={saving}
               helperText="How often to sync tabs with the server (1-60 seconds)"
-              min="1"
-              max="60"
               required
             />
           </Card>
