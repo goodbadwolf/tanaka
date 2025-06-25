@@ -42,6 +42,9 @@ describe('PopupApp', () => {
         openOptionsPage: jest.fn(),
         sendMessage: jest.fn().mockResolvedValue({ windowIds: [], titles: [] }),
       },
+      tabs: {
+        create: jest.fn(),
+      },
     };
 
     // Register mock in DI container
