@@ -92,9 +92,7 @@ def create_parser() -> argparse.ArgumentParser:
 def main() -> int:
     tasks = discover_tasks()
     parser = create_parser()
-    subparsers = parser.add_subparsers(
-        dest="command", help="Available commands", metavar="<command>"
-    )
+    subparsers = parser.add_subparsers(dest="command", help="Available commands", metavar="<command>")
 
     for task in tasks:
         task.add_subparser(subparsers)

@@ -99,11 +99,7 @@ def run(args: argparse.Namespace) -> TaskResult:
     """Run linters based on arguments"""
     if args.markdown:
         exit_code = lint_markdown(fix=args.fix)
-        message = (
-            "Markdown linting completed"
-            if exit_code == 0
-            else "Markdown linting failed"
-        )
+        message = "Markdown linting completed" if exit_code == 0 else "Markdown linting failed"
         return TaskResult(
             success=exit_code == 0,
             message=message,
@@ -111,9 +107,7 @@ def run(args: argparse.Namespace) -> TaskResult:
         )
     elif args.python:
         exit_code = lint_python(fix=args.fix)
-        message = (
-            "Python linting completed" if exit_code == 0 else "Python linting failed"
-        )
+        message = "Python linting completed" if exit_code == 0 else "Python linting failed"
         return TaskResult(
             success=exit_code == 0,
             message=message,
@@ -152,10 +146,6 @@ Examples:
         """,
     )
     parser.add_argument("--fix", action="store_true", help="Fix issues automatically")
-    parser.add_argument(
-        "--markdown", "-m", action="store_true", help="Lint only markdown files"
-    )
-    parser.add_argument(
-        "--python", "-p", action="store_true", help="Lint only Python files"
-    )
+    parser.add_argument("--markdown", "-m", action="store_true", help="Lint only markdown files")
+    parser.add_argument("--python", "-p", action="store_true", help="Lint only Python files")
     parser.set_defaults(func=run)

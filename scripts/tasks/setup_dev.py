@@ -64,9 +64,7 @@ class DependencyInstaller:
         if self.dry_run:
             cmd_str = cmd if isinstance(cmd, str) else " ".join(cmd)
             logger.info(f"[DRY RUN] Would execute: {cmd_str}")
-            return subprocess.CompletedProcess(
-                args=cmd, returncode=0, stdout="", stderr=""
-            )
+            return subprocess.CompletedProcess(args=cmd, returncode=0, stdout="", stderr="")
 
         # Special handling for shell commands
         if shell and isinstance(cmd, str):
@@ -111,9 +109,7 @@ class RustInstaller(DependencyInstaller):
         logger.info("Installing Rust...")
         try:
             rustup_url = "https://sh.rustup.rs"
-            install_cmd = (
-                f'curl --proto "=https" --tlsv1.2 -sSf {rustup_url} | sh -s -- -y'
-            )
+            install_cmd = f'curl --proto "=https" --tlsv1.2 -sSf {rustup_url} | sh -s -- -y'
             self.run_command(install_cmd, shell=True)
 
             cargo_env = os.path.expanduser("~/.cargo/env")
@@ -296,9 +292,7 @@ class FirefoxInstaller(DependencyInstaller):
                     logger.error(f"Failed to install Firefox: {e}")
                     return False
 
-        logger.warning(
-            "Please install Firefox 126+ from https://www.mozilla.org/firefox/"
-        )
+        logger.warning("Please install Firefox 126+ from https://www.mozilla.org/firefox/")
         return False
 
 
@@ -311,9 +305,7 @@ class SqliteChecker(DependencyInstaller):
             logger.success(f"SQLite is installed: {version}")
             return True
 
-        logger.warning(
-            "SQLite not found. Please install SQLite 3.40+ using your system package manager:"
-        )
+        logger.warning("SQLite not found. Please install SQLite 3.40+ using your system package manager:")
         if self.os_type == OSType.LINUX:
             logger.warning("  Ubuntu/Debian: sudo apt-get install sqlite3")
             logger.warning("  Fedora/RHEL: sudo dnf install sqlite")
@@ -338,9 +330,7 @@ class PythonInstaller(DependencyInstaller):
         try:
             result = self.run_command(["uv", "python", "list"])
             if result.stdout and f"cpython-{self.REQUIRED_VERSION}" in result.stdout:
-                logger.success(
-                    f"Python {self.REQUIRED_VERSION} already installed via uv"
-                )
+                logger.success(f"Python {self.REQUIRED_VERSION} already installed via uv")
                 return True
         except Exception:
             pass
@@ -364,9 +354,7 @@ class PythonInstaller(DependencyInstaller):
                     if match:
                         installed_version = match.group(1)
                         if float(installed_version) >= float(self.REQUIRED_VERSION):
-                            logger.info(
-                                f"System Python {installed_version} found and meets requirements"
-                            )
+                            logger.info(f"System Python {installed_version} found and meets requirements")
                             return True
 
             logger.warning("Could not install or find suitable Python version")
@@ -432,9 +420,7 @@ class SetupManager:
             "firefox": Dependency(name="firefox", check_cmd="firefox"),
             "sqlite": Dependency(name="sqlite", check_cmd="sqlite3"),
             "uv": Dependency(name="uv", check_cmd="uv"),
-            "python": Dependency(
-                name="python", depends_on=["uv"], check_cmd="uv python"
-            ),
+            "python": Dependency(name="python", depends_on=["uv"], check_cmd="uv python"),
             "venv": Dependency(name="venv", depends_on=["python", "uv"]),
         }
 
@@ -600,9 +586,7 @@ def run(args: argparse.Namespace) -> TaskResult:
         deps = parse_dependencies(args)
         manager = SetupManager(dry_run=args.dry_run)
         manager.setup(deps)
-        return TaskResult(
-            success=True, message="Setup completed successfully", exit_code=EXIT_SUCCESS
-        )
+        return TaskResult(success=True, message="Setup completed successfully", exit_code=EXIT_SUCCESS)
 
     except ValueError as e:
         message = str(e)

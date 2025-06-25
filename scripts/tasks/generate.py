@@ -40,9 +40,7 @@ def generate_api_models() -> TaskResult:
 
     if not models_rs.exists():
         logger.error(f"Models file not found: {models_rs}")
-        return TaskResult(
-            success=False, message="Models file not found", exit_code=EXIT_FAILURE
-        )
+        return TaskResult(success=False, message="Models file not found", exit_code=EXIT_FAILURE)
 
     # Check if regeneration is needed
     needs_regeneration = True
@@ -67,9 +65,7 @@ def generate_api_models() -> TaskResult:
         models_time = datetime.fromtimestamp(models_rs.stat().st_mtime)
         sentinel_time = datetime.fromtimestamp(sentinel_file.stat().st_mtime)
         logger.warning("Generated model files are stale. Regenerating...")
-        logger.info(
-            f"Generated model file date: {sentinel_time.strftime('%Y-%m-%d %H:%M:%S')}"
-        )
+        logger.info(f"Generated model file date: {sentinel_time.strftime('%Y-%m-%d %H:%M:%S')}")
         logger.info(f"Model file date: {models_time.strftime('%Y-%m-%d %H:%M:%S')}")
     else:
         logger.warning("No generated model files found. Generating...")
