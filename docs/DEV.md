@@ -48,6 +48,10 @@ This guide explains how Tanaka is wired together, how to get a local dev setup
 
 ### Installation Steps
 
+For automated setup, run: `./scripts/setup.sh`
+
+Or install manually:
+
 1. **Install Rust** via `rustup`:
 
    ```bash
