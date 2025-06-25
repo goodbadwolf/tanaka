@@ -1,4 +1,3 @@
-import { JSX } from 'preact';
 import styles from './ErrorMessage.module.css';
 
 export interface ErrorMessageProps {

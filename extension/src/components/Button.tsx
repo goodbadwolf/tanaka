@@ -1,4 +1,4 @@
-import { h, JSX } from 'preact';
+import { JSX } from 'preact';
 import styles from './Button.module.css';
 
 export interface ButtonProps {

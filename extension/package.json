@@ -76,6 +76,7 @@
     "webpack-bundle-analyzer": "^4.10.2"
   },
   "dependencies": {
+    "@preact/signals": "^2.2.0",
     "preact": "^10.26.9",
     "reflect-metadata": "^0.2.2",
     "tsyringe": "^4.10.0",

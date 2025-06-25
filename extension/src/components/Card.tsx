@@ -1,4 +1,4 @@
-import { JSX, ComponentChildren } from 'preact';
+import { ComponentChildren } from 'preact';
 import styles from './Card.module.css';
 
 export interface CardProps {

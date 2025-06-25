@@ -1,4 +1,3 @@
-import { JSX } from 'preact';
 import styles from './LoadingSpinner.module.css';
 
 export interface LoadingSpinnerProps {
