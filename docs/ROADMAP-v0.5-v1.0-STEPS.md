@@ -149,6 +149,12 @@ git checkout -b feat/preact-signals
 
 **Branch**: `feat/test-infrastructure`
 
+**Note**: Test coverage goal of 80%+ was achieved early via `test/improve-coverage` branch (PR #22) with:
+- Fixed skipped tests in SettingsApp
+- Added comprehensive API module tests (100% coverage)
+- Added comprehensive browser module tests (100% coverage)
+- Overall coverage: 86.8%
+
 ```bash
 git checkout -b feat/test-infrastructure
 ```
