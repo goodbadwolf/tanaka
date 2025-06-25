@@ -6,8 +6,9 @@ This document tracks the detailed implementation tasks for Tanaka v0.5 (Core Fun
 
 ### Current Status
 
-- **Active**: Rspack/React Migration for v0.5
-- **Planned**: Clean Architecture Implementation for v1.0
+- **Active**: Performance Optimization (Phase 5 of v0.5)
+- **Completed**: Component Migration, State Management, Test Infrastructure
+- **Next**: E2E Testing, Production Readiness
 - **Current Version**: v0.5-alpha
 
 ---
@@ -30,10 +31,10 @@ Migrating the extension from Vite to Rspack with React/Preact UI components to c
 
 ### 📊 Performance Optimization
 
-- [ ] Implement lazy loading for settings
-- [ ] Add performance monitoring utilities
-- [ ] Enable tree shaking and minification
-- [ ] Run bundle analyzer and optimize
+- [x] Implement lazy loading for settings ✅
+- [x] Add performance monitoring utilities ✅
+- [x] Enable tree shaking and minification ✅
+- [x] Run bundle analyzer and optimize ✅
 
 ### 🧪 Testing & Quality
 

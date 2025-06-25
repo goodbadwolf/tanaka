@@ -242,37 +242,37 @@ git checkout -b feat/performance-optimization
 
 **Commits**:
 
-1. `feat: implement lazy loading for settings`
+1. [x] `feat: implement lazy loading for settings`
    - Add React.lazy for SettingsApp
    - Create loading boundary
    - Add error boundary
 
-2. `feat: add performance monitoring`
+2. [x] `feat: add performance monitoring`
    - Create `src/utils/performance.ts`
    - Add timing marks
    - Implement reporting
 
-3. `feat: enable tree shaking`
+3. [x] `feat: enable tree shaking`
    - Update rspack config
    - Mark side-effect free modules
    - Optimize imports
 
-4. `feat: configure minification`
-   - Add terser plugin
+4. [x] `feat: configure minification`
+   - Add terser plugin (Note: used SWC minifier instead)
    - Configure optimization
    - Set production flags
 
-5. `feat: implement bundle analysis`
+5. [x] `feat: implement bundle analysis`
    - Add analyze script
    - Generate bundle report
    - Document findings
 
-6. `perf: optimize component re-renders`
+6. [ ] `perf: optimize component re-renders`
    - Add memo where needed
    - Optimize dependencies
    - Fix render loops
 
-7. `perf: optimize asset loading`
+7. [ ] `perf: optimize asset loading`
    - Implement resource hints
    - Add preload directives
    - Optimize images
