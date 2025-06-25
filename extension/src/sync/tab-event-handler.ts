@@ -5,10 +5,10 @@ import type {
   OnRemovedRemoveInfoType,
   OnUpdatedChangeInfoType,
   OnMovedMoveInfoType,
-} from '../browser/core.js';
-import { WindowTracker } from './window-tracker.js';
-import { SyncManager } from './sync-manager.js';
-import { debugLog } from '../utils/logger.js';
+} from '../browser/core';
+import { WindowTracker } from './window-tracker';
+import { SyncManager } from './sync-manager';
+import { debugLog } from '../utils/logger';
 
 @injectable()
 export class TabEventHandler {

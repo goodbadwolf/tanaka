@@ -1,5 +1,5 @@
 import { injectable, inject } from 'tsyringe';
-import type { IBrowser } from '../browser/core.js';
+import type { IBrowser } from '../browser/core';
 
 const USER_SETTINGS_DEFAULTS = {
   authToken: 'unset-token',

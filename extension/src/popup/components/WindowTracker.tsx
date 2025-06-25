@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'preact/hooks';
-import { useService } from '../../di/provider.js';
-import type { IBrowser } from '../../browser/core.js';
+import { useService } from '../../di/provider';
+import type { IBrowser } from '../../browser/core';
 import {
   trackedWindows,
   toggleWindowTracking,

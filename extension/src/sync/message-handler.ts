@@ -1,7 +1,7 @@
-import { asMessage, type Message, type MessageResponse } from '../core.js';
-import type { WindowTracker } from './window-tracker.js';
-import type { SyncManager } from './sync-manager.js';
-import { debugLog } from '../utils/logger.js';
+import { asMessage, type Message, type MessageResponse } from '../core';
+import type { WindowTracker } from './window-tracker';
+import type { SyncManager } from './sync-manager';
+import { debugLog } from '../utils/logger';
 
 export class MessageHandler {
   constructor(
