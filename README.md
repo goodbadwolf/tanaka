@@ -11,18 +11,16 @@ Tanaka keeps your Firefox browsing **entangled** across every computer you use. 
 
 ## ✨ Features
 
-| Capability                  | Notes                                                                                                                  |
-| --------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| **Live mirroring**          | Tab create / move / close events propagate across devices in ~1 s (baseline poll 5 s, adaptive downwards on activity). |
-| **Selective tracking**      | Opt-in per window; leave private or throw-away windows unsynced.                                                       |
-| **Session resurrection**    | Browser crashed? Tanaka restores the last good state from another device.                                              |
-| **Conflict-free merges**    | Uses Yjs/yrs CRDTs—order-independent, race-free.                                                                       |
-| **End-to-end encryption**   | TLS + shared token; data never travels plaintext.                                                                      |
-| _(Planned)_ **Scroll sync** | Resume reading at exactly the same pixel offset.                                                                       |
+| Capability                  | Notes                                                                          |
+| --------------------------- | ------------------------------------------------------------------------------ |
+| **Live mirroring**          | Tab create / move / close events propagate across devices (baseline poll 5 s). |
+| **Selective tracking**      | Opt-in per window; leave private or throw-away windows unsynced.               |
+| **Conflict-free merges**    | Uses Yjs/yrs CRDTs—order-independent, race-free.                               |
+| _(Planned)_ **Scroll sync** | Resume reading at exactly the same pixel offset.                               |
 
 ---
 
-## 🛠️ Tech Stack (Personal-Scale)
+## 🛠️ Tech Stack
 
 | Tier              | Technology                                          | Rationale                                            |
 | ----------------- | --------------------------------------------------- | ---------------------------------------------------- |
@@ -50,32 +48,35 @@ Tanaka uses a client-server architecture with CRDT-based synchronization. For de
 
 ## 🗺️ Roadmap
 
-### v0.1 - Proof of Concept
+### v0.1 - Proof of Concept ✅
 
 - [x] Documentation and architecture design
-- [ ] Basic project structure
-- [ ] Minimal WebExtension that captures tab events
-- [ ] Basic Rust server with SQLite storage
-- [ ] Simple HTTP sync (no CRDT yet)
+- [x] Basic project structure
+- [x] WebExtension that captures tab events
+- [x] Rust server with SQLite storage
+- [x] CRDT-based sync with Yjs/yrs
 
-### v0.5 - Core Functionality
+### v0.5 - Core Functionality (In Development)
 
-- [ ] Yjs/yrs CRDT integration
-- [ ] Bidirectional tab sync
-- [ ] TLS + auth token security
-- [ ] Selective window tracking
+- [x] Yjs/yrs CRDT integration
+- [x] Bidirectional tab sync
+- [x] TLS + auth token security
+- [x] Selective window tracking
+- [ ] Modern React UI (Rspack migration)
+- [ ] Component testing & 80%+ coverage
 
 ### v1.0 - First Stable Release
 
+- [ ] Clean architecture implementation
 - [ ] Adaptive polling (5s → 1s on activity)
 - [ ] Session resurrection
+- [ ] Performance optimization for 200+ tabs
 - [ ] Signed extension on addons.mozilla.org
 - [ ] Single-binary server distribution
 
 ### v2.0 - Enhanced Experience
 
 - [ ] Scroll position sync
-- [ ] WebSocket real-time updates
 - [ ] Tab groups & containers support
 
 ### Future Ideas
@@ -83,6 +84,10 @@ Tanaka uses a client-server architecture with CRDT-based synchronization. For de
 - [ ] Cross-browser support
 - [ ] P2P sync option
 - [ ] Collaborative tab sharing
+
+**For detailed implementation tasks, see** :
+
+- v0.5 to v1.0: [docs/ROADMAP-v0.5-v1.0.md](docs/ROADMAP-v0.5-v1.0.md)
 
 ---
 
