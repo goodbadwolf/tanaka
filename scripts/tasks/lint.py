@@ -1,6 +1,7 @@
 """Lint command - Run code quality checks"""
 
 import argparse
+import fnmatch
 import sys
 from pathlib import Path
 
@@ -12,8 +13,11 @@ from utils import run_command
 from .core import TaskResult
 
 
-def lint_markdown(fix: bool = False) -> int:
+def lint_markdown(fix: bool = False, patterns_to_ignore: set[str] = None) -> int:
     """Lint or fix markdown files"""
+    if not patterns_to_ignore:
+        patterns_to_ignore = set(["repomix-output.txt.md", ".venv/*"])
+
     action = "fix" if fix else "scan"
     logger.info(f"Running markdown linter ({action} mode)")
 
@@ -24,13 +28,20 @@ def lint_markdown(fix: bool = False) -> int:
 
     # Add root markdown files
     for f in glob("*.md"):
-        if "repomix-output.txt.md" not in f:
+        for ignore in patterns_to_ignore:
+            # Ignore files that match any of glob patterns
+            if any(fnmatch.fnmatch(f, ignore) for ignore in patterns_to_ignore):
+                continue
             md_files.append(f)
 
     # Add docs markdown files
     for f in glob("docs/*.md"):
-        if "MIGRATION" not in f and "TESTING-UPGRADE" not in f:
+        for ignore in patterns_to_ignore:
+            if any(fnmatch.fnmatch(f, ignore) for ignore in patterns_to_ignore):
+                continue
             md_files.append(f)
+
+    md_files = list(set(md_files))
 
     if not md_files:
         logger.info("No markdown files to lint")
