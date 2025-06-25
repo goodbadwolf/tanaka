@@ -1,6 +1,6 @@
 {
   "name": "tanaka-extension",
-  "version": "0.1.0",
+  "version": "0.5.0",
   "description": "Firefox extension for cross-device tab synchronization",
   "private": true,
   "type": "module",
