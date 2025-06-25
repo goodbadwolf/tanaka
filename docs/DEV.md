@@ -49,25 +49,28 @@ This guide explains how Tanaka is wired together, how to get a local dev setup
 ### Installation Steps
 
 For automated setup:
+
 ```bash
-make setup                                  # Install all prerequisites
-make setup-dry-run                          # Preview what would be installed
-uv run scripts/setup.py --help              # See all setup options
-uv run scripts/setup.py --include rust,node # Install only Rust and Node.js
-uv run scripts/setup.py --exclude pnpm      # Install everything except pnpm
+# Note: setup-dev runs without uv since it may need to install uv itself
+python3 scripts/tanaka.py setup-dev                      # Install all prerequisites
+python3 scripts/tanaka.py setup-dev --dry-run            # Preview what would be installed
+python3 scripts/tanaka.py setup-dev --help               # See all setup options
+python3 scripts/tanaka.py setup-dev --include rust node  # Install only Rust and Node.js
+python3 scripts/tanaka.py setup-dev --exclude pnpm       # Install everything except pnpm
 ```
 
 For development tools:
-```bash
-uv sync --dev                               # Install Python dev dependencies
 
-# Run scripts via Makefile
-make lint                                   # Run all linters
-make lint-md                                # Lint markdown files
-make lint-python                            # Lint Python scripts
-make format                                 # Fix all formatting issues
-make gen-api-models                         # Generate TypeScript API models
-make help                                   # Show all available commands
+```bash
+uv sync --dev                                        # Install Python dev dependencies
+
+# Run scripts via tanaka.py (these commands use uv internally)
+uv run scripts/tanaka.py lint                       # Run all linters
+uv run scripts/tanaka.py lint --fix                 # Fix all linting issues
+uv run scripts/tanaka.py lint --python              # Lint only Python files
+uv run scripts/tanaka.py lint --markdown            # Lint only markdown files
+uv run scripts/tanaka.py generate                   # Generate TypeScript API models
+uv run scripts/tanaka.py --help                     # Show all available commands
 ```
 
 Or install manually:
