@@ -2,11 +2,25 @@ import { render, fireEvent, waitFor } from '@testing-library/preact';
 import { PopupApp } from './PopupApp';
 import { resetPopupState, setLoadingState, setError } from '../../store/popup';
 import { container } from '../../di/container';
-import type { IBrowser } from '../../browser/core';
 
 describe('PopupApp', () => {
-  let mockBrowser: any;
-  let mockWindow: any;
+  let mockBrowser: {
+    windows: {
+      getCurrent: jest.Mock;
+    };
+    runtime: {
+      sendMessage: jest.Mock;
+      openOptionsPage: jest.Mock;
+    };
+    tabs: {
+      create: jest.Mock;
+    };
+  };
+  let mockWindow: {
+    id: number | null;
+    focused: boolean;
+    incognito: boolean;
+  };
 
   beforeEach(() => {
     // Reset popup state
@@ -128,7 +142,7 @@ describe('PopupApp', () => {
 
     const settingsLink = getByText('Settings');
     const event = new MouseEvent('click', { bubbles: true, cancelable: true });
-    
+
     Object.defineProperty(event, 'preventDefault', {
       value: jest.fn(),
       writable: false,

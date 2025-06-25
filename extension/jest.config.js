@@ -7,7 +7,7 @@ export default {
     }]
   },
   transformIgnorePatterns: [
-    'node_modules/(?!(preact)/)'
+    'node_modules/(?!(@?preact)/)'
   ],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
@@ -15,6 +15,8 @@ export default {
     '\\.module\\.css$': '<rootDir>/src/test/__mocks__/styleMock.js',
     '^(\\.{1,2}/.*)\\.js$': '$1',
     '^@env$': '<rootDir>/src/test/__mocks__/@env.ts',
+    '^preact/jsx-runtime$': 'preact/jsx-runtime/dist/jsxRuntime.cjs',
+    '^preact$': 'preact/dist/preact.cjs'
   },
   setupFilesAfterEnv: ['<rootDir>/src/test/setup.ts'],
   collectCoverageFrom: [

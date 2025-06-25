@@ -2,11 +2,21 @@ import { render, fireEvent, waitFor } from '@testing-library/preact';
 import { WindowTracker } from './WindowTracker';
 import { trackedWindows, isWindowTracked } from '../../store/extension';
 import { container } from '../../di/container';
-import type { IBrowser } from '../../browser/core';
 
 describe('WindowTracker', () => {
-  let mockBrowser: any;
-  let mockWindow: any;
+  let mockBrowser: {
+    windows: {
+      getCurrent: jest.Mock;
+    };
+    runtime: {
+      sendMessage: jest.Mock;
+    };
+  };
+  let mockWindow: {
+    id: number | null;
+    focused: boolean;
+    incognito: boolean;
+  };
 
   beforeEach(() => {
     // Reset tracked windows state
