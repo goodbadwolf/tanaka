@@ -1,5 +1,4 @@
 import { signal, computed } from '@preact/signals';
-import type { Browser } from '../browser';
 
 export interface PopupState {
   isInitialized: boolean;
