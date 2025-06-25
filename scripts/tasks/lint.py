@@ -17,14 +17,36 @@ def lint_markdown(fix: bool = False) -> int:
     action = "fix" if fix else "scan"
     logger.info(f"Running markdown linter ({action} mode)")
 
+    # Find markdown files, excluding specific patterns
+    from glob import glob
+
+    md_files = []
+
+    # Add root markdown files
+    for f in glob("*.md"):
+        if "repomix-output.txt.md" not in f:
+            md_files.append(f)
+
+    # Add docs markdown files
+    for f in glob("docs/*.md"):
+        if "MIGRATION" not in f and "TESTING-UPGRADE" not in f:
+            md_files.append(f)
+
+    if not md_files:
+        logger.info("No markdown files to lint")
+        return 0
+
+    logger.debug(f"Linting files: {md_files}")
+
     cmd = [
         "uv",
         "run",
         "pymarkdown",
+        "--config",
+        ".pymarkdown.json",
         action,
-        "*.md",
-        "docs/*.md",
-    ]
+    ] + md_files
+
     try:
         run_command(cmd)
         logger.success("Markdown linting passed")
@@ -68,12 +90,26 @@ def run(args: argparse.Namespace) -> TaskResult:
     """Run linters based on arguments"""
     if args.markdown:
         exit_code = lint_markdown(fix=args.fix)
-        message = "Markdown linting completed" if exit_code == 0 else "Markdown linting failed"
-        return TaskResult(success=exit_code == 0, message=message, exit_code=exit_code if exit_code else EXIT_SUCCESS)
+        message = (
+            "Markdown linting completed"
+            if exit_code == 0
+            else "Markdown linting failed"
+        )
+        return TaskResult(
+            success=exit_code == 0,
+            message=message,
+            exit_code=exit_code if exit_code else EXIT_SUCCESS,
+        )
     elif args.python:
         exit_code = lint_python(fix=args.fix)
-        message = "Python linting completed" if exit_code == 0 else "Python linting failed"
-        return TaskResult(success=exit_code == 0, message=message, exit_code=exit_code if exit_code else EXIT_SUCCESS)
+        message = (
+            "Python linting completed" if exit_code == 0 else "Python linting failed"
+        )
+        return TaskResult(
+            success=exit_code == 0,
+            message=message,
+            exit_code=exit_code if exit_code else EXIT_SUCCESS,
+        )
     else:
         # Run all linters
         logger.header("Running all linters")

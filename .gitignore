@@ -38,3 +38,17 @@ AGENTS.md
 .env
 .env.local
 .env.*.local
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyw
+*.pyz
+*.pywz
+*.pyzw
+
+# Python packages
+.venv/
+*.egg-info/

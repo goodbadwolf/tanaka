@@ -27,7 +27,11 @@ def generate_api_models() -> TaskResult:
         if not server_dir.exists():
             logger.error("Server directory not found")
             logger.info("Make sure you're running this from the project root")
-            return TaskResult(success=False, message="Server directory not found", exit_code=EXIT_FAILURE)
+            return TaskResult(
+                success=False,
+                message="Server directory not found",
+                exit_code=EXIT_FAILURE,
+            )
 
     # Check if generated models are stale
     models_rs = server_dir / "src" / "models.rs"
@@ -36,7 +40,9 @@ def generate_api_models() -> TaskResult:
 
     if not models_rs.exists():
         logger.error(f"Models file not found: {models_rs}")
-        return TaskResult(success=False, message="Models file not found", exit_code=EXIT_FAILURE)
+        return TaskResult(
+            success=False, message="Models file not found", exit_code=EXIT_FAILURE
+        )
 
     # Check if regeneration is needed
     needs_regeneration = True
@@ -48,7 +54,11 @@ def generate_api_models() -> TaskResult:
 
     if not needs_regeneration:
         logger.success("Generated model files are up-to-date")
-        return TaskResult(success=True, message="Generated model files are up-to-date", exit_code=EXIT_SUCCESS)
+        return TaskResult(
+            success=True,
+            message="Generated model files are up-to-date",
+            exit_code=EXIT_SUCCESS,
+        )
 
     # Show why regeneration is needed
     if sentinel_file.exists():
@@ -57,7 +67,9 @@ def generate_api_models() -> TaskResult:
         models_time = datetime.fromtimestamp(models_rs.stat().st_mtime)
         sentinel_time = datetime.fromtimestamp(sentinel_file.stat().st_mtime)
         logger.warning("Generated model files are stale. Regenerating...")
-        logger.info(f"Generated model file date: {sentinel_time.strftime('%Y-%m-%d %H:%M:%S')}")
+        logger.info(
+            f"Generated model file date: {sentinel_time.strftime('%Y-%m-%d %H:%M:%S')}"
+        )
         logger.info(f"Model file date: {models_time.strftime('%Y-%m-%d %H:%M:%S')}")
     else:
         logger.warning("No generated model files found. Generating...")
@@ -78,9 +90,17 @@ def generate_api_models() -> TaskResult:
 
     try:
         run_command(["cargo", "test"], cwd=server_dir, env=env)
-        return TaskResult(success=True, message="API models generated successfully", exit_code=EXIT_SUCCESS)
+        return TaskResult(
+            success=True,
+            message="API models generated successfully",
+            exit_code=EXIT_SUCCESS,
+        )
     except Exception as e:
-        return TaskResult(success=False, message=f"Failed to generate API models: {e}", exit_code=EXIT_FAILURE)
+        return TaskResult(
+            success=False,
+            message=f"Failed to generate API models: {e}",
+            exit_code=EXIT_FAILURE,
+        )
 
 
 def run(args: argparse.Namespace) -> TaskResult:
@@ -88,7 +108,11 @@ def run(args: argparse.Namespace) -> TaskResult:
     if args.artifact == "api-models":
         return generate_api_models()
     else:
-        return TaskResult(success=False, message=f"Unknown artifact: {args.artifact}", exit_code=EXIT_FAILURE)
+        return TaskResult(
+            success=False,
+            message=f"Unknown artifact: {args.artifact}",
+            exit_code=EXIT_FAILURE,
+        )
 
 
 def add_subparser(subparsers: argparse._SubParsersAction) -> None:

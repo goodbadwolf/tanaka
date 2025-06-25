@@ -13,7 +13,7 @@ def run_command(
     cmd: list[str],
     cwd: Path | None = None,
     check: bool = True,
-    env: dict[str, str] | None = None
+    env: dict[str, str] | None = None,
 ) -> subprocess.CompletedProcess:
     """Run a command with logging
 
@@ -33,12 +33,7 @@ def run_command(
     logger.info(f"Running: {' '.join(cmd)}")
     try:
         return subprocess.run(
-            cmd,
-            cwd=cwd,
-            check=check,
-            capture_output=False,
-            text=True,
-            env=env
+            cmd, cwd=cwd, check=check, capture_output=False, text=True, env=env
         )
     except FileNotFoundError:
         logger.error(f"Command not found: {cmd[0]}")
