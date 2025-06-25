@@ -5,7 +5,8 @@ This document provides an extremely detailed branch and commit organization for 
 ## 📝 Progress Tracking
 
 - Use `[ ]` for pending commits, `[x]` for completed commits
-- Update checkboxes as part of each commit
+- **IMPORTANT**: Update checkboxes as part of the PR, not after merging
+- The final commit before creating a PR should update both ROADMAP files
 - Add notes in parentheses for any deviations: `[x] (modified: added extra validation)`
 
 ## 🌿 Branch Strategy
@@ -673,24 +674,29 @@ git checkout -b feat/integration-docs
 
 ### Documentation Updates
 
-Each commit should include updates to track progress:
+Each feature branch should include roadmap updates **as part of the PR**:
 
-1. **Update ROADMAP-v0.5-v1.0.md**:
-   - Mark completed items with `[x]`
-   - Update "Current" column in Success Metrics
+1. **Final commit before creating PR should update:**
+   - **ROADMAP-v0.5-v1.0.md**: Mark completed items with `[x]`
+   - **ROADMAP-v0.5-v1.0-STEPS.md**: Mark commits as complete with `[x]`
+   - Update "Current" column in Success Metrics if applicable
    - Add any new discovered tasks
 
-2. **Update this file (ROADMAP-v0.5-v1.0-STEPS.md)**:
-   - Mark commit as complete by adding ✓
-   - Add notes about any deviations
-   - Document any new commits needed
+2. **Include roadmap updates in the PR**:
+   - This ensures roadmap stays in sync with code changes
+   - Prevents forgetting to update documentation
+   - Makes PR self-documenting
 
-Example commit with docs:
+Example final commit before PR:
 
 ```bash
-git add src/components/Button.tsx src/components/Button.test.tsx
+# After completing all feature work, update roadmaps
 git add docs/ROADMAP-v0.5-v1.0.md docs/ROADMAP-v0.5-v1.0-STEPS.md
-git commit -m "feat: implement Button component with variants"
+git commit -m "docs: update roadmaps for Phase X completion
+
+- Mark all completed items with [x]
+- Update success metrics
+- Note any deviations or additional work"
 ```
 
 ## 📋 PR Template
@@ -715,7 +721,8 @@ Brief description of changes
 - [ ] Code follows style guidelines
 - [ ] Self-review completed
 - [ ] Documentation updated
-- [ ] ROADMAP progress tracked
+- [ ] **ROADMAP files updated with [x] for completed items**
+- [ ] **Success metrics updated if applicable**
 - [ ] No console errors
 ```
 
