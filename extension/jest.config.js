@@ -5,7 +5,7 @@ export default {
   testEnvironment: 'jsdom',
   transform: {
     ...tsJestPreset.transform,
-    '^.+\\.tsx?$': ['ts-jest', {
+    '^.+\\.m?[tj]sx?$': ['ts-jest', {
       tsconfig: 'tsconfig.test.json',
       useESM: true
     }]
@@ -19,11 +19,17 @@ export default {
   },
   moduleNameMapper: {
     '^preact/jsx-runtime$': '<rootDir>/node_modules/preact/jsx-runtime/dist/jsxRuntime.js',
+    '^@testing-library/preact$': '<rootDir>/node_modules/@testing-library/preact/dist/cjs/index.js',
+    '^@testing-library/preact/pure$': '<rootDir>/node_modules/@testing-library/preact/dist/cjs/pure.js',
     '^@/(.*)$': '<rootDir>/src/$1',
     '\\.css$': '<rootDir>/src/test/__mocks__/styleMock.js',
     '^(\\.{1,2}/.*)\\.js$': '$1',
     '^@env$': '<rootDir>/src/test/__mocks__/@env.ts',
   },
+  transformIgnorePatterns: [
+    '/node_modules/(?!(?:.*preact)/)'
+  ],
+  extensionsToTreatAsEsm: ['.ts', '.tsx', '.jsx'],
   setupFilesAfterEnv: ['<rootDir>/src/test/setup.ts'],
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',
