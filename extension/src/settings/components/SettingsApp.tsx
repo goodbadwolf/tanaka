@@ -1,13 +1,32 @@
-import { useSettings } from '../hooks/useSettings';
+import { useEffect } from 'preact/hooks';
 import { getConfig } from '../../config/index.js';
 import { useService } from '../../di/provider.js';
 import type { IBrowser } from '../../browser/core.js';
+import {
+  settings,
+  isLoading,
+  isSaving,
+  saveStatus,
+  loadSettings,
+  saveSettings as saveSettingsToStore,
+  enablePersistence,
+} from '../../store/settings';
+import { Button, Input, Card, ErrorMessage, LoadingSpinner } from '../../components';
 
 export function SettingsApp() {
   const browser = useService<IBrowser>('IBrowser');
-  const { settings, isSaving, saveStatus, saveSettings } = useSettings();
   const config = getConfig();
   const manifest = browser.runtime.getManifest();
+
+  useEffect(() => {
+    // Load settings on mount
+    loadSettings(browser.localStorage);
+
+    // Enable auto-persistence
+    const dispose = enablePersistence(browser.localStorage);
+
+    return dispose;
+  }, [browser]);
 
   const handleSave = async (e: Event) => {
     e.preventDefault();
@@ -15,13 +34,23 @@ export function SettingsApp() {
     const authTokenInput = form.authToken as HTMLInputElement;
     const syncIntervalInput = form.syncInterval as HTMLInputElement;
 
-    await saveSettings({
-      authToken: authTokenInput.value,
-      syncInterval: parseInt(syncIntervalInput.value, 10) * 1000, // Convert seconds to milliseconds
-    });
+    try {
+      await saveSettingsToStore(
+        {
+          authToken: authTokenInput.value,
+          syncInterval: parseInt(syncIntervalInput.value, 10) * 1000,
+        },
+        browser.localStorage
+      );
+
+      // Notify background script
+      await browser.runtime.sendMessage({ type: 'SETTINGS_UPDATED' });
+    } catch (error) {
+      // Error is already handled by the store
+    }
   };
 
-  if (!settings) {
+  if (isLoading.value) {
     return (
       <div className="container">
         <header>
@@ -29,11 +58,18 @@ export function SettingsApp() {
           <p className="version">Version {manifest.version}</p>
         </header>
         <main>
-          <p>Loading settings...</p>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px' }}>
+            <LoadingSpinner size="large" />
+            <span style={{ marginLeft: '12px' }}>Loading settings...</span>
+          </div>
         </main>
       </div>
     );
   }
+
+  const currentSettings = settings.value;
+  const saving = isSaving.value;
+  const status = saveStatus.value;
 
   return (
     <div className="container">
@@ -44,60 +80,53 @@ export function SettingsApp() {
 
       <main>
         <form onSubmit={handleSave}>
-          <section className="auth-section">
-            <h2>Authentication</h2>
-            <div className="form-group">
-              <label htmlFor="auth-token">Auth Token</label>
-              <input
-                type="password"
-                id="auth-token"
-                name="authToken"
-                defaultValue={settings.authToken === 'unset-token' ? '' : settings.authToken}
-                placeholder="Enter your authentication token"
-                disabled={isSaving}
-              />
-              <small className="help-text">
-                This token is used to authenticate with the Tanaka server
-              </small>
-            </div>
-          </section>
+          <Card header="Authentication" padding="medium">
+            <Input
+              id="auth-token"
+              name="authToken"
+              type="password"
+              label="Auth Token"
+              defaultValue={currentSettings.authToken === 'unset-token' ? '' : currentSettings.authToken}
+              placeholder="Enter your authentication token"
+              disabled={saving}
+              helperText="This token is used to authenticate with the Tanaka server"
+              required
+            />
+          </Card>
 
-          <section className="sync-section">
-            <h2>Synchronization</h2>
-            <div className="form-group">
-              <label htmlFor="sync-interval">Sync Interval (seconds)</label>
-              <input
-                type="number"
-                id="sync-interval"
-                name="syncInterval"
-                min="1"
-                max="60"
-                defaultValue={settings.syncInterval / 1000} // Convert milliseconds to seconds for display
-                disabled={isSaving}
-              />
-              <small className="help-text">
-                How often to sync tabs with the server (1-60 seconds)
-              </small>
-            </div>
-          </section>
+          <Card header="Synchronization" padding="medium">
+            <Input
+              id="sync-interval"
+              name="syncInterval"
+              type="number"
+              label="Sync Interval (seconds)"
+              defaultValue={(currentSettings.syncInterval / 1000).toString()}
+              disabled={saving}
+              helperText="How often to sync tabs with the server (1-60 seconds)"
+              min="1"
+              max="60"
+              required
+            />
+          </Card>
 
           <div className="form-actions">
-            <button type="submit" disabled={isSaving}>
-              {isSaving ? 'Saving...' : 'Save Settings'}
-            </button>
+            <Button type="submit" disabled={saving} loading={saving}>
+              Save Settings
+            </Button>
           </div>
 
-          {saveStatus && (
-            <div className={`status-message ${saveStatus.type}`} style={{ display: 'block' }}>
-              {saveStatus.message}
-            </div>
+          {status && (
+            <ErrorMessage
+              type={status.type === 'success' ? 'info' : 'error'}
+              message={status.message}
+              dismissible={false}
+            />
           )}
         </form>
 
-        <section className="server-info">
-          <h2>Server Information</h2>
+        <Card header="Server Information" padding="medium" variant="outlined">
           <p id="server-info">Connected to: {config.serverUrl}</p>
-        </section>
+        </Card>
       </main>
     </div>
   );

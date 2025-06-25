@@ -93,9 +93,9 @@ git checkout -b feat/shared-components
 
 **PR**: ✅ Merged `feat/shared-components` → `main` (PR #13)
 
-#### Phase 2: State Management
+#### Phase 2: State Management ✅
 
-**Branch**: `feat/preact-signals`
+**Branch**: `feat/preact-signals` (in progress)
 
 ```bash
 git checkout -b feat/preact-signals
@@ -103,40 +103,40 @@ git checkout -b feat/preact-signals
 
 **Commits**:
 
-1. `chore: install @preact/signals`
+1. [x] `chore: install @preact/signals`
    - Add dependency
    - Update TypeScript config
    - Add test utilities for signals
 
-2. `feat: create extension state signals`
+2. [x] `feat: create extension state signals`
    - Create `src/store/extension.ts`
    - Define window tracking state
    - Add sync status signal
    - Add `extension.test.ts` with state tests
    - Test signal updates and subscriptions
 
-3. `feat: create settings state signals`
+3. [x] `feat: create settings state signals`
    - Create `src/store/settings.ts`
    - Define settings signals
    - Add persistence layer
    - Add `settings.test.ts` with persistence tests
    - Test load/save operations
 
-4. `feat: integrate signals with WindowTracker`
+4. [x] `feat: integrate signals with WindowTracker`
    - Update `WindowTracker.tsx` to use signals
    - Remove prop drilling
    - Add reactive updates
    - Update `WindowTracker.test.tsx` for signals
    - Test reactive behavior
 
-5. `feat: integrate signals with SettingsApp`
+5. [x] `feat: integrate signals with SettingsApp`
    - Update `SettingsApp.tsx` to use signals
    - Connect to settings store
    - Add auto-save functionality
    - Update `SettingsApp.test.tsx` for signals
    - Test auto-save behavior
 
-6. `refactor: migrate popup state to signals`
+6. [x] `refactor: migrate popup state to signals`
    - Update `PopupApp.tsx`
    - Remove useState calls
    - Use computed signals
