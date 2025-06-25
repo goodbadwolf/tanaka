@@ -177,7 +177,7 @@ feat: refactor entire build system with new error handling and process managemen
 - **Modify tab sync**: Look at `/extension/src/sync/`
 - **Config changes**: Update `server/config/example.toml` and docs
 - **Add dependencies**: Update `Cargo.toml` or `package.json`
-- **Generate TS types**: Run `pnpm run gen:api-models`
+- **Generate TS types**: Run `python3 scripts/tanaka.py generate`
 - **Add shared types**: Add `#[derive(TS)]` and `#[ts(export)]` to Rust structs in `/server/src/models.rs`
 
 ### Technical Patterns

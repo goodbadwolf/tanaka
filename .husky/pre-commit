@@ -1,3 +1,88 @@
-pnpm run lint:md
-cd extension && pnpm exec lint-staged
-cd ../server && cargo fmt -- --check && cargo clippy --all-targets --all-features -- -D warnings
+#!/bin/sh
+
+C_RED="\033[0;31m"
+C_YELLOW="\033[1;33m"
+C_BLUE="\033[0;34m"
+C_GRAY="\033[0;90m"
+C_NC="\033[0m"
+
+activate_venv() {
+    echo "${C_BLUE}Activating virtual environment, if not already activated${C_NC}"
+    if [ -z "$VIRTUAL_ENV" ]; then
+        echo "${C_RED}No virtual environment found.${C_NC}"
+        echo "${C_YELLOW}Activating virtual environment, assuming it's in .venv${C_NC}"
+        # shellcheck disable=SC1091
+        if ! . .venv/bin/activate; then
+            echo "Failed to activate virtual environment. Please check if .venv exists and is properly set up."
+            exit 1
+        fi
+    fi
+}
+
+lint_markdown() {
+    echo "${C_BLUE}Linting markdown files${C_NC}"
+    # Find markdown files to lint
+    MD_FILES=$(find . -name "*.md" -not -path "./node_modules/*" -not -path "./extension/node_modules/*" -not -path "./server/target/*" | grep -v "repomix-output.txt.md" | grep -v "MIGRATION" | grep -v "TESTING-UPGRADE.md")
+    
+    if [ -z "$MD_FILES" ]; then
+        echo "${C_GRAY}No markdown files to lint${C_NC}"
+        return 0
+    fi
+    
+    echo "${C_GRAY}Files to scan for markdown linting:${C_NC}"
+    echo "$MD_FILES" | sed 's/^/  /'
+    
+    # Use Python script for linting instead
+    if command -v python3 >/dev/null 2>&1; then
+        if ! python3 scripts/tanaka.py lint --markdown; then
+            echo "${C_RED}Markdown linting failed. Please fix the issues and try again.${C_NC}"
+            exit 1
+        fi
+    else
+        echo "${C_YELLOW}Warning: Python not found, skipping markdown linting${C_NC}"
+    fi
+}
+
+lint_staged() {
+    echo "${C_BLUE}Linting staged files${C_NC}"
+    current_dir=$(pwd)
+    
+    # Check TypeScript/Extension if extension directory exists
+    if [ -d "extension" ]; then
+        if command -v pnpm >/dev/null 2>&1; then
+            echo "${C_GRAY}Linting TypeScript files...${C_NC}"
+            cd extension && pnpm exec lint-staged
+            cd "$current_dir" || exit 1
+        else
+            echo "${C_YELLOW}Warning: pnpm not found, skipping TypeScript linting${C_NC}"
+        fi
+    fi
+
+    # Check Rust if server directory exists
+    if [ -d "server" ]; then
+        if command -v cargo >/dev/null 2>&1; then
+            echo "${C_GRAY}Checking Rust formatting and linting...${C_NC}"
+            cd server && cargo fmt -- --check && cargo clippy --all-targets --all-features -- -D warnings
+            cd "$current_dir" || exit 1
+        else
+            echo "${C_YELLOW}Warning: cargo not found, skipping Rust checks${C_NC}"
+        fi
+    fi
+    
+    # Check Python if Python files are staged
+    if git diff --cached --name-only | grep -q '\.py$'; then
+        if command -v python3 >/dev/null 2>&1; then
+            echo "${C_GRAY}Linting Python files...${C_NC}"
+            if ! python3 scripts/tanaka.py lint --python; then
+                echo "${C_RED}Python linting failed. Please fix the issues and try again.${C_NC}"
+                exit 1
+            fi
+        else
+            echo "${C_YELLOW}Warning: Python not found, skipping Python linting${C_NC}"
+        fi
+    fi
+}
+
+activate_venv
+lint_markdown
+lint_staged

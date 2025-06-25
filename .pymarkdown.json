@@ -1,0 +1,25 @@
+{
+  "plugins": {
+    "md013": {
+      "enabled": false
+    },
+    "md029": {
+      "style": "ordered"
+    },
+    "md031": {
+      "enabled": false
+    },
+    "md034": {
+      "enabled": false
+    },
+    "md036": {
+      "enabled": false
+    },
+    "md040": {
+      "enabled": false
+    },
+    "md041": {
+      "enabled": false
+    }
+  }
+}
