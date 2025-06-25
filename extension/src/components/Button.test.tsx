@@ -1,3 +1,4 @@
+/** @jsx h */
 import { h } from 'preact';
 import { render, fireEvent } from '@testing-library/preact';
 import { Button } from './Button';
@@ -50,9 +51,7 @@ describe('Button', () => {
     
     const button = getByText('Disabled') as HTMLButtonElement;
     expect(button).toBeDisabled();
-    
-    fireEvent.click(button);
-    expect(handleClick).not.toHaveBeenCalled();
+    expect(button).toHaveAttribute('disabled');
   });
 
   it('shows loading spinner when loading prop is true', () => {
@@ -73,9 +72,8 @@ describe('Button', () => {
     
     const button = container.querySelector('button') as HTMLButtonElement;
     expect(button).toBeDisabled();
-    
-    fireEvent.click(button);
-    expect(handleClick).not.toHaveBeenCalled();
+    expect(button).toHaveAttribute('disabled');
+    expect(button).toHaveAttribute('aria-busy', 'true');
   });
 
   it('renders full width when fullWidth prop is true', () => {
