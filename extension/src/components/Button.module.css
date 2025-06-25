@@ -1,0 +1,108 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  font-weight: 500;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+  position: relative;
+  white-space: nowrap;
+}
+
+.button:focus-visible {
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Variants */
+.primary {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.primary:hover:not(:disabled) {
+  background-color: #2563eb;
+}
+
+.primary:active:not(:disabled) {
+  background-color: #1d4ed8;
+}
+
+.secondary {
+  background-color: #e5e7eb;
+  color: #374151;
+}
+
+.secondary:hover:not(:disabled) {
+  background-color: #d1d5db;
+}
+
+.secondary:active:not(:disabled) {
+  background-color: #9ca3af;
+}
+
+.danger {
+  background-color: #ef4444;
+  color: white;
+}
+
+.danger:hover:not(:disabled) {
+  background-color: #dc2626;
+}
+
+.danger:active:not(:disabled) {
+  background-color: #b91c1c;
+}
+
+/* Sizes */
+.small {
+  padding: 6px 12px;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.medium {
+  padding: 8px 16px;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.large {
+  padding: 12px 24px;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+/* Full width */
+.fullWidth {
+  width: 100%;
+}
+
+/* Loading state */
+.loading {
+  color: transparent;
+}
+
+.loadingSpinner {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

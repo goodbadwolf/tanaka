@@ -1,2 +1,2 @@
 // Component exports will be added here as components are implemented
-export {};
+export { Button } from './Button';
