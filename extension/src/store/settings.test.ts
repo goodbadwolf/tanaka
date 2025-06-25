@@ -1,6 +1,5 @@
 import { effect } from '@preact/signals';
 import {
-  settingsState,
   settings,
   authToken,
   syncInterval,
@@ -48,20 +47,20 @@ describe('Settings Store', () => {
   describe('Settings Updates', () => {
     it('updates settings partially', () => {
       updateSettings({ authToken: 'new-token' });
-      
+
       expect(authToken.value).toBe('new-token');
       expect(syncInterval.value).toBe(5000);
     });
 
     it('updates authentication state', () => {
       expect(isAuthenticated.value).toBe(false);
-      
+
       updateSettings({ authToken: 'valid-token' });
       expect(isAuthenticated.value).toBe(true);
-      
+
       updateSettings({ authToken: '' });
       expect(isAuthenticated.value).toBe(false);
-      
+
       updateSettings({ authToken: '   ' });
       expect(isAuthenticated.value).toBe(false);
     });
@@ -100,7 +99,7 @@ describe('Settings Store', () => {
       };
 
       await expect(loadSettings(mockStorage)).rejects.toThrow('Storage error');
-      
+
       expect(isLoading.value).toBe(false);
       expect(saveStatus.value).toEqual({
         type: 'error',
@@ -112,7 +111,7 @@ describe('Settings Store', () => {
   describe('Saving Settings', () => {
     it('saves settings to storage', async () => {
       const mockStorage = mockSignalStorage();
-      
+
       await saveSettings({ authToken: 'new-token' }, mockStorage);
 
       expect(mockStorage.setItem).toHaveBeenCalledWith('authToken', 'new-token');
@@ -125,7 +124,7 @@ describe('Settings Store', () => {
 
     it('trims auth token before saving', async () => {
       const mockStorage = mockSignalStorage();
-      
+
       await saveSettings({ authToken: '  token-with-spaces  ' }, mockStorage);
 
       expect(mockStorage.setItem).toHaveBeenCalledWith('authToken', 'token-with-spaces');
@@ -134,9 +133,11 @@ describe('Settings Store', () => {
 
     it('validates auth token', async () => {
       const mockStorage = mockSignalStorage();
-      
-      await expect(saveSettings({ authToken: '' }, mockStorage)).rejects.toThrow('Auth token is required');
-      
+
+      await expect(saveSettings({ authToken: '' }, mockStorage)).rejects.toThrow(
+        'Auth token is required',
+      );
+
       expect(saveStatus.value).toEqual({
         type: 'error',
         message: 'Auth token is required',
@@ -149,8 +150,10 @@ describe('Settings Store', () => {
         set: jest.fn().mockRejectedValue(new Error('Storage error')),
       };
 
-      await expect(saveSettings({ authToken: 'token' }, mockStorage)).rejects.toThrow('Storage error');
-      
+      await expect(saveSettings({ authToken: 'token' }, mockStorage)).rejects.toThrow(
+        'Storage error',
+      );
+
       expect(isSaving.value).toBe(false);
       expect(saveStatus.value).toEqual({
         type: 'error',
@@ -163,7 +166,7 @@ describe('Settings Store', () => {
     it('manages loading state', () => {
       setLoadingState(true);
       expect(isLoading.value).toBe(true);
-      
+
       setLoadingState(false);
       expect(isLoading.value).toBe(false);
     });
@@ -171,37 +174,37 @@ describe('Settings Store', () => {
     it('manages saving state', () => {
       setSavingState(true);
       expect(isSaving.value).toBe(true);
-      
+
       setSavingState(false);
       expect(isSaving.value).toBe(false);
     });
 
     it('auto-clears save status after timeout', async () => {
       jest.useFakeTimers();
-      
+
       setSaveStatus({ type: 'success', message: 'Test' });
       expect(saveStatus.value).not.toBeNull();
-      
+
       jest.advanceTimersByTime(3000);
       expect(saveStatus.value).toBeNull();
-      
+
       jest.useRealTimers();
     });
 
     it('cancels previous timer when setting new status', () => {
       jest.useFakeTimers();
-      
+
       setSaveStatus({ type: 'success', message: 'First' });
       jest.advanceTimersByTime(1000);
-      
+
       setSaveStatus({ type: 'error', message: 'Second' });
       jest.advanceTimersByTime(2500);
-      
+
       expect(saveStatus.value).toEqual({ type: 'error', message: 'Second' });
-      
+
       jest.advanceTimersByTime(500);
       expect(saveStatus.value).toBeNull();
-      
+
       jest.useRealTimers();
     });
   });
@@ -224,7 +227,7 @@ describe('Settings Store', () => {
     it('does not persist during loading', async () => {
       const mockStorage = mockSignalStorage();
       setLoadingState(true);
-      
+
       const dispose = enablePersistence(mockStorage);
       updateSettings({ authToken: 'should-not-save' });
 
@@ -239,13 +242,13 @@ describe('Settings Store', () => {
   describe('Export', () => {
     it('exports current settings', () => {
       updateSettings({ authToken: 'export-token', syncInterval: 7000 });
-      
+
       const exported = getSettingsForExport();
       expect(exported).toEqual({
         authToken: 'export-token',
         syncInterval: 7000,
       });
-      
+
       exported.authToken = 'modified';
       expect(authToken.value).toBe('export-token');
     });

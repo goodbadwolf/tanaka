@@ -25,9 +25,13 @@ export function WindowTracker() {
 
         // Initialize tracked windows from background
         const message = { type: 'GET_TRACKED_WINDOWS' };
-        const response = await browser.runtime.sendMessage(message);
+        const response = (await browser.runtime.sendMessage(message)) as {
+          windowIds?: number[];
+          titles?: Record<number, string>;
+          error?: string;
+        };
 
-        if ('windowIds' in response && 'titles' in response) {
+        if (response.windowIds && response.titles) {
           // Initialize the tracked windows state
           const windowsMap = new Map();
           response.windowIds.forEach((id: number, index: number) => {
@@ -38,7 +42,7 @@ export function WindowTracker() {
             });
           });
           trackedWindows.value = windowsMap;
-        } else if ('error' in response) {
+        } else if (response.error) {
           throw new Error(response.error);
         }
       } catch (err) {
@@ -66,9 +70,9 @@ export function WindowTracker() {
         ? { type: 'UNTRACK_WINDOW', windowId: currentWindowId }
         : { type: 'TRACK_WINDOW', windowId: currentWindowId };
 
-      const response = await browser.runtime.sendMessage(message);
+      const response = (await browser.runtime.sendMessage(message)) as { error?: string };
 
-      if ('error' in response) {
+      if (response.error) {
         // Revert on error
         toggleWindowTracking(currentWindowId);
         throw new Error(response.error);

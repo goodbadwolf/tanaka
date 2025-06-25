@@ -1,4 +1,5 @@
 import { signal, computed } from '@preact/signals';
+import type { Browser } from '../browser';
 
 export interface PopupState {
   isInitialized: boolean;
@@ -35,13 +36,13 @@ export function setError(errorMessage: string | null) {
 }
 
 export function setCurrentWindow(windowId: number | null) {
-  setPopupState({ 
+  setPopupState({
     currentWindowId: windowId,
     isInitialized: windowId !== null,
   });
 }
 
-export async function initializePopup(browser: any): Promise<void> {
+export async function initializePopup(browser: Browser): Promise<void> {
   try {
     setLoadingState(true);
     setError(null);
