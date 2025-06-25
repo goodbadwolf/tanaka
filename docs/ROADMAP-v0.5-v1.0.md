@@ -21,11 +21,11 @@ Migrating the extension from Vite to Rspack with React/Preact UI components to c
 
 ### 🔄 Component Migration
 
-- [ ] Create shared component library
-  - [ ] Button, Input, LoadingSpinner components
-  - [ ] ErrorMessage, Card components
+- [x] Create shared component library ✅
+  - [x] Button, Input, LoadingSpinner components
+  - [x] ErrorMessage, Card components
 - [ ] Implement state management with Preact Signals
-- [ ] Add component tests
+- [x] Add component tests
 - [ ] Remove remaining vanilla JS UI code
 
 ### 📊 Performance Optimization

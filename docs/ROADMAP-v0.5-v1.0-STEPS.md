@@ -33,9 +33,9 @@ main
 
 ### 🔀 Branch: `feat/rspack-react-migration` (current)
 
-#### Phase 1: Shared Components Library
+#### Phase 1: Shared Components Library ✅
 
-**Branch**: `feat/shared-components`
+**Branch**: `feat/shared-components` (merged to main)
 
 ```bash
 git checkout -b feat/shared-components
@@ -43,54 +43,54 @@ git checkout -b feat/shared-components
 
 **Commits**:
 
-1. [ ] `feat: create components directory structure`
+1. [x] `feat: create components directory structure`
    - Create `src/components/` directory
    - Add `index.ts` for exports
    - Set up component organization
    - Add test setup for components
 
-2. [ ] `feat: implement Button component with variants`
+2. [x] `feat: implement Button component with variants`
    - Create `Button.tsx` with primary/secondary/danger variants
    - Add TypeScript props interface
    - Include basic styling
    - Add `Button.test.tsx` with variant tests
    - Test click handlers and disabled states
 
-3. `feat: implement Input component with validation`
+3. [x] `feat: implement Input component with validation`
    - Create `Input.tsx` with error states
    - Add validation prop support
    - Include focus/blur handling
    - Add `Input.test.tsx` with validation tests
    - Test error display and input events
 
-4. `feat: implement LoadingSpinner component`
+4. [x] `feat: implement LoadingSpinner component`
    - Create `LoadingSpinner.tsx`
    - Add size variants (small/medium/large)
    - Include animation styles
    - Add `LoadingSpinner.test.tsx`
    - Test size prop and accessibility
 
-5. `feat: implement ErrorMessage component`
+5. [x] `feat: implement ErrorMessage component`
    - Create `ErrorMessage.tsx`
    - Add error type variants
    - Include dismiss functionality
    - Add `ErrorMessage.test.tsx`
    - Test dismiss handler and variants
 
-6. `feat: implement Card component`
+6. [x] `feat: implement Card component`
    - Create `Card.tsx` with header/body/footer slots
    - Add shadow variants
    - Include responsive design
    - Add `Card.test.tsx`
    - Test slot rendering and styling
 
-7. `docs: add component documentation`
+7. [x] `docs: add component documentation`
    - Create Storybook stories (optional)
    - Add usage examples
    - Document props
    - Include test examples
 
-**PR**: Merge `feat/shared-components` → `feat/rspack-react-migration`
+**PR**: ✅ Merged `feat/shared-components` → `main` (PR #13)
 
 #### Phase 2: State Management
 
