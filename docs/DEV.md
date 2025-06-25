@@ -38,18 +38,21 @@ This guide explains how Tanaka is wired together, how to get a local dev setup
 
 ## 2. Prerequisites
 
-| Tool    | Version      |
-| ------- | ------------ |
-| Rust    | stable 1.78+ |
-| Node    | 20+          |
-| pnpm    | 9+           |
-| SQLite  | 3.40+        |
-| Firefox | 126+         |
+| Tool    | Version |
+| ------- | ------- |
+| Rust    | 1.86+   |
+| Node.js | 24+     |
+| pnpm    | 10.11+  |
+| SQLite  | 3.40+   |
+| Firefox | 126+    |
 
 Install Rust via `rustup`, then:
 
 ```bash
+# Install SQLx CLI for database migrations (optional)
 cargo install sqlx-cli --no-default-features --features sqlite
+
+# Enable pnpm through Node.js corepack
 corepack enable  # enables pnpm
 ```
 
@@ -240,7 +243,7 @@ const DEBUG = true;
 
 function log(...args: any[]) {
   if (DEBUG) {
-    console.log('[Tanaka]', new Date().toISOString(), ...args);
+    console.log("[Tanaka]", new Date().toISOString(), ...args);
   }
 }
 ```
@@ -249,8 +252,8 @@ function log(...args: any[]) {
 
 ```javascript
 // In extension console
-await browser.storage.local.get()  // View all stored data
-await browser.storage.local.clear() // Reset state during debugging
+await browser.storage.local.get(); // View all stored data
+await browser.storage.local.clear(); // Reset state during debugging
 ```
 
 **3. Monitor API Calls:**
@@ -259,9 +262,9 @@ await browser.storage.local.clear() // Reset state during debugging
 // Wrap fetch to log all requests
 const originalFetch = window.fetch;
 window.fetch = async (...args) => {
-  console.log('API Request:', args);
+  console.log("API Request:", args);
   const response = await originalFetch(...args);
-  console.log('API Response:', response.status);
+  console.log("API Response:", response.status);
   return response;
 };
 ```
@@ -271,7 +274,7 @@ window.fetch = async (...args) => {
 ```typescript
 // Log all messages in background script
 browser.runtime.onMessage.addListener((message, sender) => {
-  console.log('Message received:', message, 'from:', sender);
+  console.log("Message received:", message, "from:", sender);
   return true; // Keep channel open for async response
 });
 ```
@@ -280,12 +283,12 @@ browser.runtime.onMessage.addListener((message, sender) => {
 
 ```javascript
 // Profile slow operations
-console.time('sync-operation');
+console.time("sync-operation");
 await syncTabs();
-console.timeEnd('sync-operation');
+console.timeEnd("sync-operation");
 
 // Memory usage
-console.log('Memory:', performance.memory);
+console.log("Memory:", performance.memory);
 ```
 
 ### 10.4 Testing CRDT State
@@ -293,8 +296,8 @@ console.log('Memory:', performance.memory);
 ```typescript
 // Inspect Yjs document state
 const doc = new Y.Doc();
-console.log('Document state:', doc.toJSON());
-console.log('Pending updates:', Y.encodeStateAsUpdate(doc));
+console.log("Document state:", doc.toJSON());
+console.log("Pending updates:", Y.encodeStateAsUpdate(doc));
 ```
 
 ---
@@ -318,11 +321,11 @@ console.log('Pending updates:', Y.encodeStateAsUpdate(doc));
 // Always validate data from external sources
 function validateTabData(data: unknown): data is Tab {
   return (
-    typeof data === 'object' &&
+    typeof data === "object" &&
     data !== null &&
-    'id' in data &&
-    'url' in data &&
-    typeof (data as any).url === 'string' &&
+    "id" in data &&
+    "url" in data &&
+    typeof (data as any).url === "string" &&
     isValidUrl((data as any).url)
   );
 }
@@ -330,7 +333,7 @@ function validateTabData(data: unknown): data is Tab {
 function isValidUrl(url: string): boolean {
   try {
     const parsed = new URL(url);
-    return ['http:', 'https:'].includes(parsed.protocol);
+    return ["http:", "https:"].includes(parsed.protocol);
   } catch {
     return false;
   }
@@ -342,14 +345,14 @@ function isValidUrl(url: string): boolean {
 ```typescript
 // Never store sensitive data in plain text
 const encryptedToken = await crypto.subtle.encrypt(
-  { name: 'AES-GCM', iv },
+  { name: "AES-GCM", iv },
   key,
   new TextEncoder().encode(token)
 );
 
 // Store only encrypted version
-await browser.storage.local.set({ 
-  authToken: Array.from(new Uint8Array(encryptedToken))
+await browser.storage.local.set({
+  authToken: Array.from(new Uint8Array(encryptedToken)),
 });
 ```
 
@@ -359,8 +362,8 @@ await browser.storage.local.set({
 
 ```typescript
 // Enforce HTTPS in production
-if (PRODUCTION && !apiUrl.startsWith('https://')) {
-  throw new Error('API must use HTTPS in production');
+if (PRODUCTION && !apiUrl.startsWith("https://")) {
+  throw new Error("API must use HTTPS in production");
 }
 ```
 
@@ -370,11 +373,11 @@ if (PRODUCTION && !apiUrl.startsWith('https://')) {
 async function fetchWithTimeout(url: string, options: RequestInit = {}) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 10000);
-  
+
   try {
     return await fetch(url, {
       ...options,
-      signal: controller.signal
+      signal: controller.signal,
     });
   } finally {
     clearTimeout(timeout);
@@ -400,7 +403,7 @@ async function fetchWithTimeout(url: string, options: RequestInit = {}) {
 ```typescript
 // Check permissions before using APIs
 const hasTabsPermission = await browser.permissions.contains({
-  permissions: ['tabs']
+  permissions: ["tabs"],
 });
 
 if (!hasTabsPermission) {
@@ -486,7 +489,7 @@ if (!hasTabsPermission) {
    const minimalTab = {
      id: tab.id,
      url: tab.url,
-     title: tab.title
+     title: tab.title,
      // Omit favicon, etc.
    };
    ```
@@ -496,13 +499,13 @@ if (!hasTabsPermission) {
    ```typescript
    // Periodically clean old data
    async function cleanupOldTabs() {
-     const stored = await browser.storage.local.get('tabs');
-     const oneWeekAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
-     
+     const stored = await browser.storage.local.get("tabs");
+     const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+
      const filtered = stored.tabs.filter(
-       tab => tab.lastAccessed > oneWeekAgo
+       (tab) => tab.lastAccessed > oneWeekAgo
      );
-     
+
      await browser.storage.local.set({ tabs: filtered });
    }
    ```
