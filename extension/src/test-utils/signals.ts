@@ -32,11 +32,23 @@ export function flushSignalUpdates() {
 }
 
 export function mockSignalStorage() {
-  const storage: Record<string, string> = {};
+  const storage: Record<string, unknown> = {};
 
   return {
+    get: jest.fn(async (keys: string[]) => {
+      const result: Record<string, unknown> = {};
+      keys.forEach((key) => {
+        if (key in storage) {
+          result[key] = storage[key];
+        }
+      });
+      return result;
+    }),
+    set: jest.fn(async (data: Record<string, unknown>) => {
+      Object.assign(storage, data);
+    }),
     getItem: jest.fn((key: string) => storage[key] || null),
-    setItem: jest.fn((key: string, value: string) => {
+    setItem: jest.fn((key: string, value: unknown) => {
       storage[key] = value;
     }),
     removeItem: jest.fn((key: string) => {

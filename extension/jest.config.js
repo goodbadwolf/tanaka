@@ -6,9 +6,13 @@ export default {
       tsconfig: 'tsconfig.test.json'
     }]
   },
+  transformIgnorePatterns: [
+    'node_modules/(?!(preact)/)'
+  ],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '\\.css$': '<rootDir>/src/test/__mocks__/styleMock.js',
+    '\\.module\\.css$': '<rootDir>/src/test/__mocks__/styleMock.js',
     '^(\\.{1,2}/.*)\\.js$': '$1',
     '^@env$': '<rootDir>/src/test/__mocks__/@env.ts',
   },

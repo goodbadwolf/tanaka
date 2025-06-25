@@ -1,8 +1,7 @@
 import { render, fireEvent, waitFor } from '@testing-library/preact';
 import { SettingsApp } from './SettingsApp';
-import { resetSettings, settings, isLoading, saveStatus } from '../../store/settings';
+import { resetSettings, settings, setLoadingState } from '../../store/settings';
 import { container } from '../../di/container';
-import type { IBrowser } from '../../browser/core';
 
 // Mock the config module
 jest.mock('../../config/index.js', () => ({
@@ -10,8 +9,20 @@ jest.mock('../../config/index.js', () => ({
 }));
 
 describe('SettingsApp', () => {
-  let mockBrowser: any;
-  let mockLocalStorage: any;
+  let mockBrowser: {
+    localStorage: {
+      get: jest.Mock;
+      set: jest.Mock;
+    };
+    runtime: {
+      getManifest: jest.Mock;
+      sendMessage: jest.Mock;
+    };
+  };
+  let mockLocalStorage: {
+    get: jest.Mock;
+    set: jest.Mock;
+  };
 
   beforeEach(() => {
     // Reset settings state
@@ -44,7 +55,7 @@ describe('SettingsApp', () => {
   });
 
   it('renders loading state initially', () => {
-    isLoading.value = true;
+    setLoadingState(true);
     const { getByText } = render(<SettingsApp />);
     expect(getByText('Loading settings...')).toBeInTheDocument();
   });
@@ -131,7 +142,7 @@ describe('SettingsApp', () => {
   it('shows loading state on save button when saving', async () => {
     // Delay the localStorage.set to see loading state
     mockLocalStorage.set.mockImplementation(
-      () => new Promise((resolve) => setTimeout(resolve, 100))
+      () => new Promise((resolve) => setTimeout(resolve, 100)),
     );
 
     const { getByLabelText, getByText } = render(<SettingsApp />);
@@ -191,14 +202,15 @@ describe('SettingsApp', () => {
   });
 
   it('enables auto-persistence', async () => {
-    const { getByLabelText } = render(<SettingsApp />);
+    const { updateSettings } = await import('../../store/settings');
+    render(<SettingsApp />);
 
     await waitFor(() => {
       expect(settings.value.authToken).toBe('test-token');
     });
 
     // Directly update the store to test auto-persistence
-    settings.value = { authToken: 'auto-saved', syncInterval: 15000 };
+    updateSettings({ authToken: 'auto-saved', syncInterval: 15000 });
 
     await waitFor(() => {
       expect(mockLocalStorage.set).toHaveBeenCalledWith({

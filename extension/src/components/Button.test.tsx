@@ -1,4 +1,3 @@
-import { h } from 'preact';
 import { render, fireEvent } from '@testing-library/preact';
 import { Button } from './Button';
 
@@ -35,7 +34,7 @@ describe('Button', () => {
   it('handles click events', () => {
     const handleClick = jest.fn();
     const { getByText } = render(<Button onClick={handleClick}>Click me</Button>);
-    
+
     fireEvent.click(getByText('Click me'));
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
@@ -45,19 +44,19 @@ describe('Button', () => {
     const { getByText } = render(
       <Button disabled onClick={handleClick}>
         Disabled
-      </Button>
+      </Button>,
     );
-    
+
     const button = getByText('Disabled') as HTMLButtonElement;
     expect(button).toBeDisabled();
-    
+
     fireEvent.click(button);
     expect(handleClick).not.toHaveBeenCalled();
   });
 
   it('shows loading spinner when loading prop is true', () => {
     const { container, queryByText } = render(<Button loading>Loading</Button>);
-    
+
     expect(queryByText('Loading')).not.toBeInTheDocument();
     expect(container.querySelector('.loadingSpinner')).toBeInTheDocument();
     expect(container.querySelector('button')).toHaveAttribute('aria-busy', 'true');
@@ -68,12 +67,12 @@ describe('Button', () => {
     const { container } = render(
       <Button loading onClick={handleClick}>
         Loading
-      </Button>
+      </Button>,
     );
-    
+
     const button = container.querySelector('button') as HTMLButtonElement;
     expect(button).toBeDisabled();
-    
+
     fireEvent.click(button);
     expect(handleClick).not.toHaveBeenCalled();
   });
