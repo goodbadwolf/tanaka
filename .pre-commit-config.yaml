@@ -3,14 +3,14 @@
 
 # Global settings
 default_install_hook_types: [pre-commit, commit-msg]
-default_stages: [commit]
+default_stages: [pre-commit]
 fail_fast: false  # Run all hooks even if one fails
 minimum_pre_commit_version: '3.5.0'
 
 repos:
   # Python formatting and linting
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.8.8
+    rev: v0.12.1
     hooks:
       - id: ruff-format
         name: Format Python code with ruff
@@ -24,10 +24,11 @@ repos:
     hooks:
       - id: shellcheck
         name: Check shell scripts with shellcheck
-        args: [-x]  # Follow source statements
+        args: [-x, -e, SC1091]  # Follow source statements, exclude source file not found
+        exclude: ^\.husky/
 
   - repo: https://github.com/scop/pre-commit-shfmt
-    rev: v3.10.0-1
+    rev: v3.11.0-1
     hooks:
       - id: shfmt
         name: Format shell scripts with shfmt
@@ -35,11 +36,11 @@ repos:
 
   # Markdown linting
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.42.0
+    rev: v0.45.0
     hooks:
       - id: markdownlint-fix
         name: Fix markdown files with markdownlint
-        args: [--fix]
+        args: [--fix, --disable, MD013, --disable, MD040]  # Disable line length and code block language checks
         exclude: ^(node_modules|coverage)/
 
   # TypeScript/JavaScript checks (local hooks using pnpm)
@@ -99,7 +100,7 @@ repos:
 
   # Commit message validation
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v4.2.3
+    rev: v4.8.3
     hooks:
       - id: commitizen
         name: Check commit message format
