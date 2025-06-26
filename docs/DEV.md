@@ -244,6 +244,9 @@ pnpm run dev
 # Run Firefox with extension loaded
 pnpm run start
 
+# Run as webapp without Firefox
+pnpm run webapp
+
 # Bundle analysis
 pnpm run analyze
 
@@ -262,7 +265,52 @@ pnpm run watch
 
 ---
 
-## 9. Security Considerations
+## 9. Webapp Mode (Testing Without Firefox)
+
+The extension can run as a standalone webapp for testing and development without Firefox.
+
+### Starting Webapp Mode
+
+```bash
+# Run the extension as a webapp
+pnpm run webapp
+```
+
+This starts the development server at http://localhost:3000
+
+### Features
+
+- **Mock Browser API**: Simulates Firefox APIs with in-memory storage
+- **Route-based Navigation**: 
+  - `/` - Popup view
+  - `/settings` - Settings view
+- **Hot Module Replacement**: Changes update instantly
+- **Mock Data**: Pre-populated with sample tabs and windows
+
+### Architecture
+
+The webapp mode uses:
+- **Mock Browser** (`src/browser/mock.ts`): Implements all browser APIs with in-memory storage
+- **Webapp Container** (`src/di/webapp-container.ts`): Separate DI container that registers MockBrowser
+- **Webapp Entry** (`src/webapp/index.tsx`): React router setup for navigation
+
+### How It Works
+
+1. The `WEBAPP_MODE=true` environment variable triggers rspack aliasing
+2. `webextension-polyfill` imports are replaced with `mock-polyfill.ts`
+3. The DI container uses `MockBrowser` instead of the real browser API
+4. All browser operations (tabs, storage, messaging) work with mock data
+
+### Benefits
+
+- Test UI components without installing the extension
+- Faster development iteration
+- Easy debugging with browser DevTools
+- No Firefox required for UI development
+
+---
+
+## 10. Security Considerations
 
 - All communication uses TLS
 - Authentication via shared bearer token
@@ -271,9 +319,9 @@ pnpm run watch
 
 ---
 
-## 10. Debugging WebExtension Issues
+## 11. Debugging WebExtension Issues
 
-### 10.1 Extension Debugging Tools
+### 11.1 Extension Debugging Tools
 
 **Browser Console vs Extension Console:**
 
@@ -282,7 +330,7 @@ pnpm run watch
   - Shows background script errors and console logs
   - Allows setting breakpoints in background scripts
 
-### 10.2 Common Debugging Techniques
+### 11.2 Common Debugging Techniques
 
 **1. Enable Verbose Logging:**
 
@@ -328,7 +376,7 @@ browser.runtime.onMessage.addListener((message, sender) => {
 });
 ```
 
-### 10.3 Performance Profiling
+### 11.3 Performance Profiling
 
 ```javascript
 // Profile slow operations
@@ -340,7 +388,7 @@ console.timeEnd("sync-operation");
 console.log("Memory:", performance.memory);
 ```
 
-### 10.4 Testing CRDT State
+### 11.4 Testing CRDT State
 
 ```typescript
 // Inspect Yjs document state
@@ -351,9 +399,9 @@ console.log("Pending updates:", Y.encodeStateAsUpdate(doc));
 
 ---
 
-## 11. Security Best Practices
+## 12. Security Best Practices
 
-### 11.1 WebExtension Security
+### 12.1 WebExtension Security
 
 **Content Security Policy:**
 
@@ -405,7 +453,7 @@ await browser.storage.local.set({
 });
 ```
 
-### 11.2 API Communication Security
+### 12.2 API Communication Security
 
 **Always Use HTTPS:**
 
@@ -434,7 +482,7 @@ async function fetchWithTimeout(url: string, options: RequestInit = {}) {
 }
 ```
 
-### 11.3 Permission Management
+### 12.3 Permission Management
 
 **Request Minimal Permissions:**
 
@@ -462,9 +510,9 @@ if (!hasTabsPermission) {
 
 ---
 
-## 12. Troubleshooting Common Issues
+## 13. Troubleshooting Common Issues
 
-### 12.1 Extension Not Loading
+### 13.1 Extension Not Loading
 
 **Problem:** Extension doesn't appear in Firefox after installation
 
@@ -475,7 +523,7 @@ if (!hasTabsPermission) {
 3. Check browser console for manifest parsing errors
 4. Ensure all listed resources exist (icons, scripts)
 
-### 12.2 Server Connection Failures
+### 13.2 Server Connection Failures
 
 **Problem:** Extension can't connect to server
 
@@ -508,7 +556,7 @@ if (!hasTabsPermission) {
    # Check extension settings in about:addons
    ```
 
-### 12.3 Sync Not Working
+### 13.3 Sync Not Working
 
 **Problem:** Tabs not syncing between devices
 
@@ -525,7 +573,7 @@ if (!hasTabsPermission) {
 - Check SQLite database integrity: `sqlite3 tabs.db "PRAGMA integrity_check;"`
 - Ensure both devices have same server URL and token
 
-### 12.4 High Memory Usage
+### 13.4 High Memory Usage
 
 **Problem:** Extension consuming too much memory
 
@@ -559,7 +607,7 @@ if (!hasTabsPermission) {
    }
    ```
 
-### 12.5 Build Failures
+### 13.5 Build Failures
 
 **TypeScript Build Issues:**
 
@@ -588,7 +636,7 @@ cargo update
 cargo check --all-targets
 ```
 
-### 12.6 Performance Issues
+### 13.6 Performance Issues
 
 **Slow Extension Startup:**
 
@@ -602,7 +650,7 @@ cargo check --all-targets
 - Throttle/debounce frequent events
 - Profile with Firefox Performance tool
 
-### 12.7 Development Environment Issues
+### 13.7 Development Environment Issues
 
 **pnpm not found:**
 
