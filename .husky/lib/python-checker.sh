@@ -1,7 +1,16 @@
 #!/bin/bash
-
-# Python linting checker
-# Handles Python file validation and formatting
+#
+# Python Linting Checker
+# ======================
+#
+# Validates and formats Python files using ruff and mypy.
+#
+# Dependencies:
+# -------------
+# - ruff (formatting and linting)
+# - mypy (type checking) - optional, skipped in quick mode
+# - Python virtual environment or system tools
+#
 
 # Source common functions
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -9,6 +18,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/common.sh"
 
 check_python() {
+    # Check and lint Python files (.py)
+    # - Formats with ruff
+    # - Type checks with mypy (unless in quick mode)
+    # - Auto-stages fixed files
+    
     # Check if Python files are staged
     STAGED_PY_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.py$')
 

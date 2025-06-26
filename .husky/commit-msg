@@ -1,4 +1,16 @@
 #!/bin/sh
+#
+# Commit Message Validation Hook
+# ===============================
+#
+# Validates commit messages follow the project's conventional format.
+# Triggered automatically by Git after you write a commit message.
+#
+# Format: <type>: <description>
+# Types: feat, fix, docs, refactor, test, chore
+#
+# Skip validation: SKIP_COMMIT_MSG=1 git commit
+#
 
 # Emit function for color output that respects terminal capabilities
 emit() {
@@ -31,6 +43,8 @@ error() { emit "red" "$1"; }
 success() { emit "green" "$1"; }
 header() { emit "bold" "$1"; }
 
+# Git passes the commit message file path as the first argument
+# This hook is triggered AFTER the commit message is written but BEFORE the commit is finalized
 COMMIT_MSG_FILE=$1
 COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
 

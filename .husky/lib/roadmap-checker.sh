@@ -1,7 +1,14 @@
 #!/bin/bash
-
-# Roadmap tracking checker
-# Reminds developers to update ROADMAP*.md files when working on tracked features
+#
+# Roadmap Tracking Checker
+# ========================
+#
+# Reminds developers to update roadmap documentation when implementing features.
+#
+# Dependencies:
+# -------------
+# - None (uses git only)
+#
 
 # Source common functions
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -9,6 +16,12 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/common.sh"
 
 check_roadmap() {
+    # Check if roadmap documentation needs updating
+    # - Triggers when source files are modified
+    # - Skips if roadmap files are already being updated
+    # - Looks for roadmap-related keywords in commit message
+    # - Non-blocking reminder only
+    
     # Check if any source files are being modified
     local SOURCE_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(ts|tsx|js|jsx|rs|py)$')
     

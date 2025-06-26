@@ -1,7 +1,17 @@
 #!/bin/bash
-
-# Shell script linting checker
-# Supports both shellcheck (linting) and shfmt (formatting)
+#
+# Shell Script Linting Checker
+# ============================
+#
+# Validates and formats shell scripts using shellcheck and shfmt.
+#
+# Dependencies:
+# -------------
+# - shellcheck (static analysis)
+# - shfmt (formatting)
+# Install: brew install shellcheck shfmt (macOS)
+#          apt install shellcheck && go install mvdan.cc/sh/v3/cmd/shfmt@latest (Linux)
+#
 
 # Source common functions
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -9,6 +19,12 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/common.sh"
 
 check_shell() {
+    # Check and lint shell scripts (.sh, .bash, or shebang #!/bin/sh)
+    # - Validates with shellcheck
+    # - Formats with shfmt
+    # - Auto-stages formatted files
+    # - Quick mode: syntax check only (no formatting)
+    
     # Check if any shell scripts are staged
     STAGED_SH_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(sh|bash)$|^[^.]+$' | while read -r file; do
         # Check if file is a shell script by shebang

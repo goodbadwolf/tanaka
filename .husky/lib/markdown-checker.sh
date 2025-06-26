@@ -1,7 +1,15 @@
 #!/bin/bash
-
-# Markdown linting checker
-# Handles markdown file validation and auto-fixing
+#
+# Markdown Linting Checker
+# ========================
+#
+# Validates and auto-fixes markdown files using pymarkdown/markdownlint.
+#
+# Dependencies:
+# -------------
+# - pymarkdown (via uv/pip)
+# - scripts/tanaka.py with lint command
+#
 
 # Source common functions
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -9,6 +17,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/common.sh"
 
 check_markdown() {
+    # Check and lint markdown files (.md)
+    # - Auto-fixes common issues (formatting, spacing)
+    # - Excludes generated files (repomix, MIGRATION, TESTING-UPGRADE)
+    # - Falls back to basic check if tanaka.py is being modified
+    
     # Check if any markdown files are staged
     MD_STAGED=$(git diff --cached --name-only --diff-filter=ACM | grep '\.md$' | grep -v "repomix-output.txt.md" | grep -v "MIGRATION" | grep -v "TESTING-UPGRADE.md")
 

@@ -281,7 +281,7 @@ This starts the development server at http://localhost:3000
 ### Features
 
 - **Mock Browser API**: Simulates Firefox APIs with in-memory storage
-- **Route-based Navigation**: 
+- **Route-based Navigation**:
   - `/` - Popup view
   - `/settings` - Settings view
 - **Hot Module Replacement**: Changes update instantly
