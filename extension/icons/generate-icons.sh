@@ -13,7 +13,7 @@ fi
 # Generate a simple SVG icon
 echo '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
        <rect width="128" height="128" fill="#4A90E2" rx="16"/>
-       <text x="50%" y="50%" font-family="Arial, sans-serif" font-size="72" font-weight="bold" 
+       <text x="50%" y="50%" font-family="Arial, sans-serif" font-size="72" font-weight="bold"
      fill="white" text-anchor="middle" dominant-baseline="middle">T</text>
      </svg>' >icon.svg
 

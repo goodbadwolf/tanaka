@@ -51,14 +51,14 @@ describe('LoadingSpinner', () => {
 
   it('combines multiple props correctly', () => {
     const { container } = render(
-      <LoadingSpinner 
-        size="large" 
-        color="secondary" 
+      <LoadingSpinner
+        size="large"
+        color="secondary"
         className="my-spinner"
         ariaLabel="Custom loading"
       />
     );
-    
+
     const spinner = container.querySelector('[role="status"]');
     expect(spinner).toHaveClass('spinner', 'large', 'secondary', 'my-spinner');
     expect(spinner).toHaveAttribute('aria-label', 'Custom loading');

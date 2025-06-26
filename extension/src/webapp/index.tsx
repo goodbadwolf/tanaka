@@ -17,8 +17,8 @@ function WebApp() {
   return (
     <DIProvider container={webappContainer}>
       <div style={{ minHeight: '100vh', backgroundColor: '#f3f4f6' }}>
-        <nav style={{ 
-          backgroundColor: 'white', 
+        <nav style={{
+          backgroundColor: 'white',
           boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
           padding: '1rem'
         }}>
@@ -28,7 +28,7 @@ function WebApp() {
             <a href="/settings" style={{ alignSelf: 'center' }}>Settings</a>
           </div>
         </nav>
-        
+
         <main style={{ maxWidth: '1200px', margin: '2rem auto', padding: '0 1rem' }}>
           <Router>
             <Route path="/" component={PopupView} />
@@ -42,9 +42,9 @@ function WebApp() {
 
 function PopupView() {
   return (
-    <div style={{ 
-      backgroundColor: 'white', 
-      borderRadius: '8px', 
+    <div style={{
+      backgroundColor: 'white',
+      borderRadius: '8px',
       boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
       width: '400px',
       margin: '0 auto'
@@ -56,9 +56,9 @@ function PopupView() {
 
 function SettingsView() {
   return (
-    <div style={{ 
-      backgroundColor: 'white', 
-      borderRadius: '8px', 
+    <div style={{
+      backgroundColor: 'white',
+      borderRadius: '8px',
       boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
       padding: '2rem'
     }}>

@@ -35,7 +35,7 @@ export function ErrorMessage({
         {title && <div className={styles.title}>{title}</div>}
         <div className={styles.message}>{message}</div>
       </div>
-      
+
       {showDismissButton && (
         <button
           type="button"

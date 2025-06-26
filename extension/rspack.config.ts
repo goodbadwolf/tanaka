@@ -96,7 +96,7 @@ export default defineConfig({
 
   plugins: [
     isDev && new RefreshPlugin(),
-    
+
     new HtmlRspackPlugin({
       template: './src/popup/popup-template.html',
       filename: 'popup/popup.html',

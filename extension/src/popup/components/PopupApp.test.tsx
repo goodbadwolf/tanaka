@@ -128,7 +128,7 @@ describe('PopupApp', () => {
 
     const settingsLink = getByText('Settings');
     const event = new MouseEvent('click', { bubbles: true, cancelable: true });
-    
+
     Object.defineProperty(event, 'preventDefault', {
       value: jest.fn(),
       writable: false,
