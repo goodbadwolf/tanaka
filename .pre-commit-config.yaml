@@ -4,8 +4,8 @@
 # Global settings
 default_install_hook_types: [pre-commit, commit-msg]
 default_stages: [pre-commit]
-fail_fast: false  # Run all hooks even if one fails
-minimum_pre_commit_version: '3.5.0'
+fail_fast: true # Run all hooks even if one fails
+minimum_pre_commit_version: "3.5.0"
 
 repos:
   # Python formatting and linting
@@ -24,15 +24,14 @@ repos:
     hooks:
       - id: shellcheck
         name: Check shell scripts with shellcheck
-        args: [-x, -e, SC1091]  # Follow source statements, exclude source file not found
-        exclude: ^\.husky/
+        args: [-x, -e, SC1091] # Follow source statements, exclude source file not found
 
   - repo: https://github.com/scop/pre-commit-shfmt
     rev: v3.11.0-1
     hooks:
       - id: shfmt
         name: Format shell scripts with shfmt
-        args: [-i, '2', -w]  # 2 space indent, write in place
+        args: [-i, "2", -w] # 2 space indent, write in place
 
   # Markdown linting
   - repo: https://github.com/igorshubovych/markdownlint-cli
@@ -40,7 +39,7 @@ repos:
     hooks:
       - id: markdownlint-fix
         name: Fix markdown files with markdownlint
-        args: [--fix, --disable, MD013, --disable, MD040]  # Disable line length and code block language checks
+        args: [--fix, --disable, MD013, --disable, MD040] # Disable line length and code block language checks
         exclude: ^(node_modules|coverage)/
 
   # TypeScript/JavaScript checks (local hooks using pnpm)
@@ -119,7 +118,7 @@ repos:
       - id: check-merge-conflict
       - id: check-toml
       - id: check-json
-        exclude: tsconfig.json  # Has comments
+        exclude: tsconfig.json # Has comments
 
 # Configuration for specific hooks
 # Skip all: git commit --no-verify

@@ -80,81 +80,72 @@ Use `git add -p` (patch mode) to:
 
 ## Pre-commit Hooks
 
-This repository uses automated pre-commit hooks to ensure code quality. The hooks run various linters and formatters before each commit.
+This repository uses the [pre-commit](https://pre-commit.com/) framework to ensure code quality. The hooks run various linters and formatters before each commit.
 
 ### Features
 
-- **Parallel Execution**: Linters run concurrently by default for better
-  performance (30-70% faster)
-- **Quick Mode**: Skip expensive checks for rapid iteration with `PRE_COMMIT_QUICK=1`
-- **Auto-formatting**: Automatically fixes many issues (formatting, import
-  ordering)
+- **Auto-formatting**: Automatically fixes many issues (formatting, import ordering)
 - **Multi-language Support**: TypeScript, Rust, Python, Markdown, and Shell scripts
-- **Emergency Bypass**: Multiple options for urgent commits
+- **Commit Message Validation**: Ensures conventional commit format
+- **Custom Checks**: Documentation and roadmap reminders
+- **Emergency Bypass**: Skip hooks when needed
 
 ### Usage
 
 ```bash
-# Normal commit (runs all checks in parallel)
+# Normal commit (runs all checks)
 git commit
-
-# Quick mode (syntax checks only)
-PRE_COMMIT_QUICK=1 git commit
-
-# Force sequential execution
-PRE_COMMIT_SEQUENTIAL=1 git commit
 
 # Skip hooks entirely (emergency use only)
 git commit --no-verify
 
-# Persistent bypass (remove to re-enable)
-touch .git/BYPASS_PRECOMMIT
-git commit
-rm .git/BYPASS_PRECOMMIT
+# Skip specific hooks
+SKIP=hook-id git commit
 ```
 
-### Performance Tips
+### Installation
 
-- The hooks warn when linting more than 20 files
-- Use quick mode for rapid iteration during development
-- Auto-fixes are applied and staged automatically
-- Review changes with `git diff --cached` after auto-fixes
+```bash
+# Install pre-commit
+pip install pre-commit
+# or
+uv sync --dev
+
+# Install the git hooks
+pre-commit install
+pre-commit install --hook-type commit-msg
+```
+
+### Running Manually
+
+```bash
+# Run on all files
+pre-commit run --all-files
+
+# Run specific hook
+pre-commit run <hook-id>
+
+# Update hook versions
+pre-commit autoupdate
+```
 
 ### Troubleshooting
 
 If pre-commit fails:
 
-1. **Review the error messages** - they include specific commands to fix issues
+1. **Review the error messages** - they show what needs to be fixed
 2. **Check staged changes**: `git diff --cached`
 3. **Check unstaged changes**: `git diff`
 4. **Reset if needed**: `git reset` to unstage and review manually
 
-### Architecture Documentation
+### Configuration
 
-The pre-commit hook system uses a modular architecture for maintainability:
+The hooks are configured in `.pre-commit-config.yaml`. Each hook can:
 
-```text
-.husky/
-├── pre-commit          # Main orchestrator with comprehensive documentation
-└── lib/
-    ├── common.sh       # Shared utilities and state management
-    ├── markdown-checker.sh
-    ├── typescript-checker.sh
-    ├── rust-checker.sh
-    ├── python-checker.sh
-    ├── shell-checker.sh
-    ├── roadmap-checker.sh
-    └── documentation-checker.sh
-```
-
-Each file contains detailed documentation at the top explaining:
-
-- Purpose and functionality
-- Configuration options
-- Required tools and setup
-- Exit codes and error handling
-
-For implementation details, see the documentation in `.husky/pre-commit`.
+- Auto-fix issues (formatting, trailing whitespace)
+- Check for problems (linting, type checking)
+- Validate files (YAML, JSON, TOML)
+- Run custom checks (documentation reminders)
 
 ### Required Tools
 
