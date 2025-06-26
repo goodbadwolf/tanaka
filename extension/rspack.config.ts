@@ -10,6 +10,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const isDev = process.env.NODE_ENV === 'development';
 const buildEnv = process.env.BUILD_ENV || 'development';
 const isAnalyze = process.env.RSPACK_BUNDLE_ANALYZE === 'true';
+const isWebapp = process.env.WEBAPP_MODE === 'true';
 
 export default defineConfig({
   context: __dirname,
@@ -19,6 +20,7 @@ export default defineConfig({
     background: './src/background.ts',
     'popup/popup': './src/popup/popup.tsx',
     'settings/settings': './src/settings/settings.tsx',
+    webapp: './src/webapp/index.tsx',
   },
 
   output: {
@@ -38,6 +40,9 @@ export default defineConfig({
       '@env': resolve(__dirname, `src/config/environments/${buildEnv}.ts`),
       'react': 'preact/compat',
       'react-dom': 'preact/compat',
+      ...(isWebapp ? {
+        'webextension-polyfill': resolve(__dirname, 'src/browser/mock-polyfill.ts'),
+      } : {}),
     },
   },
 
@@ -104,6 +109,13 @@ export default defineConfig({
       filename: 'settings/settings.html',
       chunks: ['settings/settings'],
       inject: false,
+    }),
+
+    new HtmlRspackPlugin({
+      template: './src/webapp/index.html',
+      filename: 'index.html',
+      chunks: ['webapp'],
+      inject: true,
     }),
 
     new rspack.CopyRspackPlugin({
@@ -175,6 +187,10 @@ export default defineConfig({
     devMiddleware: {
       writeToDisk: true,
     },
+    historyApiFallback: {
+      index: '/index.html',
+    },
+    open: true,
   },
 
   devtool: isDev ? 'source-map' : false,

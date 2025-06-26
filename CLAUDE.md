@@ -54,6 +54,7 @@ Adopt the persona of a **pragmatic, experienced engineer** who values:
 - Centralize error management
 - Make invalid states unrepresentable through types
 - Prefer compile-time errors over runtime errors
+- NEVER use `any` type in TypeScript - the linter will reject it. Use proper types or `unknown` with type guards
 
 **Developer Experience**
 

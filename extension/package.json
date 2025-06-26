@@ -19,6 +19,7 @@
     "analyze": "BUILD_ENV=production RSPACK_BUNDLE_ANALYZE=true rspack build",
     "start": "web-ext run --source-dir dist --firefox-profile=dev-profile --keep-profile-changes",
     "dev:extension": "concurrently \"pnpm watch\" \"pnpm start\"",
+    "webapp": "WEBAPP_MODE=true rspack serve --mode development --config rspack.config.ts",
     "lint": "eslint 'src/**/*.ts' 'scripts/**/*.ts'",
     "lint:fix": "eslint 'src/**/*.ts' 'scripts/**/*.ts' --fix",
     "format": "prettier --write 'src/**/*.{ts,html,css}' 'scripts/**/*.ts' 'manifest.json'",
@@ -79,6 +80,7 @@
   "dependencies": {
     "@preact/signals": "^2.2.0",
     "preact": "^10.26.9",
+    "preact-router": "^4.1.2",
     "reflect-metadata": "^0.2.2",
     "tsyringe": "^4.10.0",
     "yjs": "^13.6.27"
