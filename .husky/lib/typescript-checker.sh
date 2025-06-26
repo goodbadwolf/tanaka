@@ -1,7 +1,16 @@
 #!/bin/bash
-
-# TypeScript linting checker
-# Handles TypeScript/JavaScript file validation and formatting
+#
+# TypeScript/JavaScript Linting Checker
+# ======================================
+#
+# Validates and formats TypeScript/JavaScript files using ESLint.
+#
+# Dependencies:
+# -------------
+# - pnpm install in extension directory
+# - ESLint with TypeScript parser
+# - Valid .eslintrc.json configuration
+#
 
 # Source common functions
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -9,6 +18,13 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/common.sh"
 
 check_typescript() {
+    # Check and lint TypeScript/JavaScript files (.ts, .tsx, .js, .jsx)
+    # - Only processes files in the extension/ directory
+    # - Formats with ESLint --fix (unless in quick mode)
+    # - Runs TypeScript compiler for type checking
+    # - Auto-stages fixed files
+    # - Quick mode: type check only, no auto-fix
+    
     # Check if any TypeScript files are staged
     STAGED_TS_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(ts|tsx|js|jsx)$' | grep '^extension/')
 
@@ -34,8 +50,8 @@ check_typescript() {
     # Check for partially staged files
     warn_partial_staging "$STAGED_TS_FILES"
 
-    # Convert paths for the extension directory context
-    RELATIVE_FILES=$(echo "$STAGED_TS_FILES" | sed 's|^extension/||g')
+    # ERRORS_FOUND is a global variable exported from common.sh
+    # shellcheck disable=SC2034
 
     if [ "${QUICK_MODE:-0}" -eq 1 ]; then
         debug "Quick mode: Running TypeScript compiler check only"
@@ -44,6 +60,7 @@ check_typescript() {
             return 0
         else
             log_stage_finish "TypeScript Linting" "FAILED"
+            # ERRORS_FOUND is exported from common.sh and used by the main pre-commit script
             ERRORS_FOUND=1
             return 1
         fi
@@ -84,6 +101,8 @@ check_typescript() {
         if [ $TYPECHECK_FAILED -eq 1 ]; then
             error "TypeScript type errors must be fixed before committing"
         fi
+        # ERRORS_FOUND is exported from common.sh and used by the main pre-commit script
+        # shellcheck disable=SC2034
         ERRORS_FOUND=1
         return 1
     elif [ -n "$FIXED_FILES" ]; then

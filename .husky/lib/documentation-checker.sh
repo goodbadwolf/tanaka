@@ -1,7 +1,14 @@
 #!/bin/bash
-
-# Documentation checker
-# Reminds developers to update documentation when making significant changes
+#
+# Documentation Update Checker
+# ============================
+#
+# Reminds developers to update docs when making significant changes.
+#
+# Dependencies:
+# -------------
+# - None (uses git only)
+#
 
 # Source common functions
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -9,6 +16,13 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/common.sh"
 
 check_documentation() {
+    # Check if documentation might need updating based on changed files
+    # - Config changes → DEV.md, INSTALL.md
+    # - API changes → API docs
+    # - Build config changes → build instructions
+    # - Major source changes → consider docs
+    # - Non-blocking reminders only
+    
     # Define files that might need doc updates when changed
     local CONFIG_CHANGED=$(git diff --cached --name-only | grep -E '(Cargo\.toml|package\.json|manifest\.json|example\.toml)$')
     local API_CHANGED=$(git diff --cached --name-only | grep -E 'server/src/(routes|models).*\.rs$')

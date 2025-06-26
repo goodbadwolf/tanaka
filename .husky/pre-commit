@@ -1,7 +1,23 @@
 #!/bin/bash
-
-# Pre-commit hook that uses modular checkers
-# All linting logic is now in .husky/lib/
+set +e  # Don't exit on error - we handle errors explicitly
+#
+# Tanaka Pre-commit Hook
+# ======================
+#
+# Ensures code quality by running linters and formatters before each commit.
+# Uses modular checker scripts in .husky/lib/ for each language.
+#
+# Quick Usage:
+# ------------
+# git commit                      # Normal mode (parallel, with auto-fix)
+# PRE_COMMIT_QUICK=1 git commit   # Quick mode (syntax only, no auto-fix)
+# git commit --no-verify          # Skip all checks (emergency use)
+#
+# Dependencies:
+# -------------
+# All tools installed via: uv run scripts/tanaka.py setup-dev
+# See individual checker files in .husky/lib/ for specific requirements.
+#
 
 # Get the directory of this script
 HOOK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -40,8 +56,9 @@ if [ -f ".git/BYPASS_PRECOMMIT" ]; then
     exit 0
 fi
 
-# Check if we're in a merge/rebase
 check_merge_conflict() {
+    # Skip pre-commit hooks during merge/rebase operations
+    # These operations have their own conflict resolution process
     if [ -f .git/MERGE_HEAD ] || [ -d .git/rebase-merge ] || [ -d .git/rebase-apply ]; then
         warn "Detected merge/rebase in progress"
         debug "Skipping pre-commit hooks during merge"
@@ -49,8 +66,31 @@ check_merge_conflict() {
     fi
 }
 
-# Function to show summary and give review opportunity
+check_amend_operation() {
+    # Check if this is an amend operation with no staged changes
+    # During amend, git diff --cached might show nothing even though files are being committed
+    local staged_files
+    staged_files=$(git diff --cached --name-only 2>/dev/null | head -1)
+    
+    # If no files are staged, this might be an amend, empty commit, or error
+    if [ -z "$staged_files" ]; then
+        # Check if we're in the middle of an amend
+        if [ -f ".git/COMMIT_EDITMSG" ] && grep -q "^# Please enter the commit message" ".git/COMMIT_EDITMSG" 2>/dev/null; then
+            debug "Possible amend operation detected"
+        fi
+        
+        # For now, if there are no staged files at all, skip the pre-commit
+        warn "No files staged for commit"
+        debug "Skipping pre-commit hooks (nothing to check)"
+        exit 0
+    fi
+}
+
 show_summary() {
+    # Display final summary of all checks with timing and guidance
+    # Provides different messages based on success/failure/auto-fixes
+    # Returns: 0 if all passed, 1 if any failed
+    
     END_TIME=$(date +%s)
     DURATION=$((END_TIME - START_TIME))
 
@@ -102,11 +142,20 @@ show_summary() {
     fi
 }
 
-# Function to run linters in parallel
 run_linters_parallel() {
+    # Run all language linters simultaneously for better performance
+    # Collects results from all parallel processes
+    # Returns: 0 if all passed, 1 if any failed
+    
     local pids=""
     local results_dir
     results_dir=$(mktemp -d)
+    
+    # Ensure results directory was created
+    if [ ! -d "$results_dir" ]; then
+        error "Failed to create temporary results directory"
+        return 1
+    fi
 
     # Start all linters in background
     debug "Running linters in parallel..."
@@ -144,8 +193,11 @@ run_linters_parallel() {
 
     # Aggregate results
     local total_errors=0
+    local files_found=0
+    
     for result_file in "$results_dir"/*; do
         if [ -f "$result_file" ]; then
+            files_found=1
             local exit_code
             exit_code=$(cat "$result_file")
             if [ "$exit_code" -ne 0 ]; then
@@ -153,6 +205,11 @@ run_linters_parallel() {
             fi
         fi
     done
+    
+    # If no result files were created, all checkers must have skipped
+    if [ $files_found -eq 0 ]; then
+        debug "All checkers skipped (no files to check)"
+    fi
 
     # Clean up
     rm -rf "$results_dir"
@@ -167,6 +224,7 @@ debug "Tip: Use PRE_COMMIT_QUICK=1 for faster commits, PRE_COMMIT_SEQUENTIAL=1 f
 echo ""
 
 check_merge_conflict
+check_amend_operation
 activate_venv
 
 # Check if sequential mode is explicitly requested

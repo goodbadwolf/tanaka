@@ -1,7 +1,15 @@
 #!/bin/bash
-
-# Rust linting checker
-# Handles Rust file formatting and clippy checks
+#
+# Rust Linting Checker
+# ====================
+#
+# Formats and validates Rust code using cargo fmt and clippy.
+#
+# Dependencies:
+# -------------
+# - cargo with rustfmt and clippy components
+# - Valid Cargo.toml in server directory
+#
 
 # Source common functions
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -9,6 +17,12 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/common.sh"
 
 check_rust() {
+    # Check and lint Rust files (.rs) in the server directory
+    # - Formats with cargo fmt
+    # - Lints with cargo clippy
+    # - Runs tests (unless in quick mode)
+    # - Auto-stages formatted files
+    
     # Check if any Rust files are staged
     STAGED_RUST_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.rs$' | grep '^server/')
 

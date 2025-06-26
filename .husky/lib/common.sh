@@ -1,33 +1,46 @@
 #!/bin/bash
-
-# Common functions for all checker scripts
-# This file provides shared utilities used by all linting checkers
+#
+# Common Functions and Utilities for Pre-commit Checkers
+# ========================================================
+#
+# This file provides shared utilities used by all linting checker modules.
+# It must be sourced before any checker scripts are loaded.
+#
+# Dependencies:
+# -------------
+# Requires: git, find, wc
+# Optional: Python virtual environment in .venv/
 
 # Get the project root directory (3 levels up from .husky/lib/)
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 export PROJECT_ROOT
 
-# Track global state
+# Global Variables:
+# FIXES_APPLIED           - Flag indicating if any auto-fixes were applied
+# ERRORS_FOUND            - Flag indicating if any errors need manual fixing
+# PARTIAL_STAGING_WARNING - Flag indicating files were partially staged
 FIXES_APPLIED=0
 ERRORS_FOUND=0
 PARTIAL_STAGING_WARNING=0
 
-# Emit function for color output that respects terminal capabilities
 emit() {
+    # Terminal-aware colored output function
+    # Usage: emit <color> <message>
+    # Colors: red, green, yellow, blue, gray, bold
     local color="$1"
     local message="$2"
-    
+
     # Check if stdout is a terminal
     if [ -t 1 ]; then
         # Terminal - use color
         case "$color" in
-            red)     echo -e "\033[0;31m${message}\033[0m" ;;
-            green)   echo -e "\033[0;32m${message}\033[0m" ;;
-            yellow)  echo -e "\033[1;33m${message}\033[0m" ;;
-            blue)    echo -e "\033[0;34m${message}\033[0m" ;;
-            gray)    echo -e "\033[0;90m${message}\033[0m" ;;
-            bold)    echo -e "\033[1m${message}\033[0m" ;;
-            *)       echo "$message" ;;  # No color for unknown
+        red) echo -e "\033[0;31m${message}\033[0m" ;;
+        green) echo -e "\033[0;32m${message}\033[0m" ;;
+        yellow) echo -e "\033[1;33m${message}\033[0m" ;;
+        blue) echo -e "\033[0;34m${message}\033[0m" ;;
+        gray) echo -e "\033[0;90m${message}\033[0m" ;;
+        bold) echo -e "\033[1m${message}\033[0m" ;;
+        *) echo "$message" ;; # No color for unknown
         esac
     else
         # Not a terminal (pipe, file, etc) - no color
@@ -35,24 +48,26 @@ emit() {
     fi
 }
 
-# Logging functions
-debug() { emit "gray" "$1"; }
-info() { emit "blue" "$1"; }
-warn() { emit "yellow" "$1"; }
-error() { emit "red" "$1"; }
-success() { emit "green" "$1"; }
-header() { emit "bold" "$1"; }
+# Logging functions using emit
+debug() { [ "${DEBUG:-0}" = "1" ] && emit "gray" "$1"; }  # Gray debug messages (only if DEBUG=1)
+info() { emit "blue" "$1"; }                               # Blue informational messages
+warn() { emit "yellow" "$1"; }                             # Yellow warning messages
+error() { emit "red" "$1"; }                               # Red error messages
+success() { emit "green" "$1"; }                           # Green success messages
+header() { emit "bold" "$1"; }                             # Bold section headers
 
-# Function to log stage start
 log_stage_start() {
+    # Log the start of a checker stage with formatting
+    # Usage: log_stage_start "TypeScript Linting"
     local stage_name="$1"
     echo ""
     header "Stage ${stage_name}: Started"
     debug "────────────────────────────────────────"
 }
 
-# Function to log stage skip
 log_stage_skip() {
+    # Log when a stage is skipped with reason
+    # Usage: log_stage_skip "TypeScript Linting" "no TypeScript files staged"
     local stage_name="$1"
     local reason="$2"
     echo ""
@@ -60,8 +75,9 @@ log_stage_skip() {
     debug "(${reason})"
 }
 
-# Function to log stage finish
 log_stage_finish() {
+    # Log the completion of a checker stage with result
+    # Usage: log_stage_finish "TypeScript Linting" "PASSED|FAILED|FIXED|SKIPPED"
     local stage_name="$1"
     local result="$2"
 
@@ -75,8 +91,9 @@ log_stage_finish() {
     fi
 }
 
-# Check if file is partially staged
 check_partial_staging() {
+    # Check if file has both staged and unstaged changes
+    # Returns: 0 if partially staged, 1 if fully staged or not staged
     local file="$1"
     # Check if file has both staged and unstaged changes
     if git diff --cached --name-only | grep -q "^$file$" &&
@@ -86,8 +103,9 @@ check_partial_staging() {
     return 1 # Fully staged or not staged
 }
 
-# Warn about partially staged files
 warn_partial_staging() {
+    # Warn user about partially staged files that may be affected by auto-fixes
+    # Usage: warn_partial_staging "$STAGED_FILES"
     local files="$1"
     local any_partial=0
 
@@ -107,15 +125,17 @@ warn_partial_staging() {
     fi
 }
 
-# Check if a file has unstaged changes
 has_unstaged_changes() {
+    # Check if a file has unstaged changes
+    # Returns: 0 if file has unstaged changes, 1 if not
     local file="$1"
     git diff --quiet "$file" 2>/dev/null
     return $?
 }
 
-# Function to auto-stage fixed files
 auto_stage_fixes() {
+    # Stage auto-fixed files with partial staging awareness
+    # Usage: auto_stage_fixes "$FIXED_FILES" "TypeScript"
     local files="$1"
     local file_type="$2"
 
@@ -126,22 +146,25 @@ auto_stage_fixes() {
     fi
 }
 
-# Activate Python virtual environment if needed
 activate_venv() {
+    # Activate Python virtual environment if available
+    # Tries common venv paths: .venv, venv, .virtualenv, virtualenv
+    # Falls back to system Python tools if no venv found
+    
     # Skip if already in a virtual environment
     if [ -n "$VIRTUAL_ENV" ]; then
         debug "Already in virtual environment: $VIRTUAL_ENV"
         return 0
     fi
-    
+
     # Try to find and activate virtual environment
     local venv_paths=(".venv" "venv" ".virtualenv" "virtualenv")
     local venv_found=0
-    
+
     for venv_path in "${venv_paths[@]}"; do
         if [ -f "$PROJECT_ROOT/$venv_path/bin/activate" ]; then
             debug "Activating virtual environment: $venv_path"
-            # shellcheck disable=SC1091
+            # shellcheck disable=SC1090,SC1091
             if . "$PROJECT_ROOT/$venv_path/bin/activate" 2>/dev/null; then
                 venv_found=1
                 break
@@ -150,7 +173,7 @@ activate_venv() {
             fi
         fi
     done
-    
+
     if [ $venv_found -eq 0 ]; then
         # Check if Python tools are available in system
         if command -v ruff >/dev/null 2>&1 || command -v uv >/dev/null 2>&1; then
@@ -162,12 +185,13 @@ activate_venv() {
             return 1
         fi
     fi
-    
+
     return 0
 }
 
-# Check if tanaka.py itself is being modified
 check_tanaka_py_modified() {
+    # Check if tanaka.py or related scripts are being modified
+    # Returns: 0 if modified (warning condition), 1 if not
     if git diff --cached --name-only | grep -q "scripts/tanaka.py\|scripts/tasks/.*\.py"; then
         echo ""
         warn "Warning: Python scripts are being modified"
