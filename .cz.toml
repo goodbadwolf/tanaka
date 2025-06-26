@@ -1,0 +1,34 @@
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "0.5.0"
+tag_format = "v$version"
+version_files = [
+    "extension/manifest.json:version",
+    "extension/package.json:version",
+    "server/Cargo.toml:version",
+    "pyproject.toml:version"
+]
+
+[tool.commitizen.customize]
+schema_pattern = "^(feat|fix|docs|refactor|test|chore)(\\(\\w+\\))?:\\s.+"
+bump_pattern = "^(feat|fix|refactor)"
+message_template = "{{change_type}}: {{message}}"
+
+# Custom configuration to match the project's conventions
+[[tool.commitizen.customize.questions]]
+type = "list"
+name = "change_type"
+message = "Select the type of change you're committing:"
+choices = [
+    {value = "feat", name = "feat: New features or functionality"},
+    {value = "fix", name = "fix: Bug fixes"},
+    {value = "docs", name = "docs: Documentation changes only"},
+    {value = "refactor", name = "refactor: Code restructuring without changing behavior"},
+    {value = "test", name = "test: Adding or fixing tests"},
+    {value = "chore", name = "chore: Maintenance tasks (dependencies, config, etc.)"}
+]
+
+[[tool.commitizen.customize.questions]]
+type = "input"
+name = "message"
+message = "Write a short, imperative description of the change (lowercase, no period):"
