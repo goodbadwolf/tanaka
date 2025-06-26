@@ -3,6 +3,9 @@
 # Shell script linting function for pre-commit hook
 # Supports both shellcheck (linting) and shfmt (formatting)
 
+# Inherit logging functions from parent
+# These should be available when sourced from pre-commit
+
 lint_shell() {
     # Check if any shell scripts are staged
     STAGED_SH_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(sh|bash)$|^[^.]+$' | while read -r file; do
@@ -24,20 +27,20 @@ lint_shell() {
 
     # Check if shellcheck is available
     if ! command -v shellcheck >/dev/null 2>&1; then
-        echo "${C_YELLOW}⚠️  shellcheck not found. Install with:${C_NC}"
-        echo "${C_GRAY}   brew install shellcheck  # macOS${C_NC}"
-        echo "${C_GRAY}   apt install shellcheck   # Ubuntu/Debian${C_NC}"
+        warn "shellcheck not found. Install with:"
+        debug "   brew install shellcheck  # macOS"
+        debug "   apt install shellcheck   # Ubuntu/Debian"
         log_stage_finish "Shell Script Linting" "SKIPPED"
         return 0
     fi
 
     # Quick mode - syntax check only
     if [ $QUICK_MODE -eq 1 ]; then
-        echo "${C_GRAY}Quick mode: Running syntax check only${C_NC}"
+        debug "Quick mode: Running syntax check only"
         SYNTAX_ERROR=0
         for file in $STAGED_SH_FILES; do
             if ! bash -n "$file" 2>/dev/null; then
-                echo "${C_RED}Syntax error in $file${C_NC}"
+                error "Syntax error in $file"
                 SYNTAX_ERROR=1
             fi
         done
@@ -53,7 +56,7 @@ lint_shell() {
     fi
 
     # Run shellcheck
-    echo "${C_GRAY}Running shellcheck...${C_NC}"
+    debug "Running shellcheck..."
     SHELLCHECK_FAILED=0
     
     # Common shellcheck excludes for git hooks
@@ -69,7 +72,7 @@ lint_shell() {
 
     # Check if shfmt is available for auto-formatting
     if command -v shfmt >/dev/null 2>&1; then
-        echo "${C_GRAY}Running shfmt formatter...${C_NC}"
+        debug "Running shfmt formatter..."
         
         # shfmt options:
         # -i 4: indent with 4 spaces
@@ -96,15 +99,15 @@ lint_shell() {
             auto_stage_fixes "$FIXED_FILES" "shell script"
         fi
     else
-        echo "${C_GRAY}shfmt not found (optional). Install with:${C_NC}"
-        echo "${C_GRAY}   brew install shfmt  # macOS${C_NC}"
-        echo "${C_GRAY}   go install mvdan.cc/sh/v3/cmd/shfmt@latest  # via Go${C_NC}"
+        debug "shfmt not found (optional). Install with:"
+        debug "   brew install shfmt  # macOS"
+        debug "   go install mvdan.cc/sh/v3/cmd/shfmt@latest  # via Go"
     fi
 
     if [ $SHELLCHECK_FAILED -eq 1 ]; then
         log_stage_finish "Shell Script Linting" "FAILED"
-        echo "${C_YELLOW}Fix the shellcheck warnings before committing${C_NC}"
-        echo "${C_GRAY}Tip: Use # shellcheck disable=SC#### comments to suppress specific warnings${C_NC}"
+        warn "Fix the shellcheck warnings before committing"
+        debug "Tip: Use # shellcheck disable=SC#### comments to suppress specific warnings"
         ERRORS_FOUND=1
         return 1
     elif [ -n "$FIXED_FILES" ]; then
@@ -123,19 +126,19 @@ validate_shell_best_practices() {
     
     # Check for set -e (exit on error)
     if ! grep -q "^set -e" "$file"; then
-        echo "${C_YELLOW}   ⚠️  Consider adding 'set -e' for error handling${C_NC}"
+        warn "   Consider adding 'set -e' for error handling"
         ((warnings++))
     fi
     
     # Check for set -u (error on undefined variables)
     if ! grep -q "^set -u" "$file"; then
-        echo "${C_YELLOW}   ⚠️  Consider adding 'set -u' to catch undefined variables${C_NC}"
+        warn "   Consider adding 'set -u' to catch undefined variables"
         ((warnings++))
     fi
     
     # Check for unquoted variables (common source of bugs)
     if grep -E '\$[A-Za-z_][A-Za-z0-9_]*[^"]' "$file" | grep -v '^\s*#'; then
-        echo "${C_YELLOW}   ⚠️  Found potentially unquoted variables${C_NC}"
+        warn "   Found potentially unquoted variables"
         ((warnings++))
     fi
     
