@@ -160,15 +160,15 @@ This document tracks the migration from Husky to pre-commit for the Tanaka proje
 
 ### Phase 5: CI/CD Integration
 
-- [ ] **5.1 Add CI Workflow**
-  - [ ] Create `.github/workflows/pre-commit.yml`
-  - [ ] Run on all PRs
-  - [ ] Cache pre-commit environments
+- [x] **5.1 Add CI Workflow**
+  - [x] Create `.github/workflows/pre-commit.yml`
+  - [x] Run on all PRs
+  - [x] Cache pre-commit environments
 
-- [ ] **5.2 Configure pre-commit.ci (Optional)**
-  - [ ] Enable for auto-fixing PRs
-  - [ ] Configure update schedule
-  - [ ] Set appropriate permissions
+- [x] **5.2 Configure pre-commit.ci (Optional)**
+  - [x] Enable for auto-fixing PRs
+  - [x] Configure update schedule
+  - [x] Set appropriate permissions
 
 ### Phase 6: Migration Execution
 
