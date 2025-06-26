@@ -3,6 +3,10 @@
 # Common functions for all checker scripts
 # This file provides shared utilities used by all linting checkers
 
+# Get the project root directory (3 levels up from .husky/lib/)
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+export PROJECT_ROOT
+
 # Track global state
 FIXES_APPLIED=0
 ERRORS_FOUND=0
@@ -124,15 +128,42 @@ auto_stage_fixes() {
 
 # Activate Python virtual environment if needed
 activate_venv() {
-    if [ -z "$VIRTUAL_ENV" ]; then
-        if [ -f .venv/bin/activate ]; then
+    # Skip if already in a virtual environment
+    if [ -n "$VIRTUAL_ENV" ]; then
+        debug "Already in virtual environment: $VIRTUAL_ENV"
+        return 0
+    fi
+    
+    # Try to find and activate virtual environment
+    local venv_paths=(".venv" "venv" ".virtualenv" "virtualenv")
+    local venv_found=0
+    
+    for venv_path in "${venv_paths[@]}"; do
+        if [ -f "$PROJECT_ROOT/$venv_path/bin/activate" ]; then
+            debug "Activating virtual environment: $venv_path"
             # shellcheck disable=SC1091
-            . .venv/bin/activate || {
-                error "Failed to activate virtual environment"
-                return 1
-            }
+            if . "$PROJECT_ROOT/$venv_path/bin/activate" 2>/dev/null; then
+                venv_found=1
+                break
+            else
+                warn "Failed to activate $venv_path"
+            fi
+        fi
+    done
+    
+    if [ $venv_found -eq 0 ]; then
+        # Check if Python tools are available in system
+        if command -v ruff >/dev/null 2>&1 || command -v uv >/dev/null 2>&1; then
+            debug "No virtual environment found, using system Python tools"
+            return 0
+        else
+            warn "No virtual environment found and Python tools not in PATH"
+            debug "Consider running: python -m venv .venv && .venv/bin/pip install -r requirements-dev.txt"
+            return 1
         fi
     fi
+    
+    return 0
 }
 
 # Check if tanaka.py itself is being modified

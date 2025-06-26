@@ -34,13 +34,10 @@ check_rust() {
     # Check for partially staged files
     warn_partial_staging "$STAGED_RUST_FILES"
 
-    cd server || return 1
-
     # First run cargo fmt
     debug "Running cargo fmt..."
-    if cargo fmt --all; then
+    if (cd "$PROJECT_ROOT/server" && cargo fmt --all); then
         # Check which files were formatted
-        cd .. || return 1
         local FIXED_FILES=""
         for file in $STAGED_RUST_FILES; do
             if ! has_unstaged_changes "$file"; then
@@ -52,9 +49,9 @@ check_rust() {
             auto_stage_fixes "$FIXED_FILES" "Rust"
         fi
 
-        # In quick mode, skip clippy
+        # In quick mode, skip clippy and tests
         if [ "${QUICK_MODE:-0}" -eq 1 ]; then
-            debug "Quick mode: Skipping cargo clippy"
+            debug "Quick mode: Skipping cargo clippy and tests"
             if [ -n "$FIXED_FILES" ]; then
                 log_stage_finish "Rust Linting" "FIXED"
             else
@@ -63,26 +60,37 @@ check_rust() {
             return 0
         fi
 
-        # Now run clippy to check for issues
-        cd server || return 1
+        # Run clippy to check for issues
         debug "Running cargo clippy..."
-        if cargo clippy --all-targets --all-features -- -D warnings; then
-            cd .. || return 1
-            if [ -n "$FIXED_FILES" ]; then
-                log_stage_finish "Rust Linting" "FIXED"
-            else
-                log_stage_finish "Rust Linting" "PASSED"
-            fi
-            return 0
-        else
-            cd .. || return 1
+        local CLIPPY_FAILED=0
+        if ! (cd "$PROJECT_ROOT/server" && cargo clippy --all-targets --all-features -- -D warnings); then
+            CLIPPY_FAILED=1
+        fi
+
+        # Run tests
+        debug "Running cargo test..."
+        local TEST_FAILED=0
+        if ! (cd "$PROJECT_ROOT/server" && cargo test); then
+            TEST_FAILED=1
+        fi
+
+        if [ $CLIPPY_FAILED -eq 1 ] || [ $TEST_FAILED -eq 1 ]; then
             log_stage_finish "Rust Linting" "FAILED"
-            warn "Fix the clippy warnings before committing"
+            if [ $CLIPPY_FAILED -eq 1 ]; then
+                warn "Fix the clippy warnings before committing"
+            fi
+            if [ $TEST_FAILED -eq 1 ]; then
+                error "Tests must pass before committing"
+            fi
             ERRORS_FOUND=1
             return 1
+        elif [ -n "$FIXED_FILES" ]; then
+            log_stage_finish "Rust Linting" "FIXED"
+        else
+            log_stage_finish "Rust Linting" "PASSED"
         fi
+        return 0
     else
-        cd .. || return 1
         log_stage_finish "Rust Linting" "FAILED"
         ERRORS_FOUND=1
         return 1

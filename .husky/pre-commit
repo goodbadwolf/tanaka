@@ -182,6 +182,10 @@ else
     run_linters_parallel
 fi
 
+# Run non-blocking checkers (always sequential)
+check_roadmap
+check_documentation
+
 # Show summary and exit
 show_summary
 exit $?

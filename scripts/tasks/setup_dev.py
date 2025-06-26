@@ -315,6 +315,80 @@ class SqliteChecker(DependencyInstaller):
         return False
 
 
+class ShellcheckInstaller(DependencyInstaller):
+    """Handles shellcheck installation"""
+
+    def install(self) -> bool:
+        if self.check_command("shellcheck"):
+            version = self.get_version("shellcheck")
+            logger.success(f"shellcheck already installed: {version}")
+            return True
+
+        logger.info("Installing shellcheck...")
+        try:
+            if self.os_type == OSType.MACOS:
+                if self.check_command("brew"):
+                    self.run_command(["brew", "install", "shellcheck"])
+                    return True
+                else:
+                    logger.error("Homebrew is required to install shellcheck on macOS")
+                    return False
+            elif self.os_type == OSType.LINUX:
+                # Try different package managers
+                if self.check_command("apt-get"):
+                    self.run_command(["sudo", "apt-get", "update"], check=False)
+                    self.run_command(["sudo", "apt-get", "install", "-y", "shellcheck"])
+                    return True
+                elif self.check_command("dnf"):
+                    self.run_command(["sudo", "dnf", "install", "-y", "shellcheck"])
+                    return True
+                elif self.check_command("pacman"):
+                    self.run_command(["sudo", "pacman", "-S", "--noconfirm", "shellcheck"])
+                    return True
+                else:
+                    logger.error("No supported package manager found for Linux")
+                    return False
+        except Exception as e:
+            logger.error(f"Failed to install shellcheck: {e}")
+            return False
+
+
+class ShfmtInstaller(DependencyInstaller):
+    """Handles shfmt installation"""
+
+    def install(self) -> bool:
+        if self.check_command("shfmt"):
+            version = self.get_version("shfmt")
+            logger.success(f"shfmt already installed: {version}")
+            return True
+
+        logger.info("Installing shfmt...")
+        try:
+            if self.os_type == OSType.MACOS:
+                if self.check_command("brew"):
+                    self.run_command(["brew", "install", "shfmt"])
+                    return True
+                else:
+                    logger.error("Homebrew is required to install shfmt on macOS")
+                    return False
+            elif self.os_type == OSType.LINUX:
+                # Install via go for Linux
+                if self.check_command("go"):
+                    self.run_command(["go", "install", "mvdan.cc/sh/v3/cmd/shfmt@latest"])
+                    # Add go bin to PATH if needed
+                    go_bin = os.path.expanduser("~/go/bin")
+                    if go_bin not in os.environ.get("PATH", ""):
+                        os.environ["PATH"] = f"{go_bin}:{os.environ.get('PATH', '')}"
+                    return True
+                else:
+                    logger.warning("Go is required to install shfmt on Linux")
+                    logger.warning("Install Go first or use your package manager if shfmt is available")
+                    return False
+        except Exception as e:
+            logger.error(f"Failed to install shfmt: {e}")
+            return False
+
+
 class PythonInstaller(DependencyInstaller):
     """Handles Python installation using uv"""
 
@@ -375,6 +449,8 @@ class SetupManager:
         "venv": "env",
         "sqlite": "sys",
         "firefox": "sys",
+        "shellcheck": "dev",
+        "shfmt": "dev",
     }
 
     def __init__(self, dry_run: bool = False):
@@ -408,6 +484,8 @@ class SetupManager:
             "uv": UvInstaller(self.os_type, self.dry_run),
             "python": PythonInstaller(self.os_type, self.dry_run),
             "venv": VenvInstaller(self.os_type, self.dry_run),
+            "shellcheck": ShellcheckInstaller(self.os_type, self.dry_run),
+            "shfmt": ShfmtInstaller(self.os_type, self.dry_run),
         }
 
     def _create_dependencies(self) -> dict[str, Dependency]:
@@ -422,6 +500,8 @@ class SetupManager:
             "uv": Dependency(name="uv", check_cmd="uv"),
             "python": Dependency(name="python", depends_on=["uv"], check_cmd="uv python"),
             "venv": Dependency(name="venv", depends_on=["python", "uv"]),
+            "shellcheck": Dependency(name="shellcheck", check_cmd="shellcheck"),
+            "shfmt": Dependency(name="shfmt", check_cmd="shfmt"),
         }
 
     def resolve_dependencies(self, requested: set[str]) -> list[str]:
