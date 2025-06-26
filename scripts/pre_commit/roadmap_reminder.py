@@ -4,7 +4,6 @@ Roadmap Tracking Checker
 ========================
 
 Reminds developers to update roadmap documentation when implementing features.
-Port of .husky/lib/roadmap-checker.sh to Python for pre-commit.
 """
 
 import subprocess
