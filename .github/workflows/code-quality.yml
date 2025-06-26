@@ -10,52 +10,65 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      # Setup all required tools
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      # Cache pre-commit environments for faster runs
-      - name: Cache pre-commit
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pre-commit
-          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
-          restore-keys: |
-            pre-commit-${{ runner.os }}-
-
-      # Install Node.js for TypeScript checks
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-
-      # Install pnpm for TypeScript checks
       - uses: pnpm/action-setup@v4
         with:
           version: 10.11.0
 
-      # Install extension dependencies
-      - name: Install extension dependencies
-        run: |
-          cd extension
-          pnpm install --frozen-lockfile
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: 'pnpm'
+          cache-dependency-path: extension/pnpm-lock.yaml
 
-      # Install Rust for Rust checks
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
 
-      # Build Rust dependencies (needed for type generation)
-      - name: Build Rust dependencies
-        run: |
-          cd server
-          cargo build
+      # Cache all dependencies
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pre-commit
+            ~/.cargo/registry
+            ~/.cargo/git
+            server/target
+            extension/node_modules
+          key: ${{ runner.os }}-deps-${{ hashFiles('.pre-commit-config.yaml', '**/Cargo.lock', '**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-deps-
 
-      # Generate TypeScript types from Rust models
+      # Install dependencies in parallel
+      - name: Install all dependencies
+        run: |
+          echo "Installing extension dependencies..."
+          (cd extension && pnpm install --frozen-lockfile --prefer-offline) &
+
+          echo "Fetching Rust dependencies..."
+          (cd server && cargo fetch) &
+
+          # Wait for both to complete
+          wait
+
+      # Generate TypeScript types (much faster than full build)
       - name: Generate TypeScript types
         run: |
+          cd server
+          # Only compile what's needed for type generation
+          cargo check --lib
+          cd ..
           python3 scripts/tanaka.py generate
 
       # Run pre-commit
       - uses: pre-commit/action@v3.0.1
         with:
           extra_args: --all-files
+        env:
+          # Skip hooks that don't make sense in CI
+          SKIP: no-commit-to-branch
