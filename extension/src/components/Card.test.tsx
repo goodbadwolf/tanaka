@@ -9,14 +9,14 @@ describe('Card', () => {
 
   it('renders with header and footer', () => {
     const { getByText } = render(
-      <Card 
+      <Card
         header="Card Header"
         footer="Card Footer"
       >
         Card Body
       </Card>
     );
-    
+
     expect(getByText('Card Header')).toBeInTheDocument();
     expect(getByText('Card Body')).toBeInTheDocument();
     expect(getByText('Card Footer')).toBeInTheDocument();
@@ -56,21 +56,21 @@ describe('Card', () => {
     const { container } = render(
       <Card onClick={handleClick}>Clickable card</Card>
     );
-    
+
     const button = container.querySelector('button');
     expect(button).toBeInTheDocument();
     expect(button).toHaveClass('card', 'interactive');
-    
+
     fireEvent.click(button!);
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
 
   it('renders as div when onClick is not provided', () => {
     const { container } = render(<Card>Static card</Card>);
-    
+
     const div = container.querySelector('div.card');
     const button = container.querySelector('button');
-    
+
     expect(div).toBeInTheDocument();
     expect(button).not.toBeInTheDocument();
   });
@@ -79,13 +79,13 @@ describe('Card', () => {
     const { container } = render(
       <Card interactive>Interactive card</Card>
     );
-    
+
     expect(container.querySelector('.interactive')).toBeInTheDocument();
   });
 
   it('applies custom class names', () => {
     const { container } = render(
-      <Card 
+      <Card
         className="custom-card"
         headerClassName="custom-header"
         bodyClassName="custom-body"
@@ -96,7 +96,7 @@ describe('Card', () => {
         Body
       </Card>
     );
-    
+
     expect(container.querySelector('.custom-card')).toBeInTheDocument();
     expect(container.querySelector('.custom-header')).toBeInTheDocument();
     expect(container.querySelector('.custom-body')).toBeInTheDocument();
@@ -105,14 +105,14 @@ describe('Card', () => {
 
   it('renders complex content in slots', () => {
     const { getByText, getByRole } = render(
-      <Card 
+      <Card
         header={<h2>Complex Header</h2>}
         footer={<button>Footer Button</button>}
       >
         <p>Complex body content</p>
       </Card>
     );
-    
+
     expect(getByText('Complex Header').tagName).toBe('H2');
     expect(getByText('Complex body content').tagName).toBe('P');
     expect(getByRole('button', { name: 'Footer Button' })).toBeInTheDocument();
@@ -121,7 +121,7 @@ describe('Card', () => {
   it('combines multiple props correctly', () => {
     const handleClick = jest.fn();
     const { container } = render(
-      <Card 
+      <Card
         variant="elevated"
         padding="large"
         className="my-card"
@@ -131,7 +131,7 @@ describe('Card', () => {
         Test Content
       </Card>
     );
-    
+
     const card = container.querySelector('button.card');
     expect(card).toHaveClass('elevated', 'padding-large', 'interactive', 'my-card');
   });

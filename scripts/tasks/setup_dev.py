@@ -169,10 +169,7 @@ class PnpmInstaller(DependencyInstaller):
     def install(self) -> bool:
         if not self.check_command("npm"):
             nvm_cmd = (
-                'export NVM_DIR="$HOME/.nvm" && '
-                '[ -s "$NVM_DIR/nvm.sh" ] && '
-                '. "$NVM_DIR/nvm.sh" && '
-                "nvm use default"
+                'export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" && nvm use default'
             )
             self.run_command(nvm_cmd, shell=True, check=False)
 

@@ -196,7 +196,7 @@ pub trait TabRepository: Send + Sync {
        device_id TEXT NOT NULL,       -- Client identification
        updated_at INTEGER NOT NULL
    );
-   
+
    CREATE TABLE sync_state (
        client_id TEXT PRIMARY KEY,
        last_clock INTEGER NOT NULL,

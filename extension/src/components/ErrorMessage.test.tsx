@@ -33,16 +33,16 @@ describe('ErrorMessage', () => {
   it('shows dismiss button when dismissible and onDismiss provided', () => {
     const handleDismiss = jest.fn();
     const { getByLabelText } = render(
-      <ErrorMessage 
-        message="Dismissible error" 
+      <ErrorMessage
+        message="Dismissible error"
         dismissible={true}
         onDismiss={handleDismiss}
       />
     );
-    
+
     const dismissButton = getByLabelText('Dismiss message');
     expect(dismissButton).toBeInTheDocument();
-    
+
     fireEvent.click(dismissButton);
     expect(handleDismiss).toHaveBeenCalledTimes(1);
   });
@@ -50,24 +50,24 @@ describe('ErrorMessage', () => {
   it('hides dismiss button when not dismissible', () => {
     const handleDismiss = jest.fn();
     const { queryByLabelText } = render(
-      <ErrorMessage 
-        message="Non-dismissible error" 
+      <ErrorMessage
+        message="Non-dismissible error"
         dismissible={false}
         onDismiss={handleDismiss}
       />
     );
-    
+
     expect(queryByLabelText('Dismiss message')).not.toBeInTheDocument();
   });
 
   it('hides dismiss button when onDismiss not provided', () => {
     const { queryByLabelText } = render(
-      <ErrorMessage 
-        message="Error without handler" 
+      <ErrorMessage
+        message="Error without handler"
         dismissible={true}
       />
     );
-    
+
     expect(queryByLabelText('Dismiss message')).not.toBeInTheDocument();
   });
 
@@ -90,19 +90,19 @@ describe('ErrorMessage', () => {
 
   it('renders dismiss button with correct accessibility', () => {
     const { container } = render(
-      <ErrorMessage 
-        message="Test" 
+      <ErrorMessage
+        message="Test"
         onDismiss={() => {}}
       />
     );
-    
+
     const svg = container.querySelector('svg');
     expect(svg).toHaveAttribute('aria-hidden', 'true');
   });
 
   it('handles long messages gracefully', () => {
     const longMessage = 'This is a very long error message that should wrap properly and not break the layout of the error component when displayed';
-    
+
     const { getByText } = render(<ErrorMessage message={longMessage} />);
     expect(getByText(longMessage)).toBeInTheDocument();
   });
