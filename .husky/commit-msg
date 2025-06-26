@@ -1,0 +1,86 @@
+#!/bin/sh
+
+C_RED="\033[0;31m"
+C_YELLOW="\033[1;33m"
+C_GREEN="\033[0;32m"
+C_GRAY="\033[0;90m"
+C_BOLD="\033[1m"
+C_NC="\033[0m"
+
+COMMIT_MSG_FILE=$1
+COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
+
+# Allow skipping with environment variable
+if [ "$SKIP_COMMIT_MSG" = "1" ]; then
+    exit 0
+fi
+
+# Skip validation for merge commits
+if echo "$COMMIT_MSG" | grep -q "^Merge "; then
+    exit 0
+fi
+
+# Skip validation for revert commits
+if echo "$COMMIT_MSG" | grep -q "^Revert "; then
+    exit 0
+fi
+
+# Extract first line (title)
+TITLE=$(echo "$COMMIT_MSG" | head -n1)
+
+# Check if it matches the pattern: type: description
+if ! echo "$TITLE" | grep -qE '^(feat|fix|docs|refactor|test|chore):.+'; then
+    echo ""
+    echo "${C_RED}${C_BOLD}Invalid commit message format!${C_NC}"
+    echo ""
+    echo "${C_GRAY}Expected format:${C_NC}"
+    echo "  ${C_GREEN}<type>: <description>${C_NC}"
+    echo ""
+    echo "${C_GRAY}Valid types:${C_NC}"
+    echo "  ${C_YELLOW}feat${C_NC}     - New features or functionality"
+    echo "  ${C_YELLOW}fix${C_NC}      - Bug fixes"
+    echo "  ${C_YELLOW}docs${C_NC}     - Documentation changes only"
+    echo "  ${C_YELLOW}refactor${C_NC} - Code restructuring without changing behavior"
+    echo "  ${C_YELLOW}test${C_NC}     - Adding or fixing tests"
+    echo "  ${C_YELLOW}chore${C_NC}    - Maintenance tasks (dependencies, config, etc.)"
+    echo ""
+    echo "${C_GRAY}Examples:${C_NC}"
+    echo "  feat: add dark mode support"
+    echo "  fix: prevent duplicate tab sync on fast clicks"
+    echo "  docs: update installation instructions for macOS"
+    echo ""
+    echo "${C_GRAY}Your message:${C_NC}"
+    echo "  ${C_RED}$TITLE${C_NC}"
+    echo ""
+    echo "${C_GRAY}To skip validation (use sparingly):${C_NC}"
+    echo "  ${C_YELLOW}SKIP_COMMIT_MSG=1 git commit${C_NC}"
+    exit 1
+fi
+
+# Check title length (should be under 72 characters)
+TITLE_LENGTH=${#TITLE}
+if [ "$TITLE_LENGTH" -gt 72 ]; then
+    echo ""
+    echo "${C_YELLOW}${C_BOLD}Warning: Commit title is too long${C_NC}"
+    echo ""
+    echo "${C_GRAY}Title is $TITLE_LENGTH characters (recommended: ≤ 72)${C_NC}"
+    echo "${C_GRAY}Consider making it more concise${C_NC}"
+    echo ""
+fi
+
+# Check for lowercase after type
+TYPE=$(echo "$TITLE" | cut -d: -f1)
+DESCRIPTION=$(echo "$TITLE" | cut -d: -f2- | sed 's/^ *//')
+FIRST_CHAR=$(echo "$DESCRIPTION" | cut -c1)
+
+if echo "$FIRST_CHAR" | grep -q '[A-Z]'; then
+    echo ""
+    echo "${C_YELLOW}${C_BOLD}Style suggestion:${C_NC}"
+    echo "${C_GRAY}Don't capitalize first letter after type:${C_NC}"
+    echo ""
+    echo "  ${C_YELLOW}Current:${C_NC} $TYPE: $DESCRIPTION"
+    echo "  ${C_GREEN}Better:${C_NC}  $TYPE: $(echo "$DESCRIPTION" | sed 's/^\(.\)/\L\1/')"
+    echo ""
+fi
+
+exit 0
