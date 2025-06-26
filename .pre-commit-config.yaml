@@ -56,7 +56,7 @@ repos:
 
       - id: typescript
         name: Type check TypeScript
-        entry: python scripts/pre_commit/quick_mode.py typescript bash -c 'cd extension && pnpm run typecheck'
+        entry: bash -c 'cd extension && pnpm run typecheck'
         language: system
         files: ^extension/.*\.(ts|tsx)$
         pass_filenames: false
@@ -74,7 +74,7 @@ repos:
 
       - id: clippy
         name: Lint Rust code with clippy
-        entry: python scripts/pre_commit/quick_mode.py clippy bash -c 'cd server && cargo clippy --all-targets -- -D warnings'
+        entry: bash -c 'cd server && cargo clippy --all-targets -- -D warnings'
         language: system
         files: ^server/.*\.rs$
         pass_filenames: false
@@ -122,6 +122,5 @@ repos:
         exclude: tsconfig.json  # Has comments
 
 # Configuration for specific hooks
-# Quick mode: PRE_COMMIT_QUICK=1 git commit
 # Skip all: git commit --no-verify
 # Skip specific: SKIP=hook-id git commit
