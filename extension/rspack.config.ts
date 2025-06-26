@@ -71,7 +71,12 @@ export default defineConfig({
         },
       },
       {
+        test: /\.module\.css$/,
+        type: 'css/module',
+      },
+      {
         test: /\.css$/,
+        exclude: /\.module\.css$/,
         type: 'css',
       },
       {
@@ -88,17 +93,17 @@ export default defineConfig({
     isDev && new RefreshPlugin(),
     
     new HtmlRspackPlugin({
-      template: './src/popup/popup.html',
+      template: './src/popup/popup-template.html',
       filename: 'popup/popup.html',
       chunks: ['popup/popup'],
-      inject: true,
+      inject: false,
     }),
 
     new HtmlRspackPlugin({
-      template: './src/settings/settings.html',
+      template: './src/settings/settings-template.html',
       filename: 'settings/settings.html',
       chunks: ['settings/settings'],
-      inject: true,
+      inject: false,
     }),
 
     new rspack.CopyRspackPlugin({
@@ -161,26 +166,7 @@ export default defineConfig({
     usedExports: true, // Mark used exports
     innerGraph: true, // Enable inner graph optimizations
     runtimeChunk: false,
-    splitChunks: {
-      chunks: 'all',
-      cacheGroups: {
-        yjs: {
-          test: /[\\/]node_modules[\\/]yjs/,
-          name: 'vendor-yjs',
-          priority: 10,
-        },
-        preact: {
-          test: /[\\/]node_modules[\\/]preact/,
-          name: 'vendor-preact',
-          priority: 9,
-        },
-        polyfill: {
-          test: /[\\/]node_modules[\\/]webextension-polyfill/,
-          name: 'vendor-polyfill',
-          priority: 8,
-        },
-      },
-    },
+    splitChunks: false,
   },
 
   devServer: {

@@ -1,5 +1,5 @@
 import { JSX } from 'preact';
-import styles from './Button.module.css';
+import * as styles from './Button.module.css';
 
 export interface ButtonProps {
   variant?: 'primary' | 'secondary' | 'danger';

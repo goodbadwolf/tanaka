@@ -1,5 +1,5 @@
 import { ComponentChildren } from 'preact';
-import styles from './Card.module.css';
+import * as styles from './Card.module.css';
 
 export interface CardProps {
   header?: ComponentChildren;
