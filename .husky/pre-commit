@@ -1,18 +1,17 @@
 #!/bin/bash
 
 # Pre-commit hook that uses modular checkers
-# All linting logic is now in scripts/checkers/
+# All linting logic is now in .husky/lib/
 
 # Get the directory of this script
 HOOK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "${HOOK_DIR}/.." && pwd)"
 
 # Source common functions and all checkers
 # shellcheck disable=SC1091
-source "${PROJECT_ROOT}/scripts/checkers/common.sh"
+source "${HOOK_DIR}/lib/common.sh"
 
 # Source all checker modules
-for checker in "${PROJECT_ROOT}"/scripts/checkers/*-checker.sh; do
+for checker in "${HOOK_DIR}"/lib/*-checker.sh; do
     if [ -f "$checker" ]; then
         # shellcheck source=/dev/null
         source "$checker"

@@ -72,3 +72,65 @@ Use `git add -p` (patch mode) to:
 - Stage only specific parts of a file
 - Split large changes into logical commits
 - Keep commits focused on one change
+
+### Pre-commit Hooks
+
+This repository uses automated pre-commit hooks to ensure code quality. The hooks run various linters and formatters before each commit.
+
+#### Features
+
+- **Parallel Execution**: Linters run concurrently by default for better performance (30-70% faster)
+- **Quick Mode**: Skip expensive checks for rapid iteration with `PRE_COMMIT_QUICK=1`
+- **Auto-formatting**: Automatically fixes many issues (formatting, import ordering)
+- **Multi-language Support**: TypeScript, Rust, Python, Markdown, and Shell scripts
+- **Emergency Bypass**: Multiple options for urgent commits
+
+#### Usage
+
+```bash
+# Normal commit (runs all checks in parallel)
+git commit
+
+# Quick mode (syntax checks only)
+PRE_COMMIT_QUICK=1 git commit
+
+# Force sequential execution
+PRE_COMMIT_SEQUENTIAL=1 git commit
+
+# Skip hooks entirely (emergency use only)
+git commit --no-verify
+
+# Persistent bypass (remove to re-enable)
+touch .git/BYPASS_PRECOMMIT
+git commit
+rm .git/BYPASS_PRECOMMIT
+```
+
+#### Performance Tips
+
+- The hooks warn when linting more than 20 files
+- Use quick mode for rapid iteration during development
+- Auto-fixes are applied and staged automatically
+- Review changes with `git diff --cached` after auto-fixes
+
+#### Troubleshooting
+
+If pre-commit fails:
+
+1. **Review the error messages** - they include specific commands to fix issues
+2. **Check staged changes**: `git diff --cached`
+3. **Check unstaged changes**: `git diff`
+4. **Reset if needed**: `git reset` to unstage and review manually
+
+#### Required Tools
+
+Most tools are installed automatically, but for shell script linting:
+
+```bash
+# macOS
+brew install shellcheck shfmt
+
+# Linux
+apt-get install shellcheck
+go install mvdan.cc/sh/v3/cmd/shfmt@latest
+```
