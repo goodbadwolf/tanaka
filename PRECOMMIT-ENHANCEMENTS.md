@@ -6,8 +6,8 @@ This document summarizes the improvements made to the pre-commit hook system.
 
 1. **Parallel Execution Support** (1d56d9d)
    - Added `run_linters_parallel()` function for concurrent linting
-   - Enable via `PRE_COMMIT_PARALLEL=1` environment variable
-   - Maintains backward compatibility with sequential execution
+   - Now runs in parallel by default for better performance
+   - Use `PRE_COMMIT_SEQUENTIAL=1` to force sequential execution
    - Expected 30-70% speed improvement for multi-language commits
 
 2. **File Count Warnings** (478d35a)
@@ -40,10 +40,10 @@ This document summarizes the improvements made to the pre-commit hook system.
 
 ## Usage Examples
 
-### Enable Parallel Mode
+### Use Sequential Mode (Parallel is Default)
 ```bash
-# Via environment variable
-PRE_COMMIT_PARALLEL=1 git commit
+# Force sequential execution
+PRE_COMMIT_SEQUENTIAL=1 git commit
 ```
 
 ### Quick Mode (Syntax Checks Only)
@@ -65,7 +65,7 @@ rm .git/BYPASS_PRECOMMIT  # Re-enable
 
 ## Performance Improvements
 
-- **Parallel execution**: 30-70% faster for multi-language commits
+- **Parallel execution**: Now default! 30-70% faster for multi-language commits
 - **Quick mode**: Skip expensive checks for rapid iteration
 - **File count warnings**: Set expectations for large commits
 
@@ -86,5 +86,5 @@ To use these enhancements:
 
 2. Use environment variables for personal preferences:
    ```bash
-   export PRE_COMMIT_PARALLEL=1  # Always use parallel mode
+   export PRE_COMMIT_SEQUENTIAL=1  # Force sequential mode if preferred
    ```
