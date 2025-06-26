@@ -124,8 +124,17 @@ If pre-commit fails:
 
 #### Required Tools
 
-Most tools are installed automatically, but for shell script linting:
+All tools are installed automatically via the setup script:
 
+```bash
+# Install all shell linting tools
+uv run scripts/tanaka.py setup-dev --include shellcheck shfmt
+
+# Or install all development dependencies including shell tools
+uv run scripts/tanaka.py setup-dev
+```
+
+Manual installation (if needed):
 ```bash
 # macOS
 brew install shellcheck shfmt

@@ -34,35 +34,40 @@ check_typescript() {
     # Check for partially staged files
     warn_partial_staging "$STAGED_TS_FILES"
 
-    cd extension || return 1
-
     # Convert paths for the extension directory context
     RELATIVE_FILES=$(echo "$STAGED_TS_FILES" | sed 's|^extension/||g')
 
     if [ "${QUICK_MODE:-0}" -eq 1 ]; then
         debug "Quick mode: Running TypeScript compiler check only"
-        if pnpm exec tsc --noEmit; then
-            cd ..
+        if (cd "$PROJECT_ROOT/extension" && pnpm run typecheck); then
             log_stage_finish "TypeScript Linting" "PASSED"
             return 0
         else
-            cd ..
             log_stage_finish "TypeScript Linting" "FAILED"
             ERRORS_FOUND=1
             return 1
         fi
     fi
 
-    debug "Running Prettier..."
-    local PRETTIER_FAILED=0
-    echo "$RELATIVE_FILES" | xargs pnpm exec prettier --write || PRETTIER_FAILED=1
+    debug "Running formatter (pnpm run format)..."
+    local FORMAT_FAILED=0
+    if ! (cd "$PROJECT_ROOT/extension" && pnpm run format); then
+        FORMAT_FAILED=1
+    fi
 
-    debug "Running ESLint..."
-    local ESLINT_FAILED=0
-    echo "$RELATIVE_FILES" | xargs pnpm exec eslint --fix || ESLINT_FAILED=1
+    debug "Running linter (pnpm run lint:fix)..."
+    local LINT_FAILED=0
+    if ! (cd "$PROJECT_ROOT/extension" && pnpm run lint:fix); then
+        LINT_FAILED=1
+    fi
+
+    debug "Running type checker (pnpm run typecheck)..."
+    local TYPECHECK_FAILED=0
+    if ! (cd "$PROJECT_ROOT/extension" && pnpm run typecheck); then
+        TYPECHECK_FAILED=1
+    fi
 
     # Check which files were actually modified and stage them
-    cd .. || return 1
     local FIXED_FILES=""
     for file in $STAGED_TS_FILES; do
         if ! has_unstaged_changes "$file"; then
@@ -74,8 +79,11 @@ check_typescript() {
         auto_stage_fixes "$FIXED_FILES" "TypeScript"
     fi
 
-    if [ $PRETTIER_FAILED -eq 1 ] || [ $ESLINT_FAILED -eq 1 ]; then
+    if [ $FORMAT_FAILED -eq 1 ] || [ $LINT_FAILED -eq 1 ] || [ $TYPECHECK_FAILED -eq 1 ]; then
         log_stage_finish "TypeScript Linting" "FAILED"
+        if [ $TYPECHECK_FAILED -eq 1 ]; then
+            error "TypeScript type errors must be fixed before committing"
+        fi
         ERRORS_FOUND=1
         return 1
     elif [ -n "$FIXED_FILES" ]; then
