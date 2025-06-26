@@ -1,4 +1,4 @@
-import styles from './LoadingSpinner.module.css';
+import * as styles from './LoadingSpinner.module.css';
 
 export interface LoadingSpinnerProps {
   size?: 'small' | 'medium' | 'large';

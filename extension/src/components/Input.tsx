@@ -1,6 +1,6 @@
 import { JSX } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
-import styles from './Input.module.css';
+import * as styles from './Input.module.css';
 
 export interface InputProps {
   type?: 'text' | 'email' | 'password' | 'url' | 'number';
