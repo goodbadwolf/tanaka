@@ -1,12 +1,35 @@
 #!/bin/bash
 
-C_RED="\033[0;31m"
-C_YELLOW="\033[1;33m"
-C_BLUE="\033[0;34m"
-C_GREEN="\033[0;32m"
-C_GRAY="\033[0;90m"
-C_BOLD="\033[1m"
-C_NC="\033[0m"
+# Emit function for color output that respects terminal capabilities
+emit() {
+    local color="$1"
+    local message="$2"
+    
+    # Check if stdout is a terminal
+    if [ -t 1 ]; then
+        # Terminal - use color
+        case "$color" in
+            red)     echo -e "\033[0;31m${message}\033[0m" ;;
+            green)   echo -e "\033[0;32m${message}\033[0m" ;;
+            yellow)  echo -e "\033[1;33m${message}\033[0m" ;;
+            blue)    echo -e "\033[0;34m${message}\033[0m" ;;
+            gray)    echo -e "\033[0;90m${message}\033[0m" ;;
+            bold)    echo -e "\033[1m${message}\033[0m" ;;
+            *)       echo "$message" ;;  # No color for unknown
+        esac
+    else
+        # Not a terminal (pipe, file, etc) - no color
+        echo "$message"
+    fi
+}
+
+# Logging functions
+debug() { emit "gray" "$1"; }
+info() { emit "blue" "$1"; }
+warn() { emit "yellow" "$1"; }
+error() { emit "red" "$1"; }
+success() { emit "green" "$1"; }
+header() { emit "bold" "$1"; }
 
 # Track if we made any auto-fixes
 FIXES_APPLIED=0
@@ -17,19 +40,19 @@ PARTIAL_STAGING_WARNING=0
 # Check for quick mode
 QUICK_MODE=0
 if [ "$PRE_COMMIT_QUICK" = "1" ]; then
-    echo "${C_YELLOW}⚡ Running in quick mode (syntax checks only)${C_NC}"
+    warn "Running in quick mode (syntax checks only)"
     QUICK_MODE=1
 fi
 
 # Allow skipping with environment variable
 if [ "$SKIP_PRE_COMMIT" = "1" ]; then
-    echo "${C_YELLOW}⚠️  Pre-commit checks skipped (SKIP_PRE_COMMIT=1)${C_NC}"
+    warn "Pre-commit checks skipped (SKIP_PRE_COMMIT=1)"
     exit 0
 fi
 
 # Emergency bypass file check
 if [ -f ".git/BYPASS_PRECOMMIT" ]; then
-    echo "${C_YELLOW}⚠️  Bypassing pre-commit (remove .git/BYPASS_PRECOMMIT to re-enable)${C_NC}"
+    warn "Bypassing pre-commit (remove .git/BYPASS_PRECOMMIT to re-enable)"
     exit 0
 fi
 
@@ -37,8 +60,8 @@ fi
 log_stage_start() {
     local stage_name="$1"
     echo ""
-    echo "${C_BOLD}Stage ${stage_name}: Started${C_NC}"
-    echo "${C_GRAY}────────────────────────────────────────${C_NC}"
+    header "Stage ${stage_name}: Started"
+    debug "────────────────────────────────────────"
 }
 
 # Function to log stage skip
@@ -46,30 +69,30 @@ log_stage_skip() {
     local stage_name="$1"
     local reason="$2"
     echo ""
-    echo "${C_BOLD}Stage ${stage_name}: Skipped${C_NC} ${C_GRAY}(${reason})${C_NC}"
+    header "Stage ${stage_name}: Skipped"
+    debug "(${reason})"
 }
 
 # Function to log stage finish
 log_stage_finish() {
     local stage_name="$1"
     local result="$2"
-    local color="${C_GREEN}"
 
+    debug "────────────────────────────────────────"
     if [ "$result" = "FAILED" ]; then
-        color="${C_RED}"
+        error "Stage ${stage_name}: Finished with ${result}"
     elif [ "$result" = "FIXED" ]; then
-        color="${C_YELLOW}"
+        warn "Stage ${stage_name}: Finished with ${result}"
+    else
+        success "Stage ${stage_name}: Finished with ${result}"
     fi
-
-    echo "${C_GRAY}────────────────────────────────────────${C_NC}"
-    echo "${C_BOLD}Stage ${stage_name}: Finished with ${color}${result}${C_NC}"
 }
 
 # Check if we're in a merge/rebase
 check_merge_conflict() {
     if [ -f .git/MERGE_HEAD ] || [ -d .git/rebase-merge ] || [ -d .git/rebase-apply ]; then
-        echo "${C_YELLOW}⚠️  Detected merge/rebase in progress${C_NC}"
-        echo "${C_GRAY}Skipping pre-commit hooks during merge${C_NC}"
+        warn "Detected merge/rebase in progress"
+        debug "Skipping pre-commit hooks during merge"
         exit 0
     fi
 }
@@ -78,9 +101,9 @@ check_merge_conflict() {
 check_tanaka_py_modified() {
     if git diff --cached --name-only | grep -q "scripts/tanaka.py\|scripts/tasks/.*\.py"; then
         echo ""
-        echo "${C_YELLOW}⚠️  Warning: Python scripts are being modified${C_NC}"
-        echo "${C_GRAY}Some linting checks may behave unexpectedly${C_NC}"
-        echo "${C_GRAY}Consider running checks manually after commit${C_NC}"
+        warn "Warning: Python scripts are being modified"
+        debug "Some linting checks may behave unexpectedly"
+        debug "Consider running checks manually after commit"
         return 0
     fi
     return 1
@@ -105,16 +128,16 @@ warn_partial_staging() {
     for file in $files; do
         if check_partial_staging "$file"; then
             if [ $any_partial -eq 0 ]; then
-                echo "${C_YELLOW}⚠️  Partially staged files detected:${C_NC}"
+                warn "Partially staged files detected:"
                 any_partial=1
                 PARTIAL_STAGING_WARNING=1
             fi
-            echo "${C_GRAY}   - $file${C_NC}"
+            debug "   - $file"
         fi
     done
 
     if [ $any_partial -eq 1 ]; then
-        echo "${C_GRAY}   Auto-fixes will affect the entire file${C_NC}"
+        debug "   Auto-fixes will affect the entire file"
     fi
 }
 
@@ -123,7 +146,7 @@ activate_venv() {
         if [ -f .venv/bin/activate ]; then
             # shellcheck disable=SC1091
             . .venv/bin/activate || {
-                echo "${C_RED}Failed to activate virtual environment${C_NC}"
+                error "Failed to activate virtual environment"
                 exit 1
             }
         fi
@@ -136,7 +159,7 @@ auto_stage_fixes() {
     local file_type="$2"
 
     if [ -n "$files" ]; then
-        echo "${C_GREEN}Auto-staging fixed ${file_type} files...${C_NC}"
+        success "Auto-staging fixed ${file_type} files..."
         echo "$files" | xargs git add
         FIXES_APPLIED=1
     fi
@@ -170,7 +193,7 @@ lint_markdown() {
     # Show file count warning if many files
     local file_count=$(echo "$MD_STAGED" | wc -w | tr -d ' ')
     if [ "$file_count" -gt 20 ]; then
-        echo "${C_YELLOW}⚠️  Linting $file_count markdown files (this may take a moment)${C_NC}"
+        warn "Linting $file_count markdown files (this may take a moment)"
     fi
 
     # Check for partially staged files
@@ -178,7 +201,7 @@ lint_markdown() {
 
     # Quick mode - just check if files exist
     if [ $QUICK_MODE -eq 1 ]; then
-        echo "${C_GRAY}Quick mode: Skipping markdown linting${C_NC}"
+        debug "Quick mode: Skipping markdown linting"
         log_stage_finish "Markdown Linting" "SKIPPED"
         return 0
     fi
@@ -189,7 +212,7 @@ lint_markdown() {
     )
 
     if [ $TANAKA_PY_MODIFIED -eq 0 ]; then
-        echo "${C_YELLOW}Using basic markdown check due to script modifications${C_NC}"
+        warn "Using basic markdown check due to script modifications"
         # Fallback to basic check
         if command -v pymarkdownlnt >/dev/null 2>&1; then
             if pymarkdownlnt scan $MD_STAGED; then
@@ -201,14 +224,14 @@ lint_markdown() {
                 return 1
             fi
         else
-            echo "${C_GRAY}pymarkdownlnt not found, skipping markdown check${C_NC}"
+            debug "pymarkdownlnt not found, skipping markdown check"
             log_stage_finish "Markdown Linting" "SKIPPED"
             return 0
         fi
     fi
 
     # Normal path using tanaka.py
-    echo "${C_GRAY}Attempting to auto-fix markdown issues...${C_NC}"
+    debug "Attempting to auto-fix markdown issues..."
     if python3 scripts/tanaka.py lint --markdown --fix >/dev/null 2>&1; then
         # Check which files were actually modified
         FIXED_FILES=""
@@ -227,7 +250,7 @@ lint_markdown() {
         return 0
     else
         # If auto-fix failed, run without fix to show errors
-        echo "${C_YELLOW}Auto-fix failed, showing errors:${C_NC}"
+        warn "Auto-fix failed, showing errors:"
         python3 scripts/tanaka.py lint --markdown || {
             log_stage_finish "Markdown Linting" "FAILED"
             ERRORS_FOUND=1
@@ -255,7 +278,7 @@ lint_typescript() {
     # Show file count warning if many files
     local file_count=$(echo "$STAGED_TS_FILES" | wc -w | tr -d ' ')
     if [ "$file_count" -gt 20 ]; then
-        echo "${C_YELLOW}⚠️  Linting $file_count TypeScript files (this may take a moment)${C_NC}"
+        warn "Linting $file_count TypeScript files (this may take a moment)"
     fi
 
     # Check for partially staged files
@@ -267,7 +290,7 @@ lint_typescript() {
     RELATIVE_FILES=$(echo "$STAGED_TS_FILES" | sed 's|^extension/||g')
 
     if [ $QUICK_MODE -eq 1 ]; then
-        echo "${C_GRAY}Quick mode: Running TypeScript compiler check only${C_NC}"
+        debug "Quick mode: Running TypeScript compiler check only"
         if pnpm exec tsc --noEmit; then
             cd ..
             log_stage_finish "TypeScript Linting" "PASSED"
@@ -280,11 +303,11 @@ lint_typescript() {
         fi
     fi
 
-    echo "${C_GRAY}Running Prettier...${C_NC}"
+    debug "Running Prettier..."
     PRETTIER_FAILED=0
     echo "$RELATIVE_FILES" | xargs pnpm exec prettier --write || PRETTIER_FAILED=1
 
-    echo "${C_GRAY}Running ESLint...${C_NC}"
+    debug "Running ESLint..."
     ESLINT_FAILED=0
     echo "$RELATIVE_FILES" | xargs pnpm exec eslint --fix || ESLINT_FAILED=1
 
@@ -333,7 +356,7 @@ lint_rust() {
     # Show file count warning if many files
     local file_count=$(echo "$STAGED_RUST_FILES" | wc -w | tr -d ' ')
     if [ "$file_count" -gt 20 ]; then
-        echo "${C_YELLOW}⚠️  Linting $file_count Rust files (this may take a moment)${C_NC}"
+        warn "Linting $file_count Rust files (this may take a moment)"
     fi
 
     # Check for partially staged files
@@ -342,7 +365,7 @@ lint_rust() {
     cd server || return 1
 
     # First run cargo fmt
-    echo "${C_GRAY}Running cargo fmt...${C_NC}"
+    debug "Running cargo fmt..."
     if cargo fmt --all; then
         # Check which files were formatted
         cd .. || return 1
@@ -359,7 +382,7 @@ lint_rust() {
 
         # In quick mode, skip clippy
         if [ $QUICK_MODE -eq 1 ]; then
-            echo "${C_GRAY}Quick mode: Skipping cargo clippy${C_NC}"
+            debug "Quick mode: Skipping cargo clippy"
             if [ -n "$FIXED_FILES" ]; then
                 log_stage_finish "Rust Linting" "FIXED"
             else
@@ -370,7 +393,7 @@ lint_rust() {
 
         # Now run clippy to check for issues
         cd server || return 1
-        echo "${C_GRAY}Running cargo clippy...${C_NC}"
+        debug "Running cargo clippy..."
         if cargo clippy --all-targets --all-features -- -D warnings; then
             cd .. || return 1
             if [ -n "$FIXED_FILES" ]; then
@@ -382,7 +405,7 @@ lint_rust() {
         else
             cd .. || return 1
             log_stage_finish "Rust Linting" "FAILED"
-            echo "${C_YELLOW}Fix the clippy warnings before committing${C_NC}"
+            warn "Fix the clippy warnings before committing"
             ERRORS_FOUND=1
             return 1
         fi
@@ -408,7 +431,7 @@ lint_python() {
     # Show file count warning if many files
     local file_count=$(echo "$STAGED_PY_FILES" | wc -w | tr -d ' ')
     if [ "$file_count" -gt 20 ]; then
-        echo "${C_YELLOW}⚠️  Linting $file_count Python files (this may take a moment)${C_NC}"
+        warn "Linting $file_count Python files (this may take a moment)"
     fi
 
     # Check for partially staged files
@@ -421,16 +444,16 @@ lint_python() {
 
     if [ $TANAKA_PY_MODIFIED -eq 0 ] || [ $QUICK_MODE -eq 1 ]; then
         if [ $TANAKA_PY_MODIFIED -eq 0 ]; then
-            echo "${C_YELLOW}Running basic Python checks due to script modifications${C_NC}"
+            warn "Running basic Python checks due to script modifications"
         else
-            echo "${C_GRAY}Quick mode: Running syntax check only${C_NC}"
+            debug "Quick mode: Running syntax check only"
         fi
 
         # Just check syntax
         SYNTAX_ERROR=0
         for file in $STAGED_PY_FILES; do
             if ! python3 -m py_compile "$file" 2>/dev/null; then
-                echo "${C_RED}Syntax error in $file${C_NC}"
+                error "Syntax error in $file"
                 SYNTAX_ERROR=1
             fi
         done
@@ -446,7 +469,7 @@ lint_python() {
     fi
 
     # Normal path
-    echo "${C_GRAY}Running Python formatters...${C_NC}"
+    debug "Running Python formatters..."
 
     # Run ruff with fix
     RUFF_FAILED=0
@@ -487,56 +510,56 @@ show_summary() {
     DURATION=$((END_TIME - START_TIME))
 
     echo ""
-    echo "${C_BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${C_NC}"
-    echo "${C_BOLD}Pre-commit Summary${C_NC} ${C_GRAY}(${DURATION}s)${C_NC}"
-    echo "${C_BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${C_NC}"
+    info "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    header "Pre-commit Summary (${DURATION}s)"
+    info "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
     if [ $PARTIAL_STAGING_WARNING -eq 1 ]; then
         echo ""
-        echo "${C_YELLOW}⚠️  Warning: Some files were partially staged${C_NC}"
-        echo "${C_GRAY}Auto-fixes were applied to entire files${C_NC}"
-        echo "${C_GRAY}Review carefully before committing${C_NC}"
+        warn "Warning: Some files were partially staged"
+        debug "Auto-fixes were applied to entire files"
+        debug "Review carefully before committing"
     fi
 
     if [ $FIXES_APPLIED -eq 1 ]; then
         echo ""
-        echo "${C_YELLOW}⚡ Auto-fixes were applied and staged${C_NC}"
+        warn "Auto-fixes were applied and staged"
         echo ""
-        echo "${C_GRAY}Review the changes:${C_NC}"
-        echo "  ${C_GREEN}git diff --cached${C_NC}     ${C_GRAY}# See what will be committed${C_NC}"
-        echo "  ${C_GREEN}git diff${C_NC}            ${C_GRAY}# See any remaining unstaged changes${C_NC}"
+        debug "Review the changes:"
+        echo "  git diff --cached     # See what will be committed"
+        echo "  git diff              # See any remaining unstaged changes"
         echo ""
-        echo "${C_GRAY}Options:${C_NC}"
-        echo "  ${C_GREEN}git commit${C_NC}          ${C_GRAY}# Accept fixes and commit${C_NC}"
-        echo "  ${C_YELLOW}git reset${C_NC}           ${C_GRAY}# Unstage everything to review manually${C_NC}"
-        echo "  ${C_YELLOW}git reset <file>${C_NC}    ${C_GRAY}# Unstage specific file${C_NC}"
+        debug "Options:"
+        echo "  git commit            # Accept fixes and commit"
+        echo "  git reset             # Unstage everything to review manually"
+        echo "  git reset <file>      # Unstage specific file"
     fi
 
     if [ $ERRORS_FOUND -eq 1 ]; then
         echo ""
-        echo "${C_RED}✗ Some checks failed and need manual fixes${C_NC}"
+        error "Some checks failed and need manual fixes"
         echo ""
-        echo "${C_GRAY}To troubleshoot:${C_NC}"
-        echo "  ${C_GREEN}git diff --cached${C_NC}   ${C_GRAY}# Review staged changes${C_NC}"
-        echo "  ${C_GREEN}git status${C_NC}          ${C_GRAY}# Check file states${C_NC}"
+        debug "To troubleshoot:"
+        echo "  git diff --cached     # Review staged changes"
+        echo "  git status            # Check file states"
         echo ""
-        echo "${C_GRAY}To bypass hooks (use sparingly):${C_NC}"
-        echo "  ${C_YELLOW}git commit --no-verify${C_NC}"
-        echo "  ${C_YELLOW}touch .git/BYPASS_PRECOMMIT${C_NC} ${C_GRAY}# For persistent bypass${C_NC}"
+        debug "To bypass hooks (use sparingly):"
+        echo "  git commit --no-verify"
+        echo "  touch .git/BYPASS_PRECOMMIT     # For persistent bypass"
         return 1
     else
         echo ""
-        echo "${C_GREEN}✓ All checks passed!${C_NC}"
+        success "All checks passed!"
         if [ $QUICK_MODE -eq 1 ]; then
-            echo "${C_GRAY}Note: Quick mode was enabled - some checks were skipped${C_NC}"
+            debug "Note: Quick mode was enabled - some checks were skipped"
         fi
         return 0
     fi
 }
 
 # Main execution
-echo "${C_BOLD}Running pre-commit checks...${C_NC}"
-echo "${C_GRAY}Tip: Use PRE_COMMIT_QUICK=1 for faster commits${C_NC}"
+header "Running pre-commit checks..."
+debug "Tip: Use PRE_COMMIT_QUICK=1 for faster commits"
 echo ""
 
 check_merge_conflict
@@ -549,7 +572,7 @@ run_linters_parallel() {
     results_dir=$(mktemp -d)
     
     # Start all linters in background
-    echo "${C_GRAY}Running linters in parallel...${C_NC}"
+    debug "Running linters in parallel..."
     
     (lint_markdown; echo $? > "$results_dir/markdown") & pids="$pids $!"
     (lint_typescript; echo $? > "$results_dir/typescript") & pids="$pids $!"
