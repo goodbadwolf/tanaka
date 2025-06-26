@@ -6,13 +6,13 @@ on:
     branches: [main]
 
 jobs:
-  pre-commit:
+  code-quality:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
       # Cache pre-commit environments for faster runs
       - name: Cache pre-commit
@@ -26,7 +26,7 @@ jobs:
       # Install Node.js for TypeScript checks
       - uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: "24"
 
       # Install pnpm for TypeScript checks
       - uses: pnpm/action-setup@v4
@@ -43,6 +43,17 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
+
+      # Build Rust dependencies (needed for type generation)
+      - name: Build Rust dependencies
+        run: |
+          cd server
+          cargo build
+
+      # Generate TypeScript types from Rust models
+      - name: Generate TypeScript types
+        run: |
+          python3 scripts/tanaka.py generate
 
       # Run pre-commit
       - uses: pre-commit/action@v3.0.1
