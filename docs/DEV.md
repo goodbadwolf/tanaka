@@ -158,7 +158,12 @@ When developing locally, you may not need production certificates. You can:
 
 ## 5. Running tests & lint
 
+Pre-commit hooks automatically run linters and formatters. To run manually:
+
 ```bash
+# Run all pre-commit hooks
+pre-commit run --all-files
+
 # Rust Server
 cd ../server
 cargo fmt --all && cargo clippy --all-targets -- -D warnings

@@ -138,27 +138,36 @@ feat: refactor entire build system with new error handling and process managemen
   - `/server/config` - Example configuration files
 - `/docs` - Project documentation
 
-### Pre-commit Checklist
+### Pre-commit Hooks
 
-**ALWAYS run before committing:**
+This project uses [pre-commit](https://pre-commit.com/) to automatically check code quality before commits.
+
+**Hooks run automatically on commit and will:**
+- Format Python, TypeScript, Rust, Shell, and Markdown files
+- Run linters and type checkers
+- Validate commit messages
+- Show documentation reminders
+- Auto-fix many issues
+
+**Manual checks (if needed):**
 
 1. **TypeScript** (in extension directory):
-
    ```bash
    pnpm run lint        # ESLint checks
    pnpm run typecheck   # TypeScript type checking
-   pnpm run format      # Prettier formatting (optional)
    ```
 
 2. **Rust** (in server directory):
-
    ```bash
    cargo fmt            # Format code
    cargo clippy         # Linting
    cargo test           # Run tests
    ```
 
-3. **Markdown**: Auto-runs via git hooks. Fix missing blank lines around code blocks/lists if it fails.
+3. **Run all pre-commit hooks manually**:
+   ```bash
+   pre-commit run --all-files
+   ```
 
 4. **Documentation**: Review and update if needed:
    - README.md - feature status, version roadmap
