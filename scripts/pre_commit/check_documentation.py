@@ -4,7 +4,6 @@ Documentation Update Checker
 ============================
 
 Reminds developers to update docs when making significant changes.
-Port of .husky/lib/documentation-checker.sh to Python for pre-commit.
 """
 
 import subprocess
