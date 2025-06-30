@@ -40,7 +40,7 @@ server/src/
 | **Clean Architecture**   | Repository/Service/Domain layers | Direct DB in handlers | Repository pattern + service layer                  |
 | **Dependency Injection** | Symbol‑token DI container        | Hard‑wired deps       | Trait‑based DI (`shaku`), `Arc<dyn Trait>`          |
 | **Configuration**        | Env‑based settings               | Hard‑coded values     | TOML config + env overrides                         |
-| **Testing**              |  86.8 % coverage                 | 0 %                   | Unit + integration tests, fixtures                  |
+| **Testing**              | 86.8% coverage (extension)       | 0% (server)           | Unit + integration tests, fixtures                  |
 | **Observability**        | Tracing + metrics utilities      | None                  | `metrics`, `prometheus`, `tracing-opentelemetry`    |
 | **Validation**           | Type guards & runtime checks     | None                  | Request & domain validation layer                   |
 | **Modularity**           | Feature‑based folders            | Flat structure        | Domain‑oriented modules                             |
@@ -49,7 +49,7 @@ server/src/
 
 ## Recommended Architecture (v1.0)
 
-### Target Structure: Option 1
+### Target Structure: Option 1 (Simpler)
 
 ```text
 server/src/
@@ -66,7 +66,7 @@ server/src/
 └── lib.rs                       – Public exports
 ```
 
-### Target Structure: Option 2
+### Target Structure: Option 2 (More Detailed)
 
 ```
 server/src/
@@ -132,6 +132,8 @@ pub trait TabRepository: Send + Sync {
 ```
 
 ### Service Layer & DI (using **shaku**)
+
+> **Note**: Check [shaku's latest version](https://crates.io/crates/shaku) for current best practices.
 
 - Register repositories, services, and validators in a `shaku::Module`.
 - Resolve once in `main.rs`, pass via Axum `Extension`.
