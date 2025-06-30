@@ -352,8 +352,6 @@ criterion = "0.5"
 
 This architecture will elevate the server to match the extension's robustness while remaining performant and observable.
 
----
-
 ## Related Documents
 
 - **Implementation Steps**: See [@docs/SERVER-ROADMAP-v1.0-STEPS.md](SERVER-ROADMAP-v1.0-STEPS.md) for detailed branch and commit organization
