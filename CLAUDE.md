@@ -117,7 +117,7 @@ feat: refactor entire build system with new error handling and process managemen
 - **Overview**: See @README.md
 - **Architecture & Dev Guide**: See @docs/DEV.md
 - **Installation**: See @docs/INSTALL.md
-- **Roadmap**: See @docs/ROADMAP-v0.5-v1.0.md
+- **Roadmap**: See @docs/ROADMAP.md
 
 ## AI Agent Guidelines
 
@@ -177,9 +177,8 @@ This project uses [pre-commit](https://pre-commit.com/) to automatically check c
 
 5. **Roadmap Tracking** (IMPORTANT for active development):
    - When working on roadmap items, include doc updates in the same commit
-   - Update ROADMAP-v0.5-v1.0.md: mark items complete, update metrics
-   - Update ROADMAP-v0.5-v1.0-STEPS.md: check off commits, add deviation notes
-   - Example: `git add src/feature.ts docs/ROADMAP*.md && git commit`
+   - Update ROADMAP.md: mark items complete, update metrics and progress
+   - Example: `git add src/feature.ts docs/ROADMAP.md && git commit`
 
 ### Common Tasks
 
@@ -378,9 +377,9 @@ git commit -m "refactor: simplify message validation"
 
 See @docs/DEV.md for all development commands.
 
-### Server Development
+### Development Roadmap
 
-For server improvement roadmap and architectural patterns, see [@docs/SERVER-ROADMAP-v1.0.md](docs/SERVER-ROADMAP-v1.0.md).
+For the unified development roadmap covering both extension and server improvements, see [@docs/ROADMAP.md](docs/ROADMAP.md).
 
 ### Misc
 

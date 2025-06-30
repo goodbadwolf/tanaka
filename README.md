@@ -90,9 +90,7 @@ Tanaka uses a client-server architecture with CRDT-based synchronization. For de
 - [ ] P2P sync option
 - [ ] Collaborative tab sharing
 
-**For detailed implementation tasks, see** :
-
-- v0.5 to v1.0: [docs/ROADMAP-v0.5-v1.0.md](docs/ROADMAP-v0.5-v1.0.md)
+**For detailed implementation tasks, see**: [docs/ROADMAP.md](docs/ROADMAP.md)
 
 ---
 

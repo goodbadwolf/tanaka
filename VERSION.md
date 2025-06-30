@@ -47,7 +47,7 @@ Completing the UI modernization started in v0.5.0 while maintaining the stable c
 - [ ] Single-binary server distribution
 
 ### Server Improvements
-Complete architectural overhaul as detailed in [SERVER-ROADMAP-v1.0.md](docs/SERVER-ROADMAP-v1.0.md)
+Complete architectural overhaul as detailed in [ROADMAP.md](docs/ROADMAP.md)
 
 ---
 
