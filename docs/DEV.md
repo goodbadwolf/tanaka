@@ -273,11 +273,15 @@ pnpm run start
 # Run as webapp without Firefox
 pnpm run webapp
 
-# Bundle analysis
+# Bundle analysis (generates report)
 pnpm run analyze
 
 # Watch mode (rebuilds on file changes)
 pnpm run watch
+
+# Run tests
+pnpm run test        # Unit tests
+pnpm run test:watch  # Watch mode
 ```
 
 ---
@@ -830,3 +834,36 @@ The implementation consists of:
 2. **Use dry run**: Validate workflow syntax without execution
 3. **Check logs**: Use `-v` flag for detailed output
 4. **Skip slow steps**: Add `if: ${{ !env.ACT }}` to steps that are slow or unnecessary locally
+
+---
+
+## 15. Extension Analysis Documentation
+
+The extension includes detailed analysis reports for performance and security:
+
+### Bundle Analysis
+
+See [`extension/BUNDLE-ANALYSIS.md`](../extension/BUNDLE-ANALYSIS.md) for:
+- Current bundle sizes (88.2KB total)
+- Code splitting effectiveness
+- Performance metrics
+
+**Generate new report:**
+```bash
+cd extension
+pnpm run analyze
+```
+
+### Security Audit
+
+See [`extension/SECURITY-AUDIT.md`](../extension/SECURITY-AUDIT.md) for:
+- Permission analysis
+- Security recommendations
+- CSP configuration
+
+### Component Library
+
+See [`extension/src/components/`](../extension/src/components/) for:
+- Reusable UI components
+- Component documentation
+- Usage examples
