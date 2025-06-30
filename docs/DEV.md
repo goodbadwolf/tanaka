@@ -62,7 +62,7 @@ python3 scripts/tanaka.py setup-dev --include act podman # Install GitHub Action
 
 For development tools:
 
-> **Note**: If you haven't installed `uv` yet, run `pip install uv` first.
+> **Note**: `uv` is a modern Python package installer and resolver, written in Rust for speed. If you haven't installed it yet, run `pip install uv` first. It's a drop-in replacement for pip+pip-tools+virtualenv and significantly faster.
 
 ```bash
 uv sync --dev                                        # Install Python dev dependencies
@@ -107,6 +107,26 @@ Or install manually:
    ```bash
    cargo install sqlx-cli --no-default-features --features sqlite
    ```
+
+### Python Package Management: pip vs uv
+
+This project uses `uv` for Python dependency management. Here's when to use each:
+
+**Use `uv` when:**
+- Installing project dependencies: `uv sync --dev`
+- Running project scripts: `uv run scripts/tanaka.py lint`
+- Working within this project's environment
+
+**Use `pip` when:**
+- Installing global tools: `pip install uv`
+- Installing tools outside this project
+- Systems where uv isn't available
+
+**Key differences:**
+- `uv` is 10-100x faster than pip
+- `uv` automatically manages virtual environments
+- `uv` has better dependency resolution
+- `uv sync` installs from `pyproject.toml` (like `npm install` for Python)
 
 ---
 
