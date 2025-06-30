@@ -1,3 +1,3 @@
-export type { Tab } from './generated/Tab';
-export type { SyncRequest } from './generated/SyncRequest';
-export type { SyncResponse } from './generated/SyncResponse';
+export type { Tab } from './Tab';
+export type { SyncRequest } from './SyncRequest';
+export type { SyncResponse } from './SyncResponse';
