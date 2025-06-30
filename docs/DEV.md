@@ -40,7 +40,7 @@ This guide explains how Tanaka is wired together, how to get a local dev setup
 
 | Tool    | Version |
 | ------- | ------- |
-| Rust    | 1.86+   |
+| Rust    | 1.83+   |
 | Node.js | 24+     |
 | pnpm    | 10.11+  |
 | SQLite  | 3.40+   |
@@ -61,6 +61,8 @@ python3 scripts/tanaka.py setup-dev --include act podman # Install GitHub Action
 ```
 
 For development tools:
+
+> **Note**: If you haven't installed `uv` yet, run `pip install uv` first.
 
 ```bash
 uv sync --dev                                        # Install Python dev dependencies
@@ -127,7 +129,7 @@ pnpm run start
 
 ## 4. Configuration
 
-See [@docs/INSTALL.md](docs/INSTALL.md#configuration) for detailed configuration instructions.
+See [@docs/INSTALL.md](docs/INSTALL.md#4-configuration-reference-tanakatoml) for detailed configuration instructions.
 
 The server automatically applies SQLite safety settings at startup:
 
