@@ -56,14 +56,19 @@ Tanaka uses a client-server architecture with CRDT-based synchronization. For de
 - [x] Rust server with SQLite storage
 - [x] CRDT-based sync with Yjs/yrs
 
-### v0.5 - Core Functionality (In Development)
+### v0.5 - Core Functionality ✅
 
 - [x] Yjs/yrs CRDT integration
 - [x] Bidirectional tab sync
 - [x] TLS + auth token security
 - [x] Selective window tracking
+- [x] Test coverage 80%+ (86.8% achieved)
+
+### v0.5.1 - UI Enhancements (In Development)
+
 - [ ] Modern React UI (Rspack migration)
-- [ ] Component testing & 80%+ coverage
+- [ ] Complete component library
+- [ ] Remove vanilla JS code
 
 ### v1.0 - First Stable Release
 
