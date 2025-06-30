@@ -386,6 +386,128 @@ class ShfmtInstaller(DependencyInstaller):
             return False
 
 
+class PodmanInstaller(DependencyInstaller):
+    """Handles Podman installation"""
+
+    def install(self) -> bool:
+        if self.check_command("podman"):
+            version = self.get_version("podman")
+            logger.success(f"Podman already installed: {version}")
+            return True
+
+        logger.info("Installing Podman...")
+        try:
+            if self.os_type == OSType.MACOS:
+                if self.check_command("brew"):
+                    self.run_command(["brew", "install", "podman"])
+                    # Initialize podman machine on macOS
+                    self._init_podman_machine()
+                    return True
+                else:
+                    logger.error("Homebrew is required to install Podman on macOS")
+                    return False
+            elif self.os_type == OSType.LINUX:
+                # Try different package managers
+                if self.check_command("apt-get"):
+                    self.run_command(["sudo", "apt-get", "update"], check=False)
+                    self.run_command(["sudo", "apt-get", "install", "-y", "podman"])
+                    return True
+                elif self.check_command("dnf"):
+                    self.run_command(["sudo", "dnf", "install", "-y", "podman"])
+                    return True
+                elif self.check_command("pacman"):
+                    self.run_command(["sudo", "pacman", "-S", "--noconfirm", "podman"])
+                    return True
+                else:
+                    logger.error("No supported package manager found for Linux")
+                    return False
+        except Exception as e:
+            logger.error(f"Failed to install Podman: {e}")
+            return False
+
+    def _init_podman_machine(self) -> None:
+        """Initialize podman machine on macOS"""
+        if self.os_type != OSType.MACOS:
+            return
+
+        logger.info("Initializing podman machine...")
+        try:
+            # Check if machine exists
+            result = self.run_command(["podman", "machine", "list"], capture=True)
+            if "podman-machine-default" not in result.stdout:
+                self.run_command(["podman", "machine", "init"])
+
+            # Start machine
+            self.run_command(["podman", "machine", "start"])
+        except Exception as e:
+            logger.warning(f"Podman machine initialization: {e}")
+
+
+class ActInstaller(DependencyInstaller):
+    """Handles act installation for GitHub Actions testing"""
+
+    def install(self) -> bool:
+        if self.check_command("act"):
+            version = self.get_version("act")
+            logger.success(f"act already installed: {version}")
+            self._create_actrc()
+            return True
+
+        logger.info("Installing act...")
+        try:
+            if self.os_type == OSType.MACOS:
+                if self.check_command("brew"):
+                    self.run_command(["brew", "install", "act"])
+                    self._create_actrc()
+                    return True
+                else:
+                    logger.error("Homebrew is required to install act on macOS")
+                    return False
+            elif self.os_type == OSType.LINUX:
+                # Use the official install script
+                install_script = "curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash"
+                self.run_command(install_script, shell=True)
+                self._create_actrc()
+                return True
+        except Exception as e:
+            logger.error(f"Failed to install act: {e}")
+            return False
+
+    def _create_actrc(self) -> None:
+        """Create .actrc configuration for Podman"""
+        actrc_path = os.path.expanduser("~/.actrc")
+
+        if os.path.exists(actrc_path):
+            logger.info(".actrc already exists")
+            return
+
+        logger.info("Creating .actrc configuration...")
+
+        # Get podman socket path
+        socket_path = "/run/user/1000/podman/podman.sock"  # Linux default
+        if self.os_type == OSType.MACOS:
+            try:
+                result = self.run_command(
+                    ["podman", "machine", "inspect", "--format", "{{.ConnectionInfo.PodmanSocket.Path}}"], capture=True
+                )
+                if result.stdout:
+                    socket_path = result.stdout.strip()
+            except Exception:
+                pass
+
+        config = f"""# act configuration for Podman
+--container-daemon-socket unix://{socket_path}
+--container-architecture linux/amd64
+"""
+
+        try:
+            with open(actrc_path, "w") as f:
+                f.write(config)
+            logger.success(f"Created {actrc_path}")
+        except Exception as e:
+            logger.error(f"Failed to create .actrc: {e}")
+
+
 class PythonInstaller(DependencyInstaller):
     """Handles Python installation using uv"""
 
@@ -448,6 +570,8 @@ class SetupManager:
         "firefox": "sys",
         "shellcheck": "dev",
         "shfmt": "dev",
+        "podman": "dev",
+        "act": "dev",
     }
 
     def __init__(self, dry_run: bool = False):
@@ -483,6 +607,8 @@ class SetupManager:
             "venv": VenvInstaller(self.os_type, self.dry_run),
             "shellcheck": ShellcheckInstaller(self.os_type, self.dry_run),
             "shfmt": ShfmtInstaller(self.os_type, self.dry_run),
+            "podman": PodmanInstaller(self.os_type, self.dry_run),
+            "act": ActInstaller(self.os_type, self.dry_run),
         }
 
     def _create_dependencies(self) -> dict[str, Dependency]:
@@ -499,6 +625,8 @@ class SetupManager:
             "venv": Dependency(name="venv", depends_on=["python", "uv"]),
             "shellcheck": Dependency(name="shellcheck", check_cmd="shellcheck"),
             "shfmt": Dependency(name="shfmt", check_cmd="shfmt"),
+            "podman": Dependency(name="podman", check_cmd="podman"),
+            "act": Dependency(name="act", depends_on=["podman"], check_cmd="act"),
         }
 
     def resolve_dependencies(self, requested: set[str]) -> list[str]:
