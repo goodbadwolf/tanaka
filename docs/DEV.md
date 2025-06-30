@@ -854,13 +854,6 @@ cd extension
 pnpm run analyze
 ```
 
-### Security Audit
-
-See [`extension/SECURITY-AUDIT.md`](../extension/SECURITY-AUDIT.md) for:
-- Permission analysis
-- Security recommendations
-- CSP configuration
-
 ### Component Library
 
 See [`extension/src/components/`](../extension/src/components/) for:
