@@ -58,7 +58,7 @@ Migrating the extension from Vite to Rspack with React/Preact UI components. The
 | Metric        | Target  | Current  |
 | ------------- | ------- | -------- |
 | Build time    | < 10s   | 0.118s ✓ |
-| Bundle size   | < 500KB | TBD      |
+| Bundle size   | < 500KB | 88.2KB ✓ |
 | Popup load    | < 100ms | TBD      |
 | Test coverage | 80%+    | 86.8% ✓  |
 
