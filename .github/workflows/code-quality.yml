@@ -56,14 +56,8 @@ jobs:
           # Wait for both to complete
           wait
 
-      # Generate TypeScript types (much faster than full build)
-      - name: Generate TypeScript types
-        run: |
-          cd server
-          # Only compile what's needed for type generation
-          cargo check --lib
-          cd ..
-          python3 scripts/tanaka.py generate
+      # TypeScript types are now committed to the repository
+      # No generation step needed - this saves ~2-3 minutes in CI
 
       # Run pre-commit
       - uses: pre-commit/action@v3.0.1

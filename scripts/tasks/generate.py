@@ -35,7 +35,7 @@ def generate_api_models() -> TaskResult:
 
     # Check if generated models are stale
     models_rs = server_dir / "src" / "models.rs"
-    generated_dir = project_root / "extension" / "src" / "api" / "models" / "generated"
+    generated_dir = project_root / "extension" / "src" / "api" / "models"
     sentinel_file = generated_dir / "Tab.ts"
 
     if not models_rs.exists():
