@@ -35,6 +35,8 @@ cargo test                 # All tests must pass
 
 **If any check fails, fix the issues before committing!**
 
+> **Note**: The project has a `.pre-commit-config.yaml` that automatically runs these checks. Run `pre-commit install` to set it up.
+
 ---
 
 ## 🏗️ Server v1.0 - Clean Architecture Implementation
