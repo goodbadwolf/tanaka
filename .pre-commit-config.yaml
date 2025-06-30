@@ -97,6 +97,15 @@ repos:
         files: ^(extension|server)/.*\.(ts|tsx|rs)$
         pass_filenames: true
 
+      - id: test-github-actions
+        name: Test GitHub Actions workflows locally
+        entry: python scripts/tanaka.py test-ci --check
+        language: python
+        files: ^\.github/workflows/.*\.(yml|yaml)$
+        pass_filenames: false
+        additional_dependencies: []
+        stages: [pre-commit]  # Only run locally, not in CI
+
   # Commit message validation
   - repo: https://github.com/commitizen-tools/commitizen
     rev: v4.8.3
@@ -131,5 +140,5 @@ ci:
   autoupdate_branch: ''  # Update PRs on default branch
   autoupdate_commit_msg: 'chore: pre-commit autoupdate'
   autoupdate_schedule: weekly
-  skip: []  # Don't skip any hooks in CI
+  skip: [test-github-actions]  # Skip local-only hooks in CI
   submodules: false

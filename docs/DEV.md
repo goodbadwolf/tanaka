@@ -57,6 +57,7 @@ python3 scripts/tanaka.py setup-dev --dry-run            # Preview what would be
 python3 scripts/tanaka.py setup-dev --help               # See all setup options
 python3 scripts/tanaka.py setup-dev --include rust node  # Install only Rust and Node.js
 python3 scripts/tanaka.py setup-dev --exclude pnpm       # Install everything except pnpm
+python3 scripts/tanaka.py setup-dev --include act podman # Install GitHub Actions testing tools
 ```
 
 For development tools:
@@ -681,3 +682,131 @@ pnpm run start -- --firefox-profile=default
 # Or create fresh profile
 pnpm run start -- --firefox-profile=tanaka-dev
 ```
+
+---
+
+## 14. Testing GitHub Actions Locally
+
+Test GitHub Actions workflows on your machine before pushing changes, using **act** with **Podman** (Docker alternative).
+
+### 14.1 Purpose
+
+- **Validate workflows** before pushing to avoid CI failures
+- **Debug workflow issues** locally with faster iteration
+- **Test matrix builds** without consuming GitHub Actions minutes
+- **Ensure workflows work** with your changes
+
+### 14.2 Prerequisites & Setup
+
+**One-time setup:**
+
+```bash
+# Install act and Podman
+python3 scripts/tanaka.py setup-dev --include act podman
+```
+
+This will install:
+- `act` (GitHub Actions runner)
+- `podman` (Docker alternative)
+- Podman machine initialization (macOS)
+- Act configuration for Podman backend
+
+**Manual prerequisites check:**
+
+```bash
+# Check if tools are installed
+act --version
+podman --version
+```
+
+### 14.3 Usage
+
+**Test all workflows:**
+
+```bash
+python3 scripts/tanaka.py test-ci
+```
+
+**Test specific workflow:**
+
+```bash
+python3 scripts/tanaka.py test-ci -w code-quality.yml
+```
+
+**Dry run (see what would execute):**
+
+```bash
+python3 scripts/tanaka.py test-ci --dry-run
+```
+
+**Verbose output for debugging:**
+
+```bash
+python3 scripts/tanaka.py test-ci -v
+```
+
+### 14.4 Pre-commit Integration
+
+The test-github-actions hook runs automatically when you commit changes to workflow files:
+
+```yaml
+# .pre-commit-config.yaml
+- id: test-github-actions
+  name: Test GitHub Actions workflows locally
+  files: ^\.github/workflows/.*\.(yml|yaml)$
+```
+
+To skip workflow testing during commit:
+
+```bash
+SKIP=test-github-actions git commit
+```
+
+### 14.5 Troubleshooting
+
+**"Podman machine not running" error:**
+
+```bash
+# Start podman machine (macOS)
+podman machine start
+
+# Check machine status
+podman machine list
+```
+
+**"act not found" error:**
+
+```bash
+# Install via setup-dev
+python3 scripts/tanaka.py setup-dev --include act podman
+
+# Or install manually
+brew install act  # macOS
+```
+
+**Workflow fails locally but passes on GitHub:**
+
+- Local environment may differ from GitHub runners
+- Check for hardcoded paths or environment-specific code
+- Use `if: ${{ !env.ACT }}` to skip steps in local testing
+
+**Container pull errors:**
+
+```bash
+# Use smaller, faster image
+act -P ubuntu-latest=catthehacker/ubuntu:act-latest
+```
+
+### 14.6 Architecture
+
+The implementation consists of:
+- **Task module** (`scripts/tasks/test_ci.py`): Main logic for workflow testing
+- **Pre-commit hook**: Automatic testing on workflow changes
+- **Act configuration** (`~/.actrc`): Podman backend setup
+
+### 14.7 Tips
+
+1. **Start small**: Test with simple workflows first
+2. **Use dry run**: Validate workflow syntax without execution
+3. **Check logs**: Use `-v` flag for detailed output
+4. **Skip slow steps**: Add `if: ${{ !env.ACT }}` to steps that are slow or unnecessary locally
