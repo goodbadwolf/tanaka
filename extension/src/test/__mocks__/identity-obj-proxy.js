@@ -5,6 +5,9 @@ module.exports = new Proxy({}, {
     if (key === '__esModule') {
       return false;
     }
+    if (key === Symbol.toPrimitive || key === 'valueOf' || key === 'toString') {
+      return function() { return ''; };
+    }
     return key;
   }
 });
