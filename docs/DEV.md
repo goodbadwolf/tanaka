@@ -843,27 +843,157 @@ The extension includes detailed analysis reports for performance and security:
 
 ### Bundle Analysis
 
-See [`extension/BUNDLE-ANALYSIS.md`](../extension/BUNDLE-ANALYSIS.md) for:
-- Current bundle sizes (88.2KB total)
-- Code splitting effectiveness
-- Performance metrics
+To analyze bundle sizes and code splitting:
 
-**Generate new report:**
 ```bash
 cd extension
 pnpm run analyze
 ```
 
-### Security Audit
+This generates a detailed report showing:
+- Bundle sizes for each entry point
+- Code splitting effectiveness
+- Vendor bundle separation
+- Optimization opportunities
 
-See [`extension/SECURITY-AUDIT.md`](../extension/SECURITY-AUDIT.md) for:
-- Permission analysis
-- Security recommendations
-- CSP configuration
+---
 
-### Component Library
+## 16. Component Library
 
-See [`extension/src/components/`](../extension/src/components/) for:
-- Reusable UI components
-- Component documentation
-- Usage examples
+The extension includes a collection of reusable UI components built with React/Preact.
+
+### Button
+
+A versatile button component with multiple variants and states.
+
+```tsx
+import { Button } from '../components';
+
+<Button variant="primary" onClick={handleClick}>
+  Click me
+</Button>
+
+<Button variant="danger" loading>
+  Deleting...
+</Button>
+```
+
+**Props:**
+- `variant`: 'primary' | 'secondary' | 'danger'
+- `size`: 'small' | 'medium' | 'large'
+- `loading`: boolean
+- `disabled`: boolean
+- `fullWidth`: boolean
+
+### Input
+
+Form input component with built-in validation and error handling.
+
+```tsx
+import { Input } from '../components';
+
+<Input
+  label="Email"
+  type="email"
+  required
+  validate={(value) => !value.includes('@') ? 'Invalid email' : undefined}
+  onChange={handleChange}
+/>
+```
+
+**Props:**
+- `type`: 'text' | 'email' | 'password' | 'url' | 'number'
+- `label`: string
+- `error`: string | boolean
+- `validate`: (value: string) => string | undefined
+- `required`: boolean
+
+### LoadingSpinner
+
+Animated loading indicator with size and color variants.
+
+```tsx
+import { LoadingSpinner } from '../components';
+
+<LoadingSpinner size="large" color="primary" />
+```
+
+**Props:**
+- `size`: 'small' | 'medium' | 'large'
+- `color`: 'primary' | 'secondary' | 'white'
+- `ariaLabel`: string
+
+### ErrorMessage
+
+Display error, warning, or info messages with optional dismiss functionality.
+
+```tsx
+import { ErrorMessage } from '../components';
+
+<ErrorMessage
+  type="error"
+  title="Connection Failed"
+  message="Unable to connect to the server"
+  onDismiss={() => setError(null)}
+/>
+```
+
+**Props:**
+- `type`: 'error' | 'warning' | 'info'
+- `title`: string (optional)
+- `message`: string
+- `dismissible`: boolean
+- `onDismiss`: () => void
+
+### Card
+
+Container component with optional header and footer sections.
+
+```tsx
+import { Card } from '../components';
+
+<Card
+  variant="elevated"
+  header="Settings"
+  footer={<Button>Save Changes</Button>}
+>
+  <p>Card content goes here</p>
+</Card>
+```
+
+**Props:**
+- `variant`: 'default' | 'outlined' | 'elevated'
+- `padding`: 'none' | 'small' | 'medium' | 'large'
+- `header`: ReactNode
+- `footer`: ReactNode
+- `interactive`: boolean
+- `onClick`: () => void
+
+### Component Testing
+
+All components include comprehensive test suites:
+
+```bash
+cd extension
+pnpm test        # Run all tests
+pnpm test:watch  # Watch mode
+```
+
+### Styling & Theming
+
+Components use CSS Modules for scoped styling. Each component has its own `.module.css` file.
+
+**CSS Variables for theming:**
+- Primary color: `#3b82f6`
+- Error color: `#ef4444`
+- Text color: `#111827`
+- Border color: `#e5e7eb`
+
+### Accessibility
+
+All components follow accessibility best practices:
+- Proper ARIA labels and roles
+- Keyboard navigation support
+- Screen reader friendly
+- Focus indicators
+- Color contrast compliance
