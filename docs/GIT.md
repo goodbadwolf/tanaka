@@ -107,9 +107,13 @@ SKIP=hook-id git commit
 
 ```bash
 # Install pre-commit
+
+# Option 1: Using pip (traditional)
 pip install pre-commit
-# or
-uv sync --dev
+
+# Option 2: Using uv (faster, recommended)
+# If you don't have uv: pip install uv
+uv sync --dev  # Installs all dev dependencies including pre-commit
 
 # Install the git hooks
 pre-commit install

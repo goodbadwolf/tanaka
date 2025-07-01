@@ -2,6 +2,8 @@
 
 This document provides an extremely detailed branch and commit organization for implementing the v0.5 and v1.0 roadmap.
 
+> **Note**: v0.5.0 was released with the core features from Phase 1. The remaining UI enhancements continue as v0.5.1 development.
+
 ## 📝 Progress Tracking
 
 - Use `[ ]` for pending commits, `[x]` for completed commits
@@ -91,11 +93,11 @@ git checkout -b feat/shared-components
    - Document props
    - Include test examples
 
-**PR**: ✅ Merged `feat/shared-components` → `main` (PR #13)
+**PR**: ✅ Merged `feat/shared-components` → `main` ([PR #13](https://github.com/goodbadwolf/tanaka/pull/13))
 
 #### Phase 2: State Management ✅
 
-**Branch**: `feat/preact-signals` (in progress)
+**Branch**: `feat/preact-signals` (merged to main)
 
 ```bash
 git checkout -b feat/preact-signals
@@ -143,13 +145,13 @@ git checkout -b feat/preact-signals
    - Update `PopupApp.test.tsx`
    - Test computed signal updates
 
-**PR**: Merge `feat/preact-signals` → `feat/rspack-react-migration`
+**PR**: ✅ Merged via `feat/rspack-react-migration` → `main` ([PR #13](https://github.com/goodbadwolf/tanaka/pull/13))
 
 #### Phase 3: Test Infrastructure & Coverage
 
 **Branch**: `feat/test-infrastructure`
 
-**Note**: Test coverage goal of 80%+ was achieved early via `test/improve-coverage` branch (PR #22) with:
+**Note**: Test coverage goal of 80%+ was achieved early via `test/improve-coverage` branch ([PR #22](https://github.com/goodbadwolf/tanaka/pull/22)) with:
 - Fixed skipped tests in SettingsApp
 - Added comprehensive API module tests (100% coverage)
 - Added comprehensive browser module tests (100% coverage)
@@ -161,7 +163,7 @@ git checkout -b feat/test-infrastructure
 
 **Commits**:
 
-1. `chore: configure React Testing Library and coverage`
+1. [x] `chore: configure React Testing Library and coverage` (achieved via PR #22)
    - Update Jest config for better coverage
    - Add testing utilities and helpers
    - Configure test environment

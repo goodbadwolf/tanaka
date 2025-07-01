@@ -40,7 +40,7 @@ This guide explains how Tanaka is wired together, how to get a local dev setup
 
 | Tool    | Version |
 | ------- | ------- |
-| Rust    | 1.86+   |
+| Rust    | 1.83+   |
 | Node.js | 24+     |
 | pnpm    | 10.11+  |
 | SQLite  | 3.40+   |
@@ -61,6 +61,8 @@ python3 scripts/tanaka.py setup-dev --include act podman # Install GitHub Action
 ```
 
 For development tools:
+
+> **Note**: `uv` is a modern Python package installer and resolver, written in Rust for speed. If you haven't installed it yet, run `pip install uv` first. It's a drop-in replacement for pip+pip-tools+virtualenv and significantly faster.
 
 ```bash
 uv sync --dev                                        # Install Python dev dependencies
@@ -106,6 +108,26 @@ Or install manually:
    cargo install sqlx-cli --no-default-features --features sqlite
    ```
 
+### Python Package Management: pip vs uv
+
+This project uses `uv` for Python dependency management. Here's when to use each:
+
+**Use `uv` when:**
+- Installing project dependencies: `uv sync --dev`
+- Running project scripts: `uv run scripts/tanaka.py lint`
+- Working within this project's environment
+
+**Use `pip` when:**
+- Installing global tools: `pip install uv`
+- Installing tools outside this project
+- Systems where uv isn't available
+
+**Key differences:**
+- `uv` is 10-100x faster than pip
+- `uv` automatically manages virtual environments
+- `uv` has better dependency resolution
+- `uv sync` installs from `pyproject.toml` (like `npm install` for Python)
+
 ---
 
 ## 3. First-time setup
@@ -127,7 +149,7 @@ pnpm run start
 
 ## 4. Configuration
 
-See [@docs/INSTALL.md](docs/INSTALL.md#configuration) for detailed configuration instructions.
+See [@docs/INSTALL.md](docs/INSTALL.md#4-configuration-reference-tanakatoml) for detailed configuration instructions.
 
 The server automatically applies SQLite safety settings at startup:
 
@@ -197,8 +219,6 @@ pnpm run test:watch  # Watch mode
 
 ---
 
----
-
 ## 7. Essential Commands
 
 ```bash
@@ -253,11 +273,15 @@ pnpm run start
 # Run as webapp without Firefox
 pnpm run webapp
 
-# Bundle analysis
+# Bundle analysis (generates report)
 pnpm run analyze
 
 # Watch mode (rebuilds on file changes)
 pnpm run watch
+
+# Run tests
+pnpm run test        # Unit tests
+pnpm run test:watch  # Watch mode
 ```
 
 ---
@@ -810,3 +834,36 @@ The implementation consists of:
 2. **Use dry run**: Validate workflow syntax without execution
 3. **Check logs**: Use `-v` flag for detailed output
 4. **Skip slow steps**: Add `if: ${{ !env.ACT }}` to steps that are slow or unnecessary locally
+
+---
+
+## 15. Extension Analysis Documentation
+
+The extension includes detailed analysis reports for performance and security:
+
+### Bundle Analysis
+
+See [`extension/BUNDLE-ANALYSIS.md`](../extension/BUNDLE-ANALYSIS.md) for:
+- Current bundle sizes (88.2KB total)
+- Code splitting effectiveness
+- Performance metrics
+
+**Generate new report:**
+```bash
+cd extension
+pnpm run analyze
+```
+
+### Security Audit
+
+See [`extension/SECURITY-AUDIT.md`](../extension/SECURITY-AUDIT.md) for:
+- Permission analysis
+- Security recommendations
+- CSP configuration
+
+### Component Library
+
+See [`extension/src/components/`](../extension/src/components/) for:
+- Reusable UI components
+- Component documentation
+- Usage examples

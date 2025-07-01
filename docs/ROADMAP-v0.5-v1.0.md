@@ -2,6 +2,8 @@
 
 This document tracks the detailed implementation tasks for Tanaka v0.5 (Core Functionality) and v1.0 (First Stable Release).
 
+> **Note**: v0.5.0 was released on 2024-12-16 with core functionality (CRDT sync, auth, window tracking). The remaining UI enhancements listed below continue as v0.5.1 development.
+
 ## 📋 Roadmap Overview
 
 ### Current Status
@@ -9,15 +11,14 @@ This document tracks the detailed implementation tasks for Tanaka v0.5 (Core Fun
 - **Active**: Performance Optimization (Phase 5 of v0.5)
 - **Completed**: Component Migration, State Management, Test Infrastructure
 - **Next**: E2E Testing, Production Readiness
-- **Current Version**: v0.5-alpha
+- **Current Version**: v0.5.0
 
 ---
 
 ## 🚀 Part 1: v0.5 - Modern UI Migration (Active)
 
-Migrating the extension from Vite to Rspack with React/Preact UI components to complete v0.5 release.
+Migrating the extension from Vite to Rspack with React/Preact UI components. The `feat/rspack-react-migration` branch was merged in PR #13.
 
-- **Branch**: `feat/rspack-react-migration`
 - **Build Performance**: 118ms (36% faster than Vite)
 
 ### 🔄 Component Migration
@@ -41,7 +42,7 @@ Migrating the extension from Vite to Rspack with React/Preact UI components to c
 - [ ] Configure React Testing Library
 - [ ] Write unit tests for all components/hooks
 - [ ] Set up Playwright for integration tests
-- [x] Achieve 80%+ test coverage ✅
+- [x] Achieve 80%+ test coverage ✅ (86.8% achieved in PR #22)
 - [ ] Add E2E tests for full extension flow
 
 ### 🏁 Production Ready
@@ -57,7 +58,7 @@ Migrating the extension from Vite to Rspack with React/Preact UI components to c
 | Metric        | Target  | Current  |
 | ------------- | ------- | -------- |
 | Build time    | < 10s   | 0.118s ✓ |
-| Bundle size   | < 500KB | TBD      |
+| Bundle size   | < 500KB | 88.2KB ✓ |
 | Popup load    | < 100ms | TBD      |
 | Test coverage | 80%+    | 86.8% ✓  |
 
@@ -165,7 +166,7 @@ export const parseTab = memoize(
 
 ## 📅 Timeline
 
-### Q1 2025
+### Q1 2025 (Current)
 
 - Complete Rspack/React migration
 - Begin Clean Architecture implementation
@@ -195,5 +196,5 @@ export const parseTab = memoize(
 ---
 
 **Status**: 🟡 Active Development  
-**Last Updated**: 2025-01-06  
+**Last Updated**: 2025-01-30  
 **Next Milestone**: Complete Component Migration

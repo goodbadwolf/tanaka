@@ -1,0 +1,44 @@
+# Tanaka Server Configuration Example
+# Copy this file to ~/.config/tanaka/tanaka.toml and customize
+
+[server]
+# Network binding address
+# Use 0.0.0.0 to listen on all interfaces, 127.0.0.1 for localhost only
+bind_addr = "0.0.0.0:443"
+
+# How often clients should poll for updates (seconds)
+poll_secs = 5
+
+# How often to flush CRDT state to disk (seconds)
+flush_secs = 5
+
+# Optional: Database path (defaults to tabs.db in current directory)
+# db_path = "/var/lib/tanaka/tabs.db"
+
+[tls]
+# TLS certificate paths (required for HTTPS)
+# For Let's Encrypt:
+cert_path = "/etc/letsencrypt/live/example.com/fullchain.pem"
+key_path = "/etc/letsencrypt/live/example.com/privkey.pem"
+
+# For self-signed certificates (development):
+# cert_path = "/path/to/cert.pem"
+# key_path = "/path/to/key.pem"
+
+# To run HTTP-only (development), omit the entire [tls] section
+# and change bind_addr to something like "127.0.0.1:8000"
+
+[auth]
+# Shared bearer token for authentication
+# Generate with: openssl rand -hex 32
+shared_token = "replace-me-with-secure-token"
+
+# Optional sections (not yet implemented)
+
+# [logging]
+# level = "info"  # trace, debug, info, warn, error
+# format = "json" # json, pretty
+
+# [metrics]
+# enabled = true
+# port = 9090  # Prometheus metrics endpoint
