@@ -1,10 +1,8 @@
 import type { Tab as BrowserTab } from '../browser/core';
-import type { Tab, SyncRequest, SyncResponse } from './models';
-import type { SyncV2Request, SyncV2Response } from './sync';
+import type { Tab } from './models';
+import type { SyncRequest, SyncResponse } from './sync';
 import { ExtensionError, ErrorFactories, type AsyncResult, createResult } from '../error/types';
 import { createRetryableFunction } from '../utils/retry';
-
-export type { Tab, SyncRequest, SyncResponse };
 
 export interface TabData {
   url: string;
@@ -83,21 +81,7 @@ export class TanakaAPI {
     this.token = token;
   }
 
-  async syncTabs(tabs: Tab[]): AsyncResult<Tab[], ExtensionError> {
-    return createResult(async () => {
-      const data = await this.retryableRequest<SyncResponse>('/sync', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ tabs } satisfies SyncRequest),
-      });
-
-      return data.tabs;
-    });
-  }
-
-  async syncV2(request: SyncV2Request): AsyncResult<SyncV2Response, ExtensionError> {
+  async sync(request: SyncRequest): AsyncResult<SyncResponse, ExtensionError> {
     return createResult(async () => {
       // Convert bigint values to strings for JSON serialization
       const jsonRequest = {
@@ -125,7 +109,7 @@ export class TanakaAPI {
       };
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const response = await this.retryableRequest<any>('/sync/v2', {
+      const response = await this.retryableRequest<any>('/sync', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -153,7 +137,7 @@ export class TanakaAPI {
           }
           return resultOp;
         }),
-      } as SyncV2Response;
+      } as SyncResponse;
     });
   }
 

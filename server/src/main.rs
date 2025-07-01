@@ -10,13 +10,12 @@ use std::sync::Arc;
 use tanaka_server::config::{Args, Config};
 use tanaka_server::crdt::CrdtManager;
 use tanaka_server::error::AppResult;
-use tanaka_server::sync_v2;
+use tanaka_server::sync;
 use tower_http::{cors::CorsLayer, trace::TraceLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, Layer};
 
 mod auth;
 mod db;
-mod sync;
 
 #[derive(Serialize)]
 struct HealthResponse {
@@ -90,20 +89,12 @@ fn create_app(
     let auth_middleware_layer =
         middleware::from_fn_with_state(config.auth.clone(), auth::auth_middleware);
 
-    let mut app = Router::new()
-        .route("/health", get(health))
-        .route(
-            "/sync",
-            post(sync::sync_handler)
-                .with_state(db_pool.clone())
-                .route_layer(auth_middleware_layer.clone()),
-        )
-        .route(
-            "/sync/v2",
-            post(sync_v2::sync_v2_handler)
-                .with_state((crdt_manager.clone(), db_pool.clone()))
-                .route_layer(auth_middleware_layer),
-        );
+    let mut app = Router::new().route("/health", get(health)).route(
+        "/sync",
+        post(sync::sync_handler)
+            .with_state((crdt_manager.clone(), db_pool.clone()))
+            .route_layer(auth_middleware_layer),
+    );
 
     app = app.layer(CorsLayer::permissive());
 
