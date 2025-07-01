@@ -92,6 +92,8 @@ jobs:
         run: |
           cd server
           cargo test --verbose
+        env:
+          TS_RS_EXPORT_DIR: ../extension/src/api/models
 
   test-extension:
     runs-on: ubuntu-latest
@@ -116,8 +118,7 @@ jobs:
       - name: Run extension tests
         run: |
           cd extension
-          pnpm test --coverage --watchAll=false --passWithNoTests
-        continue-on-error: true  # Allow CSS module test failures while core functionality works
+          pnpm test --coverage --watchAll=false
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
