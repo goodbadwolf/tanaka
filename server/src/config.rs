@@ -297,17 +297,14 @@ impl Config {
         if let Some(tls) = &self.tls {
             if !tls.cert_path.exists() {
                 return Err(AppError::Config {
-                    message: format!(
-                        "Certificate file not found: {cert_path:?}",
-                        cert_path = tls.cert_path
-                    ),
+                    message: format!("Certificate file not found: {}", tls.cert_path.display()),
                     key: Some("tls.cert_path".to_string()),
                 });
             }
 
             if !tls.key_path.exists() {
                 return Err(AppError::Config {
-                    message: format!("Key file not found: {key_path:?}", key_path = tls.key_path),
+                    message: format!("Key file not found: {}", tls.key_path.display()),
                     key: Some("tls.key_path".to_string()),
                 });
             }
