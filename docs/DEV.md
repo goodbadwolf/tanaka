@@ -748,25 +748,25 @@ podman --version
 **Test all workflows:**
 
 ```bash
-python3 scripts/tanaka.py test-ci
+uv run scripts/tanaka.py test-ci
 ```
 
 **Test specific workflow:**
 
 ```bash
-python3 scripts/tanaka.py test-ci -w ci.yml
+uv run scripts/tanaka.py test-ci -w ci.yml
 ```
 
 **Dry run (see what would execute):**
 
 ```bash
-python3 scripts/tanaka.py test-ci --dry-run
+uv run scripts/tanaka.py test-ci --dry-run
 ```
 
 **Verbose output for debugging:**
 
 ```bash
-python3 scripts/tanaka.py test-ci -v
+uv run scripts/tanaka.py test-ci -v
 ```
 
 ### 14.4 Pre-commit Integration

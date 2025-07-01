@@ -128,7 +128,7 @@ For commit guidelines, pre-commit hooks, and git best practices, see @docs/GIT.m
 - **Modify tab sync**: Look at `/extension/src/sync/`
 - **Config changes**: Update `server/config/example.toml` and docs
 - **Add dependencies**: Update `Cargo.toml` or `package.json`
-- **Generate TS types**: Run `python3 scripts/tanaka.py generate`
+- **Generate TS types**: Run `uv run scripts/tanaka.py generate`
 - **Add shared types**: Add `#[derive(TS)]` and `#[ts(export)]` to Rust structs in `/server/src/models.rs`
 
 ### Technical Patterns
