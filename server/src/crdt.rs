@@ -38,6 +38,7 @@ pub struct LamportClock {
 }
 
 impl LamportClock {
+    #[must_use]
     pub fn new(node_id: u32) -> Self {
         Self {
             value: AtomicU64::new(1),
@@ -45,10 +46,12 @@ impl LamportClock {
         }
     }
 
+    #[must_use]
     pub fn tick(&self) -> u64 {
         self.value.fetch_add(1, Ordering::SeqCst)
     }
 
+    #[must_use]
     pub fn update(&self, received_clock: u64) -> u64 {
         let current = self.value.load(Ordering::SeqCst);
         let new_value = received_clock.max(current) + 1;
@@ -56,10 +59,12 @@ impl LamportClock {
         new_value
     }
 
+    #[must_use]
     pub fn current(&self) -> u64 {
         self.value.load(Ordering::SeqCst)
     }
 
+    #[must_use]
     pub fn node_id(&self) -> u32 {
         self.node_id
     }
@@ -91,6 +96,7 @@ pub struct CrdtDocument {
 }
 
 impl CrdtDocument {
+    #[must_use]
     pub fn new() -> Self {
         let doc = Doc::new();
         let tabs_map = doc.get_or_insert_map("tabs");
@@ -103,6 +109,12 @@ impl CrdtDocument {
         }
     }
 
+    /// Creates a new CRDT document from an existing state.
+    ///
+    /// # Errors
+    ///
+    /// Returns `CrdtError::DecodeError` if the state cannot be decoded.
+    /// Returns `CrdtError::ApplyError` if the update cannot be applied.
     pub fn from_state(state: &[u8]) -> Result<Self, CrdtError> {
         let doc = Doc::new();
 
@@ -125,6 +137,12 @@ impl CrdtDocument {
         })
     }
 
+    /// Applies a CRDT update to the document.
+    ///
+    /// # Errors
+    ///
+    /// Returns `CrdtError::DecodeError` if the update cannot be decoded.
+    /// Returns `CrdtError::ApplyError` if the update cannot be applied.
     pub fn apply_update(&mut self, update: &[u8]) -> Result<(), CrdtError> {
         let mut txn = self.doc.transact_mut();
         txn.apply_update(
@@ -136,21 +154,30 @@ impl CrdtDocument {
         Ok(())
     }
 
+    #[must_use]
     pub fn encode_state(&self) -> Vec<u8> {
         let txn = self.doc.transact();
         txn.encode_state_as_update_v1(&yrs::StateVector::default())
     }
 
+    #[must_use]
     pub fn encode_diff_since(&self, state_vector: &yrs::StateVector) -> Vec<u8> {
         let txn = self.doc.transact();
         txn.encode_diff_v1(state_vector)
     }
 
+    #[must_use]
     pub fn state_vector(&self) -> yrs::StateVector {
         let txn = self.doc.transact();
         txn.state_vector()
     }
 
+    /// Upserts a tab in the CRDT document.
+    ///
+    /// # Errors
+    ///
+    /// Returns `CrdtError` if the operation fails.
+    #[allow(clippy::cast_precision_loss)] // Timestamp precision loss is acceptable
     pub fn upsert_tab(&mut self, tab: &CrdtTab) -> Result<(), CrdtError> {
         let mut txn = self.doc.transact_mut();
 
@@ -161,19 +188,30 @@ impl CrdtDocument {
         tab_map.insert("url".to_string(), tab.url.clone().into());
         tab_map.insert("title".to_string(), tab.title.clone().into());
         tab_map.insert("active".to_string(), tab.active.into());
-        tab_map.insert("index".to_string(), (tab.index as f64).into());
-        tab_map.insert("updated_at".to_string(), (tab.updated_at as f64).into());
+        tab_map.insert("index".to_string(), f64::from(tab.index).into());
+        tab_map.insert("updated_at".to_string(), (tab.updated_at as f64).into()); // precision loss is ok for timestamps
 
         self.tabs_map.insert(&mut txn, tab.id.as_str(), tab_map);
         Ok(())
     }
 
+    /// Removes a tab from the CRDT document.
+    ///
+    /// # Errors
+    ///
+    /// Returns `CrdtError` if the operation fails.
     pub fn remove_tab(&mut self, tab_id: &str) -> Result<(), CrdtError> {
         let mut txn = self.doc.transact_mut();
         self.tabs_map.remove(&mut txn, tab_id);
         Ok(())
     }
 
+    /// Upserts a window in the CRDT document.
+    ///
+    /// # Errors
+    ///
+    /// Returns `CrdtError` if the operation fails.
+    #[allow(clippy::cast_precision_loss)] // Timestamp precision loss is acceptable
     pub fn upsert_window(&mut self, window: &CrdtWindow) -> Result<(), CrdtError> {
         let mut txn = self.doc.transact_mut();
 
@@ -182,14 +220,19 @@ impl CrdtDocument {
             std::collections::HashMap::new();
         window_map.insert("id".to_string(), window.id.clone().into());
         window_map.insert("tracked".to_string(), window.tracked.into());
-        window_map.insert("tab_count".to_string(), (window.tab_count as f64).into());
-        window_map.insert("updated_at".to_string(), (window.updated_at as f64).into());
+        window_map.insert("tab_count".to_string(), f64::from(window.tab_count).into());
+        window_map.insert("updated_at".to_string(), (window.updated_at as f64).into()); // precision loss is ok for timestamps
 
         self.windows_map
             .insert(&mut txn, window.id.as_str(), window_map);
         Ok(())
     }
 
+    /// Gets all tabs from the CRDT document.
+    ///
+    /// # Errors
+    ///
+    /// Returns `CrdtError` if the operation fails.
     pub fn get_tabs(&self) -> Result<Vec<CrdtTab>, CrdtError> {
         let tabs = Vec::new();
 
@@ -199,6 +242,11 @@ impl CrdtDocument {
         Ok(tabs)
     }
 
+    /// Gets all windows from the CRDT document.
+    ///
+    /// # Errors
+    ///
+    /// Returns `CrdtError` if the operation fails.
     pub fn get_windows(&self) -> Result<Vec<CrdtWindow>, CrdtError> {
         let windows = Vec::new();
 
@@ -221,6 +269,7 @@ pub struct CrdtManager {
 }
 
 impl CrdtManager {
+    #[must_use]
     pub fn new(node_id: u32) -> Self {
         Self {
             documents: DashMap::new(),
@@ -228,6 +277,7 @@ impl CrdtManager {
         }
     }
 
+    #[must_use]
     pub fn get_or_create_document(&self, doc_id: &str) -> Arc<std::sync::Mutex<CrdtDocument>> {
         self.documents
             .entry(doc_id.to_string())
@@ -235,6 +285,11 @@ impl CrdtManager {
             .clone()
     }
 
+    /// Loads a document from a given state.
+    ///
+    /// # Errors
+    ///
+    /// Returns `CrdtError` if the state cannot be loaded.
     pub fn load_document(&self, doc_id: &str, state: &[u8]) -> Result<(), CrdtError> {
         let doc = CrdtDocument::from_state(state)?;
         self.documents
@@ -242,6 +297,15 @@ impl CrdtManager {
         Ok(())
     }
 
+    /// Applies an update to a document.
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError` if the update cannot be applied.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the mutex is poisoned.
     pub fn apply_update(&self, doc_id: &str, update: &[u8]) -> AppResult<Vec<u8>> {
         let doc_ref = self.get_or_create_document(doc_id);
         let mut doc = doc_ref.lock().unwrap();
@@ -259,6 +323,15 @@ impl CrdtManager {
         Ok(doc.encode_state())
     }
 
+    /// Gets updates since a given state vector.
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError` if the updates cannot be retrieved.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the mutex is poisoned.
     pub fn get_updates_since(
         &self,
         doc_id: &str,
@@ -278,6 +351,15 @@ impl CrdtManager {
         Ok(diff)
     }
 
+    /// Gets the full state of a document.
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError` if the state cannot be retrieved.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the mutex is poisoned.
     pub fn get_full_state(&self, doc_id: &str) -> AppResult<Vec<u8>> {
         let doc_ref = self.get_or_create_document(doc_id);
         let doc = doc_ref.lock().unwrap();
@@ -285,14 +367,17 @@ impl CrdtManager {
         Ok(doc.encode_state())
     }
 
+    #[must_use]
     pub fn current_clock(&self) -> u64 {
         self.clock.current()
     }
 
+    #[must_use]
     pub fn update_clock(&self, received_clock: u64) -> u64 {
         self.clock.update(received_clock)
     }
 
+    #[must_use]
     pub fn node_id(&self) -> u32 {
         self.clock.node_id()
     }

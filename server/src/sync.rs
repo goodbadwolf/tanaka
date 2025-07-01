@@ -80,19 +80,21 @@ pub struct TabData {
 }
 
 impl CrdtOperation {
+    #[must_use]
     pub fn target_id(&self) -> &str {
         match self {
             CrdtOperation::UpsertTab { id, .. }
             | CrdtOperation::CloseTab { id, .. }
             | CrdtOperation::SetActive { id, .. }
             | CrdtOperation::MoveTab { id, .. }
-            | CrdtOperation::ChangeUrl { id, .. } => id,
-            CrdtOperation::TrackWindow { id, .. }
+            | CrdtOperation::ChangeUrl { id, .. }
+            | CrdtOperation::TrackWindow { id, .. }
             | CrdtOperation::UntrackWindow { id, .. }
             | CrdtOperation::SetWindowFocus { id, .. } => id,
         }
     }
 
+    #[must_use]
     pub fn operation_type(&self) -> &'static str {
         match self {
             CrdtOperation::UpsertTab { .. } => "upsert_tab",
@@ -106,6 +108,7 @@ impl CrdtOperation {
         }
     }
 
+    #[must_use]
     pub fn updated_at(&self) -> u64 {
         match self {
             CrdtOperation::UpsertTab { data, .. } => data.updated_at,
@@ -119,6 +122,11 @@ impl CrdtOperation {
         }
     }
 
+    /// Validates the operation for correctness.
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::Validation` if the operation contains invalid data.
     pub fn validate(&self) -> AppResult<()> {
         match self {
             CrdtOperation::UpsertTab { id, data } => {
@@ -192,6 +200,13 @@ impl CrdtOperation {
     }
 }
 
+/// Handles CRDT synchronization requests.
+///
+/// # Errors
+///
+/// Returns `AppError::Validation` if any operation in the request is invalid.
+/// Returns `AppError::Database` if database operations fail.
+/// Returns `AppError::Sync` if CRDT operations fail.
 pub async fn sync_handler(
     State((crdt_manager, db_pool)): State<(Arc<CrdtManager>, SqlitePool)>,
     Json(request): Json<SyncRequest>,
@@ -266,6 +281,13 @@ pub async fn sync_handler(
     }))
 }
 
+/// Stores a CRDT operation in the database and applies it to the state.
+///
+/// # Errors
+///
+/// Returns `AppError::Internal` if serialization fails.
+/// Returns `AppError::Database` if database operations fail.
+/// Returns `AppError::Sync` if CRDT state application fails.
 async fn store_operation(
     crdt_manager: &CrdtManager,
     db_pool: &SqlitePool,
@@ -289,7 +311,7 @@ async fn store_operation(
         ",
     )
     .bind(&operation_id)
-    .bind(clock as i64)
+    .bind(i64::try_from(clock).unwrap_or(i64::MAX))
     .bind(device_id)
     .bind(operation.operation_type())
     .bind(operation.target_id())
@@ -307,12 +329,22 @@ async fn store_operation(
     );
 
     // Apply operation to CRDT state
-    apply_operation_to_state(crdt_manager, &operation, clock).await?;
+    apply_operation_to_state(crdt_manager, &operation, clock)?;
 
     Ok(operation)
 }
 
-async fn apply_operation_to_state(
+/// Applies a CRDT operation to the document state.
+///
+/// # Errors
+///
+/// Returns `AppError::Sync` if the CRDT operation fails.
+///
+/// # Panics
+///
+/// Panics if the mutex is poisoned.
+#[allow(clippy::too_many_lines)] // Function handles all operation types
+fn apply_operation_to_state(
     crdt_manager: &CrdtManager,
     operation: &CrdtOperation,
     clock: u64,
@@ -362,7 +394,7 @@ async fn apply_operation_to_state(
             // Get current tab, update window and index
             let tabs = doc.get_tabs()?;
             if let Some(mut tab) = tabs.into_iter().find(|t| t.id == *id) {
-                tab.window_id = window_id.clone();
+                tab.window_id.clone_from(window_id);
                 tab.index = *index;
                 tab.updated_at = clock;
                 doc.upsert_tab(&tab)?;
@@ -380,9 +412,9 @@ async fn apply_operation_to_state(
             // Update tab URL and title
             let tabs = doc.get_tabs()?;
             if let Some(mut tab) = tabs.into_iter().find(|t| t.id == *id) {
-                tab.url = url.clone();
+                tab.url.clone_from(url);
                 if let Some(new_title) = title {
-                    tab.title = new_title.clone();
+                    tab.title.clone_from(new_title);
                 }
                 tab.updated_at = clock;
                 doc.upsert_tab(&tab)?;
@@ -452,23 +484,29 @@ async fn apply_operation_to_state(
     Ok(())
 }
 
+/// Gets operations that occurred after a given clock value.
+///
+/// # Errors
+///
+/// Returns `AppError::Database` if database query fails.
+/// Returns `AppError::Internal` if operation deserialization fails.
 async fn get_operations_since(
     db_pool: &SqlitePool,
     since_clock: u64,
     exclude_device_id: Option<&str>,
 ) -> AppResult<Vec<CrdtOperation>> {
-    tracing::debug!(since_clock = since_clock, exclude_device_id = ?exclude_device_id, "Getting operations since clock");
-
     #[derive(sqlx::FromRow)]
     struct OperationRow {
         operation_data: String,
     }
 
+    tracing::debug!(since_clock = since_clock, exclude_device_id = ?exclude_device_id, "Getting operations since clock");
+
     let rows = if let Some(device_id) = exclude_device_id {
         sqlx::query_as::<_, OperationRow>(
             "SELECT operation_data FROM crdt_operations WHERE clock > ? AND device_id != ? ORDER BY clock ASC"
         )
-        .bind(since_clock as i64)
+        .bind(i64::try_from(since_clock).unwrap_or(i64::MAX))
         .bind(device_id)
         .fetch_all(db_pool)
         .await
@@ -476,7 +514,7 @@ async fn get_operations_since(
         sqlx::query_as::<_, OperationRow>(
             "SELECT operation_data FROM crdt_operations WHERE clock > ? ORDER BY clock ASC"
         )
-        .bind(since_clock as i64)
+        .bind(i64::try_from(since_clock).unwrap_or(i64::MAX))
         .fetch_all(db_pool)
         .await
     }
@@ -498,31 +536,37 @@ async fn get_operations_since(
     Ok(operations)
 }
 
+/// Gets the most recent operations up to a specified limit.
+///
+/// # Errors
+///
+/// Returns `AppError::Database` if database query fails.
+/// Returns `AppError::Internal` if operation deserialization fails.
 async fn get_recent_operations(
     db_pool: &SqlitePool,
     limit: usize,
     exclude_device_id: Option<&str>,
 ) -> AppResult<Vec<CrdtOperation>> {
-    tracing::debug!(limit = limit, exclude_device_id = ?exclude_device_id, "Getting recent operations");
-
     #[derive(sqlx::FromRow)]
     struct OperationRow {
         operation_data: String,
     }
+
+    tracing::debug!(limit = limit, exclude_device_id = ?exclude_device_id, "Getting recent operations");
 
     let rows = if let Some(device_id) = exclude_device_id {
         sqlx::query_as::<_, OperationRow>(
             "SELECT operation_data FROM crdt_operations WHERE device_id != ? ORDER BY clock DESC LIMIT ?"
         )
         .bind(device_id)
-        .bind(limit as i64)
+        .bind(i64::try_from(limit).unwrap_or(i64::MAX))
         .fetch_all(db_pool)
         .await
     } else {
         sqlx::query_as::<_, OperationRow>(
             "SELECT operation_data FROM crdt_operations ORDER BY clock DESC LIMIT ?"
         )
-        .bind(limit as i64)
+        .bind(i64::try_from(limit).unwrap_or(i64::MAX))
         .fetch_all(db_pool)
         .await
     }

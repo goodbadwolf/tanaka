@@ -40,7 +40,7 @@ async fn main() -> AppResult<()> {
     let crdt_manager = Arc::new(CrdtManager::new(node_id));
     tracing::info!("CRDT manager initialized with node ID: {}", node_id);
 
-    let app = create_app(db_pool, crdt_manager, &config);
+    let app = create_app(&db_pool, &crdt_manager, &config);
 
     let addr: SocketAddr =
         config
@@ -82,8 +82,8 @@ fn init_logging(config: &Config) {
 }
 
 fn create_app(
-    db_pool: sqlx::SqlitePool,
-    crdt_manager: Arc<CrdtManager>,
+    db_pool: &sqlx::SqlitePool,
+    crdt_manager: &Arc<CrdtManager>,
     config: &Config,
 ) -> Router {
     let auth_middleware_layer =
@@ -120,5 +120,5 @@ fn calculate_node_id(bind_addr: &str) -> u32 {
     bind_addr.hash(&mut hasher);
 
     // Use lower 32 bits for node ID
-    (hasher.finish() & 0xFFFFFFFF) as u32
+    (hasher.finish() & 0xFFFF_FFFF) as u32
 }
