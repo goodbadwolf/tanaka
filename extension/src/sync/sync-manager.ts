@@ -191,37 +191,128 @@ export class SyncManager {
   }
 
   private async applyOperation(operation: CrdtOperation): Promise<void> {
-    debugLog(`Applying remote operation: ${JSON.stringify(operation)}`);
+    // Use a custom replacer to handle BigInt
+    debugLog(
+      `Applying remote operation: ${JSON.stringify(operation, (_, v) => (typeof v === 'bigint' ? v.toString() : v))}`,
+    );
 
-    // TODO: Implement actual application of operations
-    // This would update local tab state based on the operation type
-    switch (operation.type) {
-      case 'upsert_tab':
-        // Update or create tab in local state
-        break;
-      case 'close_tab':
-        // Mark tab as closed
-        break;
-      case 'set_active':
-        // Update tab active state
-        break;
-      case 'move_tab':
-        // Move tab to new window/index
-        break;
-      case 'change_url':
-        // Update tab URL
-        break;
-      case 'track_window':
-        // Track window
-        this.windowTracker.track(parseInt(operation.id));
-        break;
-      case 'untrack_window':
-        // Untrack window
-        this.windowTracker.untrack(parseInt(operation.id));
-        break;
-      case 'set_window_focus':
-        // Update window focus
-        break;
+    try {
+      switch (operation.type) {
+        case 'upsert_tab': {
+          // Check if tab exists
+          const tabId = parseInt(operation.id);
+          const windowId = parseInt(operation.data.window_id);
+
+          try {
+            // Try to get the existing tab
+            const tabs = await this.browser.tabs.query({ windowId });
+            const existingTab = tabs.find((t) => t.id === tabId);
+
+            if (existingTab) {
+              // Update existing tab
+              await this.browser.tabs.update(tabId, {
+                url: operation.data.url,
+                active: operation.data.active,
+              });
+
+              // Move if needed
+              if (existingTab.index !== operation.data.index || existingTab.windowId !== windowId) {
+                await this.browser.tabs.move(tabId, {
+                  windowId,
+                  index: operation.data.index,
+                });
+              }
+            } else {
+              // Create new tab
+              await this.browser.tabs.create({
+                windowId,
+                url: operation.data.url,
+                active: operation.data.active,
+                index: operation.data.index,
+              });
+            }
+          } catch (error) {
+            debugError(`Failed to upsert tab ${operation.id}:`, error);
+          }
+          break;
+        }
+
+        case 'close_tab': {
+          const tabId = parseInt(operation.id);
+          try {
+            await this.browser.tabs.remove(tabId);
+          } catch {
+            // Tab might already be closed
+            debugLog(`Tab ${operation.id} already closed or doesn't exist`);
+          }
+          break;
+        }
+
+        case 'set_active': {
+          const tabId = parseInt(operation.id);
+          try {
+            await this.browser.tabs.update(tabId, { active: operation.active });
+          } catch (error) {
+            debugError(`Failed to set tab ${operation.id} active state:`, error);
+          }
+          break;
+        }
+
+        case 'move_tab': {
+          const tabId = parseInt(operation.id);
+          const windowId = parseInt(operation.window_id);
+          try {
+            await this.browser.tabs.move(tabId, {
+              windowId,
+              index: operation.index,
+            });
+          } catch (error) {
+            debugError(`Failed to move tab ${operation.id}:`, error);
+          }
+          break;
+        }
+
+        case 'change_url': {
+          const tabId = parseInt(operation.id);
+          try {
+            await this.browser.tabs.update(tabId, {
+              url: operation.url,
+            });
+          } catch (error) {
+            debugError(`Failed to update tab ${operation.id} URL:`, error);
+          }
+          break;
+        }
+
+        case 'track_window': {
+          const windowId = parseInt(operation.id);
+          if (operation.tracked) {
+            this.windowTracker.track(windowId);
+          }
+          break;
+        }
+
+        case 'untrack_window': {
+          const windowId = parseInt(operation.id);
+          this.windowTracker.untrack(windowId);
+          break;
+        }
+
+        case 'set_window_focus': {
+          // Note: Firefox WebExtension API doesn't support programmatically
+          // focusing windows, so we just log this operation
+          debugLog(`Window focus operation for window ${operation.id} (not supported in Firefox)`);
+          break;
+        }
+
+        default: {
+          // Type guard to ensure exhaustive switch
+          const _exhaustive: never = operation;
+          debugError(`Unknown operation type:`, _exhaustive);
+        }
+      }
+    } catch (error) {
+      debugError(`Failed to apply operation ${operation.type}:`, error);
     }
   }
 
