@@ -2,51 +2,217 @@
 
 import argparse
 import os
-import shutil
+import platform
+import subprocess
 import sys
+import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from constants import EXIT_FAILURE, EXIT_SUCCESS
 from logger import logger
-from utils import run_command
+from utils import check_command, env_with, run_command
 
 from .core import TaskResult
 
 
-def check_command_exists(command: str) -> bool:
-    """Check if a command exists in PATH"""
-    return shutil.which(command) is not None
+def setup_podman_docker_host() -> str | None:
+    """Set up Docker host for Podman based on platform"""
+    system = platform.system()
+
+    if system == "Darwin":  # macOS
+        try:
+            # Get Podman socket path on macOS
+            result = run_command(
+                ["podman", "machine", "inspect", "--format", "{{.ConnectionInfo.PodmanSocket.Path}}"],
+                capture_output=True,
+            )
+            socket_path = result.stdout.strip()
+            if socket_path:
+                docker_host = f"unix://{socket_path}"
+                logger.info(f"Docker host set to: {docker_host}")
+                return docker_host
+        except subprocess.CalledProcessError:
+            logger.warning("Failed to get Podman socket path")
+    elif system == "Linux":
+        # On Linux, check if DOCKER_HOST is already set
+        if os.environ.get("DOCKER_HOST"):
+            return os.environ.get("DOCKER_HOST")
+
+        try:
+            # Try to get Podman socket path on Linux
+            result = run_command(
+                ["podman", "info", "--format", "{{.Host.RemoteSocket.Path}}"],
+                capture_output=True,
+            )
+            socket_path = result.stdout.strip()
+            if socket_path:
+                docker_host = f"unix://{socket_path}"
+                logger.info(f"Docker host set to: {docker_host}")
+                return docker_host
+        except subprocess.CalledProcessError:
+            # Try common Linux socket location
+            xdg_runtime = os.environ.get("XDG_RUNTIME_DIR", f"/run/user/{os.getuid()}")
+            socket_path = f"{xdg_runtime}/podman/podman.sock"
+            if os.path.exists(socket_path):
+                docker_host = f"unix://{socket_path}"
+                logger.info(f"Docker host set to: {docker_host}")
+                return docker_host
+
+    # Windows typically doesn't need DOCKER_HOST as Podman listens to the default pipe
+    return None
 
 
-def check_prerequisites() -> TaskResult:
-    """Check if act and podman are installed"""
+def start_podman_machine(env: dict[str, str], timeout: int = 60) -> bool:
+    """Start Podman machine and wait for it to be ready
+
+    If no machine exists, initializes a new one first.
+
+    Args:
+        env: Environment variables to use
+        timeout: Maximum seconds to wait for machine to start
+
+    Returns:
+        True if machine started successfully, False otherwise
+    """
+    # First check if any machine exists
+    try:
+        result = run_command(
+            ["podman", "machine", "list", "--format", "{{.Name}}"],
+            env=env,
+            capture_output=True,
+        )
+        machines = result.stdout.strip().split("\n") if result.stdout.strip() else []
+
+        if not machines or machines == [""]:
+            # No machine exists, need to initialize one
+            logger.info("No Podman machine found. Initializing a new machine...")
+            try:
+                run_command(["podman", "machine", "init"], env=env)
+                logger.info("Podman machine initialized successfully")
+            except subprocess.CalledProcessError as e:
+                logger.error(f"Failed to initialize Podman machine: {e}")
+                return False
+    except subprocess.CalledProcessError:
+        # If list fails, try to init anyway
+        logger.warning("Failed to list machines, attempting to initialize...")
+        try:
+            run_command(["podman", "machine", "init"], env=env)
+        except subprocess.CalledProcessError:
+            # Might already exist, continue to start
+            pass
+
+    logger.info("Starting Podman machine...")
+
+    try:
+        # Start the machine
+        run_command(["podman", "machine", "start"], env=env)
+    except subprocess.CalledProcessError as e:
+        logger.error(f"Failed to start Podman machine: {e}")
+        return False
+
+    # Wait for machine to be ready
+    start_time = time.time()
+    while time.time() - start_time < timeout:
+        try:
+            # Check if machine is running
+            result = run_command(
+                ["podman", "machine", "list", "--format", "{{.Running}}"],
+                env=env,
+                capture_output=True,
+            )
+            if result.stdout.strip().lower() == "true":
+                logger.success("Podman machine started successfully")
+                return True
+        except subprocess.CalledProcessError:
+            pass
+
+        # Wait a bit before checking again
+        time.sleep(2)
+
+    logger.error(f"Podman machine failed to start within {timeout} seconds")
+    return False
+
+
+def check_prerequisites(auto_start: bool = True, timeout: int = 60) -> tuple[TaskResult, dict[str, str]]:
+    """Check if act and podman are installed, return result and environment
+
+    Args:
+        auto_start: Whether to automatically start Podman machine if not running
+        timeout: Maximum seconds to wait for Podman machine to start
+    """
     logger.info("Checking prerequisites...")
 
     missing = []
 
-    if not check_command_exists("act"):
+    if not check_command("act"):
         missing.append("act")
 
-    if not check_command_exists("podman"):
+    if not check_command("podman"):
         missing.append("podman")
 
     if missing:
         message = f"Missing required tools: {', '.join(missing)}\n"
         message += "Run 'python3 scripts/tanaka.py setup-dev --include act podman' to install them"
-        return TaskResult(success=False, message=message, exit_code=EXIT_FAILURE)
+        return TaskResult(success=False, message=message, exit_code=EXIT_FAILURE), {}
 
-    # Check if podman is running
+    # Set up Docker host for Podman before running podman commands
+    docker_host = setup_podman_docker_host()
+    env = env_with(DOCKER_HOST=docker_host)
+
+    # Check if podman machine exists and is running
+    machine_exists = False
+    machine_running = False
+
     try:
-        run_command(["podman", "machine", "list"], capture_output=True)
-    except Exception:
-        return TaskResult(
-            success=False,
-            message="Podman is installed but not running. Run: podman machine start",
-            exit_code=EXIT_FAILURE,
+        # Check if any machines exist
+        result = run_command(
+            ["podman", "machine", "list", "--format", "{{.Name}}"],
+            env=env,
+            capture_output=True,
         )
+        machines = result.stdout.strip().split("\n") if result.stdout.strip() else []
+        machine_exists = bool(machines and machines != [""])
 
-    return TaskResult(success=True, message="All prerequisites satisfied")
+        if machine_exists:
+            # Check if machine is running
+            result = run_command(
+                ["podman", "machine", "list", "--format", "{{.Running}}"],
+                env=env,
+                capture_output=True,
+            )
+            machine_running = result.stdout.strip().lower() == "true"
+    except subprocess.CalledProcessError:
+        # If list command fails, assume no machine exists
+        pass
+
+    if not machine_exists or not machine_running:
+        if auto_start:
+            # Try to start Podman machine automatically
+            if not machine_exists:
+                logger.warning("No Podman machine found. Creating and starting one...")
+            else:
+                logger.warning("Podman machine is not running. Attempting to start it...")
+
+            if start_podman_machine(env, timeout=timeout):
+                # Update Docker host after machine starts
+                docker_host = setup_podman_docker_host()
+                env = env_with(DOCKER_HOST=docker_host)
+                return TaskResult(success=True, message="All prerequisites satisfied (Podman machine started)"), env
+            else:
+                return TaskResult(
+                    success=False,
+                    message="Failed to start Podman machine. Try running: podman machine start",
+                    exit_code=EXIT_FAILURE,
+                ), env
+        else:
+            return TaskResult(
+                success=False,
+                message="Podman is installed but not running. Run: podman machine start",
+                exit_code=EXIT_FAILURE,
+            ), env
+
+    return TaskResult(success=True, message="All prerequisites satisfied"), env
 
 
 def get_workflow_files() -> list[Path]:
@@ -58,11 +224,17 @@ def get_workflow_files() -> list[Path]:
     return list(workflows_dir.glob("*.yml")) + list(workflows_dir.glob("*.yaml"))
 
 
-def test_workflows(workflow: str | None = None, dry_run: bool = False, verbose: bool = False) -> TaskResult:
+def test_workflows(
+    workflow: str | None = None,
+    dry_run: bool = False,
+    verbose: bool = False,
+    auto_start: bool = True,
+    timeout: int = 60,
+) -> TaskResult:
     """Test GitHub Actions workflows locally"""
 
-    # Check prerequisites first
-    prereq_result = check_prerequisites()
+    # Check prerequisites first and get configured environment
+    prereq_result, env = check_prerequisites(auto_start=auto_start, timeout=timeout)
     if not prereq_result.success:
         return prereq_result
 
@@ -87,6 +259,10 @@ def test_workflows(workflow: str | None = None, dry_run: bool = False, verbose: 
     # Use smaller image for faster testing
     act_args.extend(["-P", "ubuntu-latest=catthehacker/ubuntu:act-latest"])
 
+    # Disable socket bind mounting to avoid Podman issues
+    # This is especially important on macOS but can help on other platforms too
+    act_args.extend(["--container-daemon-socket", "-"])
+
     if dry_run:
         act_args.append("--dryrun")
 
@@ -101,9 +277,9 @@ def test_workflows(workflow: str | None = None, dry_run: bool = False, verbose: 
         try:
             # Run act for this workflow
             cmd = act_args + ["-W", str(workflow_file)]
-            run_command(cmd)
+            run_command(cmd, env=env)
             logger.success(f"✓ {workflow_file.name} passed")
-        except Exception as e:
+        except subprocess.CalledProcessError as e:
             logger.error(f"✗ {workflow_file.name} failed: {e}")
             failed.append(workflow_file.name)
 
@@ -134,7 +310,13 @@ def test_ci_main(args: argparse.Namespace) -> TaskResult:
         except Exception:
             pass  # Continue with testing anyway
 
-    return test_workflows(workflow=args.workflow, dry_run=args.dry_run, verbose=args.verbose)
+    return test_workflows(
+        workflow=args.workflow,
+        dry_run=args.dry_run,
+        verbose=args.verbose,
+        auto_start=not args.no_auto_start,
+        timeout=args.timeout,
+    )
 
 
 def add_subparser(subparsers) -> None:
@@ -154,6 +336,14 @@ def add_subparser(subparsers) -> None:
     parser.add_argument("--dry-run", "-n", action="store_true", help="Show what would be run without executing")
 
     parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
+
+    parser.add_argument(
+        "--no-auto-start", action="store_true", help="Don't automatically start Podman machine if it's not running"
+    )
+
+    parser.add_argument(
+        "--timeout", type=int, default=60, help="Timeout in seconds for starting Podman machine (default: 60)"
+    )
 
     parser.set_defaults(func=test_ci_main)
 

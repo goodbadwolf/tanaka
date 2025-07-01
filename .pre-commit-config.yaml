@@ -104,7 +104,9 @@ repos:
         files: ^\.github/workflows/.*\.(yml|yaml)$
         pass_filenames: false
         additional_dependencies: []
-        stages: [pre-commit]  # Only run locally, not in CI
+        stages: [manual]  # Only run manually with: pre-commit run --hook-stage manual test-github-actions
+        # Note: Set to manual stage because it takes a long time to run locally
+        # Run directly with: uv run scripts/tanaka.py test-ci
 
   # Commit message validation
   - repo: https://github.com/commitizen-tools/commitizen
@@ -140,5 +142,5 @@ ci:
   autoupdate_branch: ''  # Update PRs on default branch
   autoupdate_commit_msg: 'chore: pre-commit autoupdate'
   autoupdate_schedule: weekly
-  skip: [test-github-actions]  # Skip local-only hooks in CI
+  skip: []  # Skip local-only hooks in CI
   submodules: false

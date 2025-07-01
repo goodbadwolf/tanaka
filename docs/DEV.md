@@ -769,21 +769,19 @@ uv run scripts/tanaka.py test-ci --dry-run
 uv run scripts/tanaka.py test-ci -v
 ```
 
-### 14.4 Pre-commit Integration
+### 14.4 Manual Testing
 
-The test-github-actions hook runs automatically when you commit changes to workflow files:
-
-```yaml
-# .pre-commit-config.yaml
-- id: test-github-actions
-  name: Test GitHub Actions workflows locally
-  files: ^\.github/workflows/.*\.(yml|yaml)$
-```
-
-To skip workflow testing during commit:
+The GitHub Actions test hook is set to manual stage because it takes a long time to run locally. Test workflows before committing:
 
 ```bash
-SKIP=test-github-actions git commit
+# Option 1: Use the tanaka command directly
+uv run scripts/tanaka.py test-ci
+
+# Option 2: Run via pre-commit manually
+pre-commit run --hook-stage manual test-github-actions
+
+# Test specific workflow
+uv run scripts/tanaka.py test-ci -w ci.yml
 ```
 
 ### 14.5 Troubleshooting
@@ -824,9 +822,9 @@ act -P ubuntu-latest=catthehacker/ubuntu:act-latest
 ### 14.6 Architecture
 
 The implementation consists of:
-- **Task module** (`scripts/tasks/test_ci.py`): Main logic for workflow testing
-- **Pre-commit hook**: Automatic testing on workflow changes
-- **Act configuration** (`~/.actrc`): Podman backend setup
+- **Task module** (`scripts/tasks/test_ci.py`): Main logic for workflow testing with Podman support
+- **Act configuration** (`.actrc`): Podman backend setup
+- **macOS Support**: Automatic Docker host configuration for Podman socket
 
 ### 14.7 Tips
 
