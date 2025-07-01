@@ -35,7 +35,7 @@
 
 ### 1.2 Server Workflow
 
-1. **Merge** – Axum route `/sync/v2` receives structured operations, applies them to CRDT state, and assigns a monotonic Lamport clock.
+1. **Merge** – Axum route `/sync` receives structured operations, applies them to CRDT state, and assigns a monotonic Lamport clock.
 2. **Persist** – Operations are cached in a `DashMap` for fast read-back and written to `SQLite` in WAL mode for durability.
 3. **Respond** – The server streams back any operations with a clock greater than the client's `since` parameter.
 
