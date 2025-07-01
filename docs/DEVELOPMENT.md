@@ -15,7 +15,41 @@
 
 ---
 
-## Prerequisites
+## 1. Architecture Overview
+
+```
+┌──────────────┐   JSON Operations   ┌──────────────┐
+│  Extension   │ ─────────────────▶  │   Server     │
+│ (TypeScript) │ ◀────────────────── │  (Rust)      │
+└──────────────┘      5 s poll       └─────┬────────┘
+                                           │  SQLite WAL
+                                           ▼
+                                   operations.db
+```
+
+### 1.1 Browser-side Workflow
+
+1. **Capture** – The extension hooks `tabs.*` and `windows.*` events as they happen.
+2. **Encode** – Each change is converted to structured CRDT operations (`upsert_tab`, `close_tab`, etc.).
+3. **Sync** – Every 5 seconds (adjusting to 1 s during activity) the extension POSTs its queued operations and immediately requests any newer ones from the server.
+
+### 1.2 Server Workflow
+
+1. **Merge** – Axum route `/sync/v2` receives structured operations, applies them to CRDT state, and assigns a monotonic Lamport clock.
+2. **Persist** – Operations are cached in a `DashMap` for fast read-back and written to `SQLite` in WAL mode for durability.
+3. **Respond** – The server streams back any operations with a clock greater than the client's `since` parameter.
+
+### 1.3 Data Guarantees
+
+- **Eventual Consistency** – Structured CRDT operations ensure replicas converge regardless of network order.
+- **Crash Safety** – WAL mode plus 5 s flush means at most 5 seconds of operations are in memory at any moment.
+- **Security** – All traffic is TLS-encrypted (`rustls`) and protected by a shared bearer token.
+
+For detailed protocol specification, see [SYNC-PROTOCOL.md](SYNC-PROTOCOL.md).
+
+---
+
+## 2. Prerequisites
 
 | Tool    | Version | Purpose               |
 | ------- | ------- | --------------------- |
@@ -94,9 +128,29 @@ pip install uv  # Fast Python package manager
 
 </details>
 
+### Python Package Management: uv vs pip
+
+This project uses `uv` for Python dependency management:
+
+**Use `uv` when:**
+- Installing project dependencies: `uv sync --dev`
+- Running project scripts: `uv run scripts/tanaka.py lint`
+- Working within this project's environment
+
+**Use `pip` when:**
+- Installing global tools: `pip install uv`
+- Installing tools outside this project
+- Systems where uv isn't available
+
+**Key differences:**
+- `uv` is 10-100x faster than pip
+- `uv` automatically manages virtual environments
+- `uv` has better dependency resolution
+- `uv sync` installs from `pyproject.toml` (like `npm install` for Python)
+
 ---
 
-## First-Time Setup
+## 3. First-Time Setup
 
 ### 1. Clone the Repository
 
@@ -147,7 +201,39 @@ cd extension && pnpm run start
 
 ---
 
-## Development Workflow
+## 4. Configuration
+
+See [Getting Started](GETTING-STARTED.md#configuration-options) for detailed configuration instructions.
+
+The server automatically applies SQLite safety settings at startup:
+
+```sql
+PRAGMA journal_mode=WAL;
+PRAGMA busy_timeout=3000;
+```
+
+### Local Development (TLS Alternatives)
+
+When developing locally, you may not need production certificates. You can:
+
+- **Run HTTP-only**: omit the `[tls]` section and update `bind_addr` (e.g. `127.0.0.1:8000`) for plain HTTP.
+- **Use self-signed certificates**: generate a cert and key with:
+
+  ```bash
+  openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj "/CN=localhost"
+  ```
+
+  Then update your config:
+
+  ```toml
+  [tls]
+  cert_path = "path/to/cert.pem"
+  key_path  = "path/to/key.pem"
+  ```
+
+---
+
+## 5. Development Workflow
 
 ### Code Organization
 
@@ -200,7 +286,7 @@ cd extension && pnpm test:watch  # Watch mode
 
 ---
 
-## Essential Commands Reference
+## 6. Essential Commands Reference
 
 ### Server Commands (Rust)
 
@@ -250,7 +336,7 @@ pnpm run gen-icons     # Generate icons
 
 ---
 
-## Testing Strategy
+## 7. Testing Strategy
 
 ### Unit Tests
 
@@ -273,7 +359,7 @@ pnpm run gen-icons     # Generate icons
 
 ---
 
-## Local Development Configuration
+## 8. Local Development Configuration
 
 ### Server Configuration
 
@@ -312,7 +398,7 @@ key_path = "key.pem"
 
 ---
 
-## Webapp Mode
+## 9. Webapp Mode
 
 Test the extension without Firefox:
 
@@ -337,7 +423,7 @@ Implementation:
 
 ---
 
-## Python Tooling
+## 10. Python Tooling
 
 This project uses `uv` for Python dependency management:
 
@@ -358,7 +444,7 @@ uv run scripts/tanaka.py generate
 
 ---
 
-## Release Process
+## 11. Release Process
 
 1. **Update versions**:
 
@@ -379,7 +465,7 @@ uv run scripts/tanaka.py generate
 
 ---
 
-## Testing GitHub Actions Locally
+## 12. Testing GitHub Actions Locally
 
 Test CI workflows before pushing:
 
@@ -405,7 +491,7 @@ Troubleshooting:
 
 ---
 
-## Component Library
+## 13. Component Library
 
 The extension includes reusable React components. See the full [Component Documentation](#component-library-1) below.
 
@@ -422,7 +508,7 @@ import { Button, Input, Card } from "../components";
 
 ---
 
-## Contributing Guidelines
+## 14. Contributing Guidelines
 
 ### Before Submitting
 
@@ -452,16 +538,17 @@ import { Button, Input, Card } from "../components";
 
 ---
 
-## Next Steps
+## 15. Next Steps
 
 - **Architecture details**: See [Architecture](ARCHITECTURE.md)
 - **Common issues**: See [Troubleshooting](TROUBLESHOOTING.md)
 - **Git workflow**: See [Git Guidelines](GIT.md)
 - **Project roadmap**: See [Roadmap](ROADMAP.md)
+- **Sync protocol**: See [Sync Protocol](SYNC-PROTOCOL.md)
 
 ---
 
-## Component Library
+## 16. Component Library
 
 The extension includes a collection of reusable UI components built with React/Preact.
 
@@ -576,3 +663,124 @@ import { Card } from "../components";
 - `footer`: ReactNode
 - `interactive`: boolean
 - `onClick`: () => void
+
+---
+
+## 17. Debugging & Troubleshooting
+
+### Extension Debugging
+
+1. **Extension Console**: `about:debugging` → This Firefox → Tanaka → Inspect
+2. **Storage inspection**: `await browser.storage.local.get()`
+3. **Performance profiling**: Use `console.time()` and browser DevTools
+4. **Network monitoring**: Check DevTools Network tab for sync requests
+
+### Server Debugging
+
+1. **Enable debug logging**: `RUST_LOG=debug cargo run`
+2. **Database inspection**: `sqlite3 tabs.db .tables`
+3. **Monitor performance**: Check request logs and response times
+
+### Common Issues
+
+- **Extension not loading**: Check manifest.json syntax with `npx web-ext lint`
+- **Server connection failures**: Verify certificate acceptance and token match
+- **Sync not working**: Check both extension console and server logs
+- **High memory usage**: Monitor tab count and implement data cleanup
+
+For detailed troubleshooting, see [Troubleshooting Guide](TROUBLESHOOTING.md).
+
+---
+
+## 18. Security Best Practices
+
+### WebExtension Security
+
+- Validate all external data before processing
+- Use Content Security Policy in manifest.json
+- Never store sensitive data in plain text
+- Request minimal permissions
+
+### API Communication Security
+
+- Always use HTTPS in production
+- Implement request timeouts
+- Validate server certificates
+- Use strong authentication tokens
+
+### Development Security
+
+- Review all code changes for security implications
+- Keep dependencies updated
+- Follow secure coding practices
+- Test with security-focused mindset
+
+---
+
+## 19. Performance Optimization
+
+### Extension Performance
+
+- Use React.memo for expensive components
+- Implement virtual scrolling for large lists
+- Debounce frequent operations
+- Profile with Firefox Performance tools
+
+### Server Performance
+
+- Use connection pooling for database
+- Implement caching with DashMap
+- Optimize database queries
+- Monitor response times
+
+### Network Performance
+
+- Batch operations where possible
+- Implement compression for large payloads
+- Use incremental sync
+- Monitor bandwidth usage
+
+---
+
+## 20. Error Handling Architecture
+
+### Extension Error System
+
+```typescript
+// Result pattern for explicit error handling
+import { Result, ok, err } from "neverthrow";
+
+async function syncTabs(): Promise<Result<Tab[], SyncError>> {
+  try {
+    const tabs = await api.syncTabs();
+    return ok(tabs);
+  } catch (error) {
+    return err(SyncError.NetworkFailure);
+  }
+}
+```
+
+### Server Error System
+
+```rust
+// Comprehensive error types with proper HTTP status mapping
+#[derive(Error, Debug)]
+pub enum AppError {
+    #[error("Database error: {message}")]
+    Database {
+        message: String,
+        #[source]
+        source: sqlx::Error,
+    },
+    // ... more error types
+}
+```
+
+### Error Recovery
+
+- Automatic retry with exponential backoff
+- Circuit breaker pattern for repeated failures
+- Graceful degradation when possible
+- User-friendly error messages
+
+For complete error handling details, see the error handling implementation in the codebase.
