@@ -1,0 +1,14 @@
+# Prettier ignore file
+
+# Generated files
+extension/pnpm-lock.yaml
+extension/dist/
+extension/node_modules/
+server/target/
+
+# Coverage reports
+extension/coverage/
+
+# Build artifacts
+*.xpi
+*.zip

@@ -1,0 +1,11 @@
+# Prettier configuration for YAML formatting
+# Used by pre-commit hooks
+
+# General
+printWidth: 120
+tabWidth: 2
+useTabs: false
+
+# YAML specific
+proseWrap: preserve
+singleQuote: false # Use double quotes (YAML default)
