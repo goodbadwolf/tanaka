@@ -1,6 +1,12 @@
 import 'reflect-metadata';
 import '@testing-library/jest-dom';
 
+// Mock crypto.randomUUID for ExtensionError
+global.crypto = {
+  ...global.crypto,
+  randomUUID: jest.fn(() => `test-uuid-${Date.now()}`),
+} as Crypto;
+
 // Mock browser APIs for all tests
 jest.mock('webextension-polyfill', () => ({
   tabs: {

@@ -1,12 +1,12 @@
 use axum::{extract::State, Json};
 use sqlx::{query, Row, SqlitePool};
-
-use crate::models::{SyncRequest, SyncResponse, Tab};
+use tanaka_server::error::AppResult;
+use tanaka_server::models::{SyncRequest, SyncResponse, Tab};
 
 pub async fn sync_handler(
     State(pool): State<SqlitePool>,
     Json(request): Json<SyncRequest>,
-) -> Result<Json<SyncResponse>, String> {
+) -> AppResult<Json<SyncResponse>> {
     // Store incoming tabs
     for tab in request.tabs {
         query(
@@ -25,7 +25,9 @@ pub async fn sync_handler(
         .bind(tab.updated_at)
         .execute(&pool)
         .await
-        .map_err(|e| format!("Database error: {e}"))?;
+        .map_err(|e| {
+            tanaka_server::error::AppError::database(format!("Failed to upsert tab {}", tab.id), e)
+        })?;
     }
 
     // Fetch all tabs
@@ -38,7 +40,7 @@ pub async fn sync_handler(
     )
     .fetch_all(&pool)
     .await
-    .map_err(|e| format!("Database error: {e}"))?;
+    .map_err(|e| tanaka_server::error::AppError::database("Failed to fetch tabs", e))?;
 
     let tabs: Vec<Tab> = rows
         .into_iter()

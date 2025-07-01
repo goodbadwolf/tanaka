@@ -1,6 +1,7 @@
 import type { Tab as BrowserTab } from '../browser/core';
 import type { Tab, SyncRequest, SyncResponse } from './models';
 import { ExtensionError, ErrorFactories, type AsyncResult, createResult } from '../error/types';
+import { createRetryableFunction } from '../utils/retry';
 
 export type { Tab, SyncRequest, SyncResponse };
 
@@ -13,15 +14,63 @@ export interface TabData {
   active: boolean;
 }
 
+export interface TanakaAPIOptions {
+  /**
+   * Enable retry logic for API calls
+   */
+  enableRetry?: boolean;
+
+  /**
+   * Maximum number of retry attempts
+   */
+  maxRetryAttempts?: number;
+
+  /**
+   * Enable circuit breaker
+   */
+  enableCircuitBreaker?: boolean;
+}
+
 export class TanakaAPI {
   private baseUrl: URL;
   private token = 'unset-token';
+  private readonly options: TanakaAPIOptions;
+  private readonly retryableRequest: <T>(path: string, options?: RequestInit) => Promise<T>;
 
-  constructor(baseUrl: string) {
+  constructor(baseUrl: string, options: TanakaAPIOptions = {}) {
     try {
       this.baseUrl = new URL(baseUrl);
     } catch {
       throw ErrorFactories.invalidServerUrl(baseUrl);
+    }
+
+    // Set default options
+    this.options = {
+      enableRetry: true,
+      maxRetryAttempts: 3,
+      enableCircuitBreaker: true,
+      ...options,
+    };
+
+    // Create retryable version of request method
+    if (this.options.enableRetry) {
+      const retryFn = createRetryableFunction(
+        <T>(path: string, options?: RequestInit) => this.request<T>(path, options),
+        {
+          maxAttempts: this.options.maxRetryAttempts || 3,
+          circuitBreaker: this.options.enableCircuitBreaker
+            ? {
+                failureThreshold: 5,
+                resetTimeout: 60000, // 1 minute
+                successThreshold: 2,
+              }
+            : undefined,
+        },
+      );
+      this.retryableRequest = (path: string, options?: RequestInit) => retryFn(path, options);
+    } else {
+      this.retryableRequest = <T>(path: string, options?: RequestInit) =>
+        this.request<T>(path, options);
     }
   }
 
@@ -35,7 +84,7 @@ export class TanakaAPI {
 
   async syncTabs(tabs: Tab[]): AsyncResult<Tab[], ExtensionError> {
     return createResult(async () => {
-      const data = await this.request<SyncResponse>('/sync', {
+      const data = await this.retryableRequest<SyncResponse>('/sync', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -49,7 +98,7 @@ export class TanakaAPI {
 
   async checkHealth(): AsyncResult<boolean, ExtensionError> {
     return createResult(async () => {
-      await this.request('/health');
+      await this.retryableRequest('/health');
       return true;
     });
   }

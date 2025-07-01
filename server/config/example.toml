@@ -1,44 +1,51 @@
 # Tanaka Server Configuration Example
-# Copy this file to ~/.config/tanaka/tanaka.toml and customize
+# Copy this file to tanaka.toml and customize for your setup
 
 [server]
-# Network binding address
-# Use 0.0.0.0 to listen on all interfaces, 127.0.0.1 for localhost only
-bind_addr = "0.0.0.0:443"
+# Bind address for the server
+bind_addr = "127.0.0.1:8443"
+# Worker threads (optional, defaults to CPU count)
+# worker_threads = 4
+# Request timeout in seconds
+request_timeout_secs = 30
 
-# How often clients should poll for updates (seconds)
-poll_secs = 5
+[database]
+# Database URL (SQLite example)
+url = "sqlite://tabs.db"
+# Maximum database connections
+max_connections = 5
+# Connection timeout in seconds
+connection_timeout_secs = 10
 
-# How often to flush CRDT state to disk (seconds)
-flush_secs = 5
+[auth]
+# Shared authentication token (REQUIRED - must match extension config)
+shared_token = "your-secret-token-here"
+# Token header name
+token_header = "Authorization"
+# Enable rate limiting
+rate_limiting = true
+# Max requests per minute per IP
+max_requests_per_minute = 60
 
-# Optional: Database path (defaults to tabs.db in current directory)
-# db_path = "/var/lib/tanaka/tabs.db"
-
-[tls]
-# TLS certificate paths (required for HTTPS)
-# For Let's Encrypt:
-cert_path = "/etc/letsencrypt/live/example.com/fullchain.pem"
-key_path = "/etc/letsencrypt/live/example.com/privkey.pem"
-
-# For self-signed certificates (development):
+# TLS configuration (optional - uncomment to enable HTTPS)
+# [tls]
 # cert_path = "/path/to/cert.pem"
 # key_path = "/path/to/key.pem"
 
-# To run HTTP-only (development), omit the entire [tls] section
-# and change bind_addr to something like "127.0.0.1:8000"
+[sync]
+# Polling interval in seconds
+poll_secs = 5
+# Database flush interval in seconds
+flush_secs = 5
+# Maximum sync payload size in bytes
+max_payload_size = 1048576  # 1MB
+# Enable compression (experimental)
+compression = false
 
-[auth]
-# Shared bearer token for authentication
-# Generate with: openssl rand -hex 32
-shared_token = "replace-me-with-secure-token"
-
-# Optional sections (not yet implemented)
-
-# [logging]
-# level = "info"  # trace, debug, info, warn, error
-# format = "json" # json, pretty
-
-# [metrics]
-# enabled = true
-# port = 9090  # Prometheus metrics endpoint
+[logging]
+# Log level (trace, debug, info, warn, error)
+level = "info"
+# Log format (json, pretty, compact)
+format = "pretty"
+# Enable request logging
+request_logging = true

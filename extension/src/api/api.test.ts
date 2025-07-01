@@ -11,7 +11,7 @@ describe('TanakaAPI', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    api = new TanakaAPI('https://api.tanaka.test');
+    api = new TanakaAPI('https://api.tanaka.test', { enableRetry: false });
   });
 
   describe('constructor', () => {
