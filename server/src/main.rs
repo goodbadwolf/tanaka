@@ -6,8 +6,11 @@ use axum::{
 use clap::Parser;
 use serde::Serialize;
 use std::net::SocketAddr;
+use std::sync::Arc;
 use tanaka_server::config::{Args, Config};
+use tanaka_server::crdt::CrdtManager;
 use tanaka_server::error::AppResult;
+use tanaka_server::sync_v2;
 use tower_http::{cors::CorsLayer, trace::TraceLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, Layer};
 
@@ -33,7 +36,12 @@ async fn main() -> AppResult<()> {
     let db_pool = db::init_db_with_config(&config.database).await?;
     tracing::info!("Database initialized");
 
-    let app = create_app(db_pool, &config);
+    // Initialize CRDT manager with node ID based on bind address hash
+    let node_id = calculate_node_id(&config.server.bind_addr);
+    let crdt_manager = Arc::new(CrdtManager::new(node_id));
+    tracing::info!("CRDT manager initialized with node ID: {}", node_id);
+
+    let app = create_app(db_pool, crdt_manager, &config);
 
     let addr: SocketAddr =
         config
@@ -74,14 +82,28 @@ fn init_logging(config: &Config) {
         .init();
 }
 
-fn create_app(db_pool: sqlx::SqlitePool, config: &Config) -> Router {
-    let mut app = Router::new().route("/health", get(health)).route(
-        "/sync",
-        post(sync::sync_handler).route_layer(middleware::from_fn_with_state(
-            config.auth.clone(),
-            auth::auth_middleware,
-        )),
-    );
+fn create_app(
+    db_pool: sqlx::SqlitePool,
+    crdt_manager: Arc<CrdtManager>,
+    config: &Config,
+) -> Router {
+    let auth_middleware_layer =
+        middleware::from_fn_with_state(config.auth.clone(), auth::auth_middleware);
+
+    let mut app = Router::new()
+        .route("/health", get(health))
+        .route(
+            "/sync",
+            post(sync::sync_handler)
+                .with_state(db_pool.clone())
+                .route_layer(auth_middleware_layer.clone()),
+        )
+        .route(
+            "/sync/v2",
+            post(sync_v2::sync_v2_handler)
+                .with_state((crdt_manager.clone(), db_pool.clone()))
+                .route_layer(auth_middleware_layer),
+        );
 
     app = app.layer(CorsLayer::permissive());
 
@@ -89,7 +111,7 @@ fn create_app(db_pool: sqlx::SqlitePool, config: &Config) -> Router {
         app = app.layer(TraceLayer::new_for_http());
     }
 
-    app.with_state(db_pool)
+    app
 }
 
 async fn health() -> Json<HealthResponse> {
@@ -97,4 +119,15 @@ async fn health() -> Json<HealthResponse> {
         status: "ok".to_string(),
         version: env!("CARGO_PKG_VERSION").to_string(),
     })
+}
+
+fn calculate_node_id(bind_addr: &str) -> u32 {
+    use std::collections::hash_map::DefaultHasher;
+    use std::hash::{Hash, Hasher};
+
+    let mut hasher = DefaultHasher::new();
+    bind_addr.hash(&mut hasher);
+
+    // Use lower 32 bits for node ID
+    (hasher.finish() & 0xFFFFFFFF) as u32
 }
