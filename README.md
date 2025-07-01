@@ -1,6 +1,6 @@
 # Tanaka
 
-[![Code Quality](https://github.com/goodbadwolf/tanaka/actions/workflows/code-quality.yml/badge.svg)](https://github.com/goodbadwolf/tanaka/actions/workflows/code-quality.yml) [![Release](https://img.shields.io/github/v/release/goodbadwolf/tanaka?include_prereleases)](https://github.com/goodbadwolf/tanaka/releases)
+[![CI](https://github.com/goodbadwolf/tanaka/actions/workflows/ci.yml/badge.svg)](https://github.com/goodbadwolf/tanaka/actions/workflows/ci.yml) [![Release](https://img.shields.io/github/v/release/goodbadwolf/tanaka?include_prereleases)](https://github.com/goodbadwolf/tanaka/releases)
 
 Tanaka keeps your Firefox browsing **entangled** across every computer you use. Open a tab at work and it's already there when you get home; close a noisy article on your laptop and it vanishes from your desktop too. Tanaka selectively mirrors _tracked_ windows so your workspace feels like a single, coherent browser—no matter how many machines you run.
 

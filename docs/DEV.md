@@ -754,7 +754,7 @@ python3 scripts/tanaka.py test-ci
 **Test specific workflow:**
 
 ```bash
-python3 scripts/tanaka.py test-ci -w code-quality.yml
+python3 scripts/tanaka.py test-ci -w ci.yml
 ```
 
 **Dry run (see what would execute):**
