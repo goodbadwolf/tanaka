@@ -22,8 +22,14 @@ export class SyncManager {
 
     try {
       const localTabs = await this.collectTrackedTabs();
-      const allTabs = await this.api.syncTabs(localTabs);
-      debugLog(`Synced ${localTabs.length} local tabs, received ${allTabs.length} total tabs`);
+      const result = await this.api.syncTabs(localTabs);
+      if (result.success) {
+        debugLog(
+          `Synced ${localTabs.length} local tabs, received ${result.data.length} total tabs`,
+        );
+      } else {
+        debugError('Sync failed:', result.error);
+      }
     } catch (error) {
       debugError('Sync failed:', error);
     }

@@ -10,6 +10,7 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 mod auth;
 mod db;
+mod error;
 mod models;
 mod sync;
 
