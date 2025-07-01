@@ -1,22 +1,34 @@
-use axum::{extract::Request, http::StatusCode, middleware::Next, response::Response};
+use axum::{
+    extract::{Request, State},
+    middleware::Next,
+    response::{IntoResponse, Response},
+};
+use tanaka_server::config::AuthConfig;
+use tanaka_server::error::AppError;
 
-const BEARER_TOKEN: &str = "tanaka-secret-token";
-
-pub async fn auth_middleware(req: Request, next: Next) -> Result<Response, StatusCode> {
+pub async fn auth_middleware(
+    State(auth_config): State<AuthConfig>,
+    req: Request,
+    next: Next,
+) -> Result<Response, Response> {
     let auth_header = req
         .headers()
-        .get("authorization")
+        .get(&auth_config.token_header)
         .and_then(|value| value.to_str().ok());
 
     match auth_header {
         Some(auth) if auth.starts_with("Bearer ") => {
             let token = &auth[7..];
-            if token == BEARER_TOKEN {
+            if token == auth_config.shared_token {
                 Ok(next.run(req).await)
             } else {
-                Err(StatusCode::UNAUTHORIZED)
+                Err(AppError::auth_token_invalid("Invalid authentication token").into_response())
             }
         }
-        _ => Err(StatusCode::UNAUTHORIZED),
+        Some(_) => Err(AppError::auth_token_invalid(
+            "Invalid authorization format. Use: Bearer <token>",
+        )
+        .into_response()),
+        None => Err(AppError::auth_token_missing().into_response()),
     }
 }

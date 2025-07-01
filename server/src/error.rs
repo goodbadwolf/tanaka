@@ -233,6 +233,13 @@ pub enum AppError {
         message: String,
         context: HashMap<String, serde_json::Value>,
     },
+
+    #[error("IO error: {message}")]
+    Io {
+        message: String,
+        #[source]
+        source: std::io::Error,
+    },
 }
 
 impl AppError {
@@ -251,7 +258,7 @@ impl AppError {
                 StatusCode::BAD_REQUEST => ErrorCode::InvalidData,
                 _ => ErrorCode::ServerError,
             },
-            AppError::Internal { .. } => ErrorCode::ServerError,
+            AppError::Internal { .. } | AppError::Io { .. } => ErrorCode::ServerError,
         }
     }
 
@@ -259,7 +266,7 @@ impl AppError {
     #[must_use]
     pub fn status_code(&self) -> StatusCode {
         match self {
-            AppError::Database { .. } | AppError::Internal { .. } => {
+            AppError::Database { .. } | AppError::Internal { .. } | AppError::Io { .. } => {
                 StatusCode::INTERNAL_SERVER_ERROR
             }
             AppError::Auth { code, .. } => code.http_status(),
@@ -275,7 +282,7 @@ impl AppError {
     #[must_use]
     pub fn is_retryable(&self) -> bool {
         match self {
-            AppError::Database { .. } | AppError::Internal { .. } => true, // Database and internal errors are often transient
+            AppError::Database { .. } | AppError::Internal { .. } | AppError::Io { .. } => true, // Database, internal and IO errors are often transient
             AppError::Auth { code, .. } => code.is_retryable(),
             AppError::Validation { .. }
             | AppError::Sync { .. }
@@ -302,7 +309,7 @@ impl AppError {
     }
 
     /// Create an authentication error for invalid token
-    #[allow(dead_code)] // Part of public API, may be used in future
+    #[must_use]
     pub fn auth_token_invalid(message: impl Into<String>) -> Self {
         AppError::Auth {
             message: message.into(),
@@ -423,6 +430,7 @@ impl IntoResponse for AppError {
             source: match &self {
                 AppError::Database { source, .. } => Some(source.to_string()),
                 AppError::Json { source, .. } => Some(source.to_string()),
+                AppError::Io { source, .. } => Some(source.to_string()),
                 _ => None,
             },
         };
@@ -466,6 +474,15 @@ impl From<serde_json::Error> for AppError {
     fn from(err: serde_json::Error) -> Self {
         AppError::Json {
             message: "JSON parsing failed".to_string(),
+            source: err,
+        }
+    }
+}
+
+impl From<std::io::Error> for AppError {
+    fn from(err: std::io::Error) -> Self {
+        AppError::Io {
+            message: format!("IO operation failed: {}", err.kind()),
             source: err,
         }
     }

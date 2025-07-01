@@ -21,7 +21,12 @@ container.registerSingleton<WindowTracker>(WindowTracker);
 
 // Register TanakaAPI with factory
 container.register<TanakaAPI>(TanakaAPI, {
-  useFactory: () => new TanakaAPI(getConfig().serverUrl),
+  useFactory: () =>
+    new TanakaAPI(getConfig().serverUrl, {
+      enableRetry: true,
+      maxRetryAttempts: 3,
+      enableCircuitBreaker: true,
+    }),
 });
 
 // Register SyncManager as singleton
