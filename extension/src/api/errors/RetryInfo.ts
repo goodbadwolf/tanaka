@@ -3,8 +3,4 @@
 /**
  * Retry information for retryable errors
  */
-export interface RetryInfo {
-  retryable: boolean;
-  retry_after: bigint | null;
-  max_retries: number | null;
-}
+export type RetryInfo = { retryable: boolean, retry_after: bigint | null, max_retries: number | null, };

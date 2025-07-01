@@ -11,7 +11,7 @@ use uuid::Uuid;
 
 // Error code enum that is exported to TypeScript via ts-rs
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, TS)]
-#[ts(export, export_to = "../extension/src/api/errors/")]
+#[ts(export, export_to = "../../extension/src/api/errors/")]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum ErrorCode {
     // Network & Connectivity Errors
@@ -361,7 +361,7 @@ impl AppError {
 
 /// Error response structure for HTTP APIs
 #[derive(Debug, Serialize, TS)]
-#[ts(export, export_to = "../extension/src/api/errors/")]
+#[ts(export, export_to = "../../extension/src/api/errors/")]
 pub struct ErrorResponse {
     pub status: String,
     pub error: ErrorDetail,
@@ -371,7 +371,7 @@ pub struct ErrorResponse {
 
 /// Detailed error information
 #[derive(Debug, Serialize, TS)]
-#[ts(export, export_to = "../extension/src/api/errors/")]
+#[ts(export, export_to = "../../extension/src/api/errors/")]
 pub struct ErrorDetail {
     pub id: String,
     pub code: ErrorCode,
@@ -386,7 +386,7 @@ pub struct ErrorDetail {
 
 /// Retry information for retryable errors
 #[derive(Debug, Serialize, TS)]
-#[ts(export, export_to = "../extension/src/api/errors/")]
+#[ts(export, export_to = "../../extension/src/api/errors/")]
 pub struct RetryInfo {
     pub retryable: bool,
     #[serde(skip_serializing_if = "Option::is_none")]

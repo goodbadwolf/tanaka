@@ -4,7 +4,7 @@ use ts_rs::TS;
 #[derive(Debug, Serialize, Deserialize, TS)]
 #[ts(
     export,
-    export_to = "../extension/src/api/models/",
+    export_to = "../../extension/src/api/models/",
     rename_all = "camelCase"
 )]
 pub struct Tab {
@@ -18,7 +18,7 @@ pub struct Tab {
 #[derive(Debug, Deserialize, TS)]
 #[ts(
     export,
-    export_to = "../extension/src/api/models/",
+    export_to = "../../extension/src/api/models/",
     rename_all = "camelCase"
 )]
 pub struct SyncRequest {
@@ -28,7 +28,7 @@ pub struct SyncRequest {
 #[derive(Debug, Serialize, TS)]
 #[ts(
     export,
-    export_to = "../extension/src/api/models/",
+    export_to = "../../extension/src/api/models/",
     rename_all = "camelCase"
 )]
 pub struct SyncResponse {
