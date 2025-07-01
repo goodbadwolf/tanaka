@@ -34,5 +34,9 @@ toml = "0.8"
 dotenvy = "0.15"
 clap = { version = "4.5", features = ["derive", "env"] }
 
+# CRDT dependencies
+yrs = "0.21"
+dashmap = "6.1"
+
 [dev-dependencies]
 tempfile = "3"
