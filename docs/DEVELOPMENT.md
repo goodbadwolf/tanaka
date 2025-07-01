@@ -382,7 +382,7 @@ python3 scripts/tanaka.py setup-dev --include act podman
 python3 scripts/tanaka.py test-ci
 
 # Test specific workflow
-python3 scripts/tanaka.py test-ci -w code-quality.yml
+python3 scripts/tanaka.py test-ci -w ci.yml
 
 # Dry run
 python3 scripts/tanaka.py test-ci --dry-run
