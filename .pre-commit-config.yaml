@@ -96,7 +96,7 @@ repos:
 
       - id: rust-tests
         name: Run Rust tests
-        entry: bash -c 'cd server && cargo test --lib'
+        entry: bash -c 'cd server && cargo test'
         language: system
         files: ^server/.*\.rs$
         pass_filenames: false

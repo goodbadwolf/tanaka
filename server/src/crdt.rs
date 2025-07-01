@@ -378,6 +378,11 @@ impl CrdtManager {
     }
 
     #[must_use]
+    pub fn tick_clock(&self) -> u64 {
+        self.clock.tick()
+    }
+
+    #[must_use]
     pub fn node_id(&self) -> u32 {
         self.clock.node_id()
     }
