@@ -245,7 +245,7 @@ pub async fn sync_handler(
     // Process incoming operations
     let mut processed_operations = Vec::new();
     for operation in request.operations {
-        let operation_clock = crdt_manager.current_clock();
+        let operation_clock = crdt_manager.tick_clock();
 
         tracing::debug!(
             operation_type = operation.operation_type(),

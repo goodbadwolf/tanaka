@@ -91,12 +91,7 @@ jobs:
       - name: Run server tests
         run: |
           cd server
-          cargo test --lib --verbose
-
-      - name: Run doc tests
-        run: |
-          cd server
-          cargo test --doc --verbose
+          cargo test --verbose
 
   test-extension:
     runs-on: ubuntu-latest
