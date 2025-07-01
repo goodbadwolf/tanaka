@@ -145,7 +145,7 @@ def add_subparser(subparsers) -> None:
         description="Test GitHub Actions workflows locally before pushing",
     )
 
-    parser.add_argument("--workflow", "-w", help="Test specific workflow file (e.g., code-quality.yml)")
+    parser.add_argument("--workflow", "-w", help="Test specific workflow file (e.g., ci.yml)")
 
     parser.add_argument(
         "--check", action="store_true", help="Only run if workflow files have been modified (for pre-commit)"

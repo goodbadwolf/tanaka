@@ -5,6 +5,7 @@
 **Prerequisites**: Basic knowledge of Rust, TypeScript, and browser extensions
 
 ## Navigation
+
 - [🏠 Home](../README.md)
 - [🚀 Getting Started](GETTING-STARTED.md)
 - [💻 Development](DEVELOPMENT.md)
@@ -16,13 +17,13 @@
 
 ## Prerequisites
 
-| Tool    | Version | Purpose |
-| ------- | ------- | ------- |
-| Rust    | 1.83+   | Server development |
+| Tool    | Version | Purpose               |
+| ------- | ------- | --------------------- |
+| Rust    | 1.83+   | Server development    |
 | Node.js | 24+     | Extension development |
-| pnpm    | 10.11+  | Package management |
-| SQLite  | 3.40+   | Database |
-| Firefox | 126+    | Extension testing |
+| pnpm    | 10.11+  | Package management    |
+| SQLite  | 3.40+   | Database              |
+| Firefox | 126+    | Extension testing     |
 
 ### Automated Setup
 
@@ -52,6 +53,7 @@ python3 scripts/tanaka.py setup-dev --include act podman
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 source $HOME/.cargo/env
 ```
+
 </details>
 
 <details>
@@ -67,6 +69,7 @@ nvm install 24
 nvm alias default 24
 nvm use 24
 ```
+
 </details>
 
 <details>
@@ -75,6 +78,7 @@ nvm use 24
 ```bash
 npm install -g pnpm
 ```
+
 </details>
 
 <details>
@@ -87,6 +91,7 @@ cargo install sqlx-cli --no-default-features --features sqlite
 # Python development tools
 pip install uv  # Fast Python package manager
 ```
+
 </details>
 
 ---
@@ -227,7 +232,7 @@ pnpm run build:dev     # Development build
 pnpm run build:prod    # Production build
 pnpm run watch         # Watch mode
 
-# Quality
+# Lint
 pnpm run lint          # ESLint
 pnpm run lint:fix      # Fix issues
 pnpm run typecheck     # TypeScript check
@@ -286,7 +291,7 @@ AUTH_TOKEN=dev-token
 The extension uses environment-based configs in `src/config/environments/`:
 
 - `development.ts` - Local development
-- `staging.ts` - Staging environment  
+- `staging.ts` - Staging environment
 - `production.ts` - Production release
 
 ### TLS for Local Development
@@ -316,6 +321,7 @@ pnpm run webapp
 ```
 
 Features:
+
 - Runs at http://localhost:3000
 - Mock browser APIs
 - Hot module replacement
@@ -324,6 +330,7 @@ Features:
   - `/settings` - Settings page
 
 Implementation:
+
 - `src/browser/mock.ts` - Mock browser APIs
 - `src/webapp/index.tsx` - Webapp entry point
 - `WEBAPP_MODE=true` - Environment flag
@@ -354,10 +361,12 @@ uv run scripts/tanaka.py generate
 ## Release Process
 
 1. **Update versions**:
+
    - `extension/manifest.json`
    - `server/Cargo.toml`
 
 2. **Create release**:
+
    ```bash
    git tag -s vX.Y.Z -m "Release vX.Y.Z"
    git push origin --tags
@@ -389,6 +398,7 @@ uv run scripts/tanaka.py test-ci --dry-run
 ```
 
 Troubleshooting:
+
 - Start podman: `podman machine start`
 - Skip in commits: `SKIP=test-github-actions git commit`
 - Skip steps locally: `if: ${{ !env.ACT }}`
@@ -402,12 +412,12 @@ The extension includes reusable React components. See the full [Component Docume
 Quick usage:
 
 ```tsx
-import { Button, Input, Card } from '../components';
+import { Button, Input, Card } from "../components";
 
 <Card header="Settings">
   <Input label="Server URL" type="url" />
   <Button variant="primary">Save</Button>
-</Card>
+</Card>;
 ```
 
 ---
@@ -417,11 +427,13 @@ import { Button, Input, Card } from '../components';
 ### Before Submitting
 
 1. **Run all checks**:
+
    ```bash
    pre-commit run --all-files
    ```
 
 2. **Test your changes**:
+
    - Unit tests pass
    - Manual testing done
    - No regressions
@@ -470,6 +482,7 @@ import { Button } from '../components';
 ```
 
 **Props:**
+
 - `variant`: 'primary' | 'secondary' | 'danger'
 - `size`: 'small' | 'medium' | 'large'
 - `loading`: boolean
@@ -481,18 +494,19 @@ import { Button } from '../components';
 Form input component with built-in validation and error handling.
 
 ```tsx
-import { Input } from '../components';
+import { Input } from "../components";
 
 <Input
   label="Email"
   type="email"
   required
-  validate={(value) => !value.includes('@') ? 'Invalid email' : undefined}
+  validate={(value) => (!value.includes("@") ? "Invalid email" : undefined)}
   onChange={handleChange}
-/>
+/>;
 ```
 
 **Props:**
+
 - `type`: 'text' | 'email' | 'password' | 'url' | 'number'
 - `label`: string
 - `error`: string | boolean
@@ -504,12 +518,13 @@ import { Input } from '../components';
 Animated loading indicator with size and color variants.
 
 ```tsx
-import { LoadingSpinner } from '../components';
+import { LoadingSpinner } from "../components";
 
-<LoadingSpinner size="large" color="primary" />
+<LoadingSpinner size="large" color="primary" />;
 ```
 
 **Props:**
+
 - `size`: 'small' | 'medium' | 'large'
 - `color`: 'primary' | 'secondary' | 'white'
 - `ariaLabel`: string
@@ -519,17 +534,18 @@ import { LoadingSpinner } from '../components';
 Display error, warning, or info messages with optional dismiss functionality.
 
 ```tsx
-import { ErrorMessage } from '../components';
+import { ErrorMessage } from "../components";
 
 <ErrorMessage
   type="error"
   title="Connection Failed"
   message="Unable to connect to the server"
   onDismiss={() => setError(null)}
-/>
+/>;
 ```
 
 **Props:**
+
 - `type`: 'error' | 'warning' | 'info'
 - `title`: string (optional)
 - `message`: string
@@ -541,7 +557,7 @@ import { ErrorMessage } from '../components';
 Container component with optional header and footer sections.
 
 ```tsx
-import { Card } from '../components';
+import { Card } from "../components";
 
 <Card
   variant="elevated"
@@ -549,10 +565,11 @@ import { Card } from '../components';
   footer={<Button>Save Changes</Button>}
 >
   <p>Card content goes here</p>
-</Card>
+</Card>;
 ```
 
 **Props:**
+
 - `variant`: 'default' | 'outlined' | 'elevated'
 - `padding`: 'none' | 'small' | 'medium' | 'large'
 - `header`: ReactNode
