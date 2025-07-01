@@ -995,3 +995,143 @@ All components follow accessibility best practices:
 - Screen reader friendly
 - Focus indicators
 - Color contrast compliance
+
+---
+
+## 17. Error Handling
+
+Tanaka uses a unified error handling system across both extension and server.
+
+### Extension Error System
+
+**ExtensionError Class:**
+```typescript
+class ExtensionError extends Error {
+  code: ErrorCode;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  recoverable: boolean;
+  context?: Record<string, unknown>;
+}
+```
+
+**Error Codes:**
+```typescript
+enum ErrorCode {
+  NETWORK_FAILURE = 'NETWORK_FAILURE',
+  SERVER_ERROR = 'SERVER_ERROR',
+  AUTH_TOKEN_INVALID = 'AUTH_TOKEN_INVALID',
+  INVALID_DATA = 'INVALID_DATA',
+  // ... more codes
+}
+```
+
+**Result Pattern:**
+```typescript
+// Use Result pattern for explicit error handling
+async function syncTabs(): AsyncResult<Tab[], ExtensionError> {
+  return createResult(async () => {
+    const response = await api.sync(tabs);
+    return response.tabs;
+  });
+}
+```
+
+### Server Error System
+
+**AppError with thiserror:**
+```rust
+#[derive(Error, Debug)]
+pub enum AppError {
+    #[error("Bad request: {message}")]
+    BadRequest { message: String },
+
+    #[error("Database error: {message}")]
+    Database {
+        message: String,
+        #[source]
+        source: sqlx::Error,
+    },
+}
+```
+
+**Error Response Format:**
+```json
+{
+  "error": {
+    "code": "UNAUTHORIZED",
+    "message": "Invalid auth token",
+    "request_id": "abc123",
+    "timestamp": 1234567890
+  }
+}
+```
+
+### Retry Logic & Circuit Breaker
+
+**Automatic Retry with Exponential Backoff:**
+```typescript
+const api = new TanakaAPI(serverUrl, {
+  enableRetry: true,
+  maxRetryAttempts: 3,
+  enableCircuitBreaker: true,
+});
+
+// Automatically retries on failure
+const tabs = await api.syncTabs(localTabs);
+```
+
+**Circuit Breaker Pattern:**
+- Opens after 5 consecutive failures
+- Waits 60 seconds before attempting half-open state
+- Closes after 2 successful requests
+
+### React Error Boundaries
+
+**Wrap components for graceful error handling:**
+```tsx
+<ErrorBoundary>
+  <App />
+</ErrorBoundary>
+```
+
+The ErrorBoundary component:
+- Catches React component errors
+- Displays user-friendly fallback UI
+- Logs errors with full context
+- Allows users to retry
+
+### Configuration Management
+
+**Server Configuration Priority:**
+1. Configuration file (TOML)
+2. Environment variables
+3. Command-line arguments
+
+```bash
+# Via config file
+cat > tanaka.toml << EOF
+[auth]
+shared_token = "secret"
+EOF
+
+# Via environment
+export TANAKA_AUTH_TOKEN="secret"
+
+# Via CLI
+tanaka-server --auth-token "secret"
+```
+
+### Testing Error Scenarios
+
+```typescript
+// Test retry logic
+it('should retry on network failure', async () => {
+  const operation = jest.fn()
+    .mockRejectedValueOnce(new Error('Network'))
+    .mockResolvedValue('success');
+
+  const result = await withRetry(operation);
+  expect(result).toBe('success');
+  expect(operation).toHaveBeenCalledTimes(2);
+});
+```
