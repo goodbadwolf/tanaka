@@ -117,6 +117,8 @@ git commit --no-verify
 SKIP=hook-id git commit
 ```
 
+**⚠️ Important**: Avoid using `--no-verify` unless absolutely necessary. Pre-commit hooks catch issues that CI will enforce anyway. Bypassing them locally just delays the inevitable CI failures and wastes time.
+
 ### Installation
 
 ```bash
