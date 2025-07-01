@@ -52,3 +52,6 @@ __pycache__/
 # Python packages
 .venv/
 *.egg-info/
+
+# TypeScript bindings (ts-rs) - generated in wrong location
+server/bindings/
