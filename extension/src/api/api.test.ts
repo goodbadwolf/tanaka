@@ -36,28 +36,31 @@ describe('TanakaAPI', () => {
     });
   });
 
-  describe('syncTabs', () => {
+  describe('sync', () => {
     beforeEach(() => {
       api.setAuthToken('test-token');
     });
 
-    it('should sync tabs successfully', async () => {
-      const mockTabs = [
-        {
-          id: 'tab-1',
-          windowId: 'window-1',
-          data: JSON.stringify({ url: 'https://example.com' }),
-          updatedAt: Date.now(),
-        },
-      ];
+    it('should sync operations successfully', async () => {
+      const mockRequest = {
+        clock: 10n,
+        device_id: 'test-device',
+        since_clock: 5n,
+        operations: [],
+      };
+
+      const mockResponse = {
+        clock: '15',
+        operations: [],
+      };
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
         headers: new Headers({ 'content-type': 'application/json' }),
-        json: async () => ({ tabs: mockTabs }),
+        json: async () => mockResponse,
       } as Response);
 
-      const result = await api.syncTabs(mockTabs);
+      const result = await api.sync(mockRequest);
 
       expect(mockFetch).toHaveBeenCalledWith(
         'https://api.tanaka.test/sync',
@@ -67,13 +70,19 @@ describe('TanakaAPI', () => {
             Authorization: 'Bearer test-token',
             'Content-Type': 'application/json',
           }),
-          body: JSON.stringify({ tabs: mockTabs }),
+          body: JSON.stringify({
+            clock: '10',
+            device_id: 'test-device',
+            since_clock: '5',
+            operations: [],
+          }),
         }),
       );
 
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data).toEqual(mockTabs);
+        expect(result.data.clock).toBe(15n);
+        expect(result.data.operations).toEqual([]);
       }
     });
 
@@ -84,7 +93,12 @@ describe('TanakaAPI', () => {
         statusText: 'Internal Server Error',
       } as Response);
 
-      const result = await api.syncTabs([]);
+      const result = await api.sync({
+        clock: 0n,
+        device_id: 'test',
+        since_clock: null,
+        operations: [],
+      });
 
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -96,7 +110,12 @@ describe('TanakaAPI', () => {
     it('should handle network errors', async () => {
       mockFetch.mockRejectedValueOnce(new TypeError('Network error'));
 
-      const result = await api.syncTabs([]);
+      const result = await api.sync({
+        clock: 0n,
+        device_id: 'test',
+        since_clock: null,
+        operations: [],
+      });
 
       expect(result.success).toBe(false);
       if (!result.success) {

@@ -1,24 +1,38 @@
-import { injectable, inject } from 'tsyringe';
 import type {
-  IBrowser,
   Tab,
   OnRemovedRemoveInfoType,
   OnUpdatedChangeInfoType,
   OnMovedMoveInfoType,
 } from '../browser/core';
+import browser from 'webextension-polyfill';
 import { WindowTracker } from './window-tracker';
-import { SyncManager } from './sync-manager';
 import { debugLog } from '../utils/logger';
 
-@injectable()
+// Type for onActivated event
+export interface OnActivatedActiveInfoType {
+  tabId: number;
+  windowId: number;
+}
+
+export interface TabEventCallbacks {
+  onTabCreated?: (tab: Tab) => void;
+  onTabUpdated?: (tabId: number, changeInfo: OnUpdatedChangeInfoType, tab: Tab) => void;
+  onTabMoved?: (tabId: number, moveInfo: OnMovedMoveInfoType) => void;
+  onTabRemoved?: (tabId: number, removeInfo: OnRemovedRemoveInfoType) => void;
+  onTabActivated?: (activeInfo: OnActivatedActiveInfoType) => void;
+}
+
 export class TabEventHandler {
   private unsubscribers: (() => void)[] = [];
 
   constructor(
-    @inject('IBrowser') private readonly browser: IBrowser,
-    @inject(WindowTracker) private readonly windowTracker: WindowTracker,
-    @inject(SyncManager) private readonly syncManager: SyncManager,
+    private readonly windowTracker: WindowTracker,
+    private readonly callbacks: TabEventCallbacks,
   ) {}
+
+  start(): void {
+    this.setupListeners();
+  }
 
   setupListeners(): void {
     // Store references to bound methods for cleanup
@@ -27,22 +41,25 @@ export class TabEventHandler {
       tabRemoved: this.handleTabRemoved.bind(this),
       tabUpdated: this.handleTabUpdated.bind(this),
       tabMoved: this.handleTabMoved.bind(this),
+      tabActivated: this.handleTabActivated.bind(this),
       windowRemoved: this.handleWindowRemoved.bind(this),
     };
 
-    this.browser.tabs.onCreated.addListener(handlers.tabCreated);
-    this.browser.tabs.onRemoved.addListener(handlers.tabRemoved);
-    this.browser.tabs.onUpdated.addListener(handlers.tabUpdated);
-    this.browser.tabs.onMoved.addListener(handlers.tabMoved);
-    this.browser.windows.onRemoved.addListener(handlers.windowRemoved);
+    browser.tabs.onCreated.addListener(handlers.tabCreated);
+    browser.tabs.onRemoved.addListener(handlers.tabRemoved);
+    browser.tabs.onUpdated.addListener(handlers.tabUpdated);
+    browser.tabs.onMoved.addListener(handlers.tabMoved);
+    browser.tabs.onActivated.addListener(handlers.tabActivated);
+    browser.windows.onRemoved.addListener(handlers.windowRemoved);
 
     // Store cleanup functions
     this.unsubscribers = [
-      () => this.browser.tabs.onCreated.removeListener(handlers.tabCreated),
-      () => this.browser.tabs.onRemoved.removeListener(handlers.tabRemoved),
-      () => this.browser.tabs.onUpdated.removeListener(handlers.tabUpdated),
-      () => this.browser.tabs.onMoved.removeListener(handlers.tabMoved),
-      () => this.browser.windows.onRemoved.removeListener(handlers.windowRemoved),
+      () => browser.tabs.onCreated.removeListener(handlers.tabCreated),
+      () => browser.tabs.onRemoved.removeListener(handlers.tabRemoved),
+      () => browser.tabs.onUpdated.removeListener(handlers.tabUpdated),
+      () => browser.tabs.onMoved.removeListener(handlers.tabMoved),
+      () => browser.tabs.onActivated.removeListener(handlers.tabActivated),
+      () => browser.windows.onRemoved.removeListener(handlers.windowRemoved),
     ];
   }
 
@@ -54,7 +71,7 @@ export class TabEventHandler {
   private async handleTabCreated(tab: Tab): Promise<void> {
     if (tab.windowId && this.windowTracker.isTracked(tab.windowId)) {
       debugLog('Tab created:', tab);
-      await this.syncManager.syncNow();
+      this.callbacks.onTabCreated?.(tab);
     }
   }
 
@@ -64,7 +81,7 @@ export class TabEventHandler {
   ): Promise<void> {
     if (this.windowTracker.isTracked(removeInfo.windowId)) {
       debugLog('Tab removed:', tabId);
-      await this.syncManager.syncNow();
+      this.callbacks.onTabRemoved?.(tabId, removeInfo);
     }
   }
 
@@ -73,29 +90,28 @@ export class TabEventHandler {
     changeInfo: OnUpdatedChangeInfoType,
     tab: Tab,
   ): Promise<void> {
-    if (tab.windowId && this.windowTracker.isTracked(tab.windowId) && changeInfo.url) {
+    if (tab.windowId && this.windowTracker.isTracked(tab.windowId)) {
       debugLog('Tab updated:', tabId, changeInfo);
-      await this.syncManager.syncNow();
+      this.callbacks.onTabUpdated?.(tabId, changeInfo, tab);
     }
   }
 
   private async handleTabMoved(tabId: number, moveInfo: OnMovedMoveInfoType): Promise<void> {
     if (this.windowTracker.isTracked(moveInfo.windowId)) {
-      debugLog('Tab moved:', tabId, moveInfo);
-      await this.syncManager.syncNow();
+      debugLog('Tab moved:', tabId);
+      this.callbacks.onTabMoved?.(tabId, moveInfo);
+    }
+  }
+
+  private async handleTabActivated(activeInfo: OnActivatedActiveInfoType): Promise<void> {
+    if (this.windowTracker.isTracked(activeInfo.windowId)) {
+      debugLog('Tab activated:', activeInfo);
+      this.callbacks.onTabActivated?.(activeInfo);
     }
   }
 
   private async handleWindowRemoved(windowId: number): Promise<void> {
-    if (this.windowTracker.isTracked(windowId)) {
-      this.windowTracker.untrack(windowId);
-      debugLog('Tracked window removed:', windowId);
-
-      if (this.windowTracker.getTrackedCount() === 0) {
-        this.syncManager.stop();
-      } else {
-        await this.syncManager.syncNow();
-      }
-    }
+    this.windowTracker.untrack(windowId);
+    debugLog('Window removed:', windowId);
   }
 }
