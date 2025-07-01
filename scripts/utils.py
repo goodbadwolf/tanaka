@@ -1,5 +1,6 @@
 """Shared utilities for task scripts"""
 
+import os
 import shutil
 import subprocess
 import sys
@@ -14,6 +15,7 @@ def run_command(
     cwd: Path | None = None,
     check: bool = True,
     env: dict[str, str] | None = None,
+    capture_output: bool = False,
 ) -> subprocess.CompletedProcess:
     """Run a command with logging
 
@@ -22,6 +24,7 @@ def run_command(
         cwd: Working directory for the command
         check: Whether to raise on non-zero exit code
         env: Environment variables (if None, inherits current environment)
+        capture_output: Whether to capture stdout and stderr
 
     Returns:
         CompletedProcess instance
@@ -32,7 +35,7 @@ def run_command(
     """
     logger.info(f"Running: {' '.join(cmd)}")
     try:
-        return subprocess.run(cmd, cwd=cwd, check=check, capture_output=False, text=True, env=env)
+        return subprocess.run(cmd, cwd=cwd, check=check, capture_output=capture_output, text=True, env=env)
     except FileNotFoundError:
         logger.error(f"Command not found: {cmd[0]}")
         raise
@@ -44,3 +47,24 @@ def run_command(
 def check_command(cmd: str) -> bool:
     """Check if a command exists in PATH"""
     return shutil.which(cmd) is not None
+
+
+def env_with(**env_vars: str | None) -> dict[str, str]:
+    """Get environment variables with additional variables set
+
+    Args:
+        **env_vars: Keyword arguments for environment variables to set
+                    None values are ignored
+
+    Returns:
+        Copy of current environment with specified variables set
+
+    Example:
+        >>> env = env_with(DOCKER_HOST="unix:///path/to/socket", FOO="bar")
+        >>> env = env_with(DOCKER_HOST=docker_host)  # None values ignored
+    """
+    env = os.environ.copy()
+    for key, value in env_vars.items():
+        if value is not None:
+            env[key] = value
+    return env
