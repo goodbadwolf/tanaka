@@ -4,3 +4,4 @@ export { Input } from './Input';
 export { LoadingSpinner } from './LoadingSpinner';
 export { ErrorMessage } from './ErrorMessage';
 export { Card } from './Card';
+export { ErrorBoundary, withErrorBoundary, useErrorHandler } from './ErrorBoundary';

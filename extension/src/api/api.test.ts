@@ -1,4 +1,5 @@
-import { TanakaAPI, APIError, browserTabToSyncTab, parseSyncTab } from './api';
+import { TanakaAPI, browserTabToSyncTab, parseSyncTab } from './api';
+import { ExtensionError } from '../error/types';
 import type { Tab as BrowserTab } from '../browser/core';
 
 // Mock fetch globally
@@ -18,9 +19,9 @@ describe('TanakaAPI', () => {
       expect(() => new TanakaAPI('https://api.tanaka.test')).not.toThrow();
     });
 
-    it('should throw APIError for invalid URL', () => {
-      expect(() => new TanakaAPI('invalid-url')).toThrow(APIError);
-      expect(() => new TanakaAPI('invalid-url')).toThrow('Invalid server base URL');
+    it('should throw ExtensionError for invalid URL', () => {
+      expect(() => new TanakaAPI('invalid-url')).toThrow(ExtensionError);
+      expect(() => new TanakaAPI('invalid-url')).toThrow('Invalid server URL');
     });
   });
 
@@ -29,9 +30,9 @@ describe('TanakaAPI', () => {
       expect(() => api.setAuthToken('test-token')).not.toThrow();
     });
 
-    it('should throw APIError for empty token', () => {
-      expect(() => api.setAuthToken('')).toThrow(APIError);
-      expect(() => api.setAuthToken('')).toThrow('Invalid token');
+    it('should throw ExtensionError for empty token', () => {
+      expect(() => api.setAuthToken('')).toThrow(ExtensionError);
+      expect(() => api.setAuthToken('')).toThrow('Authentication token is missing');
     });
   });
 
@@ -70,23 +71,38 @@ describe('TanakaAPI', () => {
         }),
       );
 
-      expect(result).toEqual(mockTabs);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data).toEqual(mockTabs);
+      }
     });
 
-    it('should throw APIError on server error', async () => {
+    it('should return error result on server error', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 500,
         statusText: 'Internal Server Error',
       } as Response);
 
-      await expect(api.syncTabs([])).rejects.toThrow(APIError);
+      const result = await api.syncTabs([]);
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBeInstanceOf(ExtensionError);
+        expect(result.error.code).toBe('NETWORK_FAILURE');
+      }
     });
 
     it('should handle network errors', async () => {
-      mockFetch.mockRejectedValueOnce(new Error('Network error'));
+      mockFetch.mockRejectedValueOnce(new TypeError('Network error'));
 
-      await expect(api.syncTabs([])).rejects.toThrow('Network error');
+      const result = await api.syncTabs([]);
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBeInstanceOf(ExtensionError);
+        expect(result.error.code).toBe('NETWORK_FAILURE');
+      }
     });
   });
 
@@ -112,23 +128,38 @@ describe('TanakaAPI', () => {
         }),
       );
 
-      expect(result).toBe(true);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data).toBe(true);
+      }
     });
 
-    it('should return false when server is unhealthy', async () => {
+    it('should return error when server is unhealthy', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: false,
+        status: 503,
+        statusText: 'Service Unavailable',
       } as Response);
 
       const result = await api.checkHealth();
-      expect(result).toBe(false);
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBeInstanceOf(ExtensionError);
+        expect(result.error.code).toBe('NETWORK_FAILURE');
+      }
     });
 
-    it('should return false on network error', async () => {
-      mockFetch.mockRejectedValueOnce(new Error('Network error'));
+    it('should return error on network error', async () => {
+      mockFetch.mockRejectedValueOnce(new TypeError('Network error'));
 
       const result = await api.checkHealth();
-      expect(result).toBe(false);
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBeInstanceOf(ExtensionError);
+        expect(result.error.code).toBe('NETWORK_FAILURE');
+      }
     });
   });
 });
@@ -231,7 +262,7 @@ describe('parseSyncTab', () => {
     expect(result).toEqual(tabData);
   });
 
-  it('should return null for invalid JSON', () => {
+  it('should throw ExtensionError for invalid JSON', () => {
     const syncTab = {
       id: 'tab-123',
       windowId: 'window-456',
@@ -239,7 +270,19 @@ describe('parseSyncTab', () => {
       updatedAt: Date.now(),
     };
 
-    const result = parseSyncTab(syncTab);
-    expect(result).toBeNull();
+    expect(() => parseSyncTab(syncTab)).toThrow(ExtensionError);
+    expect(() => parseSyncTab(syncTab)).toThrow('Failed to parse tab data');
+  });
+
+  it('should throw ExtensionError for missing required fields', () => {
+    const syncTab = {
+      id: 'tab-123',
+      windowId: 'window-456',
+      data: JSON.stringify({ title: 'Test' }), // missing url
+      updatedAt: Date.now(),
+    };
+
+    expect(() => parseSyncTab(syncTab)).toThrow(ExtensionError);
+    expect(() => parseSyncTab(syncTab)).toThrow('Tab data is missing required fields');
   });
 });

@@ -1,9 +1,9 @@
 import 'reflect-metadata';
-import { render, ComponentChildren, ErrorInfo } from 'preact';
+import { render, ErrorInfo } from 'preact';
 import { lazy, Suspense } from 'preact/compat';
-import { Component } from 'preact';
 import { DIProvider } from '../di/provider';
-import { LoadingSpinner, ErrorMessage } from '../components';
+import { LoadingSpinner, ErrorBoundary } from '../components';
+import { ExtensionError } from '../error/types';
 import './settings.css';
 
 // Load Preact DevTools in development
@@ -16,39 +16,6 @@ const SettingsApp = lazy(() =>
   import('./components/SettingsApp').then((m) => ({ default: m.SettingsApp })),
 );
 
-// Error Boundary component
-interface ErrorBoundaryState {
-  hasError: boolean;
-  error?: Error;
-}
-
-class ErrorBoundary extends Component<{ children: ComponentChildren }, ErrorBoundaryState> {
-  state: ErrorBoundaryState = { hasError: false };
-
-  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Settings app error:', error, errorInfo);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div className="error-container">
-          <ErrorMessage
-            message={`Failed to load settings: ${this.state.error?.message || 'Unknown error'}`}
-            type="error"
-          />
-        </div>
-      );
-    }
-
-    return this.props.children;
-  }
-}
-
 // Loading component
 const LoadingFallback = () => (
   <div className="loading-container">
@@ -57,12 +24,25 @@ const LoadingFallback = () => (
   </div>
 );
 
+// Error handler for settings page
+const handleSettingsError = (error: ExtensionError, errorInfo: ErrorInfo) => {
+  console.error('Settings page error:', {
+    errorId: error.id,
+    code: error.code,
+    message: error.message,
+    componentStack: errorInfo.componentStack,
+  });
+};
+
 // Render the Preact app
 const root = document.getElementById('root');
 if (root) {
   render(
     <DIProvider>
-      <ErrorBoundary>
+      <ErrorBoundary
+        onError={handleSettingsError}
+        reportErrors={true}
+      >
         <Suspense fallback={<LoadingFallback />}>
           <SettingsApp />
         </Suspense>
