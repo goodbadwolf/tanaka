@@ -8,7 +8,7 @@ export default {
   },
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
-    '\\.module\\.css$': '<rootDir>/src/test/__mocks__/identity-obj-proxy.js',
+    '\\.module\\.css$': '<rootDir>/src/test/__mocks__/identity-obj-proxy.cjs',
     '\\.css$': '<rootDir>/src/test/__mocks__/styleMock.js',
     '^(\\.{1,2}/.*)\\.js$': '$1',
     '^@env$': '<rootDir>/src/test/__mocks__/@env.ts',
