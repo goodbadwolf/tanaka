@@ -4,6 +4,7 @@ import type { IBrowser } from '../browser/core';
 const USER_SETTINGS_DEFAULTS = {
   authToken: 'unset-token',
   syncInterval: 5000,
+  useSyncV2: false,
 };
 
 export type UserSettings = typeof USER_SETTINGS_DEFAULTS;

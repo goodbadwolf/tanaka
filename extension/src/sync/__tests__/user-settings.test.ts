@@ -32,8 +32,13 @@ describe('UserSettingsManager', () => {
       expect(settings).toEqual({
         authToken: 'unset-token',
         syncInterval: 5000,
+        useSyncV2: false,
       });
-      expect(mockBrowser.localStorage.get).toHaveBeenCalledWith(['authToken', 'syncInterval']);
+      expect(mockBrowser.localStorage.get).toHaveBeenCalledWith([
+        'authToken',
+        'syncInterval',
+        'useSyncV2',
+      ]);
     });
 
     it('merges stored settings with defaults', async () => {
@@ -46,6 +51,7 @@ describe('UserSettingsManager', () => {
       expect(settings).toEqual({
         authToken: 'my-token',
         syncInterval: 5000,
+        useSyncV2: false,
       });
     });
 
@@ -60,6 +66,7 @@ describe('UserSettingsManager', () => {
       expect(settings).toEqual({
         authToken: 'custom-token',
         syncInterval: 10000,
+        useSyncV2: false,
       });
     });
   });
@@ -96,7 +103,11 @@ describe('UserSettingsManager', () => {
     it('removes all settings from storage', async () => {
       await userSettingsManager.clear();
 
-      expect(mockBrowser.localStorage.remove).toHaveBeenCalledWith(['authToken', 'syncInterval']);
+      expect(mockBrowser.localStorage.remove).toHaveBeenCalledWith([
+        'authToken',
+        'syncInterval',
+        'useSyncV2',
+      ]);
     });
   });
 });

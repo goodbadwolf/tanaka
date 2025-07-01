@@ -4,7 +4,13 @@ import { BackgroundService } from '../background';
 import { createMockBrowser } from '../browser/__mocks__';
 import type { IBrowser } from '../browser/core';
 import { TanakaAPI } from '../api/api';
-import { SyncManager, TabEventHandler, MessageHandler, UserSettingsManager } from '../sync';
+import {
+  SyncManager,
+  TabEventHandler,
+  MessageHandler,
+  UserSettingsManager,
+  WindowTracker,
+} from '../sync';
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
 
 jest.mock('../api/api');
@@ -22,6 +28,7 @@ describe('BackgroundService', () => {
   let mockTabEventHandler: TabEventHandler;
   let mockUserSettingsManager: UserSettingsManager;
   let mockMessageHandler: MessageHandler;
+  let mockWindowTracker: WindowTracker;
   let messageListener: (message: unknown) => Promise<unknown>;
 
   beforeEach(() => {
@@ -59,6 +66,7 @@ describe('BackgroundService', () => {
         Promise.resolve({
           authToken: 'test-token',
           syncInterval: 5000,
+          useSyncV2: false,
         }),
       ),
       save: jest.fn(() => Promise.resolve()),
@@ -69,12 +77,22 @@ describe('BackgroundService', () => {
       handleMessage: jest.fn(() => Promise.resolve({ success: true })),
     } as unknown as MessageHandler;
 
+    mockWindowTracker = {
+      track: jest.fn(),
+      untrack: jest.fn(),
+      isTracked: jest.fn(),
+      getTrackedWindows: jest.fn(() => []),
+      getTrackedCount: jest.fn(() => 0),
+      clear: jest.fn(),
+    } as unknown as WindowTracker;
+
     // Register mocks
     testContainer.registerInstance(TanakaAPI, mockApi);
     testContainer.registerInstance(SyncManager, mockSyncManager);
     testContainer.registerInstance(TabEventHandler, mockTabEventHandler);
     testContainer.registerInstance(UserSettingsManager, mockUserSettingsManager);
     testContainer.registerInstance(MessageHandler, mockMessageHandler);
+    testContainer.registerInstance(WindowTracker, mockWindowTracker);
 
     // Create background service
     backgroundService = new BackgroundService(testContainer);
@@ -169,14 +187,20 @@ describe('BackgroundService', () => {
   });
 
   describe('cleanup', () => {
-    it('cleans up event handlers and stops sync', () => {
+    it('cleans up event handlers and stops sync', async () => {
+      await backgroundService.initialize();
       backgroundService.cleanup();
 
       expect(mockTabEventHandler.cleanup).toHaveBeenCalled();
       expect(mockSyncManager.stop).toHaveBeenCalled();
     });
 
-    it('can be called multiple times safely', () => {
+    it('can be called multiple times safely', async () => {
+      await backgroundService.initialize();
+
+      // Reset the mock call counts after initialization
+      jest.clearAllMocks();
+
       backgroundService.cleanup();
       backgroundService.cleanup();
 
@@ -220,6 +244,7 @@ describe('BackgroundService', () => {
         Promise.resolve({
           authToken: 'new-token',
           syncInterval: 3000,
+          useSyncV2: false,
         }),
       );
       (mockSyncManager.isRunning as jest.Mock).mockReturnValue(true);
