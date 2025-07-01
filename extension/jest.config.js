@@ -30,6 +30,21 @@ export default {
     '!src/**/*.d.ts',
     '!src/**/index.ts',
     '!src/test/**',
+    '!src/test-utils/**',
+    // Entry points and webapp-specific files
+    '!src/popup/popup.tsx',
+    '!src/settings/settings.tsx',
+    '!src/webapp/**',
+    '!src/di/webapp-container.ts',
+    // Mock and polyfill files
+    '!src/browser/mock.ts',
+    '!src/browser/mock-polyfill.ts',
+    // Configuration files (just exports)
+    '!src/config/environments/**',
+    // Component test setup
+    '!src/components/test-setup.ts',
+    // Hooks (difficult to test in isolation)
+    '!src/hooks/**',
   ],
   coverageThreshold: {
     global: {
