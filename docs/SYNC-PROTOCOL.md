@@ -1,4 +1,4 @@
-# Tanaka Sync Protocol v2
+# Tanaka Sync Protocol
 
 **Purpose**: Technical specification for CRDT-based structured synchronization protocol  
 **Audience**: Developers implementing sync functionality  
@@ -6,17 +6,15 @@
 
 ## Overview
 
-Protocol v2 replaces the simple JSON REST API with a CRDT-based structured protocol for conflict-free synchronization across devices. Operations are expressed as high-level, human-readable JSON commands that maintain CRDT guarantees.
+The Tanaka sync protocol uses a CRDT-based structured protocol for conflict-free synchronization across devices. Operations are expressed as high-level, human-readable JSON commands that maintain CRDT guarantees.
 
-## Key Changes from v1
+## Key Features
 
-| Aspect                  | v1 (Current)               | v2 (CRDT)                    |
-| ----------------------- | -------------------------- | ---------------------------- |
-| **Data Format**         | JSON with full tab objects | JSON with CRDT operations    |
-| **Conflict Resolution** | Last-write-wins            | Automatic CRDT merge         |
-| **Network Efficiency**  | Full state transfer        | Incremental operations       |
-| **Ordering**            | Timestamp-based            | Lamport clock                |
-| **Storage**             | `data TEXT`                | `operations + clock` schema  |
+- **Data Format**: JSON with CRDT operations for clear, structured commands
+- **Conflict Resolution**: Automatic CRDT merge ensures consistency
+- **Network Efficiency**: Incremental operations reduce bandwidth usage
+- **Ordering**: Lamport clock provides total ordering across devices
+- **Storage**: Structured `operations + clock` schema for full history
 
 ## Protocol Specification
 
@@ -106,7 +104,7 @@ Client                                    Server
 
 ### HTTP Endpoints
 
-#### POST /sync/v2
+#### POST /sync
 
 **Request:**
 
@@ -154,7 +152,7 @@ Client                                    Server
 
 ### Error Handling
 
-Errors are returned as JSON with fallback to v1 format:
+Errors are returned as JSON:
 
 ```json
 {
@@ -219,12 +217,11 @@ CREATE TABLE crdt_state (
 
 ### Backward Compatibility
 
-The server supports both v1 and v2 protocols:
+The server uses a single CRDT-based sync endpoint:
 
-- `/sync` - Legacy JSON API (v1)
-- `/sync/v2` - Structured CRDT API (v2)
+- `/sync` - Structured CRDT API with JSON operations
 
-Both endpoints use `application/json` content type, with v2 distinguished by operation structure.
+The endpoint uses `application/json` content type with structured operations.
 
 ### Performance Optimizations
 
@@ -235,7 +232,7 @@ Both endpoints use `application/json` content type, with v2 distinguished by ope
 
 ### Security Considerations
 
-1. **Authentication**: Same bearer token as v1
+1. **Authentication**: Bearer token in Authorization header
 2. **Rate Limiting**: Per-device limits on update frequency
 3. **Payload Limits**: Maximum binary update size
 4. **Validation**: CRDT update integrity verification
@@ -311,7 +308,7 @@ class SyncManager {
       operations,
     };
 
-    const response = await fetch("/sync/v2", {
+    const response = await fetch("/sync", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(request),
@@ -330,10 +327,7 @@ class SyncManager {
 
 ## Migration Strategy
 
-1. **Phase 1**: Implement v2 alongside v1
-2. **Phase 2**: Extension gradual rollout to v2
-3. **Phase 3**: Deprecate v1 after 6 months
-4. **Phase 4**: Remove v1 support
+The migration to CRDT-based sync is complete. All clients use the structured operation protocol.
 
 ## Testing Strategy
 
@@ -342,13 +336,13 @@ class SyncManager {
 3. **Ordering Tests**: Lamport clock correctness
 4. **Integration Tests**: Full sync flows across devices
 5. **Performance Tests**: 200+ tabs with operation batching
-6. **Compatibility Tests**: v1/v2 interoperability
+6. **Integration Tests**: Full sync scenarios
 
 ## Monitoring
 
 Key metrics to track:
 
-- `sync_requests_total{version="v2"}`
+- `sync_requests_total`
 - `crdt_operations_applied_total{type="upsert_tab|close_tab|..."}`
 - `crdt_conflicts_resolved_total`
 - `operation_batch_size_histogram`

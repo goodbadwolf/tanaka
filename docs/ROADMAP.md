@@ -179,7 +179,7 @@ git checkout -b feat/ui-completion
 **Branch**: `feat/sync-v2-endpoint`
 
 #### Overview
-✅ Implemented structured CRDT synchronization protocol for better performance with 200+ tabs, using human-readable JSON operations instead of binary updates.
+✅ Implemented structured CRDT synchronization protocol for better performance with 200+ tabs, using human-readable JSON operations instead of binary updates. The v1 protocol has been completely removed and v2 is now the default and only sync protocol.
 
 #### Completed Implementation
 
@@ -228,16 +228,17 @@ git checkout feat/sync-v2-endpoint  # Complete implementation
    - ✅ CRDT state management with DashMap caching
    - ✅ Operation-based incremental updates
 
-6. [x] ✅ `feat(server): implement /sync/v2 endpoint`
-   - ✅ Created new sync endpoint handler with full CRDT support
+6. [x] ✅ `feat(server): implement /sync endpoint`
+   - ✅ Created sync endpoint handler with full CRDT support
    - ✅ Integrated CrdtManager with HTTP layer
    - ✅ Added operation validation and processing
    - ✅ Device-aware operation filtering to prevent echo
+   - ✅ Removed v1 sync code and renamed v2 to be the default
 
 7. [x] ✅ `feat(extension): implement structured sync client`
-   - ✅ Created SyncV2Manager with JSON operations
+   - ✅ Created SyncManager with JSON operations
    - ✅ Implemented operation queue management
-   - ✅ Added dynamic sync version switching (v1/v2)
+   - ✅ Removed v1 sync code completely
 
 8. [x] ✅ `feat(extension): add offline operation queueing`
    - ✅ Queue operations in memory
@@ -255,10 +256,10 @@ git checkout feat/sync-v2-endpoint  # Complete implementation
     - Verify eventual consistency guarantees
 
 **Key Achievements:**
-- 🎯 Full sync v2 protocol implementation on both server and client
-- 🔧 Feature flag (`useSyncV2`) for backward compatibility
+- 🎯 Full CRDT sync protocol implementation on both server and client
+- 🔧 Complete removal of v1 sync code - v2 is now the only protocol
 - 🛡️ Type-safe TypeScript bindings auto-generated from Rust
-- 🔄 Seamless switching between v1 and v2 protocols
+- 🔄 Simplified architecture with no version switching needed
 - 📊 Device-aware sync to prevent operation echo
 
 ---
