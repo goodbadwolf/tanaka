@@ -38,7 +38,7 @@ poll_secs = 5
 # Database flush interval in seconds
 flush_secs = 5
 # Maximum sync payload size in bytes
-max_payload_size = 1048576  # 1MB
+max_payload_size = 1048576 # 1MB
 # Enable compression (experimental)
 compression = false
 
