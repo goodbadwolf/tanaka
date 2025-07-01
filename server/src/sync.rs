@@ -7,7 +7,10 @@ use std::sync::Arc;
 use ts_rs::TS;
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
-#[ts(export, export_to = "../../extension/src/api/sync/")]
+#[cfg_attr(
+    feature = "generate-api-models",
+    ts(export, export_to = "../../extension/src/api/sync/")
+)]
 pub struct SyncRequest {
     pub clock: u64,
     pub device_id: String,
@@ -17,14 +20,20 @@ pub struct SyncRequest {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
-#[ts(export, export_to = "../../extension/src/api/sync/")]
+#[cfg_attr(
+    feature = "generate-api-models",
+    ts(export, export_to = "../../extension/src/api/sync/")
+)]
 pub struct SyncResponse {
     pub clock: u64,
     pub operations: Vec<CrdtOperation>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
-#[ts(export, export_to = "../../extension/src/api/sync/")]
+#[cfg_attr(
+    feature = "generate-api-models",
+    ts(export, export_to = "../../extension/src/api/sync/")
+)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum CrdtOperation {
     UpsertTab {
@@ -69,7 +78,10 @@ pub enum CrdtOperation {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
-#[ts(export, export_to = "../../extension/src/api/sync/")]
+#[cfg_attr(
+    feature = "generate-api-models",
+    ts(export, export_to = "../../extension/src/api/sync/")
+)]
 pub struct TabData {
     pub window_id: String,
     pub url: String,

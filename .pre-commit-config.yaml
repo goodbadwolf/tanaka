@@ -50,7 +50,15 @@ repos:
         name: Format TOML files
         args: [--option, "indent_string=  "] # 2-space indentation
 
-  # YAML linting
+  # YAML formatting and linting
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v3.1.0
+    hooks:
+      - id: prettier
+        name: Format YAML files
+        types: [yaml]
+        args: [--write, --parser=yaml]
+
   - repo: https://github.com/adrienverge/yamllint
     rev: v1.35.1
     hooks:
@@ -77,9 +85,18 @@ repos:
         pass_filenames: false
         require_serial: true
 
+      - id: generate-api-models
+        name: Generate TypeScript API models from Rust
+        entry: python scripts/tanaka.py generate api-models
+        language: python
+        files: ^server/src/.*\.rs$
+        pass_filenames: false
+        require_serial: false
+        additional_dependencies: []
+
       - id: rust-tests
         name: Run Rust tests
-        entry: bash -c 'cd server && cargo test'
+        entry: bash -c 'cd server && cargo test --lib'
         language: system
         files: ^server/.*\.rs$
         pass_filenames: false

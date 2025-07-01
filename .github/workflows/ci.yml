@@ -56,8 +56,8 @@ jobs:
           # Wait for both to complete
           wait
 
-      # TypeScript types are now committed to the repository
-      # No generation step needed - this saves ~2-3 minutes in CI
+      # TypeScript types are generated on-demand with feature flag
+      # Pre-commit will check if they need regeneration
 
       # Run pre-commit
       - uses: pre-commit/action@v3.0.1
@@ -91,9 +91,12 @@ jobs:
       - name: Run server tests
         run: |
           cd server
-          cargo test --verbose
-        env:
-          TS_RS_EXPORT_DIR: ../extension/src/api/models
+          cargo test --lib --verbose
+
+      - name: Run doc tests
+        run: |
+          cd server
+          cargo test --doc --verbose
 
   test-extension:
     runs-on: ubuntu-latest
@@ -122,7 +125,7 @@ jobs:
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
-        if: always()  # Upload coverage even if tests fail
+        if: always() # Upload coverage even if tests fail
         with:
           file: ./extension/coverage/lcov.info
           flags: extension
