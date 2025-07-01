@@ -1,6 +1,8 @@
 # Bundle Analysis Report
 
-Generated on: January 25, 2025
+Generated on: December 15, 2024
+
+> **Note**: This is an example analysis report from the v0.5.0 release. Run `pnpm run analyze` to generate a current report.
 
 ## Bundle Sizes
 

@@ -1,6 +1,8 @@
 # Security Audit for Tanaka v0.5.0
 
-Date: January 25, 2025
+Date: December 15, 2024
+
+> **Note**: This is an example security audit from the v0.5.0 release. Perform a new audit when making security-related changes.
 
 ## Permissions Analysis
 
