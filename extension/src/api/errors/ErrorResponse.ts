@@ -2,7 +2,4 @@
 import type { ErrorDetail } from "./ErrorDetail";
 import type { RetryInfo } from "./RetryInfo";
 
-/**
- * Error response structure for HTTP APIs
- */
 export type ErrorResponse = { status: string, error: ErrorDetail, retry: RetryInfo | null, };

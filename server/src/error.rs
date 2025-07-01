@@ -9,7 +9,6 @@ use thiserror::Error;
 use ts_rs::TS;
 use uuid::Uuid;
 
-// Error code enum that is exported to TypeScript via ts-rs
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "../../extension/src/api/errors/")]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
@@ -96,7 +95,7 @@ impl ErrorCode {
         }
     }
 
-    #[allow(dead_code)] // Part of public API, may be used in future
+    #[allow(dead_code)]
     #[must_use]
     pub fn default_message(&self) -> &'static str {
         match self {
@@ -188,7 +187,7 @@ impl ErrorCode {
 
 /// Application-specific errors that can occur in the Tanaka server
 #[derive(Error, Debug)]
-#[allow(dead_code)] // Some variants are part of public API but not yet used
+#[allow(dead_code)]
 pub enum AppError {
     #[error("Database error: {message}")]
     Database {
@@ -243,7 +242,6 @@ pub enum AppError {
 }
 
 impl AppError {
-    /// Get the error code for this application error
     #[must_use]
     pub fn error_code(&self) -> ErrorCode {
         match self {
@@ -262,7 +260,6 @@ impl AppError {
         }
     }
 
-    /// Get the HTTP status code for this error
     #[must_use]
     pub fn status_code(&self) -> StatusCode {
         match self {
@@ -278,7 +275,6 @@ impl AppError {
         }
     }
 
-    /// Check if this error is retryable
     #[must_use]
     pub fn is_retryable(&self) -> bool {
         match self {
@@ -298,8 +294,7 @@ impl AppError {
         }
     }
 
-    /// Create an authentication error
-    #[allow(dead_code)] // Part of public API
+    #[allow(dead_code)]
     #[must_use]
     pub fn auth_token_missing() -> Self {
         AppError::Auth {
@@ -308,7 +303,6 @@ impl AppError {
         }
     }
 
-    /// Create an authentication error for invalid token
     #[must_use]
     pub fn auth_token_invalid(message: impl Into<String>) -> Self {
         AppError::Auth {
@@ -317,8 +311,7 @@ impl AppError {
         }
     }
 
-    /// Create a validation error
-    #[allow(dead_code)] // Part of public API
+    #[allow(dead_code)]
     #[must_use]
     pub fn validation(message: impl Into<String>, field: Option<impl Into<String>>) -> Self {
         AppError::Validation {
@@ -327,7 +320,6 @@ impl AppError {
         }
     }
 
-    /// Create a database error
     pub fn database(message: impl Into<String>, source: sqlx::Error) -> Self {
         AppError::Database {
             message: message.into(),
@@ -335,8 +327,7 @@ impl AppError {
         }
     }
 
-    /// Create an internal error
-    #[allow(dead_code)] // Part of public API
+    #[allow(dead_code)]
     #[must_use]
     pub fn internal(message: impl Into<String>) -> Self {
         AppError::Internal {
@@ -345,8 +336,7 @@ impl AppError {
         }
     }
 
-    /// Add context to an internal error
-    #[allow(dead_code)] // Part of public API, may be used in future
+    #[allow(dead_code)]
     #[must_use]
     pub fn with_context(mut self, key: impl Into<String>, value: serde_json::Value) -> Self {
         match &mut self {
@@ -359,7 +349,6 @@ impl AppError {
     }
 }
 
-/// Error response structure for HTTP APIs
 #[derive(Debug, Serialize, TS)]
 #[ts(export, export_to = "../../extension/src/api/errors/")]
 pub struct ErrorResponse {
@@ -369,7 +358,6 @@ pub struct ErrorResponse {
     pub retry: Option<RetryInfo>,
 }
 
-/// Detailed error information
 #[derive(Debug, Serialize, TS)]
 #[ts(export, export_to = "../../extension/src/api/errors/")]
 pub struct ErrorDetail {
@@ -384,7 +372,6 @@ pub struct ErrorDetail {
     pub source: Option<String>,
 }
 
-/// Retry information for retryable errors
 #[derive(Debug, Serialize, TS)]
 #[ts(export, export_to = "../../extension/src/api/errors/")]
 pub struct RetryInfo {
@@ -403,7 +390,6 @@ impl IntoResponse for AppError {
         let error_code = self.error_code();
         let is_retryable = self.is_retryable();
 
-        // Log the error for server-side debugging
         tracing::error!(
             error_id = %error_id,
             error_code = ?error_code,
@@ -463,7 +449,6 @@ impl IntoResponse for AppError {
     }
 }
 
-// Implement conversions from common error types
 impl From<sqlx::Error> for AppError {
     fn from(err: sqlx::Error) -> Self {
         AppError::database("Database operation failed", err)
@@ -489,7 +474,6 @@ impl From<std::io::Error> for AppError {
 }
 
 /// Result type alias for operations that can fail with `AppError`
-#[allow(dead_code)] // Part of public API, may be used in future
 pub type AppResult<T> = Result<T, AppError>;
 
 #[cfg(test)]
