@@ -158,6 +158,11 @@ git checkout -b feat/error-handling
     - Document all error codes
     - Add troubleshooting section
 
+11. [ ] `ci: create pull request for review`
+    - Push branch to remote
+    - Create comprehensive PR description
+    - Request review and testing
+
 ---
 
 ### 2.2 CRDT Protocol Enhancement
@@ -304,6 +309,11 @@ git checkout -b feat/repository-layer
     - Test all implementations
     - Test error cases
     - Performance benchmarks
+
+11. [ ] `ci: create pull request for review`
+    - Push branch to remote
+    - Create comprehensive PR description
+    - Request review and testing
 
 ---
 
@@ -601,6 +611,8 @@ git checkout -b feat/production-ready
 - Update this file as part of each PR
 - Each branch should result in working software
 - Run all tests before marking complete
+- **Always create a PR when a branch is ready for review**
+- Include comprehensive testing and documentation in each PR
 
 ---
 
