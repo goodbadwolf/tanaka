@@ -28,6 +28,7 @@ export default tseslint.config(
       '*.config.js',
       'src/api/errors/*.ts',
       'src/api/models/*.ts',
+      'src/api/sync/*.ts',
     ],
   },
 );
