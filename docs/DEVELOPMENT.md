@@ -107,8 +107,8 @@ cd tanaka
 uv sync --dev
 
 # Pre-commit hooks
-pre-commit install
-pre-commit install --hook-type commit-msg
+uv run pre-commit install
+uv run pre-commit install --hook-type commit-msg
 ```
 
 ### 3. Build Server
@@ -379,13 +379,13 @@ Test CI workflows before pushing:
 python3 scripts/tanaka.py setup-dev --include act podman
 
 # Test all workflows
-python3 scripts/tanaka.py test-ci
+uv run scripts/tanaka.py test-ci
 
 # Test specific workflow
-python3 scripts/tanaka.py test-ci -w ci.yml
+uv run scripts/tanaka.py test-ci -w ci.yml
 
 # Dry run
-python3 scripts/tanaka.py test-ci --dry-run
+uv run scripts/tanaka.py test-ci --dry-run
 ```
 
 Troubleshooting:
