@@ -1,11 +1,10 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
 
-# Global settings
 default_install_hook_types: [pre-commit, commit-msg]
 default_stages: [pre-commit]
-fail_fast: false  # Run all hooks even if one fails
-minimum_pre_commit_version: '3.5.0'
+fail_fast: true
+minimum_pre_commit_version: "3.5.0"
 
 repos:
   # Python formatting and linting
@@ -24,14 +23,15 @@ repos:
     hooks:
       - id: shellcheck
         name: Check shell scripts with shellcheck
-        args: [-x, -e, SC1091]  # Follow source statements, exclude source file not found
+        args: [-x, -e, SC1091] # Follow source statements, exclude source file not found
 
+  # Shell script formatting
   - repo: https://github.com/scop/pre-commit-shfmt
     rev: v3.11.0-1
     hooks:
       - id: shfmt
         name: Format shell scripts with shfmt
-        args: [-i, '2', -w]  # 2 space indent, write in place
+        args: [-i, "2", -w] # 2 space indent, write in place
 
   # Markdown linting
   - repo: https://github.com/igorshubovych/markdownlint-cli
@@ -39,37 +39,27 @@ repos:
     hooks:
       - id: markdownlint-fix
         name: Fix markdown files with markdownlint
-        args: [--fix, --disable, MD013, --disable, MD040]  # Disable line length and code block language checks
+        args: [--fix, --disable, MD013, --disable, MD040] # Disable line length and code block language checks
         exclude: ^(node_modules|coverage)/
 
-  # TypeScript/JavaScript checks (local hooks using pnpm)
-  - repo: local
+  # TOML formatting and linting
+  - repo: https://github.com/ComPWA/taplo-pre-commit
+    rev: v0.9.3
     hooks:
-      - id: eslint
-        name: Lint TypeScript with ESLint
-        entry: bash -c 'cd extension && pnpm run lint:fix'
-        language: system
-        files: ^extension/.*\.(ts|tsx|js|jsx)$
-        pass_filenames: false
-        require_serial: true
+      - id: taplo-format
+        name: Format TOML files
+        args: [--option, "indent_string=  "] # 2-space indentation
 
-      - id: typescript
-        name: Type check TypeScript
-        entry: bash -c 'cd extension && pnpm run typecheck'
-        language: system
-        files: ^extension/.*\.(ts|tsx)$
-        pass_filenames: false
-        require_serial: true
+  # YAML linting
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.35.1
+    hooks:
+      - id: yamllint
+        name: Lint YAML files
+        args: [--format, parsable, --strict]
+        files: \.(yml|yaml)$
 
-      - id: extension-tests
-        name: Run TypeScript tests
-        entry: bash -c 'cd extension && pnpm test'
-        language: system
-        files: ^extension/.*\.(ts|tsx|test\.ts|test\.tsx)$
-        pass_filenames: false
-        require_serial: true
-
-  # Rust checks (local hooks using cargo)
+  # Rust checks
   - repo: local
     hooks:
       - id: rustfmt
@@ -95,7 +85,42 @@ repos:
         pass_filenames: false
         require_serial: true
 
-  # Custom project-specific checks
+  # TypeScript/JavaScript checks
+  - repo: local
+    hooks:
+      - id: format-generated-typescript
+        name: Format generated TypeScript files
+        entry: bash -c 'cd extension && pnpm run lint:fix:generated || true'
+        language: system
+        files: ^extension/src/api/(errors|models|sync)/.*\.ts$
+        pass_filenames: false
+        always_run: false
+
+      - id: eslint
+        name: Lint TypeScript with ESLint
+        entry: bash -c 'cd extension && pnpm run lint:fix'
+        language: system
+        files: ^extension/.*\.(ts|tsx|js|jsx)$
+        pass_filenames: false
+        require_serial: true
+
+      - id: typescript
+        name: Type check TypeScript
+        entry: bash -c 'cd extension && pnpm run typecheck'
+        language: system
+        files: ^extension/.*\.(ts|tsx)$
+        pass_filenames: false
+        require_serial: true
+
+      - id: extension-tests
+        name: Run TypeScript tests
+        entry: bash -c 'cd extension && pnpm test'
+        language: system
+        files: ^extension/.*\.(ts|tsx|test\.ts|test\.tsx)$
+        pass_filenames: false
+        require_serial: true
+
+  # Miscellaneous checks
   - repo: local
     hooks:
       - id: documentation-consistency
@@ -120,7 +145,7 @@ repos:
         files: ^\.github/workflows/.*\.(yml|yaml)$
         pass_filenames: false
         additional_dependencies: []
-        stages: [manual]  # Only run manually with: pre-commit run --hook-stage manual test-github-actions
+        stages: [manual] # Only run manually with: pre-commit run --hook-stage manual test-github-actions
         # Note: Set to manual stage because it takes a long time to run locally
         # Run directly with: uv run scripts/tanaka.py test-ci
 
@@ -145,7 +170,7 @@ repos:
       - id: check-merge-conflict
       - id: check-toml
       - id: check-json
-        exclude: tsconfig.json  # Has comments
+        exclude: tsconfig.json # Has comments
 
 # Configuration for specific hooks
 # Skip all: git commit --no-verify
@@ -154,10 +179,10 @@ repos:
 
 # CI configuration
 ci:
-  autofix_prs: true  # Automatically fix PRs
-  autofix_commit_msg: 'chore: auto-fix from pre-commit hooks'
-  autoupdate_branch: ''  # Update PRs on default branch
-  autoupdate_commit_msg: 'chore: pre-commit autoupdate'
+  autofix_prs: true # Automatically fix PRs
+  autofix_commit_msg: "chore: auto-fix from pre-commit hooks"
+  autoupdate_branch: "" # Update PRs on default branch
+  autoupdate_commit_msg: "chore: pre-commit autoupdate"
   autoupdate_schedule: weekly
-  skip: []  # Skip local-only hooks in CI
+  skip: [] # Skip local-only hooks in CI
   submodules: false
