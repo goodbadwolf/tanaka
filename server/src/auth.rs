@@ -6,6 +6,8 @@ use axum::{
 use tanaka_server::config::AuthConfig;
 use tanaka_server::error::AppError;
 
+const BEARER_PREFIX: &str = "Bearer ";
+
 pub async fn auth_middleware(
     State(auth_config): State<AuthConfig>,
     req: Request,
@@ -17,8 +19,8 @@ pub async fn auth_middleware(
         .and_then(|value| value.to_str().ok());
 
     match auth_header {
-        Some(auth) if auth.starts_with("Bearer ") => {
-            let token = &auth[7..];
+        Some(auth) if auth.starts_with(BEARER_PREFIX) => {
+            let token = &auth[BEARER_PREFIX.len()..];
             if token == auth_config.shared_token {
                 Ok(next.run(req).await)
             } else {

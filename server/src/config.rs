@@ -4,154 +4,115 @@ use std::path::{Path, PathBuf};
 
 use crate::error::{AppError, AppResult};
 
-/// Tanaka server configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Config {
-    /// Server configuration
     pub server: ServerConfig,
 
-    /// Database configuration
     pub database: DatabaseConfig,
 
-    /// Authentication configuration
     pub auth: AuthConfig,
 
-    /// TLS configuration (optional)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tls: Option<TlsConfig>,
 
-    /// Sync configuration
     pub sync: SyncConfig,
 
-    /// Logging configuration
     pub logging: LoggingConfig,
 }
 
-/// Server configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ServerConfig {
-    /// Bind address (e.g., "127.0.0.1:8443")
     #[serde(default = "default_bind_addr")]
     pub bind_addr: String,
 
-    /// Worker threads (defaults to CPU count)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub worker_threads: Option<usize>,
 
-    /// Request timeout in seconds
     #[serde(default = "default_request_timeout")]
     pub request_timeout_secs: u64,
 }
 
-/// Database configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DatabaseConfig {
-    /// Database URL (e.g., `sqlite://tabs.db`)
     #[serde(default = "default_database_url")]
     pub url: String,
 
-    /// Connection pool max size
     #[serde(default = "default_pool_size")]
     pub max_connections: u32,
 
-    /// Connection timeout in seconds
     #[serde(default = "default_connection_timeout")]
     pub connection_timeout_secs: u64,
 }
 
-/// Authentication configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AuthConfig {
-    /// Shared authentication token
     pub shared_token: String,
 
-    /// Token header name
     #[serde(default = "default_token_header")]
     pub token_header: String,
 
-    /// Enable rate limiting
     #[serde(default = "default_rate_limiting")]
     pub rate_limiting: bool,
 
-    /// Max requests per minute (if rate limiting enabled)
     #[serde(default = "default_max_requests_per_minute")]
     pub max_requests_per_minute: u32,
 }
 
-/// TLS configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TlsConfig {
-    /// Path to certificate file
     pub cert_path: PathBuf,
 
-    /// Path to private key file
     pub key_path: PathBuf,
 }
 
-/// Sync configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SyncConfig {
-    /// Polling interval in seconds
     #[serde(default = "default_poll_secs")]
     pub poll_secs: u64,
 
-    /// Database flush interval in seconds
     #[serde(default = "default_flush_secs")]
     pub flush_secs: u64,
 
-    /// Maximum sync payload size in bytes
     #[serde(default = "default_max_payload_size")]
     pub max_payload_size: usize,
 
-    /// Enable compression
     #[serde(default = "default_compression")]
     pub compression: bool,
 }
 
-/// Logging configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LoggingConfig {
-    /// Log level (trace, debug, info, warn, error)
     #[serde(default = "default_log_level")]
     pub level: String,
 
-    /// Log format (json, pretty, compact)
     #[serde(default = "default_log_format")]
     pub format: String,
 
-    /// Enable request logging
     #[serde(default = "default_request_logging")]
     pub request_logging: bool,
 }
 
-/// Command line arguments
 #[derive(Parser, Debug)]
 #[command(name = "tanaka-server")]
 #[command(about = "CRDT-based tab synchronization server for Firefox")]
 #[command(version, long_about = None)]
 pub struct Args {
-    /// Path to configuration file
     #[arg(short, long, env = "TANAKA_CONFIG", default_value = "tanaka.toml")]
     pub config: PathBuf,
 
-    /// Override bind address
     #[arg(long, env = "TANAKA_BIND_ADDR")]
     pub bind_addr: Option<String>,
 
-    /// Override database URL
     #[arg(long, env = "TANAKA_DATABASE_URL")]
     pub database_url: Option<String>,
 
-    /// Override auth token
     #[arg(long, env = "TANAKA_AUTH_TOKEN")]
     pub auth_token: Option<String>,
 
-    /// Override log level
     #[arg(long, env = "TANAKA_LOG_LEVEL")]
     pub log_level: Option<String>,
 }
 
-// Default value functions
 fn default_bind_addr() -> String {
     "127.0.0.1:8443".to_string()
 }
@@ -217,18 +178,17 @@ impl Config {
     ///
     /// # Errors
     ///
-    /// Returns error if:
-    /// - Configuration file exists but cannot be read or parsed
-    /// - Required configuration values are missing or invalid
+    /// Returns `AppError::Config` if:
+    /// - Configuration file cannot be read
+    /// - Configuration file contains invalid TOML
+    /// - Configuration validation fails
     pub fn load(args: &Args) -> AppResult<Self> {
-        // Load .env file if it exists
         if let Err(e) = dotenvy::dotenv() {
             if !matches!(e, dotenvy::Error::Io(_)) {
                 tracing::warn!("Failed to load .env file: {}", e);
             }
         }
 
-        // Load base config from file
         let mut config = if args.config.exists() {
             let content = std::fs::read_to_string(&args.config).map_err(|e| AppError::Config {
                 message: format!("Failed to read config file: {e}"),
@@ -240,11 +200,9 @@ impl Config {
                 key: Some("parse".to_string()),
             })?
         } else {
-            // Create default config if file doesn't exist
             Self::default()
         };
 
-        // Apply command line overrides
         if let Some(bind_addr) = &args.bind_addr {
             config.server.bind_addr.clone_from(bind_addr);
         }
@@ -261,7 +219,6 @@ impl Config {
             config.logging.level.clone_from(log_level);
         }
 
-        // Validate configuration
         config.validate()?;
 
         Ok(config)
@@ -271,13 +228,12 @@ impl Config {
     ///
     /// # Errors
     ///
-    /// Returns error if:
+    /// Returns `AppError::Config` if:
     /// - Bind address is empty
     /// - Auth token is empty
     /// - TLS files don't exist when TLS is configured
     /// - Log level is invalid
     pub fn validate(&self) -> AppResult<()> {
-        // Validate bind address
         if self.server.bind_addr.is_empty() {
             return Err(AppError::Config {
                 message: "Bind address cannot be empty".to_string(),
@@ -285,7 +241,6 @@ impl Config {
             });
         }
 
-        // Validate auth token
         if self.auth.shared_token.is_empty() {
             return Err(AppError::Config {
                 message: "Auth token cannot be empty".to_string(),
@@ -293,7 +248,6 @@ impl Config {
             });
         }
 
-        // Validate TLS config if provided
         if let Some(tls) = &self.tls {
             if !tls.cert_path.exists() {
                 return Err(AppError::Config {
@@ -310,7 +264,6 @@ impl Config {
             }
         }
 
-        // Validate log level
         let valid_levels = ["trace", "debug", "info", "warn", "error"];
         if !valid_levels.contains(&self.logging.level.as_str()) {
             return Err(AppError::Config {
@@ -326,7 +279,7 @@ impl Config {
     ///
     /// # Errors
     ///
-    /// Returns error if:
+    /// Returns `AppError::Config` if:
     /// - Configuration cannot be serialized to TOML
     /// - File cannot be written
     #[allow(dead_code)]
@@ -397,14 +350,11 @@ mod tests {
     fn test_config_validation() {
         let mut config = Config::default();
 
-        // Empty auth token should fail
         assert!(config.validate().is_err());
 
-        // Valid config should pass
         config.auth.shared_token = "test-token".to_string();
         assert!(config.validate().is_ok());
 
-        // Invalid log level should fail
         config.logging.level = "invalid".to_string();
         assert!(config.validate().is_err());
     }
@@ -417,11 +367,9 @@ mod tests {
         let mut config = Config::default();
         config.auth.shared_token = "test-token".to_string();
 
-        // Save config
         config.save(&config_path).unwrap();
         assert!(config_path.exists());
 
-        // Load config
         let args = Args {
             config: config_path,
             bind_addr: None,

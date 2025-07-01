@@ -23,35 +23,30 @@ struct HealthResponse {
 
 #[tokio::main]
 async fn main() -> AppResult<()> {
-    // Parse command line arguments
     let args = Args::parse();
-
-    // Load configuration
     let config = Config::load(&args)?;
-
-    // Initialize logging based on config
     init_logging(&config);
 
     tracing::info!("Starting Tanaka server v{}", env!("CARGO_PKG_VERSION"));
     tracing::debug!("Configuration loaded: {:?}", config);
 
-    // Initialize database with config
     let db_pool = db::init_db_with_config(&config.database).await?;
     tracing::info!("Database initialized");
 
-    // Create app with configuration
     let app = create_app(db_pool, &config);
 
-    // Parse bind address
-    let addr: SocketAddr = config
-        .server
-        .bind_addr
-        .parse()
-        .expect("Invalid bind address");
+    let addr: SocketAddr =
+        config
+            .server
+            .bind_addr
+            .parse()
+            .map_err(|e| tanaka_server::error::AppError::Config {
+                message: format!("Invalid bind address '{}': {}", config.server.bind_addr, e),
+                key: Some("server.bind_addr".to_string()),
+            })?;
 
     tracing::info!("Starting server on {}", addr);
 
-    // Start server
     let listener = tokio::net::TcpListener::bind(addr).await?;
     axum::serve(listener, app).await?;
 
@@ -88,10 +83,8 @@ fn create_app(db_pool: sqlx::SqlitePool, config: &Config) -> Router {
         )),
     );
 
-    // Add CORS layer
     app = app.layer(CorsLayer::permissive());
 
-    // Add request tracing if enabled
     if config.logging.request_logging {
         app = app.layer(TraceLayer::new_for_http());
     }

@@ -3,27 +3,20 @@ use std::time::Duration;
 use tanaka_server::config::DatabaseConfig;
 use tanaka_server::error::AppResult;
 
-#[allow(dead_code)] // Kept for backwards compatibility
-pub async fn init_db() -> Result<SqlitePool, sqlx::Error> {
-    let default_config = DatabaseConfig {
-        url: "sqlite://tabs.db".to_string(),
-        max_connections: 5,
-        connection_timeout_secs: 10,
-    };
+const CREATE_TABS_TABLE_SQL: &str = r"
+    CREATE TABLE IF NOT EXISTS tabs (
+        id TEXT PRIMARY KEY,
+        window_id TEXT NOT NULL,
+        data TEXT NOT NULL,
+        updated_at INTEGER NOT NULL
+    )
+";
 
-    init_db_with_config(&default_config)
-        .await
-        .map_err(|e| match e {
-            tanaka_server::error::AppError::Database { source, .. } => source,
-            _ => sqlx::Error::Configuration("Unexpected error type".into()),
-        })
-}
+const MILLIS_PER_SECOND: u64 = 1000;
 
 pub async fn init_db_with_config(config: &DatabaseConfig) -> AppResult<SqlitePool> {
-    // Extract database path from URL
     let db_path = config.url.strip_prefix("sqlite://").unwrap_or(&config.url);
 
-    // Create database file if it doesn't exist
     if !db_path.starts_with(":memory:") {
         let _ = tokio::fs::File::create(db_path).await;
     }
@@ -46,8 +39,7 @@ pub async fn init_db_with_config(config: &DatabaseConfig) -> AppResult<SqlitePoo
         .await
         .map_err(|e| tanaka_server::error::AppError::database("Failed to set journal mode", e))?;
 
-    // Set busy timeout based on connection timeout
-    let busy_timeout_ms = config.connection_timeout_secs * 1000;
+    let busy_timeout_ms = config.connection_timeout_secs * MILLIS_PER_SECOND;
     sqlx::query(&format!("PRAGMA busy_timeout = {busy_timeout_ms}"))
         .execute(&pool)
         .await
@@ -60,20 +52,10 @@ pub async fn init_db_with_config(config: &DatabaseConfig) -> AppResult<SqlitePoo
             tanaka_server::error::AppError::database("Failed to set synchronous mode", e)
         })?;
 
-    // Create tables
-    sqlx::query(
-        r"
-        CREATE TABLE IF NOT EXISTS tabs (
-            id TEXT PRIMARY KEY,
-            window_id TEXT NOT NULL,
-            data TEXT NOT NULL,
-            updated_at INTEGER NOT NULL
-        )
-        ",
-    )
-    .execute(&pool)
-    .await
-    .map_err(|e| tanaka_server::error::AppError::database("Failed to create tabs table", e))?;
+    sqlx::query(CREATE_TABS_TABLE_SQL)
+        .execute(&pool)
+        .await
+        .map_err(|e| tanaka_server::error::AppError::database("Failed to create tabs table", e))?;
 
     Ok(pool)
 }
