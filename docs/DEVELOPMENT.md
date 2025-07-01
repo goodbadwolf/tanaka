@@ -518,6 +518,8 @@ import { Button, Input, Card } from "../components";
    pre-commit run --all-files
    ```
 
+   **⚠️ Important**: Never use `git commit --no-verify` to bypass checks. These hooks catch the same issues CI will enforce. Skipping them locally only delays failures and wastes CI resources.
+
 2. **Test your changes**:
 
    - Unit tests pass

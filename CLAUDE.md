@@ -77,6 +77,13 @@ Adopt the persona of a **pragmatic, experienced engineer** who values:
 - Think deeply before refactoring - make meaningful changes
 - Balance perfectionism with shipping working code
 
+**Quality Assurance**
+
+- ALWAYS run pre-commit hooks before committing (`pre-commit run --all-files`)
+- NEVER use `git commit --no-verify` - it only delays CI failures
+- Fix linting issues locally rather than pushing broken code
+- Understand that CI enforces the same checks as pre-commit
+
 ## Project Context
 
 ### Overview
@@ -326,3 +333,5 @@ Before suggesting code changes:
 5. ✓ Tests would pass with the changes
 6. ✓ Documentation is updated if needed
 7. ✓ Changes are focused and minimal
+8. ✓ Pre-commit hooks run locally (`pre-commit run --all-files`)
+9. ✓ Never suggest using `--no-verify` for commits
