@@ -61,6 +61,14 @@ repos:
         pass_filenames: false
         require_serial: true
 
+      - id: extension-tests
+        name: Run TypeScript tests
+        entry: bash -c 'cd extension && pnpm test'
+        language: system
+        files: ^extension/.*\.(ts|tsx|test\.ts|test\.tsx)$
+        pass_filenames: false
+        require_serial: true
+
   # Rust checks (local hooks using cargo)
   - repo: local
     hooks:
@@ -74,6 +82,14 @@ repos:
       - id: clippy
         name: Lint Rust code with clippy
         entry: bash -c 'cd server && cargo clippy --all-targets -- -D warnings'
+        language: system
+        files: ^server/.*\.rs$
+        pass_filenames: false
+        require_serial: true
+
+      - id: rust-tests
+        name: Run Rust tests
+        entry: bash -c 'cd server && cargo test'
         language: system
         files: ^server/.*\.rs$
         pass_filenames: false
@@ -134,6 +150,7 @@ repos:
 # Configuration for specific hooks
 # Skip all: git commit --no-verify
 # Skip specific: SKIP=hook-id git commit
+# Skip tests: SKIP=extension-tests,rust-tests git commit
 
 # CI configuration
 ci:
