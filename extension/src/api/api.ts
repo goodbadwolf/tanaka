@@ -1,5 +1,6 @@
 import type { Tab as BrowserTab } from '../browser/core';
 import type { Tab, SyncRequest, SyncResponse } from './models';
+import type { SyncV2Request, SyncV2Response } from './sync';
 import { ExtensionError, ErrorFactories, type AsyncResult, createResult } from '../error/types';
 import { createRetryableFunction } from '../utils/retry';
 
@@ -93,6 +94,66 @@ export class TanakaAPI {
       });
 
       return data.tabs;
+    });
+  }
+
+  async syncV2(request: SyncV2Request): AsyncResult<SyncV2Response, ExtensionError> {
+    return createResult(async () => {
+      // Convert bigint values to strings for JSON serialization
+      const jsonRequest = {
+        ...request,
+        clock: request.clock.toString(),
+        since_clock: request.since_clock ? request.since_clock.toString() : null,
+        operations: request.operations.map((op) => {
+          // Convert bigint fields in operations to strings
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const jsonOp: any = { ...op };
+          if ('updated_at' in jsonOp) {
+            jsonOp.updated_at = jsonOp.updated_at.toString();
+          }
+          if ('closed_at' in jsonOp) {
+            jsonOp.closed_at = jsonOp.closed_at.toString();
+          }
+          if ('data' in jsonOp && jsonOp.data.updated_at) {
+            jsonOp.data = {
+              ...jsonOp.data,
+              updated_at: jsonOp.data.updated_at.toString(),
+            };
+          }
+          return jsonOp;
+        }),
+      };
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const response = await this.retryableRequest<any>('/sync/v2', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(jsonRequest),
+      });
+
+      // Convert string values back to bigint in response
+      return {
+        clock: BigInt(response.clock),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        operations: response.operations.map((op: any) => {
+          const resultOp = { ...op };
+          if ('updated_at' in resultOp) {
+            resultOp.updated_at = BigInt(resultOp.updated_at);
+          }
+          if ('closed_at' in resultOp) {
+            resultOp.closed_at = BigInt(resultOp.closed_at);
+          }
+          if ('data' in resultOp && resultOp.data.updated_at) {
+            resultOp.data = {
+              ...resultOp.data,
+              updated_at: BigInt(resultOp.data.updated_at),
+            };
+          }
+          return resultOp;
+        }),
+      } as SyncV2Response;
     });
   }
 

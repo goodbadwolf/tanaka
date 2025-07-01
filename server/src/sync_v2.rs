@@ -567,7 +567,7 @@ mod tests {
         assert!(valid_upsert.validate().is_ok());
 
         let invalid_upsert = CrdtOperation::UpsertTab {
-            id: "".to_string(), // Empty ID
+            id: String::new(), // Empty ID
             data: TabData {
                 window_id: "window1".to_string(),
                 url: "https://example.com".to_string(),
@@ -596,7 +596,7 @@ mod tests {
 
         assert_eq!(operation.target_id(), "tab1");
         assert_eq!(operation.operation_type(), "upsert_tab");
-        assert_eq!(operation.updated_at(), 1234567890);
+        assert_eq!(operation.updated_at(), 1_234_567_890);
     }
 
     #[test]
