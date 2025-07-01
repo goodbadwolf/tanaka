@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AI Assistant Guide for Tanaka
 
-This file provides guidance to Claude Code (claude.ai/code) or any AI Agents when working with code in this repository.
+This file provides guidance to AI assistants (Claude Code, GitHub Copilot, etc.) when working with code in this repository.
 
 ## CRITICAL RULES - MUST FOLLOW
 
@@ -79,36 +79,34 @@ Adopt the persona of a **pragmatic, experienced engineer** who values:
 
 ## Project Context
 
-- **Overview**: See @README.md
-- **Architecture**: See @docs/ARCHITECTURE.md
-- **Development Guide**: See @docs/DEVELOPMENT.md
-- **Installation**: See @docs/GETTING-STARTED.md
-- **Roadmap**: See @docs/ROADMAP.md
+### Overview
 
-## AI Agent Guidelines
+Tanaka is a Firefox tab synchronization system built with:
+- **Extension**: TypeScript WebExtension using Yjs CRDT
+- **Server**: Rust server using axum, tokio, yrs, and SQLite
+- **Architecture**: Client-server with CRDT-based sync
 
-### Working with this Codebase
+### Documentation References
 
-- Firefox WebExtension (TypeScript) + Rust backend server
-- Extension uses Yjs for CRDT-based tab synchronization
-- TypeScript types generated from Rust models using ts-rs - import from `types/generated`
-- Always check existing patterns in neighboring files before implementing
-- Run `cargo fmt` and `pnpm run lint` before suggesting code changes
-- Prefer editing existing files over creating new ones
-- Ensure Firefox WebExtension API compatibility
+- **Project Overview**: See [@README.md](README.md)
+- **Architecture Details**: See [@docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+- **Development Setup**: See [@docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)
+- **Git Workflow**: See [@docs/GIT.md](docs/GIT.md)
+- **Getting Started**: See [@docs/GETTING-STARTED.md](docs/GETTING-STARTED.md)
+- **Roadmap**: See [@docs/ROADMAP.md](docs/ROADMAP.md)
+- **Troubleshooting**: See [@docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
 
 ### Project Structure
 
-- `/extension` - Firefox WebExtension (TypeScript, Yjs)
-- `/server` - Rust Tanaka server (axum, tokio, yrs, SQLite)
-  - `/server/config` - Example configuration files
-- `/docs` - Project documentation
+```
+tanaka/
+├── extension/          # Firefox WebExtension (TypeScript, Yjs)
+├── server/            # Rust Tanaka server (axum, tokio, yrs, SQLite)
+│   └── config/        # Example configuration files
+└── docs/              # Project documentation
+```
 
-### Git Workflow
-
-For commit guidelines, pre-commit hooks, and git best practices, see @docs/GIT.md
-
-### Common Tasks
+## Common Tasks
 
 - **New API endpoint**: Check `/server/src/routes/`
 - **Modify tab sync**: Look at `/extension/src/sync/`
@@ -117,9 +115,9 @@ For commit guidelines, pre-commit hooks, and git best practices, see @docs/GIT.m
 - **Generate TS types**: Run `python3 scripts/tanaka.py generate`
 - **Add shared types**: Add `#[derive(TS)]` and `#[ts(export)]` to Rust structs in `/server/src/models.rs`
 
-### Technical Patterns
+## Technical Patterns
 
-#### Error Handling (Result Pattern)
+### Error Handling (Result Pattern)
 
 ```typescript
 import { Result, ok, err } from "neverthrow";
@@ -153,7 +151,7 @@ const result = await syncTabs(tabs)
   .mapErr(handleError);
 ```
 
-#### TypeScript Guidelines
+### TypeScript Guidelines
 
 ```typescript
 // Import generated types (NEVER redefine)
@@ -184,7 +182,7 @@ type BackgroundMessage =
   | { type: "GET_STATUS" };
 ```
 
-#### Performance Best Practices
+### Performance Best Practices
 
 1. **Memory**: Use browser storage instead of keeping all data in memory
 2. **Events**: Debounce frequent events (tab updates, etc.)
@@ -228,6 +226,18 @@ class SyncManager {
 - Independent tests (no shared state)
 - Test edge cases
 
+## Working with this Codebase
+
+### Guidelines
+
+- Firefox WebExtension (TypeScript) + Rust backend server
+- Extension uses Yjs for CRDT-based tab synchronization
+- TypeScript types generated from Rust models using ts-rs - import from `types/generated`
+- Always check existing patterns in neighboring files before implementing
+- Run `cargo fmt` and `pnpm run lint` before suggesting code changes
+- Prefer editing existing files over creating new ones
+- Ensure Firefox WebExtension API compatibility
+
 ### Common Issues & Solutions
 
 #### Bash Commands
@@ -244,9 +254,9 @@ class SyncManager {
 
 #### Documentation
 
-- Check for redundancy across README.md, CLAUDE.md, and docs/
-- Keep config examples only in GETTING-STARTED.md
-- AGENTS.md is a symlink to CLAUDE.md (changes affect both)
+- Check for redundancy across documentation files
+- Keep configuration examples in GETTING-STARTED.md
+- Follow the documentation structure in docs/
 
 ### Rollback Procedures
 
@@ -276,24 +286,29 @@ pnpm build:prod
 - Run commands from the appropriate directory context
 - Always verify file contents after moving or modifying them
 
-### Memory
+### Memory Management
 
-- After compacting, read the docs and @CLAUDE.md to refresh your instructions
+- After compacting, read the docs and this guide to refresh your instructions
 - Proactively suggest adding patterns/lessons to documentation
-- Always run pre-commit checks (see @docs/GIT.md for details)
+- Always run pre-commit checks before committing
 - Fix markdown linting issues (usually missing blank lines)
-- **Documentation Updates**: Always check and update relevant documentation (README.md, docs/*.md) when making major changes
+- **Documentation Updates**: Always check and update relevant documentation when making major changes
 - **Before Pull Requests**: Review all docs for accuracy - feature status, version numbers, commands, and technical details must match the code
 
-### Essential Commands
+## Important Notes
 
-See @docs/DEVELOPMENT.md for all development commands.
-
-### Development Roadmap
-
-For the unified development roadmap covering both extension and server improvements, see [@docs/ROADMAP.md](docs/ROADMAP.md).
-
-### Misc
-
-- AGENTS.md (used by OpenAI's Codex) is a symlink for CLAUDE.md
+- This guide was previously named CLAUDE.md
+- AGENTS.md may be a symlink to this file for compatibility
 - The project uses semantic versioning - update versions in `manifest.json` and `Cargo.toml`
+
+## Quality Checklist
+
+Before suggesting code changes:
+
+1. ✓ Code follows existing patterns in the codebase
+2. ✓ No unnecessary comments added
+3. ✓ Types are properly defined (no `any`)
+4. ✓ Error handling uses Result pattern where appropriate
+5. ✓ Tests would pass with the changes
+6. ✓ Documentation is updated if needed
+7. ✓ Changes are focused and minimal

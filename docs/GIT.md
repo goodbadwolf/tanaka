@@ -1,5 +1,19 @@
 # Git Guidelines
 
+**Purpose**: Git workflow conventions and pre-commit setup  
+**Audience**: Contributors and developers  
+**Prerequisites**: Git command line knowledge
+
+## Navigation
+- [🏠 Home](../README.md)
+- [🚀 Getting Started](GETTING-STARTED.md)
+- [💻 Development](DEVELOPMENT.md)
+- [🏗️ Architecture](ARCHITECTURE.md)
+- [🔧 Troubleshooting](TROUBLESHOOTING.md)
+- [📝 Git Guidelines](GIT.md)
+
+---
+
 ## Git Commit Guidelines
 
 When making commits in this repository, follow these simple conventions:
