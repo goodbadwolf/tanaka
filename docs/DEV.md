@@ -843,16 +843,18 @@ The extension includes detailed analysis reports for performance and security:
 
 ### Bundle Analysis
 
-See [`extension/BUNDLE-ANALYSIS.md`](../extension/BUNDLE-ANALYSIS.md) for:
-- Current bundle sizes (88.2KB total)
-- Code splitting effectiveness
-- Performance metrics
+To analyze bundle sizes and code splitting:
 
-**Generate new report:**
 ```bash
 cd extension
 pnpm run analyze
 ```
+
+This generates a detailed report showing:
+- Bundle sizes for each entry point
+- Code splitting effectiveness
+- Vendor bundle separation
+- Optimization opportunities
 
 ### Component Library
 
