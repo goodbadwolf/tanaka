@@ -149,7 +149,7 @@ pnpm run start
 
 ## 4. Configuration
 
-See [@docs/INSTALL.md](docs/INSTALL.md#4-configuration-reference-tanakatoml) for detailed configuration instructions.
+See [@docs/GETTING-STARTED.md](GETTING-STARTED.md#configuration-options) for detailed configuration instructions.
 
 The server automatically applies SQLite safety settings at startup:
 

@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) or any AI Agents when working with code in this repository.
+This file provides guidance to AI assistants (Claude Code, GitHub Copilot, Cursor, etc.) when working with code in this repository.
 
 ## CRITICAL RULES - MUST FOLLOW
 
@@ -77,47 +77,24 @@ Adopt the persona of a **pragmatic, experienced engineer** who values:
 - Think deeply before refactoring - make meaningful changes
 - Balance perfectionism with shipping working code
 
-### 3. SMALL LOGICAL COMMITS
-
-**Make small, frequent commits** rather than large, infrequent ones:
-
-- Each commit should represent ONE logical change
-- If a commit does multiple things, split it into separate commits
-- Keep commits focused and atomic
-- Confirm commit message with user before committing
-
-**USE `git add -p` FOR SELECTIVE STAGING:**
-When you have multiple unrelated changes in your working directory:
-
-- Use `git add -p <file>` to stage specific hunks interactively, one file at a time
-- When prompted, use 's' to split hunks into smaller pieces for finer control
-- Review each hunk carefully and accept ('y') or skip ('n') based on what belongs in the current commit
-- Stage only the parts that belong to the current commit
-- Review staged changes with `git diff --cached` before committing
-
-Interactive options: `y` (stage), `n` (skip), `s` (split), `e` (edit), `q` (quit), `?` (help)
-
-Example of good commit sequence:
-
-```
-feat: add Result type for error handling
-refactor: extract process management into ProcessManager
-refactor: centralize build stages in single file
-fix: restore vite output colors with stdio inherit
-```
-
-NOT this:
-
-```
-feat: refactor entire build system with new error handling and process management
-```
-
 ## Project Context
 
-- **Overview**: See @README.md
-- **Architecture & Dev Guide**: See @docs/DEV.md
-- **Installation**: See @docs/INSTALL.md
+### Overview
+
+Tanaka is a Firefox tab synchronization system built with:
+- **Extension**: TypeScript WebExtension using Yjs CRDT
+- **Server**: Rust server using axum, tokio, yrs, and SQLite
+- **Architecture**: Client-server with CRDT-based sync
+
+### Documentation References
+
+- **Project Overview**: See @README.md
+- **Architecture Details**: See @docs/ARCHITECTURE.md
+- **Development Setup**: See @docs/DEVELOPMENT.md
+- **Git Workflow**: See @docs/GIT.md
+- **Getting Started**: See @docs/GETTING-STARTED.md
 - **Roadmap**: See @docs/ROADMAP.md
+- **Troubleshooting**: See @docs/TROUBLESHOOTING.md
 
 ## AI Agent Guidelines
 
@@ -133,52 +110,17 @@ feat: refactor entire build system with new error handling and process managemen
 
 ### Project Structure
 
-- `/extension` - Firefox WebExtension (TypeScript, Yjs)
-- `/server` - Rust Tanaka server (axum, tokio, yrs, SQLite)
-  - `/server/config` - Example configuration files
-- `/docs` - Project documentation
+```
+tanaka/
+├── extension/          # Firefox WebExtension (TypeScript, Yjs)
+├── server/            # Rust Tanaka server (axum, tokio, yrs, SQLite)
+│   └── config/        # Example configuration files
+└── docs/              # Project documentation
+```
 
-### Pre-commit Hooks
+### Git Workflow
 
-This project uses [pre-commit](https://pre-commit.com/) to automatically check code quality before commits.
-
-**Hooks run automatically on commit and will:**
-- Format Python, TypeScript, Rust, Shell, and Markdown files
-- Run linters and type checkers
-- Validate commit messages
-- Show documentation reminders
-- Auto-fix many issues
-
-**Manual checks (if needed):**
-
-1. **TypeScript** (in extension directory):
-   ```bash
-   pnpm run lint        # ESLint checks
-   pnpm run typecheck   # TypeScript type checking
-   ```
-
-2. **Rust** (in server directory):
-   ```bash
-   cargo fmt            # Format code
-   cargo clippy         # Linting
-   cargo test           # Run tests
-   ```
-
-3. **Run all pre-commit hooks manually**:
-   ```bash
-   pre-commit run --all-files
-   ```
-
-4. **Documentation**: Review and update if needed:
-   - README.md - feature status, version roadmap
-   - DEV.md - new commands, architecture changes
-   - ROADMAP*.md - task completion status
-   - GIT.md - if commit conventions change
-
-5. **Roadmap Tracking** (IMPORTANT for active development):
-   - When working on roadmap items, include doc updates in the same commit
-   - Update ROADMAP.md: mark items complete, update metrics and progress
-   - Example: `git add src/feature.ts docs/ROADMAP.md && git commit`
+For commit guidelines, pre-commit hooks, and git best practices, see @docs/GIT.md
 
 ### Common Tasks
 
@@ -316,8 +258,9 @@ class SyncManager {
 
 #### Documentation
 
-- Check for redundancy across README.md, CLAUDE.md, and docs/
-- Keep config examples only in INSTALL.md
+- Check for redundancy across documentation files
+- Keep configuration examples in GETTING-STARTED.md
+- Follow the documentation structure in docs/
 - AGENTS.md is a symlink to CLAUDE.md (changes affect both)
 
 ### Rollback Procedures
@@ -348,40 +291,38 @@ pnpm build:prod
 - Run commands from the appropriate directory context
 - Always verify file contents after moving or modifying them
 
-### Memory
+### Memory Management
 
-- After compacting, read the docs and @CLAUDE.md to refresh your instructions
+- After compacting, read the docs and this guide to refresh your instructions
 - Proactively suggest adding patterns/lessons to documentation
-- Always run pre-commit checks (see checklist above)
+- Always run pre-commit checks before committing
 - Fix markdown linting issues (usually missing blank lines)
-- **Documentation Updates**: Always check and update relevant documentation (README.md, DEV.md, ROADMAP*.md) when making major changes
+- **File References**: Use @<path> notation for file references in CLAUDE.md (not Markdown links)
+- **Documentation Updates**: Always check and update relevant documentation when making major changes
 - **Before Pull Requests**: Review all docs for accuracy - feature status, version numbers, commands, and technical details must match the code
-
-### Git Best Practices
-
-- Refer to @docs/GIT.md for commit message format
-- Use `git add -p` for selective staging
-- Stage files individually with full paths: `git add /path/to/file1 /path/to/file2`
-- NEVER use `git add -A` or `git add .`
-- Review with `git diff --cached` before committing
-
-Example:
-
-```bash
-git add /Users/manish/projects/tanaka/extension/src/background.ts
-git diff --cached
-git commit -m "refactor: simplify message validation"
-```
 
 ### Essential Commands
 
-See @docs/DEV.md for all development commands.
+See @docs/DEVELOPMENT.md for all development commands.
 
 ### Development Roadmap
 
-For the unified development roadmap covering both extension and server improvements, see [@docs/ROADMAP.md](docs/ROADMAP.md).
+For the unified development roadmap covering both extension and server improvements, see @docs/ROADMAP.md.
 
 ### Misc
 
-- AGENTS.md (used by OpenAI's Codex) is a symlink for CLAUDE.md
+- This guide was previously named CLAUDE.md
+- AGENTS.md is a symlink to this file for compatibility (used by OpenAI's Codex)
 - The project uses semantic versioning - update versions in `manifest.json` and `Cargo.toml`
+
+## Quality Checklist
+
+Before suggesting code changes:
+
+1. ✓ Code follows existing patterns in the codebase
+2. ✓ No unnecessary comments added
+3. ✓ Types are properly defined (no `any`)
+4. ✓ Error handling uses Result pattern where appropriate
+5. ✓ Tests would pass with the changes
+6. ✓ Documentation is updated if needed
+7. ✓ Changes are focused and minimal
