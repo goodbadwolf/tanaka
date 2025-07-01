@@ -6,7 +6,7 @@ on:
     branches: [main]
 
 jobs:
-  code-quality:
+  ci:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,7 +23,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
-          cache: 'pnpm'
+          cache: "pnpm"
           cache-dependency-path: extension/pnpm-lock.yaml
 
       - uses: dtolnay/rust-toolchain@stable

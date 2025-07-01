@@ -1,4 +1,4 @@
-"""Lint command - Run code quality checks"""
+"""Lint command - Run linting checks"""
 
 import argparse
 import fnmatch
@@ -134,7 +134,7 @@ def add_subparser(subparsers: argparse._SubParsersAction) -> None:
     """Add the lint command parser"""
     parser = subparsers.add_parser(
         "lint",
-        help="Run code quality checks",
+        help="Run linting checks",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
