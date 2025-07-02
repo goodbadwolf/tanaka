@@ -213,6 +213,36 @@ RUST_BACKTRACE=1 cargo build -vv
    poll_secs = 30  # Increase from 5
    ```
 
+### Web Worker Issues
+
+**Symptoms:**
+- Extension freezes during sync
+- Worker initialization fails
+- "Worker is not defined" errors
+
+**Solutions:**
+
+1. **Check worker is loaded**:
+   ```javascript
+   // In extension console
+   const workers = await browser.runtime.getBackgroundPage();
+   console.log('Worker available:', typeof Worker !== 'undefined');
+   ```
+
+2. **Verify worker file exists**:
+   - Check `dist/workers/crdt-worker.js` is present
+   - Rebuild if missing: `pnpm run build:dev`
+
+3. **Debug worker errors**:
+   ```javascript
+   // In background script console
+   // Look for worker initialization errors
+   ```
+
+4. **Disable worker (fallback)**:
+   - Worker automatically falls back to main thread on failure
+   - Check logs for "Worker initialization failed" messages
+
 ### Development Environment Issues
 
 **pnpm not found:**
