@@ -156,7 +156,7 @@ export function measurePerformance(
   return descriptor;
 }
 
-// React hook for measuring component render time
+// React/Preact hook for measuring component render time
 export function useRenderTime(componentName: string): void {
   if (process.env.NODE_ENV !== 'development') return;
 
@@ -170,4 +170,35 @@ export function useRenderTime(componentName: string): void {
       console.warn(`Slow render detected: ${componentName} took ${renderTime.toFixed(2)}ms`);
     }
   });
+}
+
+// Track component render counts in development
+const componentRenderCounts = new Map<string, number>();
+
+export function trackComponentRender(componentName: string): void {
+  if (process.env.NODE_ENV !== 'development') return;
+
+  const count = (componentRenderCounts.get(componentName) || 0) + 1;
+  componentRenderCounts.set(componentName, count);
+}
+
+export function logRenderStats(): void {
+  if (process.env.NODE_ENV !== 'development') return;
+
+  const stats = Array.from(componentRenderCounts.entries())
+    .filter(([_, count]) => count > 1)
+    .sort((a, b) => b[1] - a[1]);
+
+  if (stats.length > 0) {
+    console.group('🚀 Component Render Stats');
+    stats.forEach(([name, count]) => {
+      console.log(`${name}: ${count} renders`);
+    });
+    console.groupEnd();
+  }
+}
+
+// Auto-log stats every 10 seconds in development
+if (process.env.NODE_ENV === 'development') {
+  setInterval(logRenderStats, 10000);
 }
