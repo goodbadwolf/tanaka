@@ -1,4 +1,4 @@
-import { useEffect } from 'preact/hooks';
+import { useEffect, useCallback } from 'preact/hooks';
 import { getConfig } from '../../config/index';
 import { useService } from '../../di/provider';
 import type { IBrowser } from '../../browser/core';
@@ -28,27 +28,30 @@ export function SettingsApp() {
     return dispose;
   }, [browser]);
 
-  const handleSave = async (e: Event) => {
-    e.preventDefault();
-    const form = e.currentTarget as HTMLFormElement;
-    const authTokenInput = form.authToken as HTMLInputElement;
-    const syncIntervalInput = form.syncInterval as HTMLInputElement;
+  const handleSave = useCallback(
+    async (e: Event) => {
+      e.preventDefault();
+      const form = e.currentTarget as HTMLFormElement;
+      const authTokenInput = form.authToken as HTMLInputElement;
+      const syncIntervalInput = form.syncInterval as HTMLInputElement;
 
-    try {
-      await saveSettingsToStore(
-        {
-          authToken: authTokenInput.value,
-          syncInterval: parseInt(syncIntervalInput.value, 10) * 1000,
-        },
-        browser.localStorage,
-      );
+      try {
+        await saveSettingsToStore(
+          {
+            authToken: authTokenInput.value,
+            syncInterval: parseInt(syncIntervalInput.value, 10) * 1000,
+          },
+          browser.localStorage,
+        );
 
-      // Notify background script
-      await browser.runtime.sendMessage({ type: 'SETTINGS_UPDATED' });
-    } catch {
-      // Error is already handled by the store
-    }
-  };
+        // Notify background script
+        await browser.runtime.sendMessage({ type: 'SETTINGS_UPDATED' });
+      } catch {
+        // Error is already handled by the store
+      }
+    },
+    [browser]
+  );
 
   if (isLoading.value) {
     return (

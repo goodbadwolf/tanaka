@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'preact/hooks';
+import { useEffect, useState, useCallback } from 'preact/hooks';
 import { useService } from '../../di/provider';
 import type { IBrowser } from '../../browser/core';
 import {
@@ -60,7 +60,7 @@ export function WindowTracker() {
     initializeWindow();
   }, [browser]);
 
-  const handleToggle = async () => {
+  const handleToggle = useCallback(async () => {
     if (!currentWindowId || isLoading) return;
 
     try {
@@ -92,7 +92,7 @@ export function WindowTracker() {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
     }
-  };
+  }, [currentWindowId, isLoading, browser]);
 
   if (isLoading) {
     return (
