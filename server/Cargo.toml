@@ -57,5 +57,10 @@ hyper = { version = "1.5", features = ["full"] }
 http-body-util = "0.1"
 
 # Testing improvements
-pretty_assertions = "1.4" # Colorful diffs for better test debugging
-rstest = "0.18"           # Parameterized testing for CRDT operations
+pretty_assertions = "1.4"                                    # Colorful diffs for better test debugging
+rstest = "0.18"                                              # Parameterized testing for CRDT operations
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[[bench]]
+name = "sync_benchmark"
+harness = false

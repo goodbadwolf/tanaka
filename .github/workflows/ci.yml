@@ -99,10 +99,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-cargo-
 
-      - name: Install cargo-tarpaulin
+      - name: Install testing tools
         uses: taiki-e/install-action@v2
         with:
-          tool: cargo-tarpaulin
+          tool: cargo-nextest,cargo-llvm-cov
 
       - name: Install dependencies
         run: cd server && cargo fetch
@@ -110,20 +110,26 @@ jobs:
       - name: Build server with sccache
         run: |
           cd server
+          # Build both dev and test profiles to maximize sccache benefit
           cargo build --workspace
           cargo test --workspace --no-run
 
-      - name: Run server tests with coverage
+      - name: Run server tests with nextest
         run: |
           cd server
-          cargo tarpaulin --workspace --timeout 120 --skip-clean --out Xml
+          cargo nextest run --workspace --no-fail-fast
+
+      - name: Generate coverage with llvm-cov
+        run: |
+          cd server
+          cargo llvm-cov --workspace --lcov --output-path lcov.info
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         if: always() # Upload coverage even if tests fail
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./server/cobertura.xml
+          file: ./server/lcov.info
           flags: server
           name: server-coverage
 

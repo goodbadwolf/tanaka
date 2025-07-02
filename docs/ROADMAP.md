@@ -455,36 +455,37 @@ Optimize both extension and server for 200+ tabs, achieving P95 sync latency ≤
 git checkout -b feat/performance
 ```
 
-#### Testing Infrastructure Improvements (Quick Wins)
+#### Testing Infrastructure Improvements ✅ **COMPLETE**
 
-0.1. [ ] `perf(dev): install cargo-nextest for 2-3× faster test execution`
+0.1. [x] ✅ `perf(dev): install cargo-nextest for 2-3× faster test execution`
+   - ✅ Integrated into CI workflow
+   - ✅ Added to pre-commit hooks with fallback
+   - ✅ Direct command usage (no wrapper script needed)
    ```bash
    cargo install cargo-nextest --locked
-   cargo nextest run  # Run all 55 tests faster
+   cargo nextest run  # Run all tests faster
    ```
 
-0.2. [ ] `perf(dev): add pretty_assertions for colorful test diffs`
-   ```toml
-   [dev-dependencies]
-   pretty_assertions = "1.4"
-   ```
+0.2. [x] ✅ `perf(dev): add pretty_assertions for colorful test diffs`
+   - ✅ Already added in server/Cargo.toml
+   - ✅ Available for all tests
    ```rust
    #[cfg(test)]
    use pretty_assertions::{assert_eq, assert_ne};
    ```
 
-
-0.3. [ ] `perf(dev): upgrade to cargo-llvm-cov for better coverage`
+0.3. [x] ✅ `perf(dev): upgrade to cargo-llvm-cov for better coverage`
+   - ✅ Replaced cargo-tarpaulin in CI
+   - ✅ HTML and LCOV report generation
+   - ✅ Better source-based coverage
    ```bash
    cargo install cargo-llvm-cov
-   cargo llvm-cov --html  # Better than current coverage tools
+   cargo llvm-cov --html  # HTML report at target/llvm-cov/html/
    ```
 
-0.4. [ ] `perf(test): add rstest for parameterized CRDT operation tests`
-   ```toml
-   [dev-dependencies]
-   rstest = "0.18"
-   ```
+0.4. [x] ✅ `perf(test): add rstest for parameterized CRDT operation tests`
+   - ✅ Already added in server/Cargo.toml
+   - ✅ Used in repository tests
    ```rust
    #[rstest]
    #[case(CrdtOperation::UpsertTab { /* ... */ })]
@@ -492,6 +493,15 @@ git checkout -b feat/performance
    fn test_all_operation_types(#[case] operation: CrdtOperation) {
        // Test logic applies to all 8 CRDT operation types
    }
+   ```
+
+0.5. [x] ✅ `perf(bench): add criterion for benchmarking`
+   - ✅ Added criterion with HTML reports
+   - ✅ Created benchmark workflow for CI
+   - ✅ Example sync_benchmark for CRDT operations
+   ```toml
+   [dev-dependencies]
+   criterion = { version = "0.5", features = ["html_reports"] }
    ```
 
 1. [x] `feat(server): add DashMap caching`
@@ -573,30 +583,31 @@ git checkout -b feat/performance
     - Configuration options
     - Monitoring setup
 
-11. [ ] `perf(ci): integrate improved testing tools in CI`
+11. [x] ✅ `perf(ci): integrate improved testing tools in CI`
+    - ✅ CI workflow updated to use cargo-nextest
+    - ✅ cargo-llvm-cov replaces cargo-tarpaulin
+    - ✅ Benchmark workflow added for performance tracking
+    - ✅ Pre-commit hooks updated with nextest fallback
     ```yaml
     # .github/workflows/ci.yml updates
     - name: Install testing tools
-      run: |
-        cargo install cargo-nextest --locked
-        cargo install cargo-llvm-cov --locked
+      uses: taiki-e/install-action@v2
+      with:
+        tool: cargo-nextest,cargo-llvm-cov
 
     - name: Run tests with nextest
-      run: cargo nextest run --all-features
+      run: cargo nextest run --workspace --no-fail-fast
 
     - name: Generate coverage with llvm-cov
-      run: cargo llvm-cov --all-features --lcov --output-path lcov.info
-
-    - name: Run benchmarks
-      run: cargo bench --all-features
+      run: cargo llvm-cov --workspace --lcov --output-path lcov.info
     ```
 
-**Key Benefits of Testing Improvements:**
-- 🚀 **2-3× faster test execution** with cargo-nextest (critical for 55+ tests)
-- 🎨 **Better debugging** with colorful assertion diffs
-- 📊 **Enhanced coverage reporting** to ensure optimizations don't break functionality
-- 🔬 **Professional benchmarking** with criterion for performance targets
-- 🧪 **Parameterized testing** for comprehensive CRDT operation validation
+**Key Benefits of Testing Improvements (All Implemented):**
+- ✅ **2-3× faster test execution** with cargo-nextest
+- ✅ **Better debugging** with colorful assertion diffs (pretty_assertions)
+- ✅ **Enhanced coverage reporting** with cargo-llvm-cov
+- ✅ **Professional benchmarking** with criterion + CI integration
+- ✅ **Parameterized testing** with rstest for CRDT operations
 
 ---
 

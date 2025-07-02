@@ -29,6 +29,7 @@ Tanaka keeps your Firefox browsing **entangled** across every computer you use. 
 - **Extension**: TypeScript, WebExtension API, Yjs CRDT
 - **Server**: Rust, axum, tokio, yrs CRDT, SQLite
 - **Architecture**: Client-server with eventual consistency
+- **Testing**: cargo-nextest (2-3× faster), cargo-llvm-cov, pretty_assertions, rstest
 
 ## 🚀 Quick Start
 

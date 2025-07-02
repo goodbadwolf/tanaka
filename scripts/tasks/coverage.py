@@ -76,18 +76,23 @@ def parse_jest_coverage(output: str) -> CoverageMetrics | None:
     return None
 
 
-def parse_tarpaulin_coverage(output: str) -> float | None:
-    """Parse tarpaulin coverage output and extract percentage.
+def parse_llvm_cov_coverage(output: str) -> float | None:
+    """Parse cargo-llvm-cov coverage output and extract percentage.
 
-    Looks for a line like:
-    59.78% coverage, 443/741 lines covered
+    Looks for a TOTAL line with coverage percentages.
+    The line coverage is typically the third percentage value.
     """
     for line in output.splitlines():
-        if "% coverage" in line:
+        if line.strip().startswith("TOTAL") and "%" in line:
             try:
-                # Extract percentage (e.g., "42.65% coverage")
-                coverage_str = line.split("%")[0].split()[-1]
-                return float(coverage_str)
+                # Extract the line coverage percentage (third percentage in the TOTAL line)
+                parts = line.split()
+                # Find all percentage values
+                percentages = [p for p in parts if p.endswith("%")]
+                if len(percentages) >= 3:
+                    # Line coverage is typically the third percentage
+                    coverage_str = percentages[2].rstrip("%")
+                    return float(coverage_str)
             except (ValueError, IndexError):
                 pass
     return None
@@ -105,8 +110,8 @@ class JestCommand:
         return cmd
 
 
-class TarpaulinCommand:
-    """Builder for cargo-tarpaulin commands."""
+class LlvmCovCommand:
+    """Builder for cargo-llvm-cov commands."""
 
     @staticmethod
     def build(
@@ -114,24 +119,21 @@ class TarpaulinCommand:
         html: bool = False,
         verbose: bool = False,
     ) -> list[str]:
-        """Build tarpaulin command with options."""
+        """Build cargo-llvm-cov command with options."""
         cmd = [
             "cargo",
-            "tarpaulin",
+            "llvm-cov",
             "--workspace",
-            "--timeout",
-            "120",
         ]
 
         if force_clean:
-            cmd.append("--force-clean")
-        else:
-            cmd.append("--skip-clean")
+            cmd.append("--clean")
 
         if html:
-            cmd.extend(["--out", "Html", "--output-dir", "coverage"])
+            cmd.append("--html")
         else:
-            cmd.extend(["--out", "Stdout"])
+            # Default text output shows the coverage summary
+            pass
 
         if verbose:
             cmd.append("--verbose")
@@ -184,12 +186,17 @@ class CoverageChecker(ABC):
 
         # Build and run command
         cmd = self.build_command()
+        if not cmd:
+            # Tool not installed, error already logged
+            return CoverageResult(success=False)
+
         try:
             result = run_command(
                 cmd,
                 cwd=self.get_working_dir(),
                 check=False,
                 capture_output=True,
+                stream_output=True,  # Show progress in real-time
             )
 
             if result.returncode != 0:
@@ -281,30 +288,30 @@ class ServerCoverageChecker(CoverageChecker):
         return SERVER_DIR
 
     def build_command(self) -> list[str]:
-        # First check if tarpaulin is installed
-        if not check_command("cargo-tarpaulin"):
+        # First check if llvm-cov is installed
+        if not check_command("cargo-llvm-cov"):
             # Try to check with cargo
             try:
                 result = run_command(
-                    ["cargo", "tarpaulin", "--version"],
+                    ["cargo", "llvm-cov", "--version"],
                     capture_output=True,
                     check=False,
                 )
                 if result.returncode != 0:
-                    logger.error("cargo-tarpaulin not installed. Install with: cargo install cargo-tarpaulin")
+                    logger.error("cargo-llvm-cov not installed. Install with: cargo install cargo-llvm-cov --locked")
                     return []
             except Exception:
-                logger.error("cargo-tarpaulin not installed. Install with: cargo install cargo-tarpaulin")
+                logger.error("cargo-llvm-cov not installed. Install with: cargo install cargo-llvm-cov --locked")
                 return []
 
-        return TarpaulinCommand.build(
+        return LlvmCovCommand.build(
             force_clean=self.args.force_server_clean,
             html=self.args.html,
             verbose=self.args.verbose,
         )
 
     def parse_output(self, output: str) -> CoverageResult:
-        coverage = parse_tarpaulin_coverage(output)
+        coverage = parse_llvm_cov_coverage(output)
         if coverage is None:
             return CoverageResult(success=False)
 
@@ -313,7 +320,7 @@ class ServerCoverageChecker(CoverageChecker):
         # HTML report path
         html_path = None
         if self.args.html:
-            html_path = SERVER_DIR / "coverage/tarpaulin-report.html"
+            html_path = SERVER_DIR / "target/llvm-cov/html/index.html"
             logger.info(f"HTML coverage report: {html_path}")
 
         return CoverageResult(
@@ -357,7 +364,7 @@ def add_subparser(subparsers: argparse._SubParsersAction) -> None:
     parser.add_argument(
         "--force-server-clean",
         action="store_true",
-        help="Force a clean build for server coverage (runs tarpaulin --force-clean)",
+        help="Force a clean build for server coverage (runs llvm-cov --clean)",
     )
     parser.add_argument(
         "--verbose",

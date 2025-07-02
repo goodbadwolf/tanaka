@@ -291,13 +291,27 @@ cd extension && pnpm test:watch  # Watch mode
 ### Server Commands (Rust)
 
 ```bash
-cargo test              # Run tests
+# Testing (Enhanced)
+cargo nextest run       # Run tests with nextest (2-3× faster)
+cargo test              # Run tests (fallback)
+cargo llvm-cov --html   # Generate HTML coverage report
+cargo llvm-cov --lcov   # Generate LCOV coverage report
+
+# Building
 cargo build             # Debug build
 cargo build --release   # Release build
 cargo run               # Run server
+
+# Code Quality
 cargo fmt               # Format code
 cargo clippy            # Lint code
 cargo doc --open        # Generate docs
+
+# Direct Testing Commands (no script needed)
+cargo nextest run                    # Run tests with nextest (2-3× faster)
+cargo nextest run --filter sync      # Run specific tests
+cargo llvm-cov --html               # Generate HTML coverage report
+cargo llvm-cov --lcov --output-path lcov.info  # Generate LCOV report
 ```
 
 ### Extension Commands (TypeScript)
@@ -337,6 +351,35 @@ pnpm run gen-icons     # Generate icons
 ---
 
 ## 7. Testing Strategy
+
+### Enhanced Testing Infrastructure
+
+#### Rust Testing Tools
+
+- **cargo-nextest**: 2-3× faster test execution with better output
+  ```bash
+  cargo install cargo-nextest --locked
+  cargo nextest run
+  ```
+
+- **cargo-llvm-cov**: Superior coverage reporting with source-based coverage
+  ```bash
+  cargo install cargo-llvm-cov
+  cargo llvm-cov --html  # HTML report at target/llvm-cov/html/
+  ```
+
+- **pretty_assertions**: Colorful diffs for better debugging
+  ```rust
+  use pretty_assertions::{assert_eq, assert_ne};
+  ```
+
+- **rstest**: Parameterized testing for comprehensive coverage
+  ```rust
+  #[rstest]
+  #[case::upsert(CrdtOperation::UpsertTab { /* ... */ })]
+  #[case::close(CrdtOperation::CloseTab { /* ... */ })]
+  fn test_operations(#[case] op: CrdtOperation) { /* ... */ }
+  ```
 
 ### Unit Tests
 
