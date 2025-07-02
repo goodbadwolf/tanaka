@@ -36,12 +36,12 @@ flags:
   extension:
     paths:
       - extension/
-    carryforward: false
+    carryforward: true
     target: 75% # Extension coverage threshold
   server:
     paths:
       - server/
-    carryforward: false
+    carryforward: true
     target: 40% # Server coverage threshold
 
 comment:
