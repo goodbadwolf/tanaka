@@ -111,6 +111,7 @@ jobs:
         run: |
           cd server
           cargo build --workspace
+          cargo test --workspace --no-run
 
       - name: Run server tests with coverage
         run: |
