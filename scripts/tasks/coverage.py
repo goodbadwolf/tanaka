@@ -186,12 +186,17 @@ class CoverageChecker(ABC):
 
         # Build and run command
         cmd = self.build_command()
+        if not cmd:
+            # Tool not installed, error already logged
+            return CoverageResult(success=False)
+
         try:
             result = run_command(
                 cmd,
                 cwd=self.get_working_dir(),
                 check=False,
                 capture_output=True,
+                stream_output=True,  # Show progress in real-time
             )
 
             if result.returncode != 0:
@@ -293,10 +298,10 @@ class ServerCoverageChecker(CoverageChecker):
                     check=False,
                 )
                 if result.returncode != 0:
-                    logger.error("cargo-llvm-cov not installed. Install with: cargo install cargo-llvm-cov")
+                    logger.error("cargo-llvm-cov not installed. Install with: cargo install cargo-llvm-cov --locked")
                     return []
             except Exception:
-                logger.error("cargo-llvm-cov not installed. Install with: cargo install cargo-llvm-cov")
+                logger.error("cargo-llvm-cov not installed. Install with: cargo install cargo-llvm-cov --locked")
                 return []
 
         return LlvmCovCommand.build(

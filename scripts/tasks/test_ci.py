@@ -200,17 +200,23 @@ def check_prerequisites(auto_start: bool = True, timeout: int = 60) -> tuple[Tas
                 env = env_with(DOCKER_HOST=docker_host)
                 return TaskResult(success=True, message="All prerequisites satisfied (Podman machine started)"), env
             else:
-                return TaskResult(
-                    success=False,
-                    message="Failed to start Podman machine. Try running: podman machine start",
-                    exit_code=EXIT_FAILURE,
-                ), env
+                return (
+                    TaskResult(
+                        success=False,
+                        message="Failed to start Podman machine. Try running: podman machine start",
+                        exit_code=EXIT_FAILURE,
+                    ),
+                    env,
+                )
         else:
-            return TaskResult(
-                success=False,
-                message="Podman is installed but not running. Run: podman machine start",
-                exit_code=EXIT_FAILURE,
-            ), env
+            return (
+                TaskResult(
+                    success=False,
+                    message="Podman is installed but not running. Run: podman machine start",
+                    exit_code=EXIT_FAILURE,
+                ),
+                env,
+            )
 
     return TaskResult(success=True, message="All prerequisites satisfied"), env
 
