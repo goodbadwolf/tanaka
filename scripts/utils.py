@@ -67,7 +67,8 @@ def process_and_display_stream(
     captured_text = []
 
     while True:
-        # Read one byte at a time
+        # Read one byte at a time to preserve real-time progress output
+        # (buffered reading would delay carriage return updates)
         byte = stream.read(1)
         if not byte:
             break
@@ -111,6 +112,7 @@ def run_command(
     capture_output: bool = False,
     stream_output: bool = False,
     stderr_prefix: str = "[stderr] ",
+    timeout: float | None = None,
 ) -> subprocess.CompletedProcess:
     """Run a command with logging
 
@@ -122,6 +124,7 @@ def run_command(
         capture_output: Whether to capture stdout and stderr
         stream_output: Whether to stream output in real-time while cleaning terminal control characters
         stderr_prefix: Prefix to add to stderr lines when streaming (default: "[stderr] ")
+        timeout: Maximum time to wait for command completion in seconds (None for no timeout)
 
     Returns:
         CompletedProcess instance
@@ -129,6 +132,7 @@ def run_command(
     Raises:
         FileNotFoundError: If command is not found
         CalledProcessError: If command fails and check=True
+        subprocess.TimeoutExpired: If timeout is reached
 
     Note:
         When stream_output is True, the function displays raw output to the terminal
@@ -173,10 +177,16 @@ def run_command(
             stdout_thread.start()
             stderr_thread.start()
 
-            # Wait for process to complete
-            returncode = process.wait()
-            stdout_thread.join()
-            stderr_thread.join()
+            try:
+                # Wait for process to complete with timeout
+                returncode = process.wait(timeout=timeout)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                raise
+            finally:
+                # Ensure threads are always cleaned up
+                stdout_thread.join(timeout=1.0)
+                stderr_thread.join(timeout=1.0)
 
             # Create CompletedProcess object
             result = subprocess.CompletedProcess(
@@ -187,7 +197,9 @@ def run_command(
             )
         else:
             # Non-streaming mode (original behavior)
-            result = subprocess.run(cmd, cwd=cwd, check=False, capture_output=capture_output, text=True, env=env)
+            result = subprocess.run(
+                cmd, cwd=cwd, check=False, capture_output=capture_output, text=True, env=env, timeout=timeout
+            )
 
         # Unified error handling
         if check and result.returncode != 0:
@@ -196,15 +208,25 @@ def run_command(
         return result
 
     except FileNotFoundError:
-        logger.error(f"Command not found: {cmd[0]}")
+        logger.error(f"Command not found: {cmd[0]} (working directory: {cwd or Path.cwd()})")
         raise
     except subprocess.CalledProcessError as e:
-        logger.error(f"Command failed with exit code {e.returncode}")
+        logger.error(f"Command failed: {' '.join(cmd)} (exit code: {e.returncode}, cwd: {cwd or Path.cwd()})")
+        raise
+    except subprocess.TimeoutExpired:
+        logger.error(f"Command timed out after {timeout}s: {' '.join(cmd)}")
         raise
 
 
 def check_command(cmd: str) -> bool:
-    """Check if a command exists in PATH"""
+    """Check if a command exists in PATH
+
+    Args:
+        cmd: Command name to check (e.g., 'git', 'docker')
+
+    Returns:
+        True if command is found in PATH, False otherwise
+    """
     return shutil.which(cmd) is not None
 
 
