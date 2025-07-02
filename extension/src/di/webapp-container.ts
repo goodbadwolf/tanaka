@@ -3,7 +3,7 @@ import { container } from 'tsyringe';
 import { UserSettingsManager } from '../sync/user-settings';
 import { TanakaAPI } from '../api/api';
 import { WindowTracker } from '../sync/window-tracker';
-import { SyncManager } from '../sync/sync-manager';
+import { SyncManagerWithWorker as SyncManager } from '../sync/sync-manager-with-worker';
 import { TabEventHandler } from '../sync/tab-event-handler';
 import { MessageHandler } from '../sync/message-handler';
 import { getConfig } from '../config';

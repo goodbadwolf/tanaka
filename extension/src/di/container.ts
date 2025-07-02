@@ -3,8 +3,7 @@ import { container } from 'tsyringe';
 import { UserSettingsManager } from '../sync/user-settings';
 import { TanakaAPI } from '../api/api';
 import { WindowTracker } from '../sync/window-tracker';
-import { SyncManager } from '../sync/sync-manager';
-import { SyncManagerWithWorker } from '../sync/sync-manager-with-worker';
+import { SyncManager, SyncManagerWithWorker } from '../sync';
 import { TabEventHandler } from '../sync/tab-event-handler';
 import { MessageHandler } from '../sync/message-handler';
 import { getConfig } from '../config';
@@ -31,15 +30,10 @@ container.register<TanakaAPI>(TanakaAPI, {
 });
 
 // Register SyncManager as singleton
-// Use worker-based sync manager for better performance
-const useWorker = getConfig().useWebWorker ?? true;
-if (useWorker) {
-  container.register<SyncManager>(SyncManager, {
-    useClass: SyncManagerWithWorker as unknown as typeof SyncManager,
-  });
-} else {
-  container.registerSingleton<SyncManager>(SyncManager);
-}
+// Always use worker-based sync manager for better performance
+container.register<SyncManager>(SyncManager, {
+  useClass: SyncManagerWithWorker as unknown as typeof SyncManager,
+});
 
 // Register TabEventHandler as singleton
 container.registerSingleton<TabEventHandler>(TabEventHandler);

@@ -7,6 +7,13 @@ import type { CrdtOperation, SyncResponse } from '../../api/sync';
 import { ExtensionError } from '../../error/types';
 
 jest.mock('../../../src/workers/crdt-worker-client');
+jest.mock('../../utils/logger');
+
+// Polyfill setImmediate for tests
+if (typeof setImmediate === 'undefined') {
+  (global as unknown as Record<string, unknown>).setImmediate = (fn: () => void) =>
+    setTimeout(fn, 0);
+}
 
 const mockWorkerClient = {
   initialize: jest.fn(),
@@ -81,12 +88,12 @@ describe('SyncManagerWithWorker', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
-    
+
     // Mock global timer functions that Jest fake timers don't provide
     global.clearTimeout = jest.fn();
     global.clearInterval = jest.fn();
-    global.setTimeout = jest.fn() as any;
-    global.setInterval = jest.fn() as any;
+    global.setTimeout = jest.fn(() => 1) as unknown as typeof setTimeout;
+    global.setInterval = jest.fn(() => 1) as unknown as typeof setInterval;
 
     mockWorkerClient.initialize.mockResolvedValue(undefined);
     mockWorkerClient.queueOperation.mockResolvedValue({ priority: 1, dedupKey: 'test' });
@@ -119,8 +126,8 @@ describe('SyncManagerWithWorker', () => {
   });
 
   afterEach(() => {
-    jest.useRealTimers();
     syncManager.stop();
+    jest.useRealTimers();
   });
 
   describe('initialization', () => {
@@ -410,10 +417,98 @@ describe('SyncManagerWithWorker', () => {
       expect(syncManager.isRunning()).toBe(true);
     });
 
+    it('should calculate error backoff intervals correctly', async () => {
+      // Create a test-only method to access private calculateAdaptiveInterval
+      const getAdaptiveInterval = async () => {
+        // @ts-expect-error - accessing private method for testing
+        return syncManager.calculateAdaptiveInterval();
+      };
+
+      // Initial interval should be idle (no recent activity)
+      let interval = await getAdaptiveInterval();
+      expect(interval).toBe(10000); // idleIntervalMs
+
+      // Simulate consecutive errors
+      // @ts-expect-error - accessing private property for testing
+      syncManager.consecutiveErrors = 1;
+      interval = await getAdaptiveInterval();
+      expect(interval).toBe(5000); // errorBackoffMs * 2^0
+
+      // @ts-expect-error - accessing private property for testing
+      syncManager.consecutiveErrors = 2;
+      interval = await getAdaptiveInterval();
+      expect(interval).toBe(10000); // errorBackoffMs * 2^1
+
+      // @ts-expect-error - accessing private property for testing
+      syncManager.consecutiveErrors = 3;
+      interval = await getAdaptiveInterval();
+      expect(interval).toBe(20000); // errorBackoffMs * 2^2
+
+      // Test max backoff
+      // @ts-expect-error - accessing private property for testing
+      syncManager.consecutiveErrors = 10;
+      interval = await getAdaptiveInterval();
+      expect(interval).toBe(60000); // maxBackoffMs
+    });
+
+    it('should use active interval when there is recent activity', async () => {
+      // @ts-expect-error - accessing private property for testing
+      syncManager.lastActivityTime = Date.now();
+
+      const getAdaptiveInterval = async () => {
+        // @ts-expect-error - accessing private method for testing
+        return syncManager.calculateAdaptiveInterval();
+      };
+
+      const interval = await getAdaptiveInterval();
+      expect(interval).toBe(1000); // activeIntervalMs
+    });
+
+    it('should respect queue size threshold for adaptive intervals', async () => {
+      // Mock large queue size
+      mockWorkerClient.getState.mockResolvedValue({
+        queueLength: 60, // Above threshold of 50
+        lamportClock: '0',
+        deviceId: 'test-device',
+      });
+
+      const getAdaptiveInterval = async () => {
+        // @ts-expect-error - accessing private method for testing
+        return syncManager.calculateAdaptiveInterval();
+      };
+
+      // Should use active interval due to large queue even without recent activity
+      const interval = await getAdaptiveInterval();
+      expect(interval).toBe(1000); // activeIntervalMs (forced by queue size)
+    });
+
+    it('should handle scheduleSyncCheck timer management', async () => {
+      const clearTimeoutSpy = jest.spyOn(global, 'clearTimeout');
+      const setTimeoutSpy = jest.spyOn(global, 'setTimeout');
+
+      // First call - no timer to clear
+      // @ts-expect-error - accessing private method for testing
+      await syncManager.scheduleSyncCheck();
+
+      // Should have set a new timer
+      expect(setTimeoutSpy).toHaveBeenCalled();
+
+      // Set a fake timer value to test clearing
+      // @ts-expect-error - accessing private property for testing
+      syncManager.syncTimer = 999;
+
+      // Call again to test timer clearing
+      // @ts-expect-error - accessing private method for testing
+      await syncManager.scheduleSyncCheck();
+
+      // Should have cleared previous timer before setting new one
+      expect(clearTimeoutSpy).toHaveBeenCalledWith(999);
+    });
+
     it('should skip sync when already in progress', async () => {
       // Mock a long-running sync
-      let resolveSync: (value: any) => void;
-      const longRunningSyncPromise = new Promise(resolve => {
+      let resolveSync: (value: unknown) => void;
+      const longRunningSyncPromise = new Promise((resolve) => {
         resolveSync = resolve;
       });
 
@@ -426,7 +521,9 @@ describe('SyncManagerWithWorker', () => {
       const secondSyncPromise = syncManager.syncNow();
 
       // Resolve the mock sync
-      resolveSync!({ success: true, data: { clock: 1n, operations: [] } });
+      if (resolveSync) {
+        resolveSync({ success: true, data: { clock: 1n, operations: [] } });
+      }
 
       await Promise.all([firstSyncPromise, secondSyncPromise]);
 
@@ -484,7 +581,7 @@ describe('SyncManagerWithWorker', () => {
 
       // Should start successfully despite persistence error
       await expect(newSyncManager.start()).resolves.not.toThrow();
-      
+
       newSyncManager.stop();
     });
 
@@ -492,39 +589,50 @@ describe('SyncManagerWithWorker', () => {
       const handler = await syncManager.setupTabEventHandler();
 
       // Test all handler operations
-      const mockTab = { id: 123, windowId: 456, url: 'https://example.com', title: 'Test', active: true, index: 0 };
-      
+      const mockTab = {
+        id: 123,
+        windowId: 456,
+        url: 'https://example.com',
+        title: 'Test',
+        active: true,
+        index: 0,
+      };
+
       // Mock window as tracked
       (mockWindowTracker.isTracked as jest.Mock).mockReturnValue(true);
 
       // Test tab created
       handler['options'].onTabCreated(mockTab);
       expect(mockWorkerClient.queueOperation).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'upsert_tab', id: '123' })
+        expect.objectContaining({ type: 'upsert_tab', id: '123' }),
       );
 
       // Test tab updated
-      handler['options'].onTabUpdated(123, { url: 'https://new-url.com' }, { ...mockTab, url: 'https://new-url.com' });
+      handler['options'].onTabUpdated(
+        123,
+        { url: 'https://new-url.com' },
+        { ...mockTab, url: 'https://new-url.com' },
+      );
       expect(mockWorkerClient.queueOperation).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'change_url', id: '123' })
+        expect.objectContaining({ type: 'change_url', id: '123' }),
       );
 
       // Test tab moved
       handler['options'].onTabMoved(123, { windowId: 456, fromIndex: 0, toIndex: 1 });
       expect(mockWorkerClient.queueOperation).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'move_tab', id: '123' })
+        expect.objectContaining({ type: 'move_tab', id: '123' }),
       );
 
       // Test tab removed
       handler['options'].onTabRemoved(123, { windowId: 456, isWindowClosing: false });
       expect(mockWorkerClient.queueOperation).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'close_tab', id: '123' })
+        expect.objectContaining({ type: 'close_tab', id: '123' }),
       );
 
       // Test tab activated
       handler['options'].onTabActivated({ tabId: 123, windowId: 456 });
       expect(mockWorkerClient.queueOperation).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'set_active', id: '123' })
+        expect.objectContaining({ type: 'set_active', id: '123' }),
       );
     });
 
@@ -532,22 +640,201 @@ describe('SyncManagerWithWorker', () => {
       // Test all queueing methods
       await syncManager.queueTabMove('123', '456', 2);
       expect(mockWorkerClient.queueOperation).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'move_tab', id: '123', window_id: '456', index: 2 })
+        expect.objectContaining({ type: 'move_tab', id: '123', window_id: '456', index: 2 }),
       );
 
       await syncManager.queueTabUrlChange('123', 'https://example.com', 'Example');
       expect(mockWorkerClient.queueOperation).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'change_url', id: '123', url: 'https://example.com' })
+        expect.objectContaining({ type: 'change_url', id: '123', url: 'https://example.com' }),
       );
 
       await syncManager.queueWindowUntrack('456');
       expect(mockWorkerClient.queueOperation).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'untrack_window', id: '456' })
+        expect.objectContaining({ type: 'untrack_window', id: '456' }),
       );
 
       await syncManager.queueWindowFocus('456', true);
       expect(mockWorkerClient.queueOperation).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'set_window_focus', id: '456', focused: true })
+        expect.objectContaining({ type: 'set_window_focus', id: '456', focused: true }),
+      );
+    });
+
+    it('should handle batched sync with different priorities', async () => {
+      const clearTimeoutSpy = jest.spyOn(global, 'clearTimeout');
+      const setTimeoutSpy = jest.spyOn(global, 'setTimeout');
+
+      // Mock timer returns
+      (global.setTimeout as jest.Mock).mockReturnValueOnce(111).mockReturnValueOnce(222);
+
+      // Queue a low priority operation
+      mockWorkerClient.queueOperation.mockResolvedValueOnce({ priority: 3, dedupKey: 'low' });
+      await syncManager.queueTabUrlChange('123', 'https://example.com', 'Example');
+
+      expect(setTimeoutSpy).toHaveBeenCalledWith(expect.any(Function), 1000); // LOW priority delay
+
+      // Queue a high priority operation before low priority fires
+      mockWorkerClient.queueOperation.mockResolvedValueOnce({ priority: 1, dedupKey: 'high' });
+      await syncManager.queueTabUpsert('456', '789', 'https://test.com', 'Test', true, 0);
+
+      // Should clear the low priority timer and set a new high priority timer
+      expect(clearTimeoutSpy).toHaveBeenCalledWith(111);
+      expect(setTimeoutSpy).toHaveBeenCalledWith(expect.any(Function), 200); // HIGH priority delay
+    });
+
+    it('should skip batched sync if same or lower priority already pending', async () => {
+      const setTimeoutSpy = jest.spyOn(global, 'setTimeout');
+
+      // Mock timer return
+      (global.setTimeout as jest.Mock).mockReturnValue(333);
+
+      // Queue a high priority operation
+      mockWorkerClient.queueOperation.mockResolvedValueOnce({ priority: 1, dedupKey: 'high' });
+      await syncManager.queueTabUpsert('123', '456', 'https://test.com', 'Test', true, 0);
+
+      const initialCallCount = setTimeoutSpy.mock.calls.length;
+
+      // Queue a normal priority operation (lower than high)
+      mockWorkerClient.queueOperation.mockResolvedValueOnce({ priority: 2, dedupKey: 'normal' });
+      await syncManager.queueTabActive('123', true);
+
+      // Should not set a new timer since high priority is already pending
+      expect(setTimeoutSpy).toHaveBeenCalledTimes(initialCallCount);
+    });
+
+    it('should clear sync timer when batched sync triggers', async () => {
+      const clearTimeoutSpy = jest.spyOn(global, 'clearTimeout');
+
+      // @ts-expect-error - accessing private property for testing
+      syncManager.syncTimer = 123; // Set a fake timer ID
+
+      // Mock timer return
+      let timerCallback: (() => void) | null = null;
+      (global.setTimeout as jest.Mock).mockImplementation((fn: () => void, delay: number) => {
+        if (delay === 50) {
+          // CRITICAL priority delay
+          timerCallback = fn;
+        }
+        return 444;
+      });
+
+      // Queue a critical priority operation
+      mockWorkerClient.queueOperation.mockResolvedValueOnce({ priority: 0, dedupKey: 'critical' });
+      await syncManager.queueTabClose('123');
+
+      // Execute the timer callback manually
+      if (timerCallback) {
+        timerCallback();
+      }
+
+      // Should have cleared the regular sync timer
+      expect(clearTimeoutSpy).toHaveBeenCalledWith(123);
+    });
+
+    it('should handle applyOperation errors gracefully', async () => {
+      // Import debugError to check if it was called
+      const { debugError } = await import('../../utils/logger');
+
+      // Mock browser API to throw an error
+      (mockBrowser.tabs.update as jest.Mock).mockRejectedValue(new Error('Tab not found'));
+
+      const response: SyncResponse = {
+        clock: 1n,
+        operations: [
+          {
+            type: 'set_active',
+            id: '999',
+            active: true,
+            updated_at: 123456789n,
+          },
+        ],
+      };
+
+      (mockAPI.sync as jest.Mock).mockResolvedValue({ success: true, data: response });
+
+      // Should not throw even if operation application fails
+      await expect(syncManager.syncNow()).resolves.not.toThrow();
+
+      // Should have logged the error through debugError
+      expect(debugError).toHaveBeenCalledWith(
+        expect.stringContaining('Failed to set tab 999 active state:'),
+        expect.any(Error),
+      );
+    });
+
+    it('should handle existing tab update in upsert_tab operation', async () => {
+      const response: SyncResponse = {
+        clock: 1n,
+        operations: [
+          {
+            type: 'upsert_tab',
+            id: '123',
+            data: {
+              window_id: '456',
+              url: 'https://example.com',
+              title: 'Example',
+              active: true,
+              index: 2,
+              updated_at: 123456789n,
+            },
+          },
+        ],
+      };
+
+      // Mock existing tab with different index and same windowId to trigger move
+      (mockBrowser.tabs.query as jest.Mock).mockResolvedValue([
+        {
+          id: 123,
+          windowId: 456, // Same windowId
+          index: 0, // Different index (operation wants index: 2)
+          url: 'https://old.com',
+          active: false,
+        },
+      ]);
+
+      // Ensure tabs.update and tabs.move are properly mocked
+      (mockBrowser.tabs.update as jest.Mock).mockResolvedValue({});
+      (mockBrowser.tabs.move as jest.Mock).mockResolvedValue({});
+
+      (mockAPI.sync as jest.Mock).mockResolvedValue({ success: true, data: response });
+
+      await syncManager.syncNow();
+
+      // Should update tab properties
+      expect(mockBrowser.tabs.update).toHaveBeenCalledWith(123, {
+        url: 'https://example.com',
+        active: true,
+      });
+
+      // Should move tab to new position
+      expect(mockBrowser.tabs.move).toHaveBeenCalledWith(123, {
+        windowId: 456,
+        index: 2,
+      });
+    });
+
+    it('should skip window focus operations gracefully', async () => {
+      // Import debugLog to check if it was called
+      const { debugLog } = await import('../../utils/logger');
+
+      const response: SyncResponse = {
+        clock: 1n,
+        operations: [
+          {
+            type: 'set_window_focus',
+            id: '456',
+            focused: true,
+            updated_at: 123456789n,
+          },
+        ],
+      };
+
+      (mockAPI.sync as jest.Mock).mockResolvedValue({ success: true, data: response });
+
+      await syncManager.syncNow();
+
+      // Should log but not fail
+      expect(debugLog).toHaveBeenCalledWith(
+        'Window focus operation for window 456 (not supported in Firefox)',
       );
     });
   });

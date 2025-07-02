@@ -1,10 +1,10 @@
 import { MessageHandler } from '../message-handler';
 import { WindowTracker } from '../window-tracker';
-import { SyncManager } from '../sync-manager';
+import { SyncManager } from '../index';
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
 
 jest.mock('../window-tracker');
-jest.mock('../sync-manager');
+jest.mock('../sync-manager-with-worker');
 jest.mock('../../utils/logger', () => ({
   debugLog: jest.fn(),
   debugError: jest.fn(),

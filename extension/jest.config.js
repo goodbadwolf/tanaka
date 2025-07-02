@@ -2,9 +2,12 @@ export default {
   preset: 'ts-jest',
   testEnvironment: 'jsdom',
   transform: {
-    '^.+\\.(ts|tsx)$': ['ts-jest', {
-      tsconfig: 'tsconfig.test.json',
-    }],
+    '^.+\\.(ts|tsx)$': [
+      'ts-jest',
+      {
+        tsconfig: 'tsconfig.test.json',
+      },
+    ],
   },
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
@@ -17,12 +20,12 @@ export default {
     '^preact/test-utils$': '<rootDir>/node_modules/preact/test-utils/dist/testUtils.js',
     '^preact$': '<rootDir>/node_modules/preact/dist/preact.js',
     '^@testing-library/preact$': '<rootDir>/node_modules/@testing-library/preact/dist/cjs/index.js',
-    '^@preact/signals$': '<rootDir>/node_modules/.pnpm/@preact+signals@2.2.0_preact@10.26.9/node_modules/@preact/signals/dist/signals.js',
-    '^@preact/signals-core$': '<rootDir>/node_modules/.pnpm/@preact+signals-core@1.10.0/node_modules/@preact/signals-core/dist/signals-core.js',
+    '^@preact/signals$':
+      '<rootDir>/node_modules/.pnpm/@preact+signals@2.2.0_preact@10.26.9/node_modules/@preact/signals/dist/signals.js',
+    '^@preact/signals-core$':
+      '<rootDir>/node_modules/.pnpm/@preact+signals-core@1.10.0/node_modules/@preact/signals-core/dist/signals-core.js',
   },
-  transformIgnorePatterns: [
-    'node_modules/(?!(preact|@preact|@testing-library|.*\\.mjs$))'
-  ],
+  transformIgnorePatterns: ['node_modules/(?!(preact|@preact|@testing-library|.*\\.mjs$))'],
   extensionsToTreatAsEsm: ['.ts', '.tsx'],
   setupFilesAfterEnv: ['<rootDir>/src/test/setup.ts'],
   collectCoverageFrom: [
@@ -50,7 +53,7 @@ export default {
   ],
   coverageThreshold: {
     global: {
-      branches: 70,  // Reduced to allow for gradual improvement
+      branches: 70, // Reduced to allow for gradual improvement
       functions: 75,
       lines: 75,
       statements: 75,
