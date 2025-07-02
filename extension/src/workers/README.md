@@ -111,4 +111,3 @@ interface WorkerResponse {
 - Message passing overhead is minimal for CRDT operations
 - Deduplication reduces redundant work by ~70%
 - Priority-based batching optimizes sync timing
-
