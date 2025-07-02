@@ -458,34 +458,34 @@ git checkout -b feat/performance
 #### Testing Infrastructure Improvements ✅ **COMPLETE**
 
 0.1. [x] ✅ `perf(dev): install cargo-nextest for 2-3× faster test execution`
-   - ✅ Integrated into CI workflow
-   - ✅ Added to pre-commit hooks with fallback
-   - ✅ Direct command usage (no wrapper script needed)
+- ✅ Integrated into CI workflow
+- ✅ Added to pre-commit hooks with fallback
+- ✅ Direct command usage (no wrapper script needed)
    ```bash
    cargo install cargo-nextest --locked
    cargo nextest run  # Run all tests faster
    ```
 
 0.2. [x] ✅ `perf(dev): add pretty_assertions for colorful test diffs`
-   - ✅ Already added in server/Cargo.toml
-   - ✅ Available for all tests
+- ✅ Already added in server/Cargo.toml
+- ✅ Available for all tests
    ```rust
    #[cfg(test)]
    use pretty_assertions::{assert_eq, assert_ne};
    ```
 
 0.3. [x] ✅ `perf(dev): upgrade to cargo-llvm-cov for better coverage`
-   - ✅ Replaced cargo-tarpaulin in CI
-   - ✅ HTML and LCOV report generation
-   - ✅ Better source-based coverage
+- ✅ Replaced cargo-tarpaulin in CI
+- ✅ HTML and LCOV report generation
+- ✅ Better source-based coverage
    ```bash
    cargo install cargo-llvm-cov
    cargo llvm-cov --html  # HTML report at target/llvm-cov/html/
    ```
 
 0.4. [x] ✅ `perf(test): add rstest for parameterized CRDT operation tests`
-   - ✅ Already added in server/Cargo.toml
-   - ✅ Used in repository tests
+- ✅ Already added in server/Cargo.toml
+- ✅ Used in repository tests
    ```rust
    #[rstest]
    #[case(CrdtOperation::UpsertTab { /* ... */ })]
@@ -496,9 +496,9 @@ git checkout -b feat/performance
    ```
 
 0.5. [x] ✅ `perf(bench): add criterion for benchmarking`
-   - ✅ Added criterion with HTML reports
-   - ✅ Created benchmark workflow for CI
-   - ✅ Example sync_benchmark for CRDT operations
+- ✅ Added criterion with HTML reports
+- ✅ Created benchmark workflow for CI
+- ✅ Example sync_benchmark for CRDT operations
    ```toml
    [dev-dependencies]
    criterion = { version = "0.5", features = ["html_reports"] }
@@ -541,12 +541,12 @@ git checkout -b feat/performance
    - Message passing
 
 6.1. [ ] `perf(extension): optimize React re-renders`
-   - Add React.memo where appropriate
-   - Optimize context usage
-   - Profile and fix performance issues
-   - Implement virtualization for large lists
+- Add React.memo where appropriate
+- Optimize context usage
+- Profile and fix performance issues
+- Implement virtualization for large lists
 
-7. [ ] `feat(both): create benchmark suite with criterion`
+1. [ ] `feat(both): create benchmark suite with criterion`
    ```toml
    [dev-dependencies]
    criterion = { version = "0.5", features = ["html_reports"] }
@@ -568,26 +568,26 @@ git checkout -b feat/performance
    - HTML reports for performance analysis
    - Target: P95 ≤ 10ms sync latency validation
 
-8. [ ] `perf: optimize for 200+ tabs`
+2. [ ] `perf: optimize for 200+ tabs`
    - Load test scenarios
    - Profile bottlenecks
    - Apply optimizations
 
-9. [ ] `perf: achieve P95 ≤ 10ms target`
+3. [ ] `perf: achieve P95 ≤ 10ms target`
    - Server response times
    - Sync latency
    - UI responsiveness
 
-10. [ ] `docs: performance tuning guide`
-    - Best practices
-    - Configuration options
-    - Monitoring setup
+4. [ ] `docs: performance tuning guide`
+   - Best practices
+   - Configuration options
+   - Monitoring setup
 
-11. [x] ✅ `perf(ci): integrate improved testing tools in CI`
-    - ✅ CI workflow updated to use cargo-nextest
-    - ✅ cargo-llvm-cov replaces cargo-tarpaulin
-    - ✅ Benchmark workflow added for performance tracking
-    - ✅ Pre-commit hooks updated with nextest fallback
+5. [x] ✅ `perf(ci): integrate improved testing tools in CI`
+   - ✅ CI workflow updated to use cargo-nextest
+   - ✅ cargo-llvm-cov replaces cargo-tarpaulin
+   - ✅ Benchmark workflow added for performance tracking
+   - ✅ Pre-commit hooks updated with nextest fallback
     ```yaml
     # .github/workflows/ci.yml updates
     - name: Install testing tools
@@ -707,38 +707,38 @@ git checkout -b feat/production-ready
    - Fix any issues
 
 1.1. [ ] `security(extension): audit browser extension security`
-   - Review all permissions in manifest.json
-   - Check CSP (Content Security Policy) compliance
-   - Validate message passing security
-   - Document security measures and best practices
-   - Ensure no data leakage or XSS vulnerabilities
+- Review all permissions in manifest.json
+- Check CSP (Content Security Policy) compliance
+- Validate message passing security
+- Document security measures and best practices
+- Ensure no data leakage or XSS vulnerabilities
 
-2. [x] `feat(server): add TLS support`
+1. [x] `feat(server): add TLS support`
    - ✅ TLS configuration structure exists in config.rs
    - ⏳ Need to add `rustls` dependencies and implementation
    - ⏳ Certificate handling logic needed
 
-3. [ ] `build: create release scripts`
+2. [ ] `build: create release scripts`
    - Automated builds
    - Version bumping
    - Asset generation
 
-4. [ ] `feat(server): single-binary distribution`
+3. [ ] `feat(server): single-binary distribution`
    - Static linking
    - Embedded assets
    - Cross-platform
 
-5. [ ] `feat(extension): prepare for Mozilla submission`
+4. [ ] `feat(extension): prepare for Mozilla submission`
    - Policy compliance
    - Required metadata
    - Screenshots
 
-6. [ ] `test: final integration testing`
+5. [ ] `test: final integration testing`
    - Full system test
    - Multiple browsers
    - Load testing
 
-7. [ ] `docs: update all documentation`
+6. [ ] `docs: update all documentation`
    - Installation guide
    - User manual
    - API documentation
@@ -747,20 +747,20 @@ git checkout -b feat/production-ready
    - Comprehensive testing guide
    - Performance tuning guide
 
-8. [ ] `docs: create migration guide`
+7. [ ] `docs: create migration guide`
    - From v0.5 to v1.0
    - Breaking changes
    - Upgrade steps
 
-9. [ ] `test: final QA validation`
+8. [ ] `test: final QA validation`
    - Checklist completion
    - Performance validation
    - Sign-off
 
-10. [ ] `release: tag v1.0.0`
-    - Create release
-    - Publish assets
-    - Announcement
+9. [ ] `release: tag v1.0.0`
+   - Create release
+   - Publish assets
+   - Announcement
 
 ---
 
