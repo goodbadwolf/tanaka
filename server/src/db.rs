@@ -56,24 +56,44 @@ pub async fn init_db_with_config(config: &DatabaseConfig) -> AppResult<SqlitePoo
             )
         })?;
 
-    // Configure SQLite for better performance
+    // Configure SQLite for optimal performance
+    // Enable WAL mode for better concurrency
     sqlx::query("PRAGMA journal_mode = WAL")
         .execute(&pool)
         .await
         .map_err(|e| tanaka_server::error::AppError::database("Failed to set journal mode", e))?;
 
-    let busy_timeout_ms = config.connection_timeout_secs * MILLIS_PER_SECOND;
-    sqlx::query(&format!("PRAGMA busy_timeout = {busy_timeout_ms}"))
+    // Set cache size to 64MB for better performance with 200+ tabs
+    sqlx::query("PRAGMA cache_size = -65536") // Negative value = KB, so -65536 = 64MB
         .execute(&pool)
         .await
-        .map_err(|e| tanaka_server::error::AppError::database("Failed to set busy timeout", e))?;
+        .map_err(|e| tanaka_server::error::AppError::database("Failed to set cache size", e))?;
 
+    // Optimize for performance over durability (acceptable for sync data)
     sqlx::query("PRAGMA synchronous = NORMAL")
         .execute(&pool)
         .await
         .map_err(|e| {
             tanaka_server::error::AppError::database("Failed to set synchronous mode", e)
         })?;
+
+    // Busy timeout for concurrent access
+    let busy_timeout_ms = config.connection_timeout_secs * MILLIS_PER_SECOND;
+    sqlx::query(&format!("PRAGMA busy_timeout = {busy_timeout_ms}"))
+        .execute(&pool)
+        .await
+        .map_err(|e| tanaka_server::error::AppError::database("Failed to set busy timeout", e))?;
+
+    // Optimize memory usage and performance
+    sqlx::query("PRAGMA temp_store = MEMORY") // Store temp tables in memory
+        .execute(&pool)
+        .await
+        .map_err(|e| tanaka_server::error::AppError::database("Failed to set temp store", e))?;
+
+    sqlx::query("PRAGMA mmap_size = 268435456") // 256MB memory-mapped I/O
+        .execute(&pool)
+        .await
+        .map_err(|e| tanaka_server::error::AppError::database("Failed to set mmap size", e))?;
 
     sqlx::query(CREATE_TABS_TABLE_SQL)
         .execute(&pool)
@@ -94,11 +114,18 @@ pub async fn init_db_with_config(config: &DatabaseConfig) -> AppResult<SqlitePoo
             tanaka_server::error::AppError::database("Failed to create CRDT state table", e)
         })?;
 
-    // Create indexes for better query performance
+    // Create strategic indexes for optimal query performance
+
+    // CRDT Operations indexes (optimized for sync queries)
     sqlx::query("CREATE INDEX IF NOT EXISTS idx_crdt_operations_clock ON crdt_operations(clock)")
         .execute(&pool)
         .await
         .map_err(|e| tanaka_server::error::AppError::database("Failed to create clock index", e))?;
+
+    sqlx::query("CREATE INDEX IF NOT EXISTS idx_crdt_operations_device_clock ON crdt_operations(device_id, clock)")
+        .execute(&pool)
+        .await
+        .map_err(|e| tanaka_server::error::AppError::database("Failed to create device-clock index", e))?;
 
     sqlx::query(
         "CREATE INDEX IF NOT EXISTS idx_crdt_operations_target ON crdt_operations(target_id)",
@@ -106,6 +133,34 @@ pub async fn init_db_with_config(config: &DatabaseConfig) -> AppResult<SqlitePoo
     .execute(&pool)
     .await
     .map_err(|e| tanaka_server::error::AppError::database("Failed to create target index", e))?;
+
+    sqlx::query("CREATE INDEX IF NOT EXISTS idx_crdt_operations_type_target ON crdt_operations(operation_type, target_id)")
+        .execute(&pool)
+        .await
+        .map_err(|e| tanaka_server::error::AppError::database("Failed to create type-target index", e))?;
+
+    // Tabs table indexes (optimized for window-based queries)
+    sqlx::query("CREATE INDEX IF NOT EXISTS idx_tabs_window ON tabs(window_id)")
+        .execute(&pool)
+        .await
+        .map_err(|e| {
+            tanaka_server::error::AppError::database("Failed to create window index", e)
+        })?;
+
+    sqlx::query("CREATE INDEX IF NOT EXISTS idx_tabs_updated ON tabs(updated_at)")
+        .execute(&pool)
+        .await
+        .map_err(|e| {
+            tanaka_server::error::AppError::database("Failed to create updated index", e)
+        })?;
+
+    // CRDT State indexes (optimized for entity lookups)
+    sqlx::query("CREATE INDEX IF NOT EXISTS idx_crdt_state_type ON crdt_state(entity_type)")
+        .execute(&pool)
+        .await
+        .map_err(|e| {
+            tanaka_server::error::AppError::database("Failed to create state type index", e)
+        })?;
 
     Ok(pool)
 }
