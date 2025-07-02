@@ -129,6 +129,38 @@ Tanaka uses a structured JSON-based CRDT protocol for conflict-free synchronizat
 - Background ↔ Settings communication
 - Structured message types with TypeScript
 
+### Web Worker Implementation
+
+Tanaka uses Web Workers to offload heavy CRDT operations from the main thread:
+
+```
+Main Thread                 Web Worker Thread
+┌─────────────────┐       ┌─────────────────┐
+│ SyncManager     │       │ CrdtWorker      │
+│ WithWorker      │ ───── │                 │
+│                 │ msgs  │ - Operation     │
+│ - Queue ops     │ <───  │   queueing      │
+│ - Sync with API │       │ - Deduplication │
+│ - Apply remote  │       │ - Priority      │
+│   operations    │       │   management    │
+└─────────────────┘       └─────────────────┘
+         │
+         ▼
+    Browser APIs
+    (tabs, windows)
+```
+
+**Key Benefits:**
+- Non-blocking UI during sync operations
+- Parallel processing of CRDT operations
+- Efficient handling of 200+ tabs
+- Reduced memory pressure on main thread
+
+**Components:**
+- `CrdtWorker`: Handles operation queuing and deduplication
+- `CrdtWorkerClient`: Main thread interface with timeout protection
+- `SyncManagerWithWorker`: Drop-in replacement for SyncManager
+
 ## Future Architecture Plans
 
 ### v1.0 Enhancements
