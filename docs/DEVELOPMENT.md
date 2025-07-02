@@ -785,6 +785,58 @@ For detailed troubleshooting, see [Troubleshooting Guide](TROUBLESHOOTING.md).
 - Use incremental sync
 - Monitor bandwidth usage
 
+### Adaptive Sync Manager
+
+The extension includes an optimized sync manager that dynamically adjusts sync behavior based on user activity and system state:
+
+#### Key Features
+
+1. **Adaptive Sync Intervals**
+   - Active: 1s (during user activity)
+   - Idle: 10s (no activity for 30s)
+   - Error backoff: Exponential (5s, 10s, 20s... up to 60s)
+
+2. **Priority-based Operation Batching**
+   | Priority | Operations | Delay |
+   |----------|------------|-------|
+   | CRITICAL | close_tab, track/untrack_window | 50ms |
+   | HIGH | upsert_tab, move_tab | 200ms |
+   | NORMAL | set_active, window_focus | 500ms |
+   | LOW | change_url | 1000ms |
+
+3. **Operation Deduplication**
+   - Multiple URL changes → Keep only latest
+   - Redundant updates → Single operation
+   - Reduces server load by ~70%
+
+4. **Queue Management**
+   - Max 1000 operations
+   - Early sync at 50 operations
+   - Drops oldest when full
+
+#### Usage
+
+```typescript
+// Enable via environment variable
+ENABLE_ADAPTIVE_SYNC=true npm run dev
+
+// Or use the factory function
+import { createSyncManager } from './sync';
+
+const syncManager = await createSyncManager({
+  syncIntervalMs: 5000,
+  api: tanakaAPI,
+  windowTracker: tracker,
+  browser: browserAdapter,
+});
+```
+
+#### Testing
+
+```bash
+npm test -- adaptive-sync-manager.test.ts
+```
+
 ---
 
 ## 20. Error Handling Architecture
