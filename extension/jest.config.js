@@ -45,6 +45,8 @@ export default {
     '!src/components/test-setup.ts',
     // Hooks (difficult to test in isolation)
     '!src/hooks/**',
+    // Development-only utilities
+    '!src/utils/performance.ts',
   ],
   coverageThreshold: {
     global: {

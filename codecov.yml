@@ -57,3 +57,4 @@ ignore:
   - "extension/src/webapp/**"
   - "extension/src/browser/mock.ts"
   - "scripts/**"
+  - "extension/src/utils/performance.ts" # Development-only performance monitoring utilities
