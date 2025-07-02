@@ -1,6 +1,6 @@
 import { asMessage, type Message, type MessageResponse } from '../core';
 import type { WindowTracker } from './window-tracker';
-import type { SyncManager } from './sync-manager';
+import type { SyncManagerWithWorker as SyncManager } from './sync-manager-with-worker';
 import { debugLog } from '../utils/logger';
 
 export class MessageHandler {

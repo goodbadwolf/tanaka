@@ -12,38 +12,44 @@ describe('CrdtWorker Types', () => {
         { type: 'close_tab', id: '123', closed_at: 123456789n },
         { type: 'track_window', id: '456', tracked: true, updated_at: 123456789n },
         { type: 'untrack_window', id: '456', updated_at: 123456789n },
-        { 
-          type: 'upsert_tab', 
-          id: '123', 
-          data: { 
-            window_id: '456', 
-            url: 'https://example.com', 
-            title: 'Test', 
-            active: true, 
-            index: 0, 
-            updated_at: 123456789n 
-          }
+        {
+          type: 'upsert_tab',
+          id: '123',
+          data: {
+            window_id: '456',
+            url: 'https://example.com',
+            title: 'Test',
+            active: true,
+            index: 0,
+            updated_at: 123456789n,
+          },
         },
         { type: 'move_tab', id: '123', window_id: '456', index: 1, updated_at: 123456789n },
         { type: 'set_active', id: '123', active: true, updated_at: 123456789n },
         { type: 'set_window_focus', id: '456', focused: true, updated_at: 123456789n },
-        { type: 'change_url', id: '123', url: 'https://new.com', title: 'New', updated_at: 123456789n },
+        {
+          type: 'change_url',
+          id: '123',
+          url: 'https://new.com',
+          title: 'New',
+          updated_at: 123456789n,
+        },
       ];
 
       // Test that all operations have valid types
-      operations.forEach(op => {
+      operations.forEach((op) => {
         expect(op.type).toBeDefined();
         expect(op.id).toBeDefined();
       });
 
       // Test operation-specific fields
-      const closeTab = operations.find(op => op.type === 'close_tab');
+      const closeTab = operations.find((op) => op.type === 'close_tab');
       expect(closeTab?.closed_at).toBeDefined();
 
-      const upsertTab = operations.find(op => op.type === 'upsert_tab');
+      const upsertTab = operations.find((op) => op.type === 'upsert_tab');
       expect(upsertTab?.data).toBeDefined();
 
-      const moveTab = operations.find(op => op.type === 'move_tab');
+      const moveTab = operations.find((op) => op.type === 'move_tab');
       expect(moveTab?.window_id).toBeDefined();
       expect(moveTab?.index).toBeDefined();
     });
@@ -66,8 +72,8 @@ describe('CrdtWorker Types', () => {
     it('should define worker message types', () => {
       // Test message type definitions
       const messageTypes = ['queue', 'deduplicate', 'apply', 'getState'];
-      
-      messageTypes.forEach(type => {
+
+      messageTypes.forEach((type) => {
         expect(typeof type).toBe('string');
       });
     });
@@ -97,7 +103,7 @@ describe('CrdtWorker Types', () => {
       const generateDedupKey = (op: CrdtOperation): string => {
         // Simple key generation for testing
         const baseKey = `${op.type}-${op.id}`;
-        
+
         if (op.type === 'set_active') {
           return `${baseKey}-${op.active}`;
         }
@@ -138,12 +144,15 @@ describe('CrdtWorker Types', () => {
 
       // Group by dedup key
       const groups = new Map<string, CrdtOperation[]>();
-      operations.forEach(op => {
+      operations.forEach((op) => {
         const key = `${op.type}-${op.id}`;
         if (!groups.has(key)) {
           groups.set(key, []);
         }
-        groups.get(key)!.push(op);
+        const group = groups.get(key);
+        if (group) {
+          group.push(op);
+        }
       });
 
       expect(groups.size).toBe(2); // Two unique operations
@@ -155,17 +164,17 @@ describe('CrdtWorker Types', () => {
   describe('operation priorities', () => {
     it('should assign correct priorities to operations', () => {
       const priorityMap = {
-        'close_tab': 0,        // CRITICAL
-        'track_window': 0,     // CRITICAL
-        'untrack_window': 0,   // CRITICAL
-        'upsert_tab': 1,       // HIGH
-        'move_tab': 1,         // HIGH
-        'set_active': 2,       // NORMAL
-        'set_window_focus': 2, // NORMAL
-        'change_url': 3,       // LOW
+        close_tab: 0, // CRITICAL
+        track_window: 0, // CRITICAL
+        untrack_window: 0, // CRITICAL
+        upsert_tab: 1, // HIGH
+        move_tab: 1, // HIGH
+        set_active: 2, // NORMAL
+        set_window_focus: 2, // NORMAL
+        change_url: 3, // LOW
       };
 
-      Object.entries(priorityMap).forEach(([type, expectedPriority]) => {
+      Object.entries(priorityMap).forEach(([_type, expectedPriority]) => {
         expect(typeof expectedPriority).toBe('number');
         expect(expectedPriority).toBeGreaterThanOrEqual(0);
         expect(expectedPriority).toBeLessThan(4);
