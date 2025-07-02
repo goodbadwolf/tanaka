@@ -1,4 +1,4 @@
-import { useEffect } from 'preact/hooks';
+import { useEffect, useCallback } from 'preact/hooks';
 import { WindowTracker } from './WindowTracker';
 import { useService } from '../../di/provider';
 import type { IBrowser } from '../../browser/core';
@@ -10,6 +10,12 @@ export function PopupApp() {
 
   useEffect(() => {
     initializePopup(browser);
+  }, [browser]);
+
+  const handleSettingsClick = useCallback((e: Event) => {
+    e.preventDefault();
+    browser.runtime.openOptionsPage();
+    window.close();
   }, [browser]);
 
   const loading = isLoading.value;
@@ -54,11 +60,7 @@ export function PopupApp() {
       <div className="footer">
         <a
           href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            browser.runtime.openOptionsPage();
-            window.close();
-          }}
+          onClick={handleSettingsClick}
         >
           Settings
         </a>
