@@ -35,7 +35,7 @@ container.register<TanakaAPI>(TanakaAPI, {
 const useWorker = getConfig().useWebWorker ?? true;
 if (useWorker) {
   container.register<SyncManager>(SyncManager, {
-    useClass: SyncManagerWithWorker as typeof SyncManager,
+    useClass: SyncManagerWithWorker as unknown as typeof SyncManager,
   });
 } else {
   container.registerSingleton<SyncManager>(SyncManager);

@@ -201,10 +201,9 @@ export class SyncManagerWithWorker {
 
     this.currentInterval = await this.calculateAdaptiveInterval();
 
-    this.syncTimer = setTimeout(() => {
-      this.sync().then(() => {
-        this.scheduleSyncCheck();
-      });
+    this.syncTimer = setTimeout(async () => {
+      await this.sync();
+      await this.scheduleSyncCheck();
     }, this.currentInterval);
   }
 
@@ -583,4 +582,3 @@ export class SyncManagerWithWorker {
     return handler;
   }
 }
-

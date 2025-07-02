@@ -3,7 +3,7 @@ import type { TanakaAPI } from '../../api/api';
 import type { WindowTracker } from '../window-tracker';
 import type { IBrowser } from '../../browser/core';
 import type { CrdtOperation, SyncResponse } from '../../api/sync';
-import { ok, err } from 'neverthrow';
+// Removed neverthrow imports since API uses different format
 import { ExtensionError } from '../../error/types';
 
 jest.mock('../../../src/workers/crdt-worker-client');
@@ -65,12 +65,13 @@ describe('SyncManagerWithWorker', () => {
     (mockBrowser.localStorage.get as jest.Mock).mockResolvedValue({});
     (mockBrowser.localStorage.set as jest.Mock).mockResolvedValue(undefined);
 
-    (mockAPI.sync as jest.Mock).mockResolvedValue(
-      ok({
+    (mockAPI.sync as jest.Mock).mockResolvedValue({
+      success: true,
+      data: {
         clock: 1n,
         operations: [],
-      } as SyncResponse),
-    );
+      } as SyncResponse,
+    });
 
     syncManager = new SyncManagerWithWorker({
       api: mockAPI,
@@ -193,7 +194,10 @@ describe('SyncManagerWithWorker', () => {
       ];
 
       mockWorkerClient.deduplicateOperations.mockResolvedValue(operations);
-      (mockAPI.sync as jest.Mock).mockResolvedValue(err(ExtensionError.NetworkFailure));
+      (mockAPI.sync as jest.Mock).mockResolvedValue({
+        success: false,
+        error: ExtensionError.NetworkFailure,
+      });
 
       const result = await syncManager.syncNow();
 
@@ -202,16 +206,16 @@ describe('SyncManagerWithWorker', () => {
     });
 
     it('should update state after successful sync', async () => {
+      await syncManager.start();
+
       const response: SyncResponse = {
         clock: 123n,
         operations: [],
       };
 
-      (mockAPI.sync as jest.Mock).mockResolvedValue(ok(response));
+      (mockAPI.sync as jest.Mock).mockResolvedValue({ success: true, data: response });
 
       await syncManager.syncNow();
-
-      console.log('localStorage.set calls:', mockBrowser.localStorage.set.mock.calls);
 
       expect(mockBrowser.localStorage.set).toHaveBeenCalledWith({
         deviceId: 'test-device',
@@ -236,12 +240,23 @@ describe('SyncManagerWithWorker', () => {
     });
 
     it('should use error backoff on sync failures', async () => {
-      (mockAPI.sync as jest.Mock).mockResolvedValue(err(ExtensionError.NetworkFailure));
+      // Mock first call to fail, second to succeed
+      (mockAPI.sync as jest.Mock)
+        .mockResolvedValueOnce({ success: false, error: ExtensionError.NetworkFailure })
+        .mockResolvedValueOnce({ success: true, data: { clock: 1n, operations: [] } });
 
+      // First sync should fail
       await syncManager.syncNow();
+      expect(mockWorkerClient.deduplicateOperations).toHaveBeenCalledTimes(1);
 
+      // Advance timers and run all pending timers
       jest.advanceTimersByTime(5000);
+      jest.runAllTimers();
 
+      // Allow promises to resolve
+      await Promise.resolve();
+
+      // Second sync should happen automatically due to timer
       expect(mockWorkerClient.deduplicateOperations).toHaveBeenCalledTimes(2);
     });
   });
@@ -271,7 +286,7 @@ describe('SyncManagerWithWorker', () => {
       };
 
       (mockBrowser.tabs.query as jest.Mock).mockResolvedValue([]);
-      (mockAPI.sync as jest.Mock).mockResolvedValue(ok(response));
+      (mockAPI.sync as jest.Mock).mockResolvedValue({ success: true, data: response });
 
       await syncManager.syncNow();
 
@@ -295,7 +310,7 @@ describe('SyncManagerWithWorker', () => {
         ],
       };
 
-      (mockAPI.sync as jest.Mock).mockResolvedValue(ok(response));
+      (mockAPI.sync as jest.Mock).mockResolvedValue({ success: true, data: response });
 
       await syncManager.syncNow();
 
@@ -315,7 +330,7 @@ describe('SyncManagerWithWorker', () => {
         ],
       };
 
-      (mockAPI.sync as jest.Mock).mockResolvedValue(ok(response));
+      (mockAPI.sync as jest.Mock).mockResolvedValue({ success: true, data: response });
 
       await syncManager.syncNow();
 
@@ -342,4 +357,3 @@ describe('SyncManagerWithWorker', () => {
     });
   });
 });
-
