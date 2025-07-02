@@ -13,3 +13,5 @@ target/
 # Config files with secrets
 config/*.toml
 !config/example.toml
+
+coverage/
