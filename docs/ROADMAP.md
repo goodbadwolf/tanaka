@@ -455,6 +455,50 @@ Optimize both extension and server for 200+ tabs, achieving P95 sync latency ≤
 git checkout -b feat/performance
 ```
 
+#### Testing Infrastructure Improvements (Quick Wins)
+
+0.1. [ ] `perf(dev): install cargo-nextest for 2-3× faster test execution`
+   ```bash
+   cargo install cargo-nextest --locked
+   cargo nextest run  # Run all 55 tests faster
+   ```
+
+0.2. [ ] `perf(dev): add pretty_assertions for colorful test diffs`
+   ```toml
+   [dev-dependencies]
+   pretty_assertions = "1.4"
+   ```
+   ```rust
+   #[cfg(test)]
+   use pretty_assertions::{assert_eq, assert_ne};
+   ```
+
+0.3. [ ] `perf(dev): setup cargo-watch for continuous testing`
+   ```bash
+   cargo install cargo-watch
+   cargo watch -c -x "nextest run"  # Auto-run on file changes
+   ```
+
+0.4. [ ] `perf(dev): upgrade to cargo-llvm-cov for better coverage`
+   ```bash
+   cargo install cargo-llvm-cov
+   cargo llvm-cov --html  # Better than current coverage tools
+   ```
+
+0.5. [ ] `perf(test): add rstest for parameterized CRDT operation tests`
+   ```toml
+   [dev-dependencies]
+   rstest = "0.18"
+   ```
+   ```rust
+   #[rstest]
+   #[case(CrdtOperation::UpsertTab { /* ... */ })]
+   #[case(CrdtOperation::CloseTab { /* ... */ })]
+   fn test_all_operation_types(#[case] operation: CrdtOperation) {
+       // Test logic applies to all 8 CRDT operation types
+   }
+   ```
+
 1. [x] `feat(server): add DashMap caching`
    - ✅ `dashmap = "6.1"` dependency already added
    - ✅ Currently used in CRDT implementation for caching
@@ -491,10 +535,27 @@ git checkout -b feat/performance
    - Profile and fix performance issues
    - Implement virtualization for large lists
 
-7. [ ] `feat(both): create benchmark suite`
-   - Performance test harness
-   - Automated benchmarks
-   - Track regressions
+7. [ ] `feat(both): create benchmark suite with criterion`
+   ```toml
+   [dev-dependencies]
+   criterion = { version = "0.5", features = ["html_reports"] }
+   ```
+   ```rust
+   // benches/sync_bench.rs
+   use criterion::{black_box, criterion_group, criterion_main, Criterion};
+
+   fn sync_benchmark(c: &mut Criterion) {
+       c.bench_function("sync 100 operations", |b| {
+           b.iter(|| sync_operations(black_box(generate_100_ops())))
+       });
+   }
+
+   criterion_group!(benches, sync_benchmark);
+   criterion_main!(benches);
+   ```
+   - Automated benchmarks with regression detection
+   - HTML reports for performance analysis
+   - Target: P95 ≤ 10ms sync latency validation
 
 8. [ ] `perf: optimize for 200+ tabs`
    - Load test scenarios
@@ -510,6 +571,32 @@ git checkout -b feat/performance
     - Best practices
     - Configuration options
     - Monitoring setup
+
+11. [ ] `perf(ci): integrate improved testing tools in CI`
+    ```yaml
+    # .github/workflows/ci.yml updates
+    - name: Install testing tools
+      run: |
+        cargo install cargo-nextest --locked
+        cargo install cargo-llvm-cov --locked
+
+    - name: Run tests with nextest
+      run: cargo nextest run --all-features
+
+    - name: Generate coverage with llvm-cov
+      run: cargo llvm-cov --all-features --lcov --output-path lcov.info
+
+    - name: Run benchmarks
+      run: cargo bench --all-features
+    ```
+
+**Key Benefits of Testing Improvements:**
+- 🚀 **2-3× faster test execution** with cargo-nextest (critical for 55+ tests)
+- 🎨 **Better debugging** with colorful assertion diffs
+- ⚡ **Continuous feedback** during performance optimization
+- 📊 **Enhanced coverage reporting** to ensure optimizations don't break functionality
+- 🔬 **Professional benchmarking** with criterion for performance targets
+- 🧪 **Parameterized testing** for comprehensive CRDT operation validation
 
 ---
 
