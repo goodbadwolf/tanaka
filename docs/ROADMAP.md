@@ -298,6 +298,13 @@ git checkout -b feat/repository-layer
    - Add connection pooling
    - Handle CRDT storage
 
+3.1. [ ] `fix(tools): resolve coverage tool triggering TypeScript generation`
+   - Coverage tool runs Jest which triggers ts-rs TypeScript generation from Rust
+   - Auto-generated files in `extension/src/api/` are updated but not linted
+   - Files include: ErrorCode.ts, ErrorDetail.ts, ErrorResponse.ts, etc.
+   - Solutions: exclude from git status, auto-format generated files, or run generate task first
+   - Consider adding `uv run scripts/tanaka.py generate` before coverage checks
+
 4. [ ] `feat(server): add migration system`
    - Create migration framework
    - Add initial migrations
