@@ -239,48 +239,35 @@ export class TanakaAPI {
 export function browserTabToSyncTab(tab: BrowserTab, windowId: number): Tab | null {
   if (!tab.id || !tab.url) return null;
 
-  const tabData: TabData = {
-    url: tab.url,
-    title: tab.title || '',
-    favIconUrl: tab.favIconUrl || '',
-    index: tab.index,
-    pinned: tab.pinned,
-    active: tab.active,
-  };
-
   return {
     id: `tab-${tab.id}`,
     windowId: `window-${windowId}`,
-    data: JSON.stringify(tabData),
+    url: tab.url,
+    title: tab.title || '',
+    active: tab.active,
+    index: BigInt(tab.index),
     updatedAt: Date.now(),
   };
 }
 
 export function parseSyncTab(tab: Tab): TabData {
-  try {
-    const parsed = JSON.parse(tab.data) as TabData;
-
-    // Validate the parsed data has required fields
-    if (!parsed.url || typeof parsed.title !== 'string') {
-      throw new ExtensionError('INVALID_DATA', 'Tab data is missing required fields', {
-        context: { tabId: tab.id, data: tab.data },
-        source: 'parser',
-        severity: 'medium',
-        recoverable: false,
-      });
-    }
-
-    return parsed;
-  } catch (error) {
-    if (error instanceof ExtensionError) {
-      throw error;
-    }
-
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    throw new ExtensionError('INVALID_DATA', `Failed to parse tab data: ${errorMessage}`, {
-      context: { tabId: tab.id, data: tab.data },
+  // Validate the tab has required fields
+  if (!tab.url || typeof tab.title !== 'string') {
+    throw new ExtensionError('INVALID_DATA', 'Tab data is missing required fields', {
+      context: { tabId: tab.id },
       source: 'parser',
-      cause: error instanceof Error ? error : new Error(String(error)),
+      severity: 'medium',
+      recoverable: false,
     });
   }
+
+  // Convert Tab to TabData - note that Tab doesn't have all fields that TabData has
+  return {
+    url: tab.url,
+    title: tab.title,
+    favIconUrl: '', // Not available in the new Tab model
+    index: Number(tab.index), // Convert bigint to number
+    pinned: false, // Not available in the new Tab model
+    active: tab.active,
+  };
 }

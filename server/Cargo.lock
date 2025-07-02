@@ -1892,6 +1892,7 @@ dependencies = [
 name = "tanaka-server"
 version = "0.5.0"
 dependencies = [
+ "async-trait",
  "axum",
  "chrono",
  "clap",

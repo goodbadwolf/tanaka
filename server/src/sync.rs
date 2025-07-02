@@ -1,5 +1,6 @@
 use crate::crdt::CrdtManager;
 use crate::error::{AppError, AppResult};
+use crate::repository::{sqlite::SqliteOperationRepository, OperationRepository};
 use axum::{extract::State, Json};
 use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
@@ -212,7 +213,17 @@ impl CrdtOperation {
     }
 }
 
-/// Handles CRDT synchronization requests.
+/// Represents a stored CRDT operation with metadata
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StoredOperation {
+    pub id: String,
+    pub clock: u64,
+    pub device_id: String,
+    pub operation: CrdtOperation,
+    pub created_at: i64,
+}
+
+/// Handles CRDT synchronization requests using the repository pattern.
 ///
 /// # Errors
 ///
@@ -239,11 +250,13 @@ pub async fn sync_handler(
         operation.validate()?;
     }
 
+    // Create repository instances
+    let operation_repo = SqliteOperationRepository::new(Arc::new(db_pool.clone()));
+
     // Update server clock with client's clock
     let _server_clock = crdt_manager.update_clock(request.clock);
 
     // Process incoming operations
-    let mut processed_operations = Vec::new();
     for operation in request.operations {
         let operation_clock = crdt_manager.tick_clock();
 
@@ -254,25 +267,32 @@ pub async fn sync_handler(
             "Processing CRDT operation"
         );
 
-        // Store operation with server-assigned clock and device_id
-        let stored_operation = store_operation(
-            &crdt_manager,
-            &db_pool,
-            operation,
-            operation_clock,
-            &request.device_id,
-        )
-        .await?;
-        processed_operations.push(stored_operation);
+        // Store operation using repository
+        operation_repo
+            .store(&operation, operation_clock, &request.device_id)
+            .await?;
+
+        // Apply operation to CRDT state
+        apply_operation_to_state(&crdt_manager, &operation, operation_clock)?;
     }
 
     // Get operations that happened since client's last sync
     // Exclude operations from the same device to avoid echoing back
-    let response_operations = if let Some(since_clock) = request.since_clock {
-        get_operations_since(&db_pool, since_clock, Some(&request.device_id)).await?
+    let response_operations: Vec<CrdtOperation> = if let Some(since_clock) = request.since_clock {
+        operation_repo
+            .get_since(&request.device_id, since_clock)
+            .await?
+            .into_iter()
+            .map(|stored_op| stored_op.operation)
+            .collect()
     } else {
-        // If no since_clock provided, return all recent operations
-        get_recent_operations(&db_pool, 100, Some(&request.device_id)).await?
+        // If no since_clock provided, return recent operations
+        operation_repo
+            .get_recent(&request.device_id, 100)
+            .await?
+            .into_iter()
+            .map(|stored_op| stored_op.operation)
+            .collect()
     };
 
     let current_clock = crdt_manager.current_clock();
@@ -291,59 +311,6 @@ pub async fn sync_handler(
         clock: current_clock,
         operations: response_operations,
     }))
-}
-
-/// Stores a CRDT operation in the database and applies it to the state.
-///
-/// # Errors
-///
-/// Returns `AppError::Internal` if serialization fails.
-/// Returns `AppError::Database` if database operations fail.
-/// Returns `AppError::Sync` if CRDT state application fails.
-async fn store_operation(
-    crdt_manager: &CrdtManager,
-    db_pool: &SqlitePool,
-    operation: CrdtOperation,
-    clock: u64,
-    device_id: &str,
-) -> AppResult<CrdtOperation> {
-    // Convert operation to JSON for storage
-    let operation_data = serde_json::to_string(&operation)
-        .map_err(|e| AppError::internal(format!("Failed to serialize operation: {e}")))?;
-
-    // Generate operation ID with device_id for uniqueness
-    let operation_id = format!("{}_{}_{}", clock, device_id, operation.target_id());
-
-    // Store in operations log
-    sqlx::query(
-        r"
-        INSERT INTO crdt_operations (
-            id, clock, device_id, operation_type, target_id, operation_data, created_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?)
-        ",
-    )
-    .bind(&operation_id)
-    .bind(i64::try_from(clock).unwrap_or(i64::MAX))
-    .bind(device_id)
-    .bind(operation.operation_type())
-    .bind(operation.target_id())
-    .bind(&operation_data)
-    .bind(chrono::Utc::now().timestamp())
-    .execute(db_pool)
-    .await
-    .map_err(|e| AppError::database("Failed to store CRDT operation", e))?;
-
-    tracing::debug!(
-        operation_type = operation.operation_type(),
-        target_id = operation.target_id(),
-        clock = clock,
-        "Stored CRDT operation to database"
-    );
-
-    // Apply operation to CRDT state
-    apply_operation_to_state(crdt_manager, &operation, clock)?;
-
-    Ok(operation)
 }
 
 /// Applies a CRDT operation to the document state.
@@ -494,113 +461,6 @@ fn apply_operation_to_state(
     }
 
     Ok(())
-}
-
-/// Gets operations that occurred after a given clock value.
-///
-/// # Errors
-///
-/// Returns `AppError::Database` if database query fails.
-/// Returns `AppError::Internal` if operation deserialization fails.
-async fn get_operations_since(
-    db_pool: &SqlitePool,
-    since_clock: u64,
-    exclude_device_id: Option<&str>,
-) -> AppResult<Vec<CrdtOperation>> {
-    #[derive(sqlx::FromRow)]
-    struct OperationRow {
-        operation_data: String,
-    }
-
-    tracing::debug!(since_clock = since_clock, exclude_device_id = ?exclude_device_id, "Getting operations since clock");
-
-    let rows = if let Some(device_id) = exclude_device_id {
-        sqlx::query_as::<_, OperationRow>(
-            "SELECT operation_data FROM crdt_operations WHERE clock > ? AND device_id != ? ORDER BY clock ASC"
-        )
-        .bind(i64::try_from(since_clock).unwrap_or(i64::MAX))
-        .bind(device_id)
-        .fetch_all(db_pool)
-        .await
-    } else {
-        sqlx::query_as::<_, OperationRow>(
-            "SELECT operation_data FROM crdt_operations WHERE clock > ? ORDER BY clock ASC"
-        )
-        .bind(i64::try_from(since_clock).unwrap_or(i64::MAX))
-        .fetch_all(db_pool)
-        .await
-    }
-    .map_err(|e| AppError::database("Failed to fetch operations since clock", e))?;
-
-    let mut operations = Vec::new();
-    for row in rows {
-        let operation: CrdtOperation = serde_json::from_str(&row.operation_data)
-            .map_err(|e| AppError::internal(format!("Failed to deserialize operation: {e}")))?;
-        operations.push(operation);
-    }
-
-    tracing::debug!(
-        since_clock = since_clock,
-        operations_count = operations.len(),
-        "Retrieved operations since clock"
-    );
-
-    Ok(operations)
-}
-
-/// Gets the most recent operations up to a specified limit.
-///
-/// # Errors
-///
-/// Returns `AppError::Database` if database query fails.
-/// Returns `AppError::Internal` if operation deserialization fails.
-async fn get_recent_operations(
-    db_pool: &SqlitePool,
-    limit: usize,
-    exclude_device_id: Option<&str>,
-) -> AppResult<Vec<CrdtOperation>> {
-    #[derive(sqlx::FromRow)]
-    struct OperationRow {
-        operation_data: String,
-    }
-
-    tracing::debug!(limit = limit, exclude_device_id = ?exclude_device_id, "Getting recent operations");
-
-    let rows = if let Some(device_id) = exclude_device_id {
-        sqlx::query_as::<_, OperationRow>(
-            "SELECT operation_data FROM crdt_operations WHERE device_id != ? ORDER BY clock DESC LIMIT ?"
-        )
-        .bind(device_id)
-        .bind(i64::try_from(limit).unwrap_or(i64::MAX))
-        .fetch_all(db_pool)
-        .await
-    } else {
-        sqlx::query_as::<_, OperationRow>(
-            "SELECT operation_data FROM crdt_operations ORDER BY clock DESC LIMIT ?"
-        )
-        .bind(i64::try_from(limit).unwrap_or(i64::MAX))
-        .fetch_all(db_pool)
-        .await
-    }
-    .map_err(|e| AppError::database("Failed to fetch recent operations", e))?;
-
-    let mut operations = Vec::new();
-    for row in rows {
-        let operation: CrdtOperation = serde_json::from_str(&row.operation_data)
-            .map_err(|e| AppError::internal(format!("Failed to deserialize operation: {e}")))?;
-        operations.push(operation);
-    }
-
-    // Reverse to get chronological order (oldest first)
-    operations.reverse();
-
-    tracing::debug!(
-        limit = limit,
-        operations_count = operations.len(),
-        "Retrieved recent operations"
-    );
-
-    Ok(operations)
 }
 
 #[cfg(test)]
