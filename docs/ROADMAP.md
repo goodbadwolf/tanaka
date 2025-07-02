@@ -222,7 +222,13 @@ git checkout feat/sync-v2-endpoint  # Complete implementation
 **Branch**: `feat/repository-layer`
 
 #### Overview
-Implement clean data access patterns with repository interfaces, enabling testability and supporting different storage backends.
+Implement clean data access patterns with repository interfaces, enabling testability and supporting different storage backends. Currently, data access is tightly coupled to route handlers with direct SQL queries in `sync.rs`.
+
+#### Current State Analysis
+- **Direct SQL queries** in sync.rs: `store_operation()`, `get_operations_since()`, `get_recent_operations()`
+- **Mixed concerns**: Business logic intertwined with data access
+- **Hard to test**: No abstraction layer for mocking
+- **Existing tables**: `crdt_operations`, `crdt_state`, legacy `tabs` table
 
 #### Implementation Steps
 
@@ -230,41 +236,78 @@ Implement clean data access patterns with repository interfaces, enabling testab
 git checkout -b feat/repository-layer
 ```
 
-1. [ ] `feat(shared): align data models`
-   - Define canonical Tab model
-   - Define Window model
-   - Add validation
+1. [ ] `feat(server): add async-trait dependency`
+   - Add `async-trait = "0.1"` to Cargo.toml
+   - Required for async trait methods
 
 2. [ ] `feat(server): create repository traits`
    ```rust
+   // server/src/repository/mod.rs
+   #[async_trait]
+   pub trait OperationRepository: Send + Sync {
+     async fn store(&self, operation: &CrdtOperation) -> Result<()>;
+     async fn get_since(&self, device_id: &str, since_clock: u64) -> Result<Vec<StoredOperation>>;
+     async fn get_recent(&self, device_id: &str, limit: i64) -> Result<Vec<StoredOperation>>;
+   }
+
    #[async_trait]
    pub trait TabRepository: Send + Sync {
-     async fn get(&self, id: &str) -> Result<Tab>;
+     async fn get(&self, id: &str) -> Result<Option<Tab>>;
      async fn upsert(&self, tab: &Tab) -> Result<()>;
      async fn delete(&self, id: &str) -> Result<()>;
-     async fn get_since(&self, clock: u64) -> Result<Vec<Tab>>;
+     async fn get_all(&self) -> Result<Vec<Tab>>;
+   }
+
+   #[async_trait]
+   pub trait WindowRepository: Send + Sync {
+     async fn get(&self, id: &str) -> Result<Option<Window>>;
+     async fn upsert(&self, window: &Window) -> Result<()>;
+     async fn delete(&self, id: &str) -> Result<()>;
+     async fn get_all(&self) -> Result<Vec<Window>>;
    }
    ```
 
-3. [ ] `feat(server): implement SqliteTabRepository`
-   - Implement all trait methods
-   - Add connection pooling
-   - Handle CRDT storage
+3. [ ] `feat(server): implement SQLite repositories`
+   - Create `server/src/repository/sqlite/operation.rs`
+   - Create `server/src/repository/sqlite/tab.rs`
+   - Create `server/src/repository/sqlite/window.rs`
+   - Move SQL queries from sync.rs to repositories
+   - Use existing SqlitePool for connections
+   - Convert SQLx errors to AppError
 
-3.1. [ ] `fix(tools): resolve coverage tool triggering TypeScript generation`
-   - Coverage tool runs Jest which triggers ts-rs TypeScript generation from Rust
-   - Auto-generated files in `extension/src/api/` are updated but not linted
-   - Files include: ErrorCode.ts, ErrorDetail.ts, ErrorResponse.ts, etc.
-   - Solutions: exclude from git status, auto-format generated files, or run generate task first
-   - Consider adding `uv run scripts/tanaka.py generate` before coverage checks
+4. [ ] `feat(server): create mock repositories`
+   - Create `server/src/repository/mock.rs`
+   - In-memory implementations using DashMap
+   - Configurable behavior for testing
+   - Thread-safe with Arc<DashMap<>>
 
-4. [ ] `feat(server): add migration system`
-   - Create migration framework
-   - Add initial migrations
-   - Version the schema
+5. [ ] `feat(server): update domain models`
+   - Update `server/src/models.rs` with canonical models
+   - Separate domain models from CRDT models
+   - Add validation methods
+   - Ensure ts-rs annotations for TypeScript generation
 
-5. [ ] `feat(extension): create repository interfaces`
+6. [ ] `feat(server): integrate repositories into sync handler`
+   - Update `server/src/sync.rs` to use repositories
+   - Inject repositories instead of direct SqlitePool
+   - Keep business logic separate from data access
+   - Update AppState to include repositories
+
+7. [ ] `feat(server): add migration system`
+   - Create `server/src/migrations/` directory
+   - Use sqlx migrate! macro
+   - Add initial migration for existing schema
+   - Version control schema changes
+
+8. [ ] `feat(extension): create repository interfaces`
    ```typescript
+   // extension/src/repositories/index.ts
+   interface OperationRepository {
+     store(operation: CrdtOperation): Promise<void>;
+     getSince(sinceClock: bigint): Promise<StoredOperation[]>;
+     getRecent(limit: number): Promise<StoredOperation[]>;
+   }
+
    interface TabRepository {
      get(id: string): Promise<Tab | null>;
      upsert(tab: Tab): Promise<void>;
@@ -273,35 +316,69 @@ git checkout -b feat/repository-layer
    }
    ```
 
-6. [ ] `feat(extension): implement BrowserStorageRepository`
-   - Use browser.storage.local
-   - Add batching
-   - Handle quota limits
+9. [ ] `feat(extension): implement BrowserStorageRepository`
+   - Create `extension/src/repositories/browser-storage.ts`
+   - Use browser.storage.local API
+   - Add batching for performance
+   - Handle quota limits gracefully
 
-7. [ ] `feat(extension): add IndexedDBRepository`
-   - For large datasets
-   - Add indexing
-   - Handle upgrades
+10. [ ] `feat(extension): create mock repositories`
+    - Create `extension/src/repositories/mock.ts`
+    - In-memory implementations for testing
+    - Match server mock behavior
 
-8. [ ] `feat(both): create mock repositories`
-   - In-memory implementations
-   - For testing
-   - Configurable behavior
+11. [ ] `fix(tools): resolve coverage tool TypeScript generation`
+    - Add `uv run scripts/tanaka.py generate` before coverage
+    - Configure Jest to ignore generated files
+    - Add .gitignore entries if needed
 
-9. [ ] `feat(server): regenerate TypeScript types`
-   - Update ts-rs models
-   - Generate new types
-   - Commit to repository
+12. [ ] `feat(server): regenerate TypeScript types`
+    - Run `uv run scripts/tanaka.py generate`
+    - Ensure new repository types are exported
+    - Commit generated files
 
-10. [ ] `test: repository integration tests`
-    - Test all implementations
-    - Test error cases
-    - Performance benchmarks
+13. [ ] `test: comprehensive repository tests`
+    - Unit tests for each repository implementation
+    - Integration tests with real SQLite
+    - Mock repository behavior tests
+    - Performance benchmarks for large datasets
 
-11. [ ] `ci: create pull request for review`
-    - Push branch to remote
-    - Create comprehensive PR description
-    - Request review and testing
+14. [ ] `docs: update repository documentation`
+    - Document repository pattern usage
+    - Add examples for testing with mocks
+    - Update architecture documentation
+
+#### File Structure
+```
+server/src/
+├── repository/
+│   ├── mod.rs              # Trait definitions
+│   ├── sqlite/
+│   │   ├── mod.rs         # SQLite repository module
+│   │   ├── operation.rs   # OperationRepository impl
+│   │   ├── tab.rs         # TabRepository impl
+│   │   └── window.rs      # WindowRepository impl
+│   └── mock.rs            # Mock implementations
+├── migrations/
+│   ├── 001_initial.sql    # Initial schema
+│   └── 002_crdt_tables.sql # CRDT tables
+└── models.rs              # Updated domain models
+
+extension/src/
+└── repositories/
+    ├── index.ts           # Interface definitions
+    ├── browser-storage.ts # Browser storage impl
+    └── mock.ts           # Mock implementations
+```
+
+#### Key Design Decisions
+- **Use async_trait** for async repository methods in Rust
+- **Keep repositories focused** on data access only, no business logic
+- **Use Result types** for all repository methods for proper error handling
+- **Separate domain models** from storage/CRDT models
+- **Support transaction context** in repository methods for consistency
+- **Make repositories testable** with clear trait boundaries
+- **Thread-safe implementations** using Arc and DashMap where needed
 
 ---
 
