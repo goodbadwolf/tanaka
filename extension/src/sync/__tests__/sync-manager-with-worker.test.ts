@@ -389,14 +389,43 @@ describe('SyncManagerWithWorker', () => {
       expect(mockWorkerClient.terminate).toHaveBeenCalled();
     });
 
-    it.skip('should clear timers on stop', async () => {
+    it('should clear timers on stop', async () => {
+      // Set up spies BEFORE any timer operations
+      const clearTimeoutSpy = jest.spyOn(global, 'clearTimeout');
+      const setTimeoutSpy = jest.spyOn(global, 'setTimeout');
+
+      // Start the sync manager (this creates syncTimer)
       await syncManager.start();
 
-      const clearTimeoutSpy = jest.spyOn(global, 'clearTimeout');
+      // Verify a timer was actually created
+      expect(setTimeoutSpy).toHaveBeenCalled();
+      const syncTimerCalls = setTimeoutSpy.mock.calls.length;
 
+      // Queue an operation to create batchTimer
+      mockWorkerClient.queueOperation.mockResolvedValueOnce({
+        priority: 0,
+        dedupKey: 'close-tab-test',
+      });
+      await syncManager.queueTabClose('test-tab-id');
+
+      // Verify batch timer was created
+      expect(setTimeoutSpy).toHaveBeenCalledTimes(syncTimerCalls + 1);
+
+      // Clear spy history to focus on stop() behavior
+      clearTimeoutSpy.mockClear();
+
+      // Call stop() which should clear the timers
       syncManager.stop();
 
-      expect(clearTimeoutSpy).toHaveBeenCalled();
+      // Verify clearTimeout was called for active timers
+      // Should clear at least syncTimer, and batchTimer if it exists
+      expect(clearTimeoutSpy.mock.calls.length).toBeGreaterThanOrEqual(1);
+
+      // Verify the sync manager is no longer running
+      expect(syncManager.isRunning()).toBe(false);
+
+      // Verify worker was terminated
+      expect(mockWorkerClient.terminate).toHaveBeenCalled();
     });
   });
 
