@@ -47,8 +47,6 @@ export default {
     '!src/hooks/**',
     // Development-only utilities
     '!src/utils/performance.ts',
-    // Feature-flagged optimization (not enabled by default)
-    '!src/sync/adaptive-sync-manager.ts',
   ],
   coverageThreshold: {
     global: {

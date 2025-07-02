@@ -858,13 +858,9 @@ The extension includes an optimized sync manager that dynamically adjusts sync b
 #### Usage
 
 ```typescript
-// Enable via environment variable
-ENABLE_ADAPTIVE_SYNC=true npm run dev
+import { SyncManager } from './sync';
 
-// Or use the factory function
-import { createSyncManager } from './sync';
-
-const syncManager = await createSyncManager({
+const syncManager = new SyncManager({
   syncIntervalMs: 5000,  // Base interval (adapts 1-10s)
   api: tanakaAPI,
   windowTracker: tracker,
@@ -875,7 +871,7 @@ const syncManager = await createSyncManager({
 #### Testing
 
 ```bash
-npm test -- adaptive-sync-manager.test.ts
+npm test -- sync-manager.test.ts
 ```
 
 ---

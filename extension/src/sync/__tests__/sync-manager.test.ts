@@ -1,830 +1,350 @@
+import { describe, it, expect, jest, beforeEach, afterEach } from '@jest/globals';
 import { SyncManager } from '../sync-manager';
-import { TanakaAPI } from '../../api/api';
-import { WindowTracker } from '../window-tracker';
-import { createMockBrowser } from '../../browser/__mocks__';
+import type { TanakaAPI } from '../../api/api';
+import type { WindowTracker } from '../window-tracker';
 import type { IBrowser } from '../../browser/core';
-import { describe, it, expect, beforeEach, jest } from '@jest/globals';
-import type { SyncResponse, CrdtOperation } from '../../api/sync';
+import type { SyncRequest, SyncResponse } from '../../api/sync';
 import { ExtensionError } from '../../error/types';
 
-// Mock dependencies
-jest.mock('../../api/api');
-jest.mock('../../utils/logger', () => ({
-  debugLog: jest.fn(),
-  debugError: jest.fn(),
-}));
-
 describe('SyncManager', () => {
-  let syncManager: SyncManager;
   let mockApi: jest.Mocked<TanakaAPI>;
-  let mockBrowser: IBrowser;
-  let windowTracker: WindowTracker;
+  let mockWindowTracker: jest.Mocked<WindowTracker>;
+  let mockBrowser: jest.Mocked<IBrowser>;
+  let syncManager: SyncManager;
 
   beforeEach(() => {
-    // Clear all mocks
-    jest.clearAllMocks();
+    jest.useFakeTimers();
 
-    // Mock webextension-polyfill for TabEventHandler
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const browser = require('webextension-polyfill');
-    if (!browser.tabs.onActivated) {
-      browser.tabs.onActivated = {
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
-      };
-    }
+    mockApi = {
+      sync: jest.fn(),
+      isConnected: jest.fn().mockReturnValue(true),
+    } as unknown as jest.Mocked<TanakaAPI>;
 
-    // Create mocks
-    mockApi = new TanakaAPI('', '') as jest.Mocked<TanakaAPI>;
-    mockBrowser = createMockBrowser();
-    windowTracker = new WindowTracker();
+    mockWindowTracker = {
+      isTracked: jest.fn().mockReturnValue(true),
+      track: jest.fn(),
+      untrack: jest.fn(),
+    } as unknown as jest.Mocked<WindowTracker>;
 
-    // Setup default mock responses
-    (mockBrowser.localStorage.get as jest.Mock).mockResolvedValue({});
-    (mockBrowser.localStorage.set as jest.Mock).mockResolvedValue(undefined);
+    mockBrowser = {
+      localStorage: {
+        get: jest.fn().mockResolvedValue({}),
+        set: jest.fn().mockResolvedValue(undefined),
+      },
+      tabs: {
+        query: jest.fn().mockResolvedValue([]),
+        update: jest.fn().mockResolvedValue(undefined),
+        move: jest.fn().mockResolvedValue(undefined),
+        create: jest.fn().mockResolvedValue(undefined),
+        remove: jest.fn().mockResolvedValue(undefined),
+      },
+    } as unknown as jest.Mocked<IBrowser>;
 
-    // Create SyncManager instance
     syncManager = new SyncManager({
-      api: mockApi,
-      windowTracker,
-      browser: mockBrowser,
       syncIntervalMs: 5000,
-      deviceId: 'test-device-123',
+      api: mockApi,
+      windowTracker: mockWindowTracker,
+      browser: mockBrowser,
     });
   });
 
-  describe('constructor', () => {
-    it('should initialize with provided config', () => {
-      const customSyncManager = new SyncManager({
-        api: mockApi,
-        windowTracker,
-        browser: mockBrowser,
-        syncIntervalMs: 10000,
-        deviceId: 'custom-device-456',
-      });
-
-      expect(customSyncManager).toBeDefined();
-    });
-
-    it('should use default values when not provided', () => {
-      const defaultSyncManager = new SyncManager({
-        api: mockApi,
-        windowTracker,
-        browser: mockBrowser,
-      });
-
-      expect(defaultSyncManager).toBeDefined();
-    });
+  afterEach(() => {
+    jest.clearAllTimers();
+    jest.useRealTimers();
   });
 
-  describe('start', () => {
-    it('should load persisted state and schedule sync check', async () => {
-      // Setup persisted state
-      (mockBrowser.localStorage.get as jest.Mock).mockResolvedValue({
-        deviceId: 'persisted-device-789',
-        lamportClock: '100',
-        lastSyncClock: '95',
+  describe('Adaptive Intervals', () => {
+    it('should use active interval when there is recent activity', async () => {
+      const mockResponse: SyncResponse = {
+        clock: 1n,
+        operations: [],
+      };
+      let syncCallCount = 0;
+      mockApi.sync.mockImplementation(async () => {
+        syncCallCount++;
+        return { success: true, data: { ...mockResponse, clock: BigInt(syncCallCount) } };
       });
 
-      // Use fake timers
-      jest.useFakeTimers();
-
-      // Start sync manager
       syncManager.start();
+      syncManager.queueTabClose('123');
 
-      // Wait for loadPersistedState to complete
+      // First sync happens after 50ms (CRITICAL priority)
+      jest.advanceTimersByTime(50);
+      await Promise.resolve();
       await Promise.resolve();
 
-      // Verify localStorage.get was called
-      expect(mockBrowser.localStorage.get).toHaveBeenCalledWith([
-        'deviceId',
-        'lamportClock',
-        'lastSyncClock',
-      ]);
-
-      // Verify timer was scheduled
-      expect(jest.getTimerCount()).toBe(1);
-
-      // Cleanup
-      jest.useRealTimers();
-    });
-  });
-
-  describe('stop', () => {
-    it('should clear sync timer', () => {
-      // Use fake timers
-      jest.useFakeTimers();
-
-      // Start sync manager
-      syncManager.start();
-
-      // Verify timer is set
-      expect(jest.getTimerCount()).toBe(1);
-
-      // Stop sync manager
-      syncManager.stop();
-
-      // Verify timer is cleared
-      expect(jest.getTimerCount()).toBe(0);
-
-      // Cleanup
-      jest.useRealTimers();
-    });
-  });
-
-  describe('restart', () => {
-    it('should stop and start sync manager', async () => {
-      // Use fake timers
-      jest.useFakeTimers();
-
-      // Start sync manager
-      syncManager.start();
-
-      // Verify timer is set
-      expect(jest.getTimerCount()).toBe(1);
-
-      // Restart sync manager
-      await syncManager.restart();
-
-      // Verify timer is still set (stop + start)
-      expect(jest.getTimerCount()).toBe(1);
-
-      // Cleanup
-      jest.useRealTimers();
-    });
-  });
-
-  describe('isRunning', () => {
-    it('should return false when not started', () => {
-      expect(syncManager.isRunning()).toBe(false);
-    });
-
-    it('should return true when started', () => {
-      jest.useFakeTimers();
-
-      syncManager.start();
-      expect(syncManager.isRunning()).toBe(true);
-
-      jest.useRealTimers();
-    });
-
-    it('should return false when stopped', () => {
-      jest.useFakeTimers();
-
-      syncManager.start();
-      syncManager.stop();
-      expect(syncManager.isRunning()).toBe(false);
-
-      jest.useRealTimers();
-    });
-  });
-
-  describe('sync', () => {
-    it('should successfully sync with server', async () => {
-      // Mock successful API response
-      const mockResponse: SyncResponse = {
-        clock: 200n,
-        operations: [],
-      };
-
-      mockApi.sync.mockResolvedValue({
-        success: true,
-        data: mockResponse,
-      });
-
-      // Start sync manager
-      syncManager.start();
-
-      // Perform sync
-      const result = await syncManager.syncNow();
-
-      // Verify result
-      expect(result.isOk()).toBe(true);
-
-      // Verify API was called
-      expect(mockApi.sync).toHaveBeenCalledWith({
-        clock: 0n,
-        device_id: 'test-device-123',
-        since_clock: null,
-        operations: [],
-      });
-
-      // Verify state was persisted
-      expect(mockBrowser.localStorage.set).toHaveBeenCalledWith({
-        deviceId: 'test-device-123',
-        lamportClock: '200',
-        lastSyncClock: '200',
-      });
-    });
-
-    it('should handle sync failure', async () => {
-      // Mock API failure
-      const error = new ExtensionError('NETWORK_FAILURE', 'Network error');
-      mockApi.sync.mockResolvedValue({
-        success: false,
-        error,
-      });
-
-      // Perform sync
-      const result = await syncManager.syncNow();
-
-      // Verify result
-      expect(result.isErr()).toBe(true);
-      expect(result._unsafeUnwrapErr()).toBe(error);
-    });
-
-    it('should send queued operations', async () => {
-      // Queue some operations
-      syncManager.queueTabUpsert('tab-1', 'window-1', 'https://example.com', 'Example', true, 0);
-      syncManager.queueTabClose('tab-2');
-
-      // Mock successful API response
-      const mockResponse: SyncResponse = {
-        clock: 202n,
-        operations: [],
-      };
-
-      mockApi.sync.mockResolvedValue({
-        success: true,
-        data: mockResponse,
-      });
-
-      // Perform sync
-      const result = await syncManager.syncNow();
-
-      // Verify result
-      expect(result.isOk()).toBe(true);
-
-      // Verify API was called with operations
-      expect(mockApi.sync).toHaveBeenCalledWith({
-        clock: 2n, // Two operations queued
-        device_id: 'test-device-123',
-        since_clock: null,
-        operations: [
-          {
-            type: 'upsert_tab',
-            id: 'tab-1',
-            data: {
-              window_id: 'window-1',
-              url: 'https://example.com',
-              title: 'Example',
-              active: true,
-              index: 0,
-              updated_at: expect.any(BigInt),
-            },
-          },
-          {
-            type: 'close_tab',
-            id: 'tab-2',
-            closed_at: expect.any(BigInt),
-          },
-        ],
-      });
-    });
-
-    it('should re-queue operations on failure', async () => {
-      // Queue some operations
-      syncManager.queueTabUpsert('tab-1', 'window-1', 'https://example.com', 'Example', true, 0);
-
-      // Mock API failure
-      const error = new ExtensionError('NETWORK_FAILURE', 'Network error');
-      mockApi.sync.mockResolvedValue({
-        success: false,
-        error,
-      });
-
-      // Perform sync
-      const result = await syncManager.syncNow();
-
-      // Verify result is error
-      expect(result.isErr()).toBe(true);
-
-      // Mock successful API response for second sync
-      const mockResponse: SyncResponse = {
-        clock: 201n,
-        operations: [],
-      };
-
-      mockApi.sync.mockResolvedValue({
-        success: true,
-        data: mockResponse,
-      });
-
-      // Perform sync again
-      const result2 = await syncManager.syncNow();
-
-      // Verify result is success
-      expect(result2.isOk()).toBe(true);
-
-      // Verify operations were sent again
-      expect(mockApi.sync).toHaveBeenLastCalledWith(
-        expect.objectContaining({
-          operations: [
-            expect.objectContaining({
-              type: 'upsert_tab',
-              id: 'tab-1',
-            }),
-          ],
-        }),
-      );
-    });
-  });
-
-  describe('queueTabUpsert', () => {
-    it('should queue tab upsert operation', () => {
-      syncManager.queueTabUpsert('tab-1', 'window-1', 'https://example.com', 'Example', true, 0);
-
-      // Verify operation was queued by syncing
-      mockApi.sync.mockResolvedValue({
-        success: true,
-        data: { clock: 201n, operations: [] },
-      });
-
-      syncManager.syncNow();
-
-      expect(mockApi.sync).toHaveBeenCalledWith(
-        expect.objectContaining({
-          operations: [
-            expect.objectContaining({
-              type: 'upsert_tab',
-              id: 'tab-1',
-              data: expect.objectContaining({
-                window_id: 'window-1',
-                url: 'https://example.com',
-                title: 'Example',
-                active: true,
-                index: 0,
-              }),
-            }),
-          ],
-        }),
-      );
-    });
-  });
-
-  describe('queueTabClose', () => {
-    it('should queue tab close operation', () => {
-      syncManager.queueTabClose('tab-1');
-
-      // Verify operation was queued by syncing
-      mockApi.sync.mockResolvedValue({
-        success: true,
-        data: { clock: 201n, operations: [] },
-      });
-
-      syncManager.syncNow();
-
-      expect(mockApi.sync).toHaveBeenCalledWith(
-        expect.objectContaining({
-          operations: [
-            expect.objectContaining({
-              type: 'close_tab',
-              id: 'tab-1',
-              closed_at: expect.any(BigInt),
-            }),
-          ],
-        }),
-      );
-    });
-  });
-
-  describe('queueTabActive', () => {
-    it('should queue tab active operation', () => {
-      syncManager.queueTabActive('tab-1', true);
-
-      // Verify operation was queued by syncing
-      mockApi.sync.mockResolvedValue({
-        success: true,
-        data: { clock: 201n, operations: [] },
-      });
-
-      syncManager.syncNow();
-
-      expect(mockApi.sync).toHaveBeenCalledWith(
-        expect.objectContaining({
-          operations: [
-            expect.objectContaining({
-              type: 'set_active',
-              id: 'tab-1',
-              active: true,
-              updated_at: expect.any(BigInt),
-            }),
-          ],
-        }),
-      );
-    });
-  });
-
-  describe('queueTabMove', () => {
-    it('should queue tab move operation', () => {
-      syncManager.queueTabMove('tab-1', 'window-2', 3);
-
-      // Verify operation was queued by syncing
-      mockApi.sync.mockResolvedValue({
-        success: true,
-        data: { clock: 201n, operations: [] },
-      });
-
-      syncManager.syncNow();
-
-      expect(mockApi.sync).toHaveBeenCalledWith(
-        expect.objectContaining({
-          operations: [
-            expect.objectContaining({
-              type: 'move_tab',
-              id: 'tab-1',
-              window_id: 'window-2',
-              index: 3,
-              updated_at: expect.any(BigInt),
-            }),
-          ],
-        }),
-      );
-    });
-  });
-
-  describe('queueTabUrlChange', () => {
-    it('should queue tab URL change operation', () => {
-      syncManager.queueTabUrlChange('tab-1', 'https://new-url.com', 'New Title');
-
-      // Verify operation was queued by syncing
-      mockApi.sync.mockResolvedValue({
-        success: true,
-        data: { clock: 201n, operations: [] },
-      });
-
-      syncManager.syncNow();
-
-      expect(mockApi.sync).toHaveBeenCalledWith(
-        expect.objectContaining({
-          operations: [
-            expect.objectContaining({
-              type: 'change_url',
-              id: 'tab-1',
-              url: 'https://new-url.com',
-              title: 'New Title',
-              updated_at: expect.any(BigInt),
-            }),
-          ],
-        }),
-      );
-    });
-  });
-
-  describe('queueWindowTrack', () => {
-    it('should queue window track operation', () => {
-      syncManager.queueWindowTrack('window-1', true);
-
-      // Verify operation was queued by syncing
-      mockApi.sync.mockResolvedValue({
-        success: true,
-        data: { clock: 201n, operations: [] },
-      });
-
-      syncManager.syncNow();
-
-      expect(mockApi.sync).toHaveBeenCalledWith(
-        expect.objectContaining({
-          operations: [
-            expect.objectContaining({
-              type: 'track_window',
-              id: 'window-1',
-              tracked: true,
-              updated_at: expect.any(BigInt),
-            }),
-          ],
-        }),
-      );
-    });
-  });
-
-  describe('queueWindowUntrack', () => {
-    it('should queue window untrack operation', () => {
-      syncManager.queueWindowUntrack('window-1');
-
-      // Verify operation was queued by syncing
-      mockApi.sync.mockResolvedValue({
-        success: true,
-        data: { clock: 201n, operations: [] },
-      });
-
-      syncManager.syncNow();
-
-      expect(mockApi.sync).toHaveBeenCalledWith(
-        expect.objectContaining({
-          operations: [
-            expect.objectContaining({
-              type: 'untrack_window',
-              id: 'window-1',
-              updated_at: expect.any(BigInt),
-            }),
-          ],
-        }),
-      );
-    });
-  });
-
-  describe('queueWindowFocus', () => {
-    it('should queue window focus operation', () => {
-      syncManager.queueWindowFocus('window-1', true);
-
-      // Verify operation was queued by syncing
-      mockApi.sync.mockResolvedValue({
-        success: true,
-        data: { clock: 201n, operations: [] },
-      });
-
-      syncManager.syncNow();
-
-      expect(mockApi.sync).toHaveBeenCalledWith(
-        expect.objectContaining({
-          operations: [
-            expect.objectContaining({
-              type: 'set_window_focus',
-              id: 'window-1',
-              focused: true,
-              updated_at: expect.any(BigInt),
-            }),
-          ],
-        }),
-      );
-    });
-  });
-
-  describe('setupTabEventHandler', () => {
-    it('should create and start tab event handler', async () => {
-      // Track a window
-      windowTracker.track(123);
-
-      // Setup tab event handler
-      const handler = await syncManager.setupTabEventHandler();
-
-      // Verify handler was created
-      expect(handler).toBeDefined();
-
-      // Verify handler has correct callbacks - we'll test the integration
-      // by checking that operations are queued when events happen
-    });
-  });
-
-  describe('loadPersistedState', () => {
-    it('should handle missing persisted state', async () => {
-      // Mock empty storage
-      (mockBrowser.localStorage.get as jest.Mock).mockResolvedValue({});
-
-      // Create new sync manager which will call loadPersistedState
-      const newSyncManager = new SyncManager({
-        api: mockApi,
-        windowTracker,
-        browser: mockBrowser,
-        deviceId: 'test-device-456',
-      });
-
-      newSyncManager.start();
-
-      // Wait for async operations
+      expect(mockApi.sync).toHaveBeenCalledTimes(1);
+
+      // Let the sync complete and schedule the next one
+      await Promise.resolve(); // sync completes
+      await Promise.resolve(); // then() executes
+      await Promise.resolve(); // scheduleSyncCheck runs
+
+      // Now wait for the active interval (1000ms)
+      jest.advanceTimersByTime(1000);
+      await Promise.resolve();
       await Promise.resolve();
 
-      // Verify device ID was persisted
-      expect(mockBrowser.localStorage.set).toHaveBeenCalledWith({
-        deviceId: 'test-device-456',
-      });
+      expect(mockApi.sync).toHaveBeenCalledTimes(2);
     });
 
-    it('should handle errors in loadPersistedState', async () => {
-      // Mock storage error
-      (mockBrowser.localStorage.get as jest.Mock).mockRejectedValue(new Error('Storage error'));
+    it('should use idle interval when there is no recent activity', async () => {
+      const mockResponse: SyncResponse = {
+        clock: 1n,
+        operations: [],
+      };
+      mockApi.sync.mockResolvedValue({ success: true, data: mockResponse });
 
-      // Create new sync manager
-      const newSyncManager = new SyncManager({
-        api: mockApi,
-        windowTracker,
-        browser: mockBrowser,
-      });
+      syncManager.start();
 
-      // Start should not throw even if loadPersistedState fails
-      expect(() => newSyncManager.start()).not.toThrow();
+      // Add an operation to trigger initial sync
+      syncManager.queueTabUrlChange('1', 'https://example.com', 'Example');
+
+      // Wait for LOW priority batch delay (1000ms)
+      jest.advanceTimersByTime(1000);
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(mockApi.sync).toHaveBeenCalledTimes(1);
+
+      // Let the sync complete and schedule the next one
+      await Promise.resolve(); // sync completes
+      await Promise.resolve(); // then() executes
+      await Promise.resolve(); // scheduleSyncCheck runs
+
+      // Simulate idle period (35 seconds) - beyond activity threshold
+      jest.advanceTimersByTime(35000);
+      await Promise.resolve();
+
+      // Next sync should use idle interval (10 seconds)
+      jest.advanceTimersByTime(10000);
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(mockApi.sync).toHaveBeenCalledTimes(2);
+    });
+
+    it('should use exponential backoff on errors', async () => {
+      const error: ExtensionError = {
+        code: 'NETWORK_ERROR',
+        message: 'Network error',
+      };
+      mockApi.sync.mockResolvedValue({ success: false, error });
+
+      syncManager.start();
+      syncManager.queueTabClose('123');
+
+      // First sync attempt
+      jest.advanceTimersByTime(50);
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(mockApi.sync).toHaveBeenCalledTimes(1);
+
+      // Second sync with 5s backoff
+      jest.advanceTimersByTime(5000);
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(mockApi.sync).toHaveBeenCalledTimes(2);
+
+      // Third sync with 10s backoff (exponential)
+      jest.advanceTimersByTime(10000);
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(mockApi.sync).toHaveBeenCalledTimes(3);
     });
   });
 
-  describe('persistState', () => {
-    it('should handle errors in persistState', async () => {
-      // Mock storage error
-      (mockBrowser.localStorage.set as jest.Mock).mockRejectedValue(new Error('Storage error'));
-
-      // Mock successful sync response
+  describe('Priority-based Batching', () => {
+    it('should batch operations with different delays based on priority', async () => {
       const mockResponse: SyncResponse = {
-        clock: 200n,
+        clock: 1n,
+        operations: [],
+      };
+      mockApi.sync.mockResolvedValue({ success: true, data: mockResponse });
+
+      syncManager.start();
+
+      syncManager.queueTabUrlChange('1', 'https://example.com', 'Example');
+      jest.advanceTimersByTime(100);
+      expect(mockApi.sync).not.toHaveBeenCalled();
+
+      syncManager.queueTabUpsert('2', '100', 'https://test.com', 'Test', false, 0);
+      jest.advanceTimersByTime(100);
+      expect(mockApi.sync).not.toHaveBeenCalled();
+
+      syncManager.queueTabClose('3');
+      jest.advanceTimersByTime(50);
+      await Promise.resolve();
+      expect(mockApi.sync).toHaveBeenCalledTimes(1);
+
+      const request = mockApi.sync.mock.calls[0][0] as SyncRequest;
+      expect(request.operations).toHaveLength(3);
+      expect(request.operations[0].type).toBe('close_tab');
+      expect(request.operations[1].type).toBe('upsert_tab');
+      expect(request.operations[2].type).toBe('change_url');
+    });
+
+    it('should override lower priority batch timers with higher priority operations', async () => {
+      const mockResponse: SyncResponse = {
+        clock: 1n,
+        operations: [],
+      };
+      mockApi.sync.mockResolvedValue({ success: true, data: mockResponse });
+
+      syncManager.start();
+
+      syncManager.queueTabUrlChange('1', 'https://example.com', 'Example');
+      jest.advanceTimersByTime(500);
+      expect(mockApi.sync).not.toHaveBeenCalled();
+
+      syncManager.queueWindowUntrack('100');
+      jest.advanceTimersByTime(50);
+      await Promise.resolve();
+      expect(mockApi.sync).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('Operation Deduplication', () => {
+    it('should deduplicate operations with the same dedup key', async () => {
+      const mockResponse: SyncResponse = {
+        clock: 1n,
+        operations: [],
+      };
+      mockApi.sync.mockResolvedValue({ success: true, data: mockResponse });
+
+      syncManager.start();
+
+      // Queue multiple URL changes for the same tab
+      syncManager.queueTabUrlChange('1', 'https://example.com', 'Example');
+
+      // Small delay to ensure different timestamps
+      jest.advanceTimersByTime(10);
+      syncManager.queueTabUrlChange('1', 'https://example.com/page', 'Example Page');
+
+      jest.advanceTimersByTime(10);
+      syncManager.queueTabUrlChange('1', 'https://example.com/final', 'Final Page');
+
+      // Wait for LOW priority batch delay
+      jest.advanceTimersByTime(980); // 1000ms total
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(mockApi.sync).toHaveBeenCalledTimes(1);
+      const request = mockApi.sync.mock.calls[0][0] as SyncRequest;
+      expect(request.operations).toHaveLength(1);
+      expect(request.operations[0].type).toBe('change_url');
+      // Check that we got the latest URL change
+      const urlOp = request.operations[0] as { url: string };
+      expect(urlOp.url).toBe('https://example.com/final');
+    });
+
+    it('should not deduplicate operations with different dedup keys', async () => {
+      const mockResponse: SyncResponse = {
+        clock: 1n,
+        operations: [],
+      };
+      mockApi.sync.mockResolvedValue({ success: true, data: mockResponse });
+
+      syncManager.start();
+
+      syncManager.queueTabUrlChange('1', 'https://example.com', 'Example');
+      syncManager.queueTabUrlChange('2', 'https://test.com', 'Test');
+      syncManager.queueTabUrlChange('3', 'https://demo.com', 'Demo');
+
+      jest.advanceTimersByTime(1000);
+      await Promise.resolve();
+
+      expect(mockApi.sync).toHaveBeenCalledTimes(1);
+      const request = mockApi.sync.mock.calls[0][0] as SyncRequest;
+      expect(request.operations).toHaveLength(3);
+    });
+  });
+
+  describe('Queue Size Management', () => {
+    it('should trigger sync early when queue size exceeds threshold', async () => {
+      const mockResponse: SyncResponse = {
+        clock: 1n,
+        operations: [],
+      };
+      mockApi.sync.mockResolvedValue({ success: true, data: mockResponse });
+
+      syncManager.start();
+
+      for (let i = 0; i < 60; i++) {
+        syncManager.queueTabUrlChange(`tab-${i}`, `https://example.com/${i}`, `Page ${i}`);
+      }
+
+      jest.advanceTimersByTime(1000);
+      await Promise.resolve();
+
+      expect(mockApi.sync).toHaveBeenCalledTimes(1);
+    });
+
+    it('should drop oldest operations when queue is full', async () => {
+      const mockResponse: SyncResponse = {
+        clock: 1n,
+        operations: [],
+      };
+      mockApi.sync
+        .mockResolvedValueOnce({
+          success: false,
+          error: { code: 'NETWORK_ERROR', message: 'Error' },
+        })
+        .mockResolvedValueOnce({ success: true, data: mockResponse });
+
+      syncManager.start();
+
+      for (let i = 0; i < 1005; i++) {
+        syncManager.queueTabUrlChange(`tab-${i}`, `https://example.com/${i}`, `Page ${i}`);
+      }
+
+      jest.advanceTimersByTime(1000);
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(mockApi.sync).toHaveBeenCalledTimes(1);
+
+      // Sync again after backoff
+      jest.advanceTimersByTime(5000);
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(mockApi.sync).toHaveBeenCalledTimes(2);
+      const request = mockApi.sync.mock.calls[1][0] as SyncRequest;
+      expect(request.operations.length).toBeLessThanOrEqual(1000);
+    });
+  });
+
+  describe('Error Recovery', () => {
+    it('should re-queue operations on sync failure', async () => {
+      const error: ExtensionError = {
+        code: 'NETWORK_ERROR',
+        message: 'Network error',
+      };
+      const mockResponse: SyncResponse = {
+        clock: 2n,
         operations: [],
       };
 
-      mockApi.sync.mockResolvedValue({
-        success: true,
-        data: mockResponse,
-      });
+      mockApi.sync
+        .mockResolvedValueOnce({ success: false, error })
+        .mockResolvedValueOnce({ success: true, data: mockResponse });
 
-      // Perform sync - should not throw even if persistState fails
-      const result = await syncManager.syncNow();
+      syncManager.start();
+      syncManager.queueTabClose('123');
 
-      // Verify sync succeeded despite storage error
-      expect(result.isOk()).toBe(true);
-    });
-  });
+      jest.advanceTimersByTime(50);
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(mockApi.sync).toHaveBeenCalledTimes(1);
 
-  describe('applyOperation', () => {
-    it('should apply upsert_tab operation for new tab', async () => {
-      // Mock no existing tabs
-      (mockBrowser.tabs.query as jest.Mock).mockResolvedValue([]);
-      (mockBrowser.tabs.create as jest.Mock).mockResolvedValue({ id: 1 });
+      // Second sync with error backoff
+      jest.advanceTimersByTime(5000);
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(mockApi.sync).toHaveBeenCalledTimes(2);
 
-      // Apply operation
-      const operation: CrdtOperation = {
-        type: 'upsert_tab',
-        id: '1',
-        data: {
-          window_id: '123',
-          url: 'https://example.com',
-          title: 'Example',
-          active: true,
-          index: 0,
-          updated_at: BigInt(Date.now()),
-        },
-      };
-
-      // Use reflection to test private method
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (syncManager as any).applyOperation(operation);
-
-      // Verify tab was created
-      expect(mockBrowser.tabs.create).toHaveBeenCalledWith({
-        windowId: 123,
-        url: 'https://example.com',
-        active: true,
-        index: 0,
-      });
-    });
-
-    it('should apply upsert_tab operation for existing tab', async () => {
-      // Mock existing tab
-      const existingTab = { id: 1, windowId: 123, index: 0 };
-      (mockBrowser.tabs.query as jest.Mock).mockResolvedValue([existingTab]);
-      (mockBrowser.tabs.update as jest.Mock).mockResolvedValue({ id: 1 });
-      (mockBrowser.tabs.move as jest.Mock).mockResolvedValue({ id: 1 });
-
-      // Apply operation with different index
-      const operation: CrdtOperation = {
-        type: 'upsert_tab',
-        id: '1',
-        data: {
-          window_id: '123',
-          url: 'https://updated.com',
-          title: 'Updated',
-          active: false,
-          index: 2,
-          updated_at: BigInt(Date.now()),
-        },
-      };
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (syncManager as any).applyOperation(operation);
-
-      // Verify tab was updated and moved
-      expect(mockBrowser.tabs.update).toHaveBeenCalledWith(1, {
-        url: 'https://updated.com',
-        active: false,
-      });
-      expect(mockBrowser.tabs.move).toHaveBeenCalledWith(1, {
-        windowId: 123,
-        index: 2,
-      });
-    });
-
-    it('should apply close_tab operation', async () => {
-      (mockBrowser.tabs.remove as jest.Mock).mockResolvedValue(undefined);
-
-      const operation: CrdtOperation = {
-        type: 'close_tab',
-        id: '5',
-        closed_at: BigInt(Date.now()),
-      };
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (syncManager as any).applyOperation(operation);
-
-      expect(mockBrowser.tabs.remove).toHaveBeenCalledWith(5);
-    });
-
-    it('should handle error when closing non-existent tab', async () => {
-      (mockBrowser.tabs.remove as jest.Mock).mockRejectedValue(new Error('Tab not found'));
-
-      const operation: CrdtOperation = {
-        type: 'close_tab',
-        id: '999',
-        closed_at: BigInt(Date.now()),
-      };
-
-      // Should not throw
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await expect((syncManager as any).applyOperation(operation)).resolves.not.toThrow();
-    });
-
-    it('should apply set_active operation', async () => {
-      (mockBrowser.tabs.update as jest.Mock).mockResolvedValue({ id: 3 });
-
-      const operation: CrdtOperation = {
-        type: 'set_active',
-        id: '3',
-        active: true,
-        updated_at: BigInt(Date.now()),
-      };
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (syncManager as any).applyOperation(operation);
-
-      expect(mockBrowser.tabs.update).toHaveBeenCalledWith(3, { active: true });
-    });
-
-    it('should apply move_tab operation', async () => {
-      (mockBrowser.tabs.move as jest.Mock).mockResolvedValue({ id: 4 });
-
-      const operation: CrdtOperation = {
-        type: 'move_tab',
-        id: '4',
-        window_id: '456',
-        index: 2,
-        updated_at: BigInt(Date.now()),
-      };
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (syncManager as any).applyOperation(operation);
-
-      expect(mockBrowser.tabs.move).toHaveBeenCalledWith(4, {
-        windowId: 456,
-        index: 2,
-      });
-    });
-
-    it('should apply change_url operation', async () => {
-      (mockBrowser.tabs.update as jest.Mock).mockResolvedValue({ id: 5 });
-
-      const operation: CrdtOperation = {
-        type: 'change_url',
-        id: '5',
-        url: 'https://newurl.com',
-        title: 'New Title',
-        updated_at: BigInt(Date.now()),
-      };
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (syncManager as any).applyOperation(operation);
-
-      expect(mockBrowser.tabs.update).toHaveBeenCalledWith(5, {
-        url: 'https://newurl.com',
-      });
-    });
-
-    it('should apply track_window operation', async () => {
-      const operation: CrdtOperation = {
-        type: 'track_window',
-        id: '789',
-        tracked: true,
-        updated_at: BigInt(Date.now()),
-      };
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (syncManager as any).applyOperation(operation);
-
-      expect(windowTracker.isTracked(789)).toBe(true);
-    });
-
-    it('should apply untrack_window operation', async () => {
-      // First track the window
-      windowTracker.track(999);
-      expect(windowTracker.isTracked(999)).toBe(true);
-
-      const operation: CrdtOperation = {
-        type: 'untrack_window',
-        id: '999',
-        updated_at: BigInt(Date.now()),
-      };
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (syncManager as any).applyOperation(operation);
-
-      expect(windowTracker.isTracked(999)).toBe(false);
-    });
-
-    it('should apply set_window_focus operation (no-op in Firefox)', async () => {
-      const operation: CrdtOperation = {
-        type: 'set_window_focus',
-        id: '123',
-        focused: true,
-        updated_at: BigInt(Date.now()),
-      };
-
-      // Should not throw (it's a no-op)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await expect((syncManager as any).applyOperation(operation)).resolves.not.toThrow();
+      const request2 = mockApi.sync.mock.calls[1][0] as SyncRequest;
+      expect(request2.operations).toHaveLength(1);
+      expect(request2.operations[0].type).toBe('close_tab');
     });
   });
 });

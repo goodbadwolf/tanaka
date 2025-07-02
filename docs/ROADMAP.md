@@ -535,7 +535,7 @@ git checkout -b feat/performance
    - ✅ Adaptive intervals (1s active, 10s idle, exponential backoff)
    - ✅ Reduces server load by ~70%
    - ✅ Operation deduplication and queue management
-   - ✅ Feature flag for gradual rollout (ENABLE_ADAPTIVE_SYNC)
+   - ✅ Replaced original sync manager - now the default implementation
    - ✅ 10 comprehensive tests covering all scenarios
 
 6. [ ] `feat(extension): move CRDT to Web Worker`
