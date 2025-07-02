@@ -52,3 +52,7 @@ tempfile = "3"
 tower = { version = "0.5", features = ["util"] }
 hyper = { version = "1.5", features = ["full"] }
 http-body-util = "0.1"
+
+# Testing improvements
+pretty_assertions = "1.4" # Colorful diffs for better test debugging
+rstest = "0.18"           # Parameterized testing for CRDT operations

@@ -7,6 +7,10 @@ use crate::sync::{CrdtOperation, TabData};
 use sqlx::SqlitePool;
 use std::sync::Arc;
 
+#[cfg(test)]
+use pretty_assertions::assert_eq;
+use rstest::rstest;
+
 // Helper function to create a test operation
 fn create_test_operation() -> CrdtOperation {
     CrdtOperation::UpsertTab {
@@ -511,6 +515,69 @@ async fn test_repositories_container_mock() {
     repos.windows.upsert(&window).await.unwrap();
     let retrieved = repos.windows.get("mock-window").await.unwrap();
     assert!(retrieved.is_some());
+}
+
+/// Parameterized test demonstrating rstest for different CRDT operation types
+#[rstest]
+#[case::upsert_tab(CrdtOperation::UpsertTab {
+    id: "test-tab".to_string(),
+    data: TabData {
+        window_id: "window-1".to_string(),
+        url: "https://example.com".to_string(),
+        title: "Test".to_string(),
+        active: true,
+        index: 0,
+        updated_at: 123_456_789,
+    }
+})]
+#[case::close_tab(CrdtOperation::CloseTab {
+    id: "test-tab".to_string(),
+    closed_at: 123_456_789,
+})]
+#[case::set_active(CrdtOperation::SetActive {
+    id: "test-tab".to_string(),
+    active: true,
+    updated_at: 123_456_789,
+})]
+#[case::move_tab(CrdtOperation::MoveTab {
+    id: "test-tab".to_string(),
+    window_id: "window-2".to_string(),
+    index: 1,
+    updated_at: 123_456_789,
+})]
+#[case::change_url(CrdtOperation::ChangeUrl {
+    id: "test-tab".to_string(),
+    url: "https://updated.com".to_string(),
+    title: Some("Updated".to_string()),
+    updated_at: 123_456_789,
+})]
+#[case::track_window(CrdtOperation::TrackWindow {
+    id: "window-1".to_string(),
+    tracked: true,
+    updated_at: 123_456_789,
+})]
+#[case::untrack_window(CrdtOperation::UntrackWindow {
+    id: "window-1".to_string(),
+    updated_at: 123_456_789,
+})]
+#[case::set_window_focus(CrdtOperation::SetWindowFocus {
+    id: "window-1".to_string(),
+    focused: true,
+    updated_at: 123_456_789,
+})]
+#[tokio::test]
+async fn test_all_crdt_operation_types_storage(#[case] operation: CrdtOperation) {
+    // This test validates that all 8 CRDT operation types can be stored
+    // and demonstrates rstest parameterized testing across all operation types
+    let repo = MockOperationRepository::new();
+
+    // Store the operation - this should always succeed for valid operations
+    let result = repo.store(&operation, 1, "test-device").await;
+    assert!(result.is_ok(), "Failed to store operation: {operation:?}");
+
+    // Basic validation - the operation was stored without error
+    // Note: We don't test retrieval here as MockOperationRepository
+    // may have different behavior, but rstest ensures all 8 operation types are tested
 }
 
 #[tokio::test]
