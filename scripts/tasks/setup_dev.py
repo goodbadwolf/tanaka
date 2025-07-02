@@ -265,6 +265,23 @@ class SqlxInstaller(DependencyInstaller):
             return False
 
 
+class TarpaulinInstaller(DependencyInstaller):
+    """Handles cargo-tarpaulin installation for code coverage"""
+
+    def install(self) -> bool:
+        if not self.check_command("cargo"):
+            logger.error("Rust/Cargo is required to install cargo-tarpaulin")
+            return False
+
+        logger.info("Installing cargo-tarpaulin...")
+        try:
+            self.run_command(["cargo", "install", "cargo-tarpaulin"])
+            return True
+        except Exception as e:
+            logger.error(f"Failed to install cargo-tarpaulin: {e}")
+            return False
+
+
 class FirefoxInstaller(DependencyInstaller):
     """Handles Firefox installation check"""
 
@@ -563,6 +580,7 @@ class SetupManager:
         "node": "dev",
         "pnpm": "dev",
         "sqlx": "dev",
+        "tarpaulin": "dev",
         "uv": "dev",
         "python": "dev",
         "venv": "env",
@@ -600,6 +618,7 @@ class SetupManager:
             "node": NodeInstaller(self.os_type, self.dry_run),
             "pnpm": PnpmInstaller(self.os_type, self.dry_run),
             "sqlx": SqlxInstaller(self.os_type, self.dry_run),
+            "tarpaulin": TarpaulinInstaller(self.os_type, self.dry_run),
             "sqlite": SqliteChecker(self.os_type, self.dry_run),
             "firefox": FirefoxInstaller(self.os_type, self.dry_run),
             "uv": UvInstaller(self.os_type, self.dry_run),
@@ -618,6 +637,7 @@ class SetupManager:
             "node": Dependency(name="node", depends_on=[], check_cmd="node"),
             "pnpm": Dependency(name="pnpm", depends_on=["node"], check_cmd="pnpm"),
             "sqlx": Dependency(name="sqlx", depends_on=["rust"], check_cmd="sqlx"),
+            "tarpaulin": Dependency(name="tarpaulin", depends_on=["rust"], check_cmd="cargo-tarpaulin"),
             "firefox": Dependency(name="firefox", check_cmd="firefox"),
             "sqlite": Dependency(name="sqlite", check_cmd="sqlite3"),
             "uv": Dependency(name="uv", check_cmd="uv"),
