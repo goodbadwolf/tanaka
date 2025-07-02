@@ -1,5 +1,5 @@
 import { JSX } from 'preact';
-import { useState, useEffect } from 'preact/hooks';
+import { useState, useEffect, useCallback, useMemo } from 'preact/hooks';
 import * as styles from './Input.module.css';
 
 export interface InputProps {
@@ -73,40 +73,51 @@ export function Input({
     }
   }, [validate, value, touched]);
 
-  const handleChange = (e: JSX.TargetedEvent<HTMLInputElement>) => {
-    const newValue = (e.target as HTMLInputElement).value;
+  const handleChange = useCallback(
+    (e: JSX.TargetedEvent<HTMLInputElement>) => {
+      const newValue = (e.target as HTMLInputElement).value;
 
-    if (controlledValue === undefined) {
-      setInternalValue(newValue);
-    }
+      if (controlledValue === undefined) {
+        setInternalValue(newValue);
+      }
 
-    if (validate && touched) {
-      setValidationError(validate(newValue));
-    }
+      if (validate && touched) {
+        setValidationError(validate(newValue));
+      }
 
-    onChange?.(newValue);
-  };
+      onChange?.(newValue);
+    },
+    [controlledValue, onChange, validate, touched]
+  );
 
-  const handleBlur = (e: JSX.TargetedFocusEvent<HTMLInputElement>) => {
-    setTouched(true);
+  const handleBlur = useCallback(
+    (e: JSX.TargetedFocusEvent<HTMLInputElement>) => {
+      setTouched(true);
 
-    if (validate && value) {
-      setValidationError(validate(value));
-    }
+      if (validate && value) {
+        setValidationError(validate(value));
+      }
 
-    onBlur?.(e);
-  };
+      onBlur?.(e);
+    },
+    [onBlur, validate, value]
+  );
 
-  const containerClasses = [styles.container, fullWidth && styles.fullWidth, className]
-    .filter(Boolean)
-    .join(' ');
+  const containerClasses = useMemo(
+    () => [styles.container, fullWidth && styles.fullWidth, className].filter(Boolean).join(' '),
+    [fullWidth, className]
+  );
 
-  const inputClasses = [styles.input, styles[size], hasError && styles.error, inputClassName]
-    .filter(Boolean)
-    .join(' ');
+  const inputClasses = useMemo(
+    () => [styles.input, styles[size], hasError && styles.error, inputClassName].filter(Boolean).join(' '),
+    [size, hasError, inputClassName]
+  );
 
-  const inputId =
-    id || (label ? `input-${name || Math.random().toString(36).substr(2, 9)}` : undefined);
+  const inputId = useMemo(
+    () => id || (label ? `input-${name || Math.random().toString(36).substr(2, 9)}` : undefined),
+    [id, label, name]
+  );
+
   const errorId = hasError && errorMessage ? `${inputId}-error` : undefined;
   const helperId = helperText ? `${inputId}-helper` : undefined;
 
