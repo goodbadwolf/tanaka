@@ -85,13 +85,26 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-cargo-
 
+      - name: Install cargo-tarpaulin
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-tarpaulin
+
       - name: Install dependencies
         run: cd server && cargo fetch
 
-      - name: Run server tests
+      - name: Run server tests with coverage
         run: |
           cd server
-          cargo test --verbose
+          cargo tarpaulin --workspace --all-features --timeout 120 --skip-clean --out Xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        if: always() # Upload coverage even if tests fail
+        with:
+          file: ./server/cobertura.xml
+          flags: server
+          name: server-coverage
 
   test-extension:
     runs-on: ubuntu-latest
@@ -125,3 +138,56 @@ jobs:
           file: ./extension/coverage/lcov.info
           flags: extension
           name: extension-coverage
+
+  coverage-check:
+    runs-on: ubuntu-latest
+    needs: [test-server, test-extension]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.11.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "pnpm"
+          cache-dependency-path: extension/pnpm-lock.yaml
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            server/target
+            extension/node_modules
+          key: ${{ runner.os }}-coverage-${{ hashFiles('**/Cargo.lock', '**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-coverage-
+
+      - name: Install Python dependencies
+        run: |
+          pip install uv
+          uv sync --dev
+
+      - name: Install cargo-tarpaulin
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-tarpaulin
+
+      - name: Install extension dependencies
+        run: |
+          cd extension
+          pnpm install --frozen-lockfile --prefer-offline
+
+      - name: Check coverage thresholds
+        run: |
+          uv run scripts/tanaka.py coverage
