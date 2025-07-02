@@ -107,6 +107,11 @@ jobs:
       - name: Install dependencies
         run: cd server && cargo fetch
 
+      - name: Build server with sccache
+        run: |
+          cd server
+          cargo build --workspace
+
       - name: Run server tests with coverage
         run: |
           cd server
