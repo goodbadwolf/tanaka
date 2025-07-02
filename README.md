@@ -19,7 +19,7 @@ Tanaka keeps your Firefox browsing **entangled** across every computer you use. 
 
 ## ✨ Key Features
 
-- **Live mirroring** - Changes sync across devices in real-time (5s intervals)
+- **Live mirroring** - Changes sync across devices in real-time (adaptive 1-10s intervals)
 - **Selective tracking** - Choose which windows to sync
 - **Conflict-free** - CRDT technology ensures consistent state
 - **Privacy-focused** - Self-hosted, your data stays yours
