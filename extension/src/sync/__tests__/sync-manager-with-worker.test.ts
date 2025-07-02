@@ -89,12 +89,6 @@ describe('SyncManagerWithWorker', () => {
     jest.clearAllMocks();
     jest.useFakeTimers();
 
-    // Mock global timer functions that Jest fake timers don't provide
-    global.clearTimeout = jest.fn();
-    global.clearInterval = jest.fn();
-    global.setTimeout = jest.fn(() => 1) as unknown as typeof setTimeout;
-    global.setInterval = jest.fn(() => 1) as unknown as typeof setInterval;
-
     mockWorkerClient.initialize.mockResolvedValue(undefined);
     mockWorkerClient.queueOperation.mockResolvedValue({ priority: 1, dedupKey: 'test' });
     mockWorkerClient.deduplicateOperations.mockResolvedValue([]);
@@ -282,25 +276,64 @@ describe('SyncManagerWithWorker', () => {
       expect(mockWorkerClient.deduplicateOperations).toHaveBeenCalled();
     });
 
-    it.skip('should use error backoff on sync failures', async () => {
+    it('should use error backoff on sync failures', async () => {
+      // Start the sync manager first
+      await syncManager.start();
+
+      // Stop the sync manager to clear the regular timer, but keep the worker running
+      // @ts-expect-error - accessing private property for testing
+      if (syncManager.syncTimer) {
+        clearTimeout(syncManager.syncTimer);
+        // @ts-expect-error - accessing private property for testing
+        syncManager.syncTimer = null;
+      }
+
+      // Clear mock counts after start
+      mockWorkerClient.deduplicateOperations.mockClear();
+      mockAPI.sync.mockClear();
+
       // Mock first call to fail, second to succeed
       (mockAPI.sync as jest.Mock)
         .mockResolvedValueOnce({ success: false, error: ExtensionError.NetworkFailure })
         .mockResolvedValueOnce({ success: true, data: { clock: 1n, operations: [] } });
 
-      // First sync should fail
-      await syncManager.syncNow();
+      // Set up operations to sync
+      mockWorkerClient.deduplicateOperations.mockResolvedValue([
+        {
+          type: 'set_active',
+          id: '123',
+          active: true,
+          updated_at: 123456789n,
+        },
+      ]);
+
+      // Queue an operation which triggers a batched sync with HIGH priority (200ms delay)
+      await syncManager.queueTabActive('123', true);
+
+      // The batched sync is scheduled for 200ms later
+      // Use advanceTimersToNextTimer to run exactly one timer
+      await jest.advanceTimersToNextTimerAsync();
+
+      // First sync should have failed
       expect(mockWorkerClient.deduplicateOperations).toHaveBeenCalledTimes(1);
+      expect(mockAPI.sync).toHaveBeenCalledTimes(1);
 
-      // Advance timers and run all pending timers
-      jest.advanceTimersByTime(5000);
-      jest.runAllTimers();
+      // Verify error count was incremented
+      // @ts-expect-error - accessing private property for testing
+      expect(syncManager.consecutiveErrors).toBe(1);
 
-      // Allow promises to resolve
-      await Promise.resolve();
+      // After the failed sync, scheduleSyncCheck should have been called
+      // which sets a new timer with error backoff (5000ms)
+      // Use advanceTimersToNextTimer to run exactly one timer
+      await jest.advanceTimersToNextTimerAsync();
 
-      // Second sync should happen automatically due to timer
+      // Second sync should have happened automatically
       expect(mockWorkerClient.deduplicateOperations).toHaveBeenCalledTimes(2);
+      expect(mockAPI.sync).toHaveBeenCalledTimes(2);
+
+      // Verify error count was reset after successful sync
+      // @ts-expect-error - accessing private property for testing
+      expect(syncManager.consecutiveErrors).toBe(0);
     });
   });
 
@@ -692,29 +725,24 @@ describe('SyncManagerWithWorker', () => {
       const clearTimeoutSpy = jest.spyOn(global, 'clearTimeout');
       const setTimeoutSpy = jest.spyOn(global, 'setTimeout');
 
-      // Mock timer returns
-      (global.setTimeout as jest.Mock).mockReturnValueOnce(111).mockReturnValueOnce(222);
-
       // Queue a low priority operation
       mockWorkerClient.queueOperation.mockResolvedValueOnce({ priority: 3, dedupKey: 'low' });
       await syncManager.queueTabUrlChange('123', 'https://example.com', 'Example');
 
       expect(setTimeoutSpy).toHaveBeenCalledWith(expect.any(Function), 1000); // LOW priority delay
+      const lowPriorityTimerCalls = clearTimeoutSpy.mock.calls.length;
 
       // Queue a high priority operation before low priority fires
       mockWorkerClient.queueOperation.mockResolvedValueOnce({ priority: 1, dedupKey: 'high' });
       await syncManager.queueTabUpsert('456', '789', 'https://test.com', 'Test', true, 0);
 
-      // Should clear the low priority timer and set a new high priority timer
-      expect(clearTimeoutSpy).toHaveBeenCalledWith(111);
+      // Should have cleared a timer (the low priority one) and set a new high priority timer
+      expect(clearTimeoutSpy.mock.calls.length).toBeGreaterThan(lowPriorityTimerCalls);
       expect(setTimeoutSpy).toHaveBeenCalledWith(expect.any(Function), 200); // HIGH priority delay
     });
 
     it('should skip batched sync if same or lower priority already pending', async () => {
       const setTimeoutSpy = jest.spyOn(global, 'setTimeout');
-
-      // Mock timer return
-      (global.setTimeout as jest.Mock).mockReturnValue(333);
 
       // Queue a high priority operation
       mockWorkerClient.queueOperation.mockResolvedValueOnce({ priority: 1, dedupKey: 'high' });
@@ -736,24 +764,15 @@ describe('SyncManagerWithWorker', () => {
       // @ts-expect-error - accessing private property for testing
       syncManager.syncTimer = 123; // Set a fake timer ID
 
-      // Mock timer return
-      let timerCallback: (() => void) | null = null;
-      (global.setTimeout as jest.Mock).mockImplementation((fn: () => void, delay: number) => {
-        if (delay === 50) {
-          // CRITICAL priority delay
-          timerCallback = fn;
-        }
-        return 444;
-      });
-
       // Queue a critical priority operation
       mockWorkerClient.queueOperation.mockResolvedValueOnce({ priority: 0, dedupKey: 'critical' });
       await syncManager.queueTabClose('123');
 
-      // Execute the timer callback manually
-      if (timerCallback) {
-        timerCallback();
-      }
+      // The critical priority has a 50ms delay
+      jest.advanceTimersByTime(50);
+
+      // Process the batch timer
+      await jest.runOnlyPendingTimersAsync();
 
       // Should have cleared the regular sync timer
       expect(clearTimeoutSpy).toHaveBeenCalledWith(123);
