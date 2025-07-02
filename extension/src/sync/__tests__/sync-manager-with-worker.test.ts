@@ -309,7 +309,7 @@ describe('SyncManagerWithWorker', () => {
       await syncManager.start();
     });
 
-    it.skip('should apply remote upsert_tab operations', async () => {
+    it('should apply remote upsert_tab operations', async () => {
       const response: SyncResponse = {
         clock: 1n,
         operations: [
