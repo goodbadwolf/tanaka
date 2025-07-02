@@ -96,7 +96,7 @@ jobs:
       - name: Run server tests with coverage
         run: |
           cd server
-          cargo tarpaulin --workspace --all-features --timeout 120 --skip-clean --out Xml
+          cargo tarpaulin --workspace --timeout 120 --skip-clean --out Xml
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4

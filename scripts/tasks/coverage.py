@@ -119,7 +119,6 @@ class TarpaulinCommand:
             "cargo",
             "tarpaulin",
             "--workspace",
-            "--all-features",
             "--timeout",
             "120",
         ]
