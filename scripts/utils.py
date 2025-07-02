@@ -6,10 +6,12 @@ import subprocess
 import sys
 import threading
 from pathlib import Path
-from typing import IO, TextIO
+from typing import IO, TextIO, TypeVar
 
 sys.path.insert(0, str(Path(__file__).parent))
 from logger import logger
+
+T = TypeVar("T")
 
 
 def clean_terminal_output(text: str) -> str:
@@ -272,3 +274,61 @@ def find_project_root(marker: str = ".git") -> Path | None:
             return parent
 
     return None
+
+
+class SetOnce[T]:
+    """A value that can only be set once, with an associated reason.
+
+    Useful for tracking why a decision was made, where multiple conditions
+    might trigger the same outcome but we only care about the first one.
+    """
+
+    def __init__(self, initial: T | None = None, reason: str = ""):
+        """Initialize the value.
+
+        Args:
+            initial: Initial value (default: None)
+            reason: Initial reason if initial is not None (default: "")
+        """
+        self._value: T | None = initial
+        self._reason = reason if initial is not None else ""
+        self._is_set = initial is not None
+
+    def set(self, value: T, reason: str) -> None:
+        """Set the value with a reason. Only works if not already set.
+
+        Args:
+            value: The value to set
+            reason: The reason for setting the value
+        """
+        if not self._is_set:
+            self._value = value
+            self._reason = reason
+            self._is_set = True
+
+    @property
+    def value(self) -> T | None:
+        """Get the stored value."""
+        return self._value
+
+    @property
+    def reason(self) -> str:
+        """Get the reason why the value was set."""
+        return self._reason
+
+    @property
+    def is_set(self) -> bool:
+        """Check if the value has been set."""
+        return self._is_set
+
+    def __bool__(self) -> bool:
+        """Return True if value is set and truthy."""
+        return self._is_set and bool(self._value)
+
+    def __str__(self) -> str:
+        """Return the reason as string representation."""
+        return self._reason
+
+    def __repr__(self) -> str:
+        """Return detailed representation for debugging."""
+        return f"SetOnce(value={self._value!r}, reason={self._reason!r}, is_set={self._is_set})"
