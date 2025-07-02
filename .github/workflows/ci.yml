@@ -132,6 +132,7 @@ jobs:
           file: ./server/lcov.info
           flags: server
           name: server-coverage
+          directory: ./server
 
   test-extension:
     runs-on: ubuntu-latest
@@ -166,3 +167,4 @@ jobs:
           file: ./extension/coverage/lcov.info
           flags: extension
           name: extension-coverage
+          directory: ./extension
