@@ -1,24 +1,13 @@
-"""Setup development environment task"""
-
 import argparse
 import os
 import platform
 import subprocess
 import sys
+import tomllib
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-
-try:
-    import tomli
-    import tomli_w
-
-    HAS_TOML = True
-except ImportError:
-    HAS_TOML = False
-    tomli = None  # type: ignore
-    tomli_w = None  # type: ignore
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from constants import EXIT_FAILURE, EXIT_SIGINT, EXIT_SUCCESS
@@ -31,8 +20,6 @@ from .core import TaskResult
 
 @dataclass
 class Dependency:
-    """Represents a dependency with its installation info"""
-
     name: str
     depends_on: list[str] = field(default_factory=list)
     installer: Callable | None = None
@@ -41,21 +28,16 @@ class Dependency:
 
 
 class OSType(Enum):
-    """Supported operating systems"""
-
     LINUX = "Linux"
     MACOS = "macOS"
 
 
 class DependencyInstaller:
-    """Base class for dependency installers"""
-
     def __init__(self, os_type: OSType, dry_run: bool = False):
         self.os_type = os_type
         self.dry_run = dry_run
 
     def check_command(self, cmd: str) -> bool:
-        """Check if a command exists"""
         return check_command(cmd)
 
     def run_command(
@@ -65,7 +47,6 @@ class DependencyInstaller:
         check: bool = True,
         capture: bool = True,
     ) -> subprocess.CompletedProcess:
-        """Run a shell command"""
         if isinstance(cmd, list):
             logger.debug(f"Running: {' '.join(cmd)}")
         else:
@@ -76,9 +57,7 @@ class DependencyInstaller:
             logger.info(f"[DRY RUN] Would execute: {cmd_str}")
             return subprocess.CompletedProcess(args=cmd, returncode=0, stdout="", stderr="")
 
-        # Special handling for shell commands
         if shell and isinstance(cmd, str):
-            # Shell commands need to be run with subprocess directly
             try:
                 return subprocess.run(
                     cmd,
@@ -95,11 +74,9 @@ class DependencyInstaller:
                     logger.debug(f"stderr: {e.stderr}")
                 raise
         else:
-            # Use shared utility for non-shell commands
             return run_cmd(cmd, check=check)
 
     def get_version(self, cmd: str, version_flag: str = "--version") -> str:
-        """Get version of installed dependency"""
         try:
             result = self.run_command([cmd, version_flag])
             return result.stdout.strip().split("\n")[0]
@@ -108,8 +85,6 @@ class DependencyInstaller:
 
 
 class RustInstaller(DependencyInstaller):
-    """Handles Rust installation"""
-
     def install(self) -> bool:
         if self.check_command("rustc"):
             version = self.get_version("rustc")
@@ -133,8 +108,6 @@ class RustInstaller(DependencyInstaller):
 
 
 class NodeInstaller(DependencyInstaller):
-    """Handles Node.js installation via nvm"""
-
     NVM_VERSION = "v0.40.3"
 
     def install(self) -> bool:
@@ -148,7 +121,6 @@ class NodeInstaller(DependencyInstaller):
         return self._install_node()
 
     def _install_nvm(self) -> bool:
-        """Install nvm"""
         logger.info("Installing nvm...")
         try:
             nvm_url = f"https://raw.githubusercontent.com/nvm-sh/nvm/{self.NVM_VERSION}/install.sh"
@@ -160,7 +132,6 @@ class NodeInstaller(DependencyInstaller):
             return False
 
     def _install_node(self) -> bool:
-        """Install Node.js using nvm"""
         logger.info("Installing Node.js 24...")
         try:
             nvm_init = 'export NVM_DIR="$HOME/.nvm"'
@@ -174,8 +145,6 @@ class NodeInstaller(DependencyInstaller):
 
 
 class PnpmInstaller(DependencyInstaller):
-    """Handles pnpm installation"""
-
     def install(self) -> bool:
         if not self.check_command("npm"):
             nvm_cmd = (
@@ -197,8 +166,6 @@ class PnpmInstaller(DependencyInstaller):
 
 
 class UvInstaller(DependencyInstaller):
-    """Handles uv installation"""
-
     def install(self) -> bool:
         if self.check_command("uv"):
             version = self.get_version("uv")
@@ -221,8 +188,6 @@ class UvInstaller(DependencyInstaller):
 
 
 class VenvInstaller(DependencyInstaller):
-    """Handles virtual environment setup"""
-
     def install(self) -> bool:
         venv_path = os.path.join(os.getcwd(), ".venv")
 
@@ -250,8 +215,6 @@ class VenvInstaller(DependencyInstaller):
 
 
 class SqlxInstaller(DependencyInstaller):
-    """Handles SQLx CLI installation"""
-
     def install(self) -> bool:
         if not self.check_command("cargo"):
             logger.error("Rust/Cargo is required to install SQLx CLI")
@@ -276,8 +239,6 @@ class SqlxInstaller(DependencyInstaller):
 
 
 class TestingToolsInstaller(DependencyInstaller):
-    """Handles Rust testing tools installation (nextest, llvm-cov)"""
-
     def install(self) -> bool:
         if not self.check_command("cargo"):
             logger.error("Rust/Cargo is required to install testing tools")
@@ -285,11 +246,9 @@ class TestingToolsInstaller(DependencyInstaller):
 
         logger.info("Installing enhanced testing tools...")
         try:
-            # Install cargo-nextest for faster test execution
             logger.info("Installing cargo-nextest...")
             self.run_command(["cargo", "install", "cargo-nextest", "--locked"])
 
-            # Install cargo-llvm-cov for better coverage
             logger.info("Installing cargo-llvm-cov...")
             self.run_command(["cargo", "install", "cargo-llvm-cov", "--locked"])
 
@@ -300,8 +259,6 @@ class TestingToolsInstaller(DependencyInstaller):
 
 
 class SccacheInstaller(DependencyInstaller):
-    """Handles sccache installation for faster Rust compilation"""
-
     def install(self) -> bool:
         if not self.check_command("cargo"):
             logger.error("Rust/Cargo is required to install sccache")
@@ -311,38 +268,28 @@ class SccacheInstaller(DependencyInstaller):
         try:
             self.run_command(["cargo", "install", "sccache"])
 
-            # Set up sccache in server's cargo config
             logger.info("Configuring server project to use sccache...")
 
-            # Find project root (where .git directory is)
             project_root = find_project_root()
             if not project_root:
                 logger.warning("Could not find project root, using current directory")
                 project_root = Path.cwd()
 
-            # Create .cargo directory in server directory if it doesn't exist
             server_cargo_dir = project_root / "server" / ".cargo"
             server_cargo_dir.mkdir(parents=True, exist_ok=True)
 
             config_path = server_cargo_dir / "config.toml"
 
-            # Check if TOML libraries are available
-            if not HAS_TOML:
-                logger.error("TOML libraries not available. Please install tomli and tomli-w")
-                return False
-
-            # Load existing config or create new one
             if config_path.exists():
                 config_content = config_path.read_text()
                 try:
-                    config = tomli.loads(config_content)
+                    config = tomllib.loads(config_content)
                 except Exception as e:
                     logger.error(f"Failed to parse existing config.toml: {e}")
                     return False
             else:
                 config = {}
 
-            # Add or update sccache configuration
             if "build" not in config:
                 config["build"] = {}
 
@@ -350,7 +297,7 @@ class SccacheInstaller(DependencyInstaller):
                 logger.info("sccache already configured in cargo config")
             else:
                 config["build"]["rustc-wrapper"] = "sccache"
-                config_path.write_text(tomli_w.dumps(config))
+                self._write_toml(config, config_path)
                 logger.success(f"Added sccache configuration to {config_path}")
 
             return True
@@ -358,10 +305,21 @@ class SccacheInstaller(DependencyInstaller):
             logger.error(f"Failed to install sccache: {e}")
             return False
 
+    def _write_toml(self, config: dict, config_path: Path) -> None:
+        """Poor man's TOML writer.
+        It is severly limited, but it is enough for our use case, which is that it does not use any external libraries.
+        """
+        with open(config_path, "w") as f:
+            top_level_keys = config.keys()
+            for key in top_level_keys:
+                f.write(f"[{key}]\n")
+                if isinstance(config[key], dict):
+                    for sub_key, sub_value in config[key].items():
+                        f.write(f"{sub_key} = {sub_value}\n")
+                    f.write("\n")
+
 
 class FirefoxInstaller(DependencyInstaller):
-    """Handles Firefox installation check"""
-
     def install(self) -> bool:
         if self.check_command("firefox") or os.path.exists("/Applications/Firefox.app"):
             logger.success("Firefox is already installed")
@@ -388,8 +346,6 @@ class FirefoxInstaller(DependencyInstaller):
 
 
 class SqliteChecker(DependencyInstaller):
-    """Checks SQLite installation"""
-
     def install(self) -> bool:
         if self.check_command("sqlite3"):
             version = self.get_version("sqlite3")
@@ -407,8 +363,6 @@ class SqliteChecker(DependencyInstaller):
 
 
 class ShellcheckInstaller(DependencyInstaller):
-    """Handles shellcheck installation"""
-
     def install(self) -> bool:
         if self.check_command("shellcheck"):
             version = self.get_version("shellcheck")
@@ -445,8 +399,6 @@ class ShellcheckInstaller(DependencyInstaller):
 
 
 class ShfmtInstaller(DependencyInstaller):
-    """Handles shfmt installation"""
-
     def install(self) -> bool:
         if self.check_command("shfmt"):
             version = self.get_version("shfmt")
@@ -481,8 +433,6 @@ class ShfmtInstaller(DependencyInstaller):
 
 
 class PodmanInstaller(DependencyInstaller):
-    """Handles Podman installation"""
-
     def install(self) -> bool:
         if self.check_command("podman"):
             version = self.get_version("podman")
@@ -520,7 +470,6 @@ class PodmanInstaller(DependencyInstaller):
             return False
 
     def _init_podman_machine(self) -> None:
-        """Initialize podman machine on macOS"""
         if self.os_type != OSType.MACOS:
             return
 
@@ -538,8 +487,6 @@ class PodmanInstaller(DependencyInstaller):
 
 
 class ActInstaller(DependencyInstaller):
-    """Handles act installation for GitHub Actions testing"""
-
     def install(self) -> bool:
         if self.check_command("act"):
             version = self.get_version("act")
@@ -568,7 +515,6 @@ class ActInstaller(DependencyInstaller):
             return False
 
     def _create_actrc(self) -> None:
-        """Create .actrc configuration for Podman"""
         actrc_path = os.path.expanduser("~/.actrc")
 
         if os.path.exists(actrc_path):
@@ -603,17 +549,13 @@ class ActInstaller(DependencyInstaller):
 
 
 class PythonInstaller(DependencyInstaller):
-    """Handles Python installation using uv"""
-
     REQUIRED_VERSION = "3.12"
 
     def install(self) -> bool:
-        # First check if uv is available
         if not self.check_command("uv"):
             logger.error("uv is required to install Python. Please install uv first.")
             return False
 
-        # Check if the required Python version is already installed via uv
         try:
             result = self.run_command(["uv", "python", "list"])
             if result.stdout and f"cpython-{self.REQUIRED_VERSION}" in result.stdout:
@@ -622,7 +564,6 @@ class PythonInstaller(DependencyInstaller):
         except Exception:
             pass
 
-        # Install Python using uv
         logger.info(f"Installing Python {self.REQUIRED_VERSION} using uv...")
         try:
             self.run_command(["uv", "python", "install", self.REQUIRED_VERSION])
@@ -631,7 +572,6 @@ class PythonInstaller(DependencyInstaller):
         except Exception as e:
             logger.error(f"Failed to install Python {self.REQUIRED_VERSION}: {e}")
 
-            # Fallback to system Python check
             for cmd in ["python3", "python"]:
                 if self.check_command(cmd):
                     version = self.get_version(cmd)
@@ -649,9 +589,6 @@ class PythonInstaller(DependencyInstaller):
 
 
 class SetupManager:
-    """Manages dependency installation"""
-
-    # Single source of truth for dependency names and categories
     DEPENDENCY_NAMES = {
         "rust": "dev",
         "node": "dev",
@@ -679,7 +616,6 @@ class SetupManager:
         self.failed: set[str] = set()
 
     def _detect_os(self) -> OSType:
-        """Detect operating system"""
         system = platform.system()
         if system == "Linux":
             return OSType.LINUX
@@ -690,7 +626,6 @@ class SetupManager:
             sys.exit(1)
 
     def _create_installers(self) -> dict[str, DependencyInstaller]:
-        """Create installer instances"""
         return {
             "rust": RustInstaller(self.os_type, self.dry_run),
             "node": NodeInstaller(self.os_type, self.dry_run),
@@ -710,7 +645,6 @@ class SetupManager:
         }
 
     def _create_dependencies(self) -> dict[str, Dependency]:
-        """Create dependency definitions"""
         return {
             "rust": Dependency(name="rust", check_cmd="rustc"),
             "node": Dependency(name="node", depends_on=[], check_cmd="node"),
@@ -730,7 +664,6 @@ class SetupManager:
         }
 
     def resolve_dependencies(self, requested: set[str]) -> list[str]:
-        """Resolve dependencies in correct order"""
         resolved = []
         visited = set()
 
@@ -751,7 +684,6 @@ class SetupManager:
         return resolved
 
     def install_dependency(self, name: str) -> bool:
-        """Install a single dependency"""
         installer = self.installers.get(name)
         if not installer:
             logger.error(f"No installer for {name}")
@@ -771,7 +703,6 @@ class SetupManager:
             return False
 
     def setup(self, requested: set[str]) -> None:
-        """Run the setup process"""
         logger.info(f"Detected OS: {self.os_type.value}")
         if self.dry_run:
             logger.info("Running in DRY RUN mode - no changes will be made")
@@ -785,7 +716,6 @@ class SetupManager:
         self.print_summary(requested)
 
     def print_summary(self, requested: set[str]) -> None:
-        """Print installation summary"""
         print()
         if self.dry_run:
             logger.info("Dry run complete! (no changes were made)")
@@ -793,7 +723,6 @@ class SetupManager:
             logger.info("Setup complete!")
         print()
 
-        # Group dependencies by category
         dev_deps = [name for name, cat in self.DEPENDENCY_NAMES.items() if cat == "dev"]
         env_deps = [name for name, cat in self.DEPENDENCY_NAMES.items() if cat == "env"]
         sys_deps = [name for name, cat in self.DEPENDENCY_NAMES.items() if cat == "sys"]
@@ -809,7 +738,6 @@ class SetupManager:
         print("  3. See docs/DEV.md for development instructions")
 
     def _print_group(self, title: str, deps: list[str], requested: set[str]) -> None:
-        """Print a group of dependencies"""
         print(f"\n{title}")
         for dep in deps:
             if dep in self.installed:
@@ -823,7 +751,6 @@ class SetupManager:
 
 
 def parse_dependencies(args) -> set[str]:
-    """Parse command line arguments to determine dependencies"""
     all_deps = set(SetupManager.DEPENDENCY_NAMES.keys())
 
     if args.include:
@@ -843,8 +770,6 @@ def parse_dependencies(args) -> set[str]:
 
 
 def add_subparser(subparsers: argparse._SubParsersAction) -> None:
-    """Add the setup-dev subcommand"""
-    # Generate dependency list from single source of truth
     dep_names = ", ".join(sorted(SetupManager.DEPENDENCY_NAMES.keys()))
     parser = subparsers.add_parser(
         "setup-dev",
@@ -883,7 +808,6 @@ Available dependencies: {dep_names}
 
 
 def run(args: argparse.Namespace) -> TaskResult:
-    """Run the setup-dev command"""
     if args.debug:
         os.environ["DEBUG"] = "1"
 

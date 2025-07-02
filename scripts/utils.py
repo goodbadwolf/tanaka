@@ -11,8 +11,6 @@ from typing import IO, TextIO, TypeVar
 sys.path.insert(0, str(Path(__file__).parent))
 from logger import logger
 
-T = TypeVar("T")
-
 
 def clean_terminal_output(text: str) -> str:
     """Clean terminal control characters from text output.
@@ -276,59 +274,64 @@ def find_project_root(marker: str = ".git") -> Path | None:
     return None
 
 
-class SetOnce[T]:
+def find_extension_dir() -> Path | None:
+    """Find the extension directory
+
+    Returns:
+        Path to extension directory if found, None otherwise
+    """
+    project_root = find_project_root()
+    if not project_root:
+        return None
+    return project_root / "extension"
+
+
+def find_server_dir() -> Path | None:
+    """Find the server directory
+
+    Returns:
+        Path to server directory if found, None otherwise
+    """
+    project_root = find_project_root()
+    if not project_root:
+        return None
+    return project_root / "server"
+
+
+SetOnceType = TypeVar("SetOnceType")
+
+
+class SetOnce[SetOnceType]:
     """A value that can only be set once, with an associated reason.
 
     Useful for tracking why a decision was made, where multiple conditions
     might trigger the same outcome but we only care about the first one.
     """
 
-    def __init__(self, initial: T | None = None, reason: str = ""):
-        """Initialize the value.
+    def __init__(self):
+        self._value: SetOnceType | None = None
+        self._reason = ""
+        self._is_set = False
 
-        Args:
-            initial: Initial value (default: None)
-            reason: Initial reason if initial is not None (default: "")
-        """
-        self._value: T | None = initial
-        self._reason = reason if initial is not None else ""
-        self._is_set = initial is not None
-
-    def set(self, value: T, reason: str) -> None:
-        """Set the value with a reason. Only works if not already set.
-
-        Args:
-            value: The value to set
-            reason: The reason for setting the value
-        """
+    def set(self, value: SetOnceType, reason: str) -> None:
         if not self._is_set:
             self._value = value
             self._reason = reason
             self._is_set = True
 
-    @property
-    def value(self) -> T | None:
-        """Get the stored value."""
+    def get(self) -> SetOnceType | None:
         return self._value
 
     @property
     def reason(self) -> str:
-        """Get the reason why the value was set."""
         return self._reason
 
     @property
     def is_set(self) -> bool:
-        """Check if the value has been set."""
         return self._is_set
 
-    def __bool__(self) -> bool:
-        """Return True if value is set and truthy."""
-        return self._is_set and bool(self._value)
-
     def __str__(self) -> str:
-        """Return the reason as string representation."""
         return self._reason
 
     def __repr__(self) -> str:
-        """Return detailed representation for debugging."""
         return f"SetOnce(value={self._value!r}, reason={self._reason!r}, is_set={self._is_set})"

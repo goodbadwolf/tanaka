@@ -1,8 +1,8 @@
 # Build output
 dist/
 
-# Generated TypeScript types from Rust
-src/api/models/generated/*.ts
+# Generated icons
+icons/
 
 # Rspack
 .rspack/

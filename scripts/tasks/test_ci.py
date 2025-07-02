@@ -17,12 +17,10 @@ from .core import TaskResult
 
 
 def setup_podman_docker_host() -> str | None:
-    """Set up Docker host for Podman based on platform"""
     system = platform.system()
 
     if system == "Darwin":  # macOS
         try:
-            # Get Podman socket path on macOS
             result = run_command(
                 ["podman", "machine", "inspect", "--format", "{{.ConnectionInfo.PodmanSocket.Path}}"],
                 capture_output=True,
@@ -35,12 +33,10 @@ def setup_podman_docker_host() -> str | None:
         except subprocess.CalledProcessError:
             logger.warning("Failed to get Podman socket path")
     elif system == "Linux":
-        # On Linux, check if DOCKER_HOST is already set
         if os.environ.get("DOCKER_HOST"):
             return os.environ.get("DOCKER_HOST")
 
         try:
-            # Try to get Podman socket path on Linux
             result = run_command(
                 ["podman", "info", "--format", "{{.Host.RemoteSocket.Path}}"],
                 capture_output=True,
@@ -51,7 +47,6 @@ def setup_podman_docker_host() -> str | None:
                 logger.info(f"Docker host set to: {docker_host}")
                 return docker_host
         except subprocess.CalledProcessError:
-            # Try common Linux socket location
             xdg_runtime = os.environ.get("XDG_RUNTIME_DIR", f"/run/user/{os.getuid()}")
             socket_path = f"{xdg_runtime}/podman/podman.sock"
             if os.path.exists(socket_path):
@@ -64,18 +59,6 @@ def setup_podman_docker_host() -> str | None:
 
 
 def start_podman_machine(env: dict[str, str], timeout: int = 60) -> bool:
-    """Start Podman machine and wait for it to be ready
-
-    If no machine exists, initializes a new one first.
-
-    Args:
-        env: Environment variables to use
-        timeout: Maximum seconds to wait for machine to start
-
-    Returns:
-        True if machine started successfully, False otherwise
-    """
-    # First check if any machine exists
     try:
         result = run_command(
             ["podman", "machine", "list", "--format", "{{.Name}}"],
@@ -85,7 +68,6 @@ def start_podman_machine(env: dict[str, str], timeout: int = 60) -> bool:
         machines = result.stdout.strip().split("\n") if result.stdout.strip() else []
 
         if not machines or machines == [""]:
-            # No machine exists, need to initialize one
             logger.info("No Podman machine found. Initializing a new machine...")
             try:
                 run_command(["podman", "machine", "init"], env=env)
@@ -94,28 +76,23 @@ def start_podman_machine(env: dict[str, str], timeout: int = 60) -> bool:
                 logger.error(f"Failed to initialize Podman machine: {e}")
                 return False
     except subprocess.CalledProcessError:
-        # If list fails, try to init anyway
         logger.warning("Failed to list machines, attempting to initialize...")
         try:
             run_command(["podman", "machine", "init"], env=env)
         except subprocess.CalledProcessError:
-            # Might already exist, continue to start
             pass
 
     logger.info("Starting Podman machine...")
 
     try:
-        # Start the machine
         run_command(["podman", "machine", "start"], env=env)
     except subprocess.CalledProcessError as e:
         logger.error(f"Failed to start Podman machine: {e}")
         return False
 
-    # Wait for machine to be ready
     start_time = time.time()
     while time.time() - start_time < timeout:
         try:
-            # Check if machine is running
             result = run_command(
                 ["podman", "machine", "list", "--format", "{{.Running}}"],
                 env=env,
@@ -127,7 +104,6 @@ def start_podman_machine(env: dict[str, str], timeout: int = 60) -> bool:
         except subprocess.CalledProcessError:
             pass
 
-        # Wait a bit before checking again
         time.sleep(2)
 
     logger.error(f"Podman machine failed to start within {timeout} seconds")
@@ -135,12 +111,6 @@ def start_podman_machine(env: dict[str, str], timeout: int = 60) -> bool:
 
 
 def check_prerequisites(auto_start: bool = True, timeout: int = 60) -> tuple[TaskResult, dict[str, str]]:
-    """Check if act and podman are installed, return result and environment
-
-    Args:
-        auto_start: Whether to automatically start Podman machine if not running
-        timeout: Maximum seconds to wait for Podman machine to start
-    """
     logger.info("Checking prerequisites...")
 
     missing = []
@@ -156,16 +126,13 @@ def check_prerequisites(auto_start: bool = True, timeout: int = 60) -> tuple[Tas
         message += "Run 'python3 scripts/tanaka.py setup-dev --include act podman' to install them"
         return TaskResult(success=False, message=message, exit_code=EXIT_FAILURE), {}
 
-    # Set up Docker host for Podman before running podman commands
     docker_host = setup_podman_docker_host()
     env = env_with(DOCKER_HOST=docker_host)
 
-    # Check if podman machine exists and is running
     machine_exists = False
     machine_running = False
 
     try:
-        # Check if any machines exist
         result = run_command(
             ["podman", "machine", "list", "--format", "{{.Name}}"],
             env=env,
@@ -175,7 +142,6 @@ def check_prerequisites(auto_start: bool = True, timeout: int = 60) -> tuple[Tas
         machine_exists = bool(machines and machines != [""])
 
         if machine_exists:
-            # Check if machine is running
             result = run_command(
                 ["podman", "machine", "list", "--format", "{{.Running}}"],
                 env=env,
@@ -188,14 +154,12 @@ def check_prerequisites(auto_start: bool = True, timeout: int = 60) -> tuple[Tas
 
     if not machine_exists or not machine_running:
         if auto_start:
-            # Try to start Podman machine automatically
             if not machine_exists:
                 logger.warning("No Podman machine found. Creating and starting one...")
             else:
                 logger.warning("Podman machine is not running. Attempting to start it...")
 
             if start_podman_machine(env, timeout=timeout):
-                # Update Docker host after machine starts
                 docker_host = setup_podman_docker_host()
                 env = env_with(DOCKER_HOST=docker_host)
                 return TaskResult(success=True, message="All prerequisites satisfied (Podman machine started)"), env
@@ -222,7 +186,6 @@ def check_prerequisites(auto_start: bool = True, timeout: int = 60) -> tuple[Tas
 
 
 def get_workflow_files() -> list[Path]:
-    """Get all workflow files"""
     workflows_dir = Path.cwd() / ".github" / "workflows"
     if not workflows_dir.exists():
         return []
@@ -239,7 +202,6 @@ def test_workflows(
 ) -> TaskResult:
     """Test GitHub Actions workflows locally"""
 
-    # Check prerequisites first and get configured environment
     prereq_result, env = check_prerequisites(auto_start=auto_start, timeout=timeout)
     if not prereq_result.success:
         return prereq_result
@@ -250,7 +212,6 @@ def test_workflows(
             success=False, message="No workflow files found in .github/workflows/", exit_code=EXIT_FAILURE
         )
 
-    # Filter to specific workflow if requested
     if workflow:
         workflow_path = Path(".github/workflows") / workflow
         if workflow_path not in workflows:
@@ -259,10 +220,8 @@ def test_workflows(
 
     logger.header(f"Testing {len(workflows)} workflow(s)")
 
-    # Prepare act command
     act_args = ["act"]
 
-    # Use smaller image for faster testing
     act_args.extend(["-P", "ubuntu-latest=catthehacker/ubuntu:act-latest"])
 
     # Disable socket bind mounting to avoid Podman issues
@@ -275,13 +234,11 @@ def test_workflows(
     if verbose:
         act_args.append("-v")
 
-    # Test each workflow
     failed = []
     for workflow_file in workflows:
         logger.info(f"Testing {workflow_file.name}...")
 
         try:
-            # Run act for this workflow
             cmd = act_args + ["-W", str(workflow_file)]
             run_command(cmd, env=env)
             logger.success(f"✓ {workflow_file.name} passed")
@@ -296,8 +253,6 @@ def test_workflows(
 
 
 def test_ci_main(args: argparse.Namespace) -> TaskResult:
-    """Main entry point for test-ci command"""
-
     # Skip in CI environment
     if os.environ.get("CI") == "true":
         logger.info("Skipping GitHub Actions testing in CI environment")
@@ -326,7 +281,6 @@ def test_ci_main(args: argparse.Namespace) -> TaskResult:
 
 
 def add_subparser(subparsers) -> None:
-    """Add test-ci command parser"""
     parser = subparsers.add_parser(
         "test-ci",
         help="Test GitHub Actions workflows locally using act and Podman",
@@ -354,5 +308,4 @@ def add_subparser(subparsers) -> None:
     parser.set_defaults(func=test_ci_main)
 
 
-# This is discovered by tanaka.py
 main = test_ci_main

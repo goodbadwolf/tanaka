@@ -11,14 +11,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from constants import EXIT_FAILURE, EXIT_SUCCESS
 from logger import logger
 from tasks.core import TaskResult
-from utils import check_command, run_command
+from utils import check_command, find_extension_dir, find_server_dir, run_command
 
-# Project paths
-PROJECT_ROOT = Path(__file__).parent.parent.parent
-EXTENSION_DIR = PROJECT_ROOT / "extension"
-SERVER_DIR = PROJECT_ROOT / "server"
-
-# Coverage thresholds
 DEFAULT_THRESHOLDS = {
     "extension": {"overall": 75},  # Use overall average instead of strict per-metric
     "server": {"total": 40},
@@ -27,8 +21,6 @@ DEFAULT_THRESHOLDS = {
 
 @dataclass
 class CoverageMetrics:
-    """Coverage metrics for different aspects of code."""
-
     statements: float
     branches: float
     functions: float
@@ -36,18 +28,14 @@ class CoverageMetrics:
 
     @property
     def overall(self) -> float:
-        """Calculate overall coverage as average of all metrics."""
         return sum([self.statements, self.branches, self.functions, self.lines]) / 4
 
     def asdict(self) -> dict[str, float]:
-        """Convert to dictionary."""
         return asdict(self)
 
 
 @dataclass
 class CoverageResult:
-    """Result of a coverage check."""
-
     success: bool
     metrics: CoverageMetrics | None = None
     coverage: float | None = None
@@ -55,12 +43,9 @@ class CoverageResult:
 
 
 def parse_jest_coverage(output: str) -> CoverageMetrics | None:
-    """Parse Jest coverage output and extract metrics.
-
-    Looks for a line like:
-    All files     |   87.53 |    74.74 |   84.79 |   87.31 |
-    """
     for line in output.splitlines():
+        # Looks for a line like:
+        # All files     |   87.53 |    74.74 |   84.79 |   87.31 |
         if "All files" in line and "|" in line:
             parts = [p.strip() for p in line.split("|")]
             if len(parts) >= 6:
@@ -77,11 +62,8 @@ def parse_jest_coverage(output: str) -> CoverageMetrics | None:
 
 
 def parse_llvm_cov_coverage(output: str) -> float | None:
-    """Parse cargo-llvm-cov coverage output and extract percentage.
-
-    Looks for a TOTAL line with coverage percentages.
-    The line coverage is typically the third percentage value.
-    """
+    # Looks for a TOTAL line with coverage percentages.
+    # The line coverage is typically the third percentage value.
     for line in output.splitlines():
         if line.strip().startswith("TOTAL") and "%" in line:
             try:
@@ -99,11 +81,8 @@ def parse_llvm_cov_coverage(output: str) -> float | None:
 
 
 class JestCommand:
-    """Builder for Jest coverage commands."""
-
     @staticmethod
     def build(verbose: bool = False) -> list[str]:
-        """Build Jest command with coverage options."""
         cmd = ["pnpm", "test", "--coverage", "--watchAll=false"]
         if not verbose:
             cmd.append("--silent")
@@ -111,15 +90,12 @@ class JestCommand:
 
 
 class LlvmCovCommand:
-    """Builder for cargo-llvm-cov commands."""
-
     @staticmethod
     def build(
         force_clean: bool = False,
         html: bool = False,
         verbose: bool = False,
     ) -> list[str]:
-        """Build cargo-llvm-cov command with options."""
         cmd = [
             "cargo",
             "llvm-cov",
@@ -131,9 +107,6 @@ class LlvmCovCommand:
 
         if html:
             cmd.append("--html")
-        else:
-            # Default text output shows the coverage summary
-            pass
 
         if verbose:
             cmd.append("--verbose")
@@ -142,52 +115,45 @@ class LlvmCovCommand:
 
 
 class CoverageChecker(ABC):
-    """Base class for coverage checkers."""
-
     def __init__(self, args: argparse.Namespace):
         self.args = args
 
     @abstractmethod
     def get_tool_name(self) -> str:
-        """Get the name of the coverage tool."""
+        pass
 
     @abstractmethod
     def get_tool_hint(self) -> str:
-        """Get installation hint for the tool."""
+        pass
 
     @abstractmethod
     def get_working_dir(self) -> Path:
-        """Get the working directory for running coverage."""
+        pass
 
     @abstractmethod
     def build_command(self) -> list[str]:
-        """Build the coverage command."""
+        pass
 
     @abstractmethod
     def parse_output(self, output: str) -> CoverageResult:
-        """Parse coverage output and return result."""
+        pass
 
     @abstractmethod
     def get_threshold(self) -> float:
-        """Get the coverage threshold."""
+        pass
 
     def check_tool_available(self) -> bool:
-        """Check if the coverage tool is available."""
         return check_command(self.get_tool_name())
 
     def run_coverage(self) -> CoverageResult:
-        """Run coverage check and return results."""
         logger.info(f"Checking {self.get_tool_name()} coverage...")
 
-        # Check tool availability
         if not self.check_tool_available():
             logger.error(f"{self.get_tool_name()} not found. {self.get_tool_hint()}")
             return CoverageResult(success=False)
 
-        # Build and run command
         cmd = self.build_command()
         if not cmd:
-            # Tool not installed, error already logged
             return CoverageResult(success=False)
 
         try:
@@ -196,7 +162,7 @@ class CoverageChecker(ABC):
                 cwd=self.get_working_dir(),
                 check=False,
                 capture_output=True,
-                stream_output=True,  # Show progress in real-time
+                stream_output=True,
             )
 
             if result.returncode != 0:
@@ -205,10 +171,8 @@ class CoverageChecker(ABC):
                     logger.error(result.stderr)
                 return CoverageResult(success=False)
 
-            # Parse output
             coverage_result = self.parse_output(result.stdout)
 
-            # Check threshold
             if coverage_result.metrics:
                 coverage_value = coverage_result.metrics.overall
             elif coverage_result.coverage is not None:
@@ -232,8 +196,6 @@ class CoverageChecker(ABC):
 
 
 class ExtensionCoverageChecker(CoverageChecker):
-    """Coverage checker for TypeScript extension."""
-
     def get_tool_name(self) -> str:
         return "pnpm"
 
@@ -241,7 +203,7 @@ class ExtensionCoverageChecker(CoverageChecker):
         return "Please install dependencies first."
 
     def get_working_dir(self) -> Path:
-        return EXTENSION_DIR
+        return find_extension_dir()
 
     def build_command(self) -> list[str]:
         return JestCommand.build(verbose=self.args.verbose)
@@ -251,7 +213,6 @@ class ExtensionCoverageChecker(CoverageChecker):
         if not metrics:
             return CoverageResult(success=False)
 
-        # Log coverage summary
         logger.info("Extension coverage:")
         logger.info(f"  Statements: {metrics.statements:.2f}%")
         logger.info(f"  Branches:   {metrics.branches:.2f}%")
@@ -259,10 +220,9 @@ class ExtensionCoverageChecker(CoverageChecker):
         logger.info(f"  Lines:      {metrics.lines:.2f}%")
         logger.info(f"  Overall:    {metrics.overall:.2f}%")
 
-        # HTML report path
         html_path = None
         if self.args.html:
-            html_path = EXTENSION_DIR / "coverage/lcov-report/index.html"
+            html_path = find_extension_dir() / "coverage/lcov-report/index.html"
             logger.info(f"HTML coverage report: {html_path}")
 
         return CoverageResult(
@@ -276,8 +236,6 @@ class ExtensionCoverageChecker(CoverageChecker):
 
 
 class ServerCoverageChecker(CoverageChecker):
-    """Coverage checker for Rust server."""
-
     def get_tool_name(self) -> str:
         return "cargo"
 
@@ -285,12 +243,10 @@ class ServerCoverageChecker(CoverageChecker):
         return "Please install Rust toolchain."
 
     def get_working_dir(self) -> Path:
-        return SERVER_DIR
+        return find_server_dir()
 
     def build_command(self) -> list[str]:
-        # First check if llvm-cov is installed
         if not check_command("cargo-llvm-cov"):
-            # Try to check with cargo
             try:
                 result = run_command(
                     ["cargo", "llvm-cov", "--version"],
@@ -317,10 +273,9 @@ class ServerCoverageChecker(CoverageChecker):
 
         logger.info(f"Server coverage: {coverage:.2f}%")
 
-        # HTML report path
         html_path = None
         if self.args.html:
-            html_path = SERVER_DIR / "target/llvm-cov/html/index.html"
+            html_path = find_server_dir() / "target/llvm-cov/html/index.html"
             logger.info(f"HTML coverage report: {html_path}")
 
         return CoverageResult(
@@ -334,7 +289,6 @@ class ServerCoverageChecker(CoverageChecker):
 
 
 def add_subparser(subparsers: argparse._SubParsersAction) -> None:
-    """Add the coverage subcommand."""
     parser = subparsers.add_parser(
         "coverage",
         help="Check test coverage for extension and server",
@@ -376,38 +330,32 @@ def add_subparser(subparsers: argparse._SubParsersAction) -> None:
 
 
 def check_extension_coverage(args: argparse.Namespace) -> tuple[bool, dict[str, float]]:
-    """Check TypeScript extension test coverage."""
     checker = ExtensionCoverageChecker(args)
     result = checker.run_coverage()
     return result.success, result.metrics.asdict() if result.metrics else {}
 
 
 def check_server_coverage(args: argparse.Namespace) -> tuple[bool, float]:
-    """Check Rust server test coverage."""
     checker = ServerCoverageChecker(args)
     result = checker.run_coverage()
     return result.success, result.coverage or 0.0
 
 
 def run(args: argparse.Namespace) -> TaskResult:
-    """Run coverage checks."""
     check_both = not args.extension and not args.server
     success = True
     results = {}
 
-    # Check extension coverage
     if args.extension or check_both:
         ext_success, ext_coverage = check_extension_coverage(args)
         success = success and ext_success
         results["extension"] = ext_coverage
 
-    # Check server coverage
     if args.server or check_both:
         srv_success, srv_coverage = check_server_coverage(args)
         success = success and srv_success
         results["server"] = srv_coverage
 
-    # Summary
     if check_both and results:
         logger.info("\n" + "=" * 50)
         logger.info("Coverage Summary:")

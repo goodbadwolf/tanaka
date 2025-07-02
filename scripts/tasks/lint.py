@@ -1,11 +1,11 @@
-"""Lint command - Run linting checks"""
-
 import argparse
 import fnmatch
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
+from glob import glob
+
 from constants import EXIT_FAILURE, EXIT_SUCCESS
 from logger import logger
 from utils import run_command
@@ -14,27 +14,20 @@ from .core import TaskResult
 
 
 def lint_markdown(fix: bool = False, patterns_to_ignore: set[str] | None = None) -> int:
-    """Lint or fix markdown files"""
     if not patterns_to_ignore:
         patterns_to_ignore = set(["repomix-output.txt.md", ".venv/*"])
 
     action = "fix" if fix else "scan"
     logger.info(f"Running markdown linter ({action} mode)")
 
-    # Find markdown files, excluding specific patterns
-    from glob import glob
-
     md_files = []
 
-    # Add root markdown files
     for f in glob("*.md"):
         for ignore in patterns_to_ignore:
-            # Ignore files that match any of glob patterns
             if any(fnmatch.fnmatch(f, ignore) for ignore in patterns_to_ignore):
                 continue
             md_files.append(f)
 
-    # Add docs markdown files
     for f in glob("docs/*.md"):
         for ignore in patterns_to_ignore:
             if any(fnmatch.fnmatch(f, ignore) for ignore in patterns_to_ignore):
@@ -65,13 +58,11 @@ def lint_markdown(fix: bool = False, patterns_to_ignore: set[str] | None = None)
 
 
 def lint_python(fix: bool = False) -> int:
-    """Lint or fix Python scripts"""
     mode = "fix" if fix else "check"
     logger.info(f"Running Python linters ({mode} mode)")
 
     errors = 0
 
-    # Run ruff
     ruff_cmd = ["uv", "run", "ruff", "check", "scripts/"]
     if fix:
         ruff_cmd.append("--fix")
@@ -81,7 +72,6 @@ def lint_python(fix: bool = False) -> int:
     except Exception:
         errors += 1
 
-    # Run black
     black_cmd = ["uv", "run", "black"]
     if not fix:
         black_cmd.append("--check")
@@ -96,7 +86,6 @@ def lint_python(fix: bool = False) -> int:
 
 
 def run(args: argparse.Namespace) -> TaskResult:
-    """Run linters based on arguments"""
     if args.markdown:
         exit_code = lint_markdown(fix=args.fix)
         message = "Markdown linting completed" if exit_code == 0 else "Markdown linting failed"
@@ -114,7 +103,6 @@ def run(args: argparse.Namespace) -> TaskResult:
             exit_code=exit_code if exit_code else EXIT_SUCCESS,
         )
     else:
-        # Run all linters
         logger.header("Running all linters")
         errors = 0
         errors += lint_markdown(fix=args.fix)
@@ -131,7 +119,6 @@ def run(args: argparse.Namespace) -> TaskResult:
 
 
 def add_subparser(subparsers: argparse._SubParsersAction) -> None:
-    """Add the lint command parser"""
     parser = subparsers.add_parser(
         "lint",
         help="Run linting checks",
