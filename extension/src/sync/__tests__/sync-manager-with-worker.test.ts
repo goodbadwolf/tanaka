@@ -268,12 +268,51 @@ describe('SyncManagerWithWorker', () => {
       await syncManager.start();
     });
 
-    it.skip('should use active interval when operations are queued', async () => {
+    it('should use active interval when operations are queued', async () => {
+      // Clear the initial sync timer to control timing
+      // @ts-expect-error - accessing private property for testing
+      if (syncManager.syncTimer) {
+        clearTimeout(syncManager.syncTimer);
+        // @ts-expect-error - accessing private property for testing
+        syncManager.syncTimer = null;
+      }
+
+      // Clear mock counts after start
+      mockWorkerClient.deduplicateOperations.mockClear();
+      mockAPI.sync.mockClear();
+
+      // Set up operations to sync
+      mockWorkerClient.deduplicateOperations.mockResolvedValue([
+        {
+          type: 'set_active',
+          id: '123',
+          active: true,
+          updated_at: 123456789n,
+        },
+      ]);
+
+      // Queue an operation which should trigger batched sync with HIGH priority (200ms)
       await syncManager.queueTabActive('123', true);
 
-      jest.advanceTimersByTime(1000);
+      // The batched sync is scheduled for 200ms later (HIGH priority)
+      await jest.advanceTimersToNextTimerAsync();
 
-      expect(mockWorkerClient.deduplicateOperations).toHaveBeenCalled();
+      // First sync should have happened via batched sync
+      expect(mockWorkerClient.deduplicateOperations).toHaveBeenCalledTimes(1);
+
+      // After the sync, scheduleSyncCheck should have been called
+      // Since there was recent activity (queueTabActive), it should use active interval (1000ms)
+      // @ts-expect-error - accessing private property for testing
+      expect(syncManager.currentInterval).toBe(1000);
+
+      // Clear the mock for next check
+      mockWorkerClient.deduplicateOperations.mockClear();
+
+      // Advance by active interval (1000ms) to trigger the next scheduled sync
+      await jest.advanceTimersToNextTimerAsync();
+
+      // Should sync again after active interval
+      expect(mockWorkerClient.deduplicateOperations).toHaveBeenCalledTimes(1);
     });
 
     it('should use error backoff on sync failures', async () => {
