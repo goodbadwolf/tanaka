@@ -2,6 +2,7 @@ pub mod config;
 pub mod crdt;
 pub mod error;
 pub mod models;
+pub mod repository;
 pub mod sync;
 
 use crate::crdt::CrdtManager;
@@ -96,14 +97,17 @@ pub async fn setup_database(
     use sqlx::sqlite::SqlitePoolOptions;
     use std::time::Duration;
 
-    const CREATE_TABS_TABLE_SQL: &str = r"
+    const CREATE_TABS_TABLE_SQL: &str = r#"
         CREATE TABLE IF NOT EXISTS tabs (
             id TEXT PRIMARY KEY,
             window_id TEXT NOT NULL,
-            data TEXT NOT NULL,
+            url TEXT NOT NULL,
+            title TEXT NOT NULL,
+            active INTEGER NOT NULL DEFAULT 0,
+            "index" INTEGER NOT NULL DEFAULT 0,
             updated_at INTEGER NOT NULL
         )
-    ";
+    "#;
 
     const CREATE_CRDT_OPERATIONS_TABLE_SQL: &str = r"
         CREATE TABLE IF NOT EXISTS crdt_operations (

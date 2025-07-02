@@ -201,14 +201,10 @@ describe('browserTabToSyncTab', () => {
     expect(result).toEqual({
       id: 'tab-123',
       windowId: 'window-456',
-      data: JSON.stringify({
-        url: 'https://example.com',
-        title: 'Example',
-        favIconUrl: 'https://example.com/favicon.ico',
-        index: 0,
-        pinned: false,
-        active: true,
-      }),
+      url: 'https://example.com',
+      title: 'Example',
+      active: true,
+      index: 0n,
       updatedAt: expect.any(Number),
     });
   });
@@ -246,14 +242,10 @@ describe('browserTabToSyncTab', () => {
     expect(result).toEqual({
       id: 'tab-123',
       windowId: 'window-456',
-      data: JSON.stringify({
-        url: 'https://example.com',
-        title: '',
-        favIconUrl: '',
-        index: 0,
-        pinned: false,
-        active: true,
-      }),
+      url: 'https://example.com',
+      title: '',
+      active: true,
+      index: 0n,
       updatedAt: expect.any(Number),
     });
   });
@@ -261,43 +253,50 @@ describe('browserTabToSyncTab', () => {
 
 describe('parseSyncTab', () => {
   it('should parse valid sync tab data', () => {
-    const tabData = {
-      url: 'https://example.com',
-      title: 'Example',
-      favIconUrl: 'https://example.com/favicon.ico',
-      index: 0,
-      pinned: false,
-      active: true,
-    };
-
     const syncTab = {
       id: 'tab-123',
       windowId: 'window-456',
-      data: JSON.stringify(tabData),
+      url: 'https://example.com',
+      title: 'Example',
+      active: true,
+      index: 0n,
       updatedAt: Date.now(),
     };
 
     const result = parseSyncTab(syncTab);
-    expect(result).toEqual(tabData);
+    expect(result).toEqual({
+      url: 'https://example.com',
+      title: 'Example',
+      favIconUrl: '', // Not available in new Tab model
+      index: 0,
+      pinned: false, // Not available in new Tab model
+      active: true,
+    });
   });
 
-  it('should throw ExtensionError for invalid JSON', () => {
+  it('should throw ExtensionError for missing url', () => {
     const syncTab = {
       id: 'tab-123',
       windowId: 'window-456',
-      data: 'invalid-json',
+      url: '',
+      title: 'Example',
+      active: true,
+      index: 0n,
       updatedAt: Date.now(),
     };
 
     expect(() => parseSyncTab(syncTab)).toThrow(ExtensionError);
-    expect(() => parseSyncTab(syncTab)).toThrow('Failed to parse tab data');
+    expect(() => parseSyncTab(syncTab)).toThrow('Tab data is missing required fields');
   });
 
-  it('should throw ExtensionError for missing required fields', () => {
+  it('should throw ExtensionError for invalid title type', () => {
     const syncTab = {
       id: 'tab-123',
       windowId: 'window-456',
-      data: JSON.stringify({ title: 'Test' }), // missing url
+      url: 'https://example.com',
+      title: null as unknown as string, // Invalid type for testing
+      active: true,
+      index: 0n,
       updatedAt: Date.now(),
     };
 
