@@ -525,12 +525,7 @@ git checkout -b feat/performance
    - ✅ Comprehensive test coverage with 4 test cases
    - ✅ Reduces statement compilation overhead for high-frequency operations
 
-4. [ ] `feat(extension): add virtual scrolling`
-   - For 200+ tabs UI
-   - Lazy rendering
-   - Smooth scrolling
-
-5. [x] ✅ `feat(extension): optimize sync debouncing`
+4. [x] ✅ `feat(extension): optimize sync debouncing`
    - ✅ Intelligent batching with priority-based delays
    - ✅ Adaptive intervals (1s active, 10s idle, exponential backoff)
    - ✅ Reduces server load by ~70%
@@ -538,7 +533,7 @@ git checkout -b feat/performance
    - ✅ Replaced original sync manager - now the default implementation
    - ✅ 10 comprehensive tests covering all scenarios
 
-6. [x] ✅ `feat(extension): move CRDT to Web Worker` ✅ **COMPLETE**
+5. [x] ✅ `feat(extension): move CRDT to Web Worker` ✅ **COMPLETE**
    - ✅ Offload heavy operations to separate thread
    - ✅ Non-blocking UI during sync operations
    - ✅ Structured message passing protocol
@@ -550,13 +545,12 @@ git checkout -b feat/performance
    - ✅ Error backoff and timer scheduling working correctly
    - ✅ Integration with DI container completed
 
-6.1. [ ] `perf(extension): optimize React re-renders`
-- Add React.memo where appropriate
-- Optimize context usage
-- Profile and fix performance issues
-- Implement virtualization for large lists
+6. [ ] `perf(extension): optimize React re-renders`
+   - Add React.memo where appropriate
+   - Optimize context usage
+   - Profile and fix performance issues
 
-1. [ ] `feat(both): create benchmark suite with criterion`
+7. [ ] `feat(both): create benchmark suite with criterion`
    ```toml
    [dev-dependencies]
    criterion = { version = "0.5", features = ["html_reports"] }
@@ -578,22 +572,22 @@ git checkout -b feat/performance
    - HTML reports for performance analysis
    - Target: P95 ≤ 10ms sync latency validation
 
-2. [ ] `perf: optimize for 200+ tabs`
+8. [ ] `perf: optimize for 200+ tabs`
    - Load test scenarios
    - Profile bottlenecks
    - Apply optimizations
 
-3. [ ] `perf: achieve P95 ≤ 10ms target`
+9. [ ] `perf: achieve P95 ≤ 10ms target`
    - Server response times
    - Sync latency
    - UI responsiveness
 
-4. [ ] `docs: performance tuning guide`
-   - Best practices
-   - Configuration options
-   - Monitoring setup
+10. [ ] `docs: performance tuning guide`
+    - Best practices
+    - Configuration options
+    - Monitoring setup
 
-5. [x] ✅ `perf(ci): integrate improved testing tools in CI`
+11. [x] ✅ `perf(ci): integrate improved testing tools in CI`
    - ✅ CI workflow updated to use cargo-nextest
    - ✅ cargo-llvm-cov replaces cargo-tarpaulin
    - ✅ Benchmark workflow added for performance tracking
@@ -771,6 +765,12 @@ git checkout -b feat/production-ready
    - Create release
    - Publish assets
    - Announcement
+
+10. [ ] `feat(extension): add virtual scrolling`
+    - For 200+ tabs UI
+    - Lazy rendering
+    - Smooth scrolling
+    - Implement virtualization for large lists
 
 ---
 

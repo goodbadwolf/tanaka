@@ -17,52 +17,52 @@
 ## System Overview
 
 ```
-┌──────────────┐   Yjs Δ via HTTPS   ┌──────────────┐
-│  Extension   │ ─────────────────▶  │   Server     │
-│ (TypeScript) │ ◀────────────────── │  (Rust)      │
-└──────────────┘      5 s poll       └─────┬────────┘
-                                           │  SQLite WAL
-                                           ▼
-                                      tabs.db
+┌──────────────┐  JSON Operations via HTTPS  ┌──────────────┐
+│  Extension   │ ─────────────────────────▶  │   Server     │
+│ (TypeScript) │ ◀───────────────────────── │  (Rust)      │
+└──────────────┘    Adaptive 1-10s sync     └─────┬────────┘
+                                                   │  SQLite WAL
+                                                   ▼
+                                             operations.db
 ```
 
 ## Browser-side Workflow
 
 1. **Capture** – The extension hooks `tabs.*` and `windows.*` events as they happen.
-2. **Encode** – Each change is appended to a local Yjs document and flushed as a binary update (`Uint8Array`).
-3. **Sync** – The extension uses adaptive sync intervals (1s during activity, 10s when idle) to POST queued updates and request newer ones from the server.
+2. **Encode** – Each change is converted to structured CRDT operations (`upsert_tab`, `close_tab`, etc.).
+3. **Sync** – The extension uses adaptive sync intervals (1s during activity, 10s when idle) to POST queued operations and request newer ones from the server.
 
 ## Server Workflow
 
-1. **Merge** – Axum route `/sync` receives the binary update, feeds it to `yrs::Doc`, and assigns a monotonic Lamport clock.
-2. **Persist** – The merged document is cached in a `DashMap` for fast read-back and written to `SQLite` in WAL mode for durability.
-3. **Respond** – The server streams back any updates with a clock greater than the client's `since` parameter.
+1. **Merge** – Axum route `/sync` receives structured operations, applies them to CRDT state, and assigns a monotonic Lamport clock.
+2. **Persist** – Operations are cached in a `DashMap` for fast read-back and written to `SQLite` in WAL mode for durability.
+3. **Respond** – The server streams back any operations with a clock greater than the client's `since` parameter.
 
 ## Data Guarantees
 
-- **Eventual Consistency** – Yjs/yrs ensures replicas converge regardless of network order.
-- **Crash Safety** – WAL mode plus periodic flush means at most 10 seconds of edits are in memory during idle periods.
+- **Eventual Consistency** – Structured CRDT operations ensure replicas converge regardless of network order.
+- **Crash Safety** – WAL mode plus adaptive sync intervals mean at most 10 seconds of operations are in memory during idle periods.
 - **Security** – All traffic is TLS-encrypted (`rustls`) and protected by a shared bearer token.
 
 ## CRDT Synchronization Protocol
 
-Tanaka uses Yjs/yrs for conflict-free synchronization:
+Tanaka uses a structured JSON-based CRDT protocol for conflict-free synchronization:
 
-- **Yjs (client)**: JavaScript CRDT implementation in the extension
-- **yrs (server)**: Rust CRDT implementation compatible with Yjs
-- **Binary protocol**: Efficient binary encoding for updates
-- **Lamport clock**: Monotonic clock for ordering updates
+- **Structured Operations**: JSON-based operations (`upsert_tab`, `close_tab`, etc.)
+- **Conflict Resolution**: Automatic CRDT merge semantics for consistency
+- **Lamport Clock**: Monotonic clock for total ordering of operations
+- **Protocol Version**: v2 is the only protocol (v1 has been removed)
 
 ### Sync Flow
 
-1. Client accumulates local changes in Yjs document
-2. Client encodes changes as binary update
-3. Client POSTs update to `/sync` endpoint
-4. Server merges update into its yrs document
-5. Server assigns Lamport clock to update
-6. Server persists to SQLite and cache
-7. Server returns newer updates to client
-8. Client merges received updates
+1. Client captures tab/window events as CRDT operations
+2. Client queues operations with device ID and clock
+3. Client POSTs operations to `/sync` endpoint
+4. Server applies operations to CRDT state
+5. Server assigns Lamport clock to each operation
+6. Server persists to SQLite and DashMap cache
+7. Server returns operations newer than client's clock
+8. Client applies received operations to local state
 
 ## Security Architecture
 
@@ -91,22 +91,25 @@ Tanaka uses Yjs/yrs for conflict-free synchronization:
 ### Optimizations
 - DashMap for in-memory caching
 - SQLite WAL mode for concurrent reads
-- Debounced sync operations
-- Binary protocol for minimal payload size
-- Future: Web Workers for CRDT operations
+- Statement caching for prepared queries
+- Adaptive sync intervals (1s active, 10s idle)
+- Web Workers for non-blocking CRDT operations
+- Operation batching and deduplication
 
 ## Storage Architecture
 
 ### Client Storage
-- `browser.storage.local` for tab state
-- Yjs document for CRDT state
+- `browser.storage.local` for tab state and sync metadata
+- Operation queue for pending CRDT operations
+- Device ID and Lamport clock persistence
 - Settings in storage.sync
 
 ### Server Storage
-- SQLite database with WAL mode
-- Schema designed for CRDT storage
-- DashMap cache for hot data
-- Future: Support for other backends
+- SQLite database (operations.db) with WAL mode
+- CRDT operations table with Lamport clock indexing
+- Materialized state table for current tab/window data
+- DashMap cache for hot operations
+- Statement cache for prepared queries
 
 ## Extension Architecture
 
