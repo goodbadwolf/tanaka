@@ -18,10 +18,6 @@ from constants import EXIT_FAILURE, EXIT_SIGINT
 from logger import logger
 
 
-def sanitize_module_name(name: str) -> str:
-    return name.replace("-", "_").replace(" ", "_")
-
-
 class Task:
     def __init__(self, name: str, module_name: str | None = None):
         self.name = name

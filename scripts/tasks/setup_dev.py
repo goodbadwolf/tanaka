@@ -23,7 +23,7 @@ except ImportError:
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from constants import EXIT_FAILURE, EXIT_SIGINT, EXIT_SUCCESS
 from logger import logger
-from utils import check_command
+from utils import check_command, find_project_root
 from utils import run_command as run_cmd
 
 from .core import TaskResult
@@ -315,12 +315,10 @@ class SccacheInstaller(DependencyInstaller):
             logger.info("Configuring server project to use sccache...")
 
             # Find project root (where .git directory is)
-            current_dir = Path.cwd()
-            project_root = current_dir
-            while project_root.parent != project_root:
-                if (project_root / ".git").exists():
-                    break
-                project_root = project_root.parent
+            project_root = find_project_root()
+            if not project_root:
+                logger.warning("Could not find project root, using current directory")
+                project_root = Path.cwd()
 
             # Create .cargo directory in server directory if it doesn't exist
             server_cargo_dir = project_root / "server" / ".cargo"
@@ -580,7 +578,7 @@ class ActInstaller(DependencyInstaller):
         logger.info("Creating .actrc configuration...")
 
         # Get podman socket path
-        socket_path = "/run/user/1000/podman/podman.sock"  # Linux default
+        socket_path = f"/run/user/{os.getuid()}/podman/podman.sock"  # Linux default
         if self.os_type == OSType.MACOS:
             try:
                 result = self.run_command(

@@ -7,7 +7,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from constants import EXIT_FAILURE, EXIT_SUCCESS
 from logger import logger
-from utils import run_command
+from utils import find_project_root, run_command
 
 from .core import TaskResult
 
@@ -16,21 +16,25 @@ def generate_api_models() -> TaskResult:
     """Generate TypeScript types from Rust using ts-rs"""
     logger.header("Generating TypeScript API models")
 
-    # Find project root by looking for server directory
-    project_root = Path.cwd()
+    # Find project root
+    project_root = find_project_root()
+    if not project_root:
+        logger.error("Could not find project root (no .git directory found)")
+        return TaskResult(
+            success=False,
+            message="Could not find project root",
+            exit_code=EXIT_FAILURE,
+        )
+
     server_dir = project_root / "server"
     if not server_dir.exists():
-        # Try parent directory
-        project_root = Path.cwd().parent
-        server_dir = project_root / "server"
-        if not server_dir.exists():
-            logger.error("Server directory not found")
-            logger.info("Make sure you're running this from the project root")
-            return TaskResult(
-                success=False,
-                message="Server directory not found",
-                exit_code=EXIT_FAILURE,
-            )
+        logger.error("Server directory not found")
+        logger.info("Make sure you're running this from the project root")
+        return TaskResult(
+            success=False,
+            message="Server directory not found",
+            exit_code=EXIT_FAILURE,
+        )
 
     # Check if generated models are stale
     # Check multiple source files that generate TypeScript

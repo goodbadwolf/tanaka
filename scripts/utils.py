@@ -172,8 +172,8 @@ def run_command(
                     )
 
             # Start threads to process streams
-            stdout_thread = threading.Thread(target=process_stdout)
-            stderr_thread = threading.Thread(target=process_stderr)
+            stdout_thread = threading.Thread(target=process_stdout, daemon=True)
+            stderr_thread = threading.Thread(target=process_stderr, daemon=True)
             stdout_thread.start()
             stderr_thread.start()
 
@@ -249,3 +249,26 @@ def env_with(**env_vars: str | None) -> dict[str, str]:
         if value is not None:
             env[key] = value
     return env
+
+
+def find_project_root(marker: str = ".git") -> Path | None:
+    """Find project root by looking for a marker file or directory
+
+    Args:
+        marker: File or directory name to look for (default: ".git")
+
+    Returns:
+        Path to project root if found, None otherwise
+    """
+    current_dir = Path.cwd()
+
+    # First check current directory
+    if (current_dir / marker).exists():
+        return current_dir
+
+    # Walk up the directory tree
+    for parent in current_dir.parents:
+        if (parent / marker).exists():
+            return parent
+
+    return None
