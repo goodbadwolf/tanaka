@@ -23,6 +23,7 @@ Tanaka keeps your Firefox browsing **entangled** across every computer you use. 
 - **Selective tracking** - Choose which windows to sync
 - **Conflict-free** - CRDT technology ensures consistent state
 - **Privacy-focused** - Self-hosted, your data stays yours
+- **Non-blocking sync** - Web Worker offloads heavy operations for smooth UI
 
 ## 🛠️ Built With
 
