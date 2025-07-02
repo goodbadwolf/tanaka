@@ -371,3 +371,205 @@ async fn test_incremental_sync() {
         _ => panic!("Expected UpsertTab operation for tab-2"),
     }
 }
+
+#[tokio::test]
+async fn test_sync_repository_integration() {
+    // This test specifically covers the repository integration paths in sync.rs
+    let db_pool = create_test_db().await;
+    let app = create_test_app(db_pool);
+
+    // Test 1: Sync with operations to cover repository.store() path (lines 253-254, 272)
+    let operation = CrdtOperation::UpsertTab {
+        id: "repo-test-tab".to_string(),
+        data: TabData {
+            window_id: "repo-test-window".to_string(),
+            url: "https://repo-test.com".to_string(),
+            title: "Repository Test".to_string(),
+            active: true,
+            index: 0,
+            updated_at: 123_456_789,
+        },
+    };
+
+    let request1 = SyncRequest {
+        clock: 1,
+        device_id: "repo-device-1".to_string(),
+        since_clock: None,
+        operations: vec![operation],
+    };
+
+    let (status1, body1) = make_sync_request(app.clone(), "test-token", request1).await;
+    assert_eq!(status1, StatusCode::OK);
+    let response1: SyncResponse = serde_json::from_str(&body1).unwrap();
+
+    // Test 2: Sync with since_clock to cover get_since() path (lines 281, 284-287)
+    let request2 = SyncRequest {
+        clock: response1.clock,
+        device_id: "repo-device-2".to_string(),
+        since_clock: Some(0), // Get all operations since clock 0
+        operations: vec![],
+    };
+
+    let (status2, body2) = make_sync_request(app.clone(), "test-token", request2).await;
+    assert_eq!(status2, StatusCode::OK);
+    let response2: SyncResponse = serde_json::from_str(&body2).unwrap();
+
+    // Should receive the operation from device-1
+    assert_eq!(response2.operations.len(), 1);
+    match &response2.operations[0] {
+        CrdtOperation::UpsertTab { id, data } => {
+            assert_eq!(id, "repo-test-tab");
+            assert_eq!(data.url, "https://repo-test.com");
+        }
+        _ => panic!("Expected UpsertTab operation"),
+    }
+
+    // Test 3: Sync without since_clock to cover get_recent() path (lines 290-292)
+    let request3 = SyncRequest {
+        clock: response1.clock,
+        device_id: "repo-device-3".to_string(),
+        since_clock: None, // No since_clock, should use get_recent()
+        operations: vec![],
+    };
+
+    let (status3, body3) = make_sync_request(app.clone(), "test-token", request3).await;
+    assert_eq!(status3, StatusCode::OK);
+    let response3: SyncResponse = serde_json::from_str(&body3).unwrap();
+
+    // Should receive recent operations (up to 100)
+    assert_eq!(response3.operations.len(), 1);
+    match &response3.operations[0] {
+        CrdtOperation::UpsertTab { id, data } => {
+            assert_eq!(id, "repo-test-tab");
+            assert_eq!(data.url, "https://repo-test.com");
+        }
+        _ => panic!("Expected UpsertTab operation"),
+    }
+}
+
+#[tokio::test]
+async fn test_sync_device_filtering() {
+    // Test that devices don't receive their own operations back (device filtering)
+    let db_pool = create_test_db().await;
+    let app = create_test_app(db_pool);
+
+    // Device 1 sends an operation
+    let operation = CrdtOperation::CloseTab {
+        id: "filter-test-tab".to_string(),
+        closed_at: 123_456_789,
+    };
+
+    let request1 = SyncRequest {
+        clock: 1,
+        device_id: "filter-device-1".to_string(),
+        since_clock: None,
+        operations: vec![operation],
+    };
+
+    let (status1, body1) = make_sync_request(app.clone(), "test-token", request1).await;
+    assert_eq!(status1, StatusCode::OK);
+    let _response1: SyncResponse = serde_json::from_str(&body1).unwrap();
+
+    // Same device syncs again - should not receive its own operation
+    let request2 = SyncRequest {
+        clock: 1,
+        device_id: "filter-device-1".to_string(), // Same device ID
+        since_clock: Some(0),
+        operations: vec![],
+    };
+
+    let (status2, body2) = make_sync_request(app.clone(), "test-token", request2).await;
+    assert_eq!(status2, StatusCode::OK);
+    let response2: SyncResponse = serde_json::from_str(&body2).unwrap();
+
+    // Should not receive its own operation back
+    assert_eq!(response2.operations.len(), 0);
+
+    // Different device should receive the operation
+    let request3 = SyncRequest {
+        clock: 0,
+        device_id: "filter-device-2".to_string(), // Different device ID
+        since_clock: Some(0),
+        operations: vec![],
+    };
+
+    let (status3, body3) = make_sync_request(app.clone(), "test-token", request3).await;
+    assert_eq!(status3, StatusCode::OK);
+    let response3: SyncResponse = serde_json::from_str(&body3).unwrap();
+
+    // Should receive the operation from device-1
+    assert_eq!(response3.operations.len(), 1);
+    match &response3.operations[0] {
+        CrdtOperation::CloseTab { id, closed_at: _ } => {
+            assert_eq!(id, "filter-test-tab");
+        }
+        _ => panic!("Expected CloseTab operation"),
+    }
+}
+
+#[tokio::test]
+async fn test_sync_multiple_operations_storage() {
+    // Test storing multiple operations in a single sync request
+    let db_pool = create_test_db().await;
+    let app = create_test_app(db_pool);
+
+    // Create multiple operations to test the storage loop
+    let operations = vec![
+        CrdtOperation::UpsertTab {
+            id: "multi-tab-1".to_string(),
+            data: TabData {
+                window_id: "multi-window-1".to_string(),
+                url: "https://multi1.com".to_string(),
+                title: "Multi 1".to_string(),
+                active: true,
+                index: 0,
+                updated_at: 123_456_789,
+            },
+        },
+        CrdtOperation::UpsertTab {
+            id: "multi-tab-2".to_string(),
+            data: TabData {
+                window_id: "multi-window-1".to_string(),
+                url: "https://multi2.com".to_string(),
+                title: "Multi 2".to_string(),
+                active: false,
+                index: 1,
+                updated_at: 123_456_790,
+            },
+        },
+        CrdtOperation::SetActive {
+            id: "multi-tab-1".to_string(),
+            active: false,
+            updated_at: 123_456_791,
+        },
+    ];
+
+    let request = SyncRequest {
+        clock: 1,
+        device_id: "multi-device-1".to_string(),
+        since_clock: None,
+        operations,
+    };
+
+    let (status, body) = make_sync_request(app.clone(), "test-token", request).await;
+    assert_eq!(status, StatusCode::OK);
+    let response: SyncResponse = serde_json::from_str(&body).unwrap();
+
+    // All operations should be processed
+    assert!(response.clock >= 3);
+
+    // Another device should receive all operations
+    let request2 = SyncRequest {
+        clock: 0,
+        device_id: "multi-device-2".to_string(),
+        since_clock: Some(0),
+        operations: vec![],
+    };
+
+    let (status2, body2) = make_sync_request(app.clone(), "test-token", request2).await;
+    assert_eq!(status2, StatusCode::OK);
+    let response2: SyncResponse = serde_json::from_str(&body2).unwrap();
+
+    // Should receive all 3 operations
+    assert_eq!(response2.operations.len(), 3);
+}
