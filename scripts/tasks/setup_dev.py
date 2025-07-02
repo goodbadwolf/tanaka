@@ -10,6 +10,16 @@ from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
 
+try:
+    import tomli
+    import tomli_w
+
+    HAS_TOML = True
+except ImportError:
+    HAS_TOML = False
+    tomli = None  # type: ignore
+    tomli_w = None  # type: ignore
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from constants import EXIT_FAILURE, EXIT_SIGINT, EXIT_SUCCESS
 from logger import logger
@@ -279,6 +289,68 @@ class TarpaulinInstaller(DependencyInstaller):
             return True
         except Exception as e:
             logger.error(f"Failed to install cargo-tarpaulin: {e}")
+            return False
+
+
+class SccacheInstaller(DependencyInstaller):
+    """Handles sccache installation for faster Rust compilation"""
+
+    def install(self) -> bool:
+        if not self.check_command("cargo"):
+            logger.error("Rust/Cargo is required to install sccache")
+            return False
+
+        logger.info("Installing sccache...")
+        try:
+            self.run_command(["cargo", "install", "sccache"])
+
+            # Set up sccache in server's cargo config
+            logger.info("Configuring server project to use sccache...")
+
+            # Find project root (where .git directory is)
+            current_dir = Path.cwd()
+            project_root = current_dir
+            while project_root.parent != project_root:
+                if (project_root / ".git").exists():
+                    break
+                project_root = project_root.parent
+
+            # Create .cargo directory in server directory if it doesn't exist
+            server_cargo_dir = project_root / "server" / ".cargo"
+            server_cargo_dir.mkdir(parents=True, exist_ok=True)
+
+            config_path = server_cargo_dir / "config.toml"
+
+            # Check if TOML libraries are available
+            if not HAS_TOML:
+                logger.error("TOML libraries not available. Please install tomli and tomli-w")
+                return False
+
+            # Load existing config or create new one
+            if config_path.exists():
+                config_content = config_path.read_text()
+                try:
+                    config = tomli.loads(config_content)
+                except Exception as e:
+                    logger.error(f"Failed to parse existing config.toml: {e}")
+                    return False
+            else:
+                config = {}
+
+            # Add or update sccache configuration
+            if "build" not in config:
+                config["build"] = {}
+
+            if config["build"].get("rustc-wrapper") == "sccache":
+                logger.info("sccache already configured in cargo config")
+            else:
+                config["build"]["rustc-wrapper"] = "sccache"
+                config_path.write_text(tomli_w.dumps(config))
+                logger.success(f"Added sccache configuration to {config_path}")
+
+            return True
+        except Exception as e:
+            logger.error(f"Failed to install sccache: {e}")
             return False
 
 
@@ -581,6 +653,7 @@ class SetupManager:
         "pnpm": "dev",
         "sqlx": "dev",
         "tarpaulin": "dev",
+        "sccache": "dev",
         "uv": "dev",
         "python": "dev",
         "venv": "env",
@@ -619,6 +692,7 @@ class SetupManager:
             "pnpm": PnpmInstaller(self.os_type, self.dry_run),
             "sqlx": SqlxInstaller(self.os_type, self.dry_run),
             "tarpaulin": TarpaulinInstaller(self.os_type, self.dry_run),
+            "sccache": SccacheInstaller(self.os_type, self.dry_run),
             "sqlite": SqliteChecker(self.os_type, self.dry_run),
             "firefox": FirefoxInstaller(self.os_type, self.dry_run),
             "uv": UvInstaller(self.os_type, self.dry_run),
@@ -638,6 +712,7 @@ class SetupManager:
             "pnpm": Dependency(name="pnpm", depends_on=["node"], check_cmd="pnpm"),
             "sqlx": Dependency(name="sqlx", depends_on=["rust"], check_cmd="sqlx"),
             "tarpaulin": Dependency(name="tarpaulin", depends_on=["rust"], check_cmd="cargo-tarpaulin"),
+            "sccache": Dependency(name="sccache", depends_on=["rust"], check_cmd="sccache"),
             "firefox": Dependency(name="firefox", check_cmd="firefox"),
             "sqlite": Dependency(name="sqlite", check_cmd="sqlite3"),
             "uv": Dependency(name="uv", check_cmd="uv"),

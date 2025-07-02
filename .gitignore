@@ -55,3 +55,6 @@ __pycache__/
 
 # TypeScript bindings (ts-rs) - generated in wrong location
 server/bindings/
+
+# Cargo/Rust project-local config
+server/.cargo/
