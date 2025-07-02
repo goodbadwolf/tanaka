@@ -275,20 +275,27 @@ class SqlxInstaller(DependencyInstaller):
             return False
 
 
-class TarpaulinInstaller(DependencyInstaller):
-    """Handles cargo-tarpaulin installation for code coverage"""
+class TestingToolsInstaller(DependencyInstaller):
+    """Handles Rust testing tools installation (nextest, llvm-cov)"""
 
     def install(self) -> bool:
         if not self.check_command("cargo"):
-            logger.error("Rust/Cargo is required to install cargo-tarpaulin")
+            logger.error("Rust/Cargo is required to install testing tools")
             return False
 
-        logger.info("Installing cargo-tarpaulin...")
+        logger.info("Installing enhanced testing tools...")
         try:
-            self.run_command(["cargo", "install", "cargo-tarpaulin"])
+            # Install cargo-nextest for faster test execution
+            logger.info("Installing cargo-nextest...")
+            self.run_command(["cargo", "install", "cargo-nextest", "--locked"])
+
+            # Install cargo-llvm-cov for better coverage
+            logger.info("Installing cargo-llvm-cov...")
+            self.run_command(["cargo", "install", "cargo-llvm-cov", "--locked"])
+
             return True
         except Exception as e:
-            logger.error(f"Failed to install cargo-tarpaulin: {e}")
+            logger.error(f"Failed to install testing tools: {e}")
             return False
 
 
@@ -652,7 +659,7 @@ class SetupManager:
         "node": "dev",
         "pnpm": "dev",
         "sqlx": "dev",
-        "tarpaulin": "dev",
+        "testing-tools": "dev",
         "sccache": "dev",
         "uv": "dev",
         "python": "dev",
@@ -691,7 +698,7 @@ class SetupManager:
             "node": NodeInstaller(self.os_type, self.dry_run),
             "pnpm": PnpmInstaller(self.os_type, self.dry_run),
             "sqlx": SqlxInstaller(self.os_type, self.dry_run),
-            "tarpaulin": TarpaulinInstaller(self.os_type, self.dry_run),
+            "testing-tools": TestingToolsInstaller(self.os_type, self.dry_run),
             "sccache": SccacheInstaller(self.os_type, self.dry_run),
             "sqlite": SqliteChecker(self.os_type, self.dry_run),
             "firefox": FirefoxInstaller(self.os_type, self.dry_run),
@@ -711,7 +718,7 @@ class SetupManager:
             "node": Dependency(name="node", depends_on=[], check_cmd="node"),
             "pnpm": Dependency(name="pnpm", depends_on=["node"], check_cmd="pnpm"),
             "sqlx": Dependency(name="sqlx", depends_on=["rust"], check_cmd="sqlx"),
-            "tarpaulin": Dependency(name="tarpaulin", depends_on=["rust"], check_cmd="cargo-tarpaulin"),
+            "testing-tools": Dependency(name="testing-tools", depends_on=["rust"], check_cmd="cargo-nextest"),
             "sccache": Dependency(name="sccache", depends_on=["rust"], check_cmd="sccache"),
             "firefox": Dependency(name="firefox", check_cmd="firefox"),
             "sqlite": Dependency(name="sqlite", check_cmd="sqlite3"),
