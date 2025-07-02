@@ -122,6 +122,7 @@ jobs:
         uses: codecov/codecov-action@v4
         if: always() # Upload coverage even if tests fail
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           file: ./server/cobertura.xml
           flags: server
           name: server-coverage
@@ -155,6 +156,7 @@ jobs:
         uses: codecov/codecov-action@v4
         if: always() # Upload coverage even if tests fail
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           file: ./extension/coverage/lcov.info
           flags: extension
           name: extension-coverage
