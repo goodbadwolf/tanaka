@@ -2,6 +2,7 @@ use sqlx::{sqlite::SqlitePoolOptions, SqlitePool};
 use std::time::Duration;
 use tanaka_server::config::DatabaseConfig;
 use tanaka_server::error::AppResult;
+use tanaka_server::repository::sqlite::StatementCache;
 
 const CREATE_TABS_TABLE_SQL: &str = r"
     CREATE TABLE IF NOT EXISTS tabs (
@@ -37,6 +38,7 @@ const CREATE_CRDT_STATE_TABLE_SQL: &str = r"
 
 const MILLIS_PER_SECOND: u64 = 1000;
 
+#[allow(clippy::too_many_lines)] // Database initialization requires many sequential setup steps
 pub async fn init_db_with_config(config: &DatabaseConfig) -> AppResult<SqlitePool> {
     let db_path = config.url.strip_prefix("sqlite://").unwrap_or(&config.url);
 
@@ -115,6 +117,18 @@ pub async fn init_db_with_config(config: &DatabaseConfig) -> AppResult<SqlitePoo
         })?;
 
     // Create strategic indexes for optimal query performance
+
+    // Warm up statement cache for better performance
+    let cache = StatementCache::new(std::sync::Arc::new(pool.clone()));
+    if let Err(e) = cache.warm_cache().await {
+        tracing::warn!("Failed to warm statement cache: {}", e);
+        // Continue anyway as this is just an optimization
+    } else {
+        tracing::info!(
+            "Statement cache warmed with {} prepared statements",
+            cache.size()
+        );
+    }
 
     // CRDT Operations indexes (optimized for sync queries)
     sqlx::query("CREATE INDEX IF NOT EXISTS idx_crdt_operations_clock ON crdt_operations(clock)")

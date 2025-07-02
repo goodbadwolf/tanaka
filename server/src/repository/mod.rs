@@ -80,14 +80,26 @@ pub struct Repositories {
 }
 
 impl Repositories {
-    /// Create new repositories with `SQLite` implementation
+    /// Create new repositories with `SQLite` implementation and shared statement cache
     #[must_use]
     pub fn new_sqlite(pool: SqlitePool) -> Self {
         let pool = Arc::new(pool);
+        // Create shared statement cache for optimal performance
+        let cache = Arc::new(sqlite::StatementCache::new(Arc::clone(&pool)));
+
         Self {
-            operations: Arc::new(sqlite::SqliteOperationRepository::new(Arc::clone(&pool))),
-            tabs: Arc::new(sqlite::SqliteTabRepository::new(Arc::clone(&pool))),
-            windows: Arc::new(sqlite::SqliteWindowRepository::new(Arc::clone(&pool))),
+            operations: Arc::new(sqlite::SqliteOperationRepository::with_cache(
+                Arc::clone(&pool),
+                Arc::clone(&cache),
+            )),
+            tabs: Arc::new(sqlite::SqliteTabRepository::with_cache(
+                Arc::clone(&pool),
+                Arc::clone(&cache),
+            )),
+            windows: Arc::new(sqlite::SqliteWindowRepository::with_cache(
+                Arc::clone(&pool),
+                Arc::clone(&cache),
+            )),
         }
     }
 

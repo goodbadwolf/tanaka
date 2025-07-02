@@ -2,18 +2,27 @@ use async_trait::async_trait;
 use sqlx::SqlitePool;
 use std::sync::Arc;
 
+use super::cache::StatementCache;
 use crate::error::AppError;
 use crate::repository::OperationRepository;
 use crate::sync::{CrdtOperation, StoredOperation};
 
 pub struct SqliteOperationRepository {
     pool: Arc<SqlitePool>,
+    cache: Arc<StatementCache>,
 }
 
 impl SqliteOperationRepository {
     #[must_use]
     pub fn new(pool: Arc<SqlitePool>) -> Self {
-        Self { pool }
+        let cache = Arc::new(StatementCache::new(pool.clone()));
+        Self { pool, cache }
+    }
+
+    /// Creates a repository with a shared statement cache for optimal performance.
+    #[must_use]
+    pub fn with_cache(pool: Arc<SqlitePool>, cache: Arc<StatementCache>) -> Self {
+        Self { pool, cache }
     }
 }
 
@@ -32,13 +41,22 @@ impl OperationRepository for SqliteOperationRepository {
         // Generate operation ID with device_id for uniqueness
         let operation_id = format!("{}_{}_{}", clock, device_id, operation.target_id());
 
-        // Store in operations log
-        sqlx::query(
-            r"
-            INSERT INTO crdt_operations (
+        // Use cached prepared statement for better performance
+        self.cache
+            .get_or_prepare(
+                "crdt_operations:insert",
+                r"INSERT INTO crdt_operations (
                 id, clock, device_id, operation_type, target_id, operation_data, created_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?)
-            ",
+            ) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            )
+            .await
+            .map_err(|e| AppError::database("Failed to prepare insert statement", e))?;
+
+        // Store in operations log using the cached statement's SQL
+        sqlx::query(
+            r"INSERT INTO crdt_operations (
+                id, clock, device_id, operation_type, target_id, operation_data, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?)",
         )
         .bind(&operation_id)
         .bind(i64::try_from(clock).unwrap_or(i64::MAX))
@@ -70,6 +88,18 @@ impl OperationRepository for SqliteOperationRepository {
             operation_data: String,
             created_at: i64,
         }
+
+        // Use cached prepared statement
+        self.cache
+            .get_or_prepare(
+                "crdt_operations:get_since",
+                "SELECT id, clock, device_id, operation_type, target_id, operation_data, created_at
+             FROM crdt_operations
+             WHERE clock > ? AND device_id != ?
+             ORDER BY clock ASC",
+            )
+            .await
+            .map_err(|e| AppError::database("Failed to prepare get_since statement", e))?;
 
         let rows = sqlx::query_as::<_, OperationRow>(
             "SELECT id, clock, device_id, operation_type, target_id, operation_data, created_at
@@ -116,6 +146,19 @@ impl OperationRepository for SqliteOperationRepository {
             operation_data: String,
             created_at: i64,
         }
+
+        // Use cached prepared statement
+        self.cache
+            .get_or_prepare(
+                "crdt_operations:get_recent",
+                "SELECT id, clock, device_id, operation_type, target_id, operation_data, created_at
+             FROM crdt_operations
+             WHERE device_id != ?
+             ORDER BY clock DESC
+             LIMIT ?",
+            )
+            .await
+            .map_err(|e| AppError::database("Failed to prepare get_recent statement", e))?;
 
         let rows = sqlx::query_as::<_, OperationRow>(
             "SELECT id, clock, device_id, operation_type, target_id, operation_data, created_at

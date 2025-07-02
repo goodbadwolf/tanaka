@@ -2,18 +2,27 @@ use async_trait::async_trait;
 use sqlx::{Row, SqlitePool};
 use std::sync::Arc;
 
+use super::cache::StatementCache;
 use crate::error::AppError;
 use crate::models::Window;
 use crate::repository::WindowRepository;
 
 pub struct SqliteWindowRepository {
     pool: Arc<SqlitePool>,
+    cache: Arc<StatementCache>,
 }
 
 impl SqliteWindowRepository {
     #[must_use]
     pub fn new(pool: Arc<SqlitePool>) -> Self {
-        Self { pool }
+        let cache = Arc::new(StatementCache::new(pool.clone()));
+        Self { pool, cache }
+    }
+
+    /// Creates a repository with a shared statement cache for optimal performance.
+    #[must_use]
+    pub fn with_cache(pool: Arc<SqlitePool>, cache: Arc<StatementCache>) -> Self {
+        Self { pool, cache }
     }
 }
 
@@ -21,18 +30,15 @@ impl SqliteWindowRepository {
 impl WindowRepository for SqliteWindowRepository {
     async fn get(&self, id: &str) -> Result<Option<Window>, AppError> {
         // For now, windows are tracked in the CRDT state, not in a separate table
-        // We'll need to either create a windows table or query from crdt_state
-        // This is a placeholder implementation
+        // Prepare statement in cache
+        self.cache.get_or_prepare(
+            "windows:select_by_id",
+            "SELECT entity_id, current_data, last_clock FROM crdt_state WHERE entity_type = 'window' AND entity_id = ?",
+        ).await
+        .map_err(|e| AppError::database("Failed to prepare window select statement", e))?;
 
         let result = sqlx::query(
-            r"
-            SELECT
-                entity_id,
-                current_data,
-                last_clock
-            FROM crdt_state
-            WHERE entity_type = 'window' AND entity_id = ?
-            ",
+            "SELECT entity_id, current_data, last_clock FROM crdt_state WHERE entity_type = 'window' AND entity_id = ?",
         )
         .bind(id)
         .fetch_optional(&*self.pool)
