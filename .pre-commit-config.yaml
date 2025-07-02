@@ -95,8 +95,8 @@ repos:
         additional_dependencies: []
 
       - id: rust-tests
-        name: Run Rust tests
-        entry: bash -c 'cd server && cargo test'
+        name: Run Rust tests with nextest
+        entry: bash -c 'cd server && (command -v cargo-nextest >/dev/null 2>&1 && cargo nextest run) || cargo test'
         language: system
         files: ^server/.*\.rs$
         pass_filenames: false

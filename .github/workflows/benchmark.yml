@@ -1,0 +1,73 @@
+name: Benchmarks
+
+on:
+  pull_request:
+    paths:
+      - "server/**"
+      - ".github/workflows/benchmark.yml"
+  push:
+    branches: [main]
+    paths:
+      - "server/**"
+      - ".github/workflows/benchmark.yml"
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    env:
+      SCCACHE_GHA_ENABLED: "true"
+      RUSTC_WRAPPER: "sccache"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      # Setup sccache for faster Rust compilation
+      - name: Setup sccache
+        uses: mozilla-actions/sccache-action@v0.0.9
+
+      - name: Cache Cargo dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            server/target
+          key: ${{ runner.os }}-cargo-bench-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-bench-
+            ${{ runner.os }}-cargo-
+
+      - name: Install criterion
+        run: |
+          cd server
+          # Criterion is already in dev-dependencies, just need to build benchmarks
+          cargo bench --no-run
+
+      - name: Run benchmarks
+        run: |
+          cd server
+          cargo bench --workspace -- --output-format bencher | tee output.txt
+
+      - name: Store benchmark result
+        uses: benchmark-action/github-action-benchmark@v1
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        with:
+          name: Rust Benchmarks
+          tool: "cargo"
+          output-file-path: server/output.txt
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-push: true
+
+      - name: Comment PR with benchmark results
+        uses: benchmark-action/github-action-benchmark@v1
+        if: github.event_name == 'pull_request'
+        with:
+          name: Rust Benchmarks
+          tool: "cargo"
+          output-file-path: server/output.txt
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          comment-on-alert: true
+          alert-threshold: "120%"
+          comment-always: true
+          fail-on-alert: false
