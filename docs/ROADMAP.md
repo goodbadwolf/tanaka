@@ -473,19 +473,14 @@ git checkout -b feat/performance
    use pretty_assertions::{assert_eq, assert_ne};
    ```
 
-0.3. [ ] `perf(dev): setup cargo-watch for continuous testing`
-   ```bash
-   cargo install cargo-watch
-   cargo watch -c -x "nextest run"  # Auto-run on file changes
-   ```
 
-0.4. [ ] `perf(dev): upgrade to cargo-llvm-cov for better coverage`
+0.3. [ ] `perf(dev): upgrade to cargo-llvm-cov for better coverage`
    ```bash
    cargo install cargo-llvm-cov
    cargo llvm-cov --html  # Better than current coverage tools
    ```
 
-0.5. [ ] `perf(test): add rstest for parameterized CRDT operation tests`
+0.4. [ ] `perf(test): add rstest for parameterized CRDT operation tests`
    ```toml
    [dev-dependencies]
    rstest = "0.18"
@@ -593,7 +588,6 @@ git checkout -b feat/performance
 **Key Benefits of Testing Improvements:**
 - 🚀 **2-3× faster test execution** with cargo-nextest (critical for 55+ tests)
 - 🎨 **Better debugging** with colorful assertion diffs
-- ⚡ **Continuous feedback** during performance optimization
 - 📊 **Enhanced coverage reporting** to ensure optimizations don't break functionality
 - 🔬 **Professional benchmarking** with criterion for performance targets
 - 🧪 **Parameterized testing** for comprehensive CRDT operation validation

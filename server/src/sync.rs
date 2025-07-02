@@ -36,6 +36,7 @@ pub struct SyncResponse {
     ts(export, export_to = "../../extension/src/api/sync/")
 )]
 #[serde(tag = "type", rename_all = "snake_case")]
+#[derive(PartialEq)]
 pub enum CrdtOperation {
     UpsertTab {
         id: String,
@@ -83,6 +84,7 @@ pub enum CrdtOperation {
     feature = "generate-api-models",
     ts(export, export_to = "../../extension/src/api/sync/")
 )]
+#[derive(PartialEq)]
 pub struct TabData {
     pub window_id: String,
     pub url: String,
