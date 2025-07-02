@@ -307,11 +307,11 @@ cargo fmt               # Format code
 cargo clippy            # Lint code
 cargo doc --open        # Generate docs
 
-# Enhanced Testing Script
-uv run scripts/tanaka.py test-enhanced           # Run tests with nextest
-uv run scripts/tanaka.py test-enhanced --coverage # With coverage report
-uv run scripts/tanaka.py test-enhanced --html     # With HTML coverage
-uv run scripts/tanaka.py test-enhanced --install  # Install required tools
+# Direct Testing Commands (no script needed)
+cargo nextest run                    # Run tests with nextest (2-3× faster)
+cargo nextest run --filter sync      # Run specific tests
+cargo llvm-cov --html               # Generate HTML coverage report
+cargo llvm-cov --lcov --output-path lcov.info  # Generate LCOV report
 ```
 
 ### Extension Commands (TypeScript)

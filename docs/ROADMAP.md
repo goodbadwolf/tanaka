@@ -460,7 +460,7 @@ git checkout -b feat/performance
 0.1. [x] ✅ `perf(dev): install cargo-nextest for 2-3× faster test execution`
    - ✅ Integrated into CI workflow
    - ✅ Added to pre-commit hooks with fallback
-   - ✅ Created test-enhanced task for local development
+   - ✅ Direct command usage (no wrapper script needed)
    ```bash
    cargo install cargo-nextest --locked
    cargo nextest run  # Run all tests faster
