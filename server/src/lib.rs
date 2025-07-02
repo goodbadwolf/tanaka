@@ -3,6 +3,7 @@ pub mod crdt;
 pub mod error;
 pub mod models;
 pub mod repository;
+pub mod services;
 pub mod sync;
 
 use crate::crdt::CrdtManager;

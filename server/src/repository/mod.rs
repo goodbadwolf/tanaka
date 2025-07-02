@@ -104,7 +104,6 @@ impl Repositories {
     }
 
     /// Create new repositories with mock implementation for testing
-    #[cfg(test)]
     #[must_use]
     pub fn new_mock() -> Self {
         Self {
