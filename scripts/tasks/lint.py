@@ -13,7 +13,7 @@ from utils import run_command
 from .core import TaskResult
 
 
-def lint_markdown(fix: bool = False, patterns_to_ignore: set[str] = None) -> int:
+def lint_markdown(fix: bool = False, patterns_to_ignore: set[str] | None = None) -> int:
     """Lint or fix markdown files"""
     if not patterns_to_ignore:
         patterns_to_ignore = set(["repomix-output.txt.md", ".venv/*"])
