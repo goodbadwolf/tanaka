@@ -545,12 +545,14 @@ git checkout -b feat/performance
    - ✅ Error backoff and timer scheduling working correctly
    - ✅ Integration with DI container completed
 
-6. [ ] `perf(extension): optimize React re-renders`
-   - Add React.memo where appropriate
-   - Optimize context usage
-   - Profile and fix performance issues
+6. [x] ✅ `perf(extension): optimize React re-renders`
+   - ✅ NO memo for simple components (Button, Card, etc. - premature optimization)
+   - ✅ Fix callback recreation with useCallback where it matters
+   - ✅ Optimize context usage to prevent cascading updates (using signals)
+   - ✅ Profile and fix actual performance bottlenecks
+   - ⏳ Implement virtualization for large lists when needed (deferred - no large lists yet)
 
-7. [ ] `feat(both): create benchmark suite with criterion`
+1. [ ] `feat(both): create benchmark suite with criterion`
    ```toml
    [dev-dependencies]
    criterion = { version = "0.5", features = ["html_reports"] }
@@ -572,22 +574,22 @@ git checkout -b feat/performance
    - HTML reports for performance analysis
    - Target: P95 ≤ 10ms sync latency validation
 
-8. [ ] `perf: optimize for 200+ tabs`
+2. [ ] `perf: optimize for 200+ tabs`
    - Load test scenarios
    - Profile bottlenecks
    - Apply optimizations
 
-9. [ ] `perf: achieve P95 ≤ 10ms target`
+3. [ ] `perf: achieve P95 ≤ 10ms target`
    - Server response times
    - Sync latency
    - UI responsiveness
 
-10. [ ] `docs: performance tuning guide`
+4. [ ] `docs: performance tuning guide`
     - Best practices
     - Configuration options
     - Monitoring setup
 
-11. [x] ✅ `perf(ci): integrate improved testing tools in CI`
+5. [x] ✅ `perf(ci): integrate improved testing tools in CI`
    - ✅ CI workflow updated to use cargo-nextest
    - ✅ cargo-llvm-cov replaces cargo-tarpaulin
    - ✅ Benchmark workflow added for performance tracking
