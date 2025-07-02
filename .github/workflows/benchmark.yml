@@ -48,7 +48,7 @@ jobs:
         run: |
           cd server
           # Run only the criterion benchmarks with bencher output format
-          cargo bench --bench sync_benchmark -- --output-format bencher | tee output.txt
+          cargo bench --bench sync_benchmark -- --output-format bencher | tee benchmarks.txt
 
       - name: Store benchmark result
         uses: benchmark-action/github-action-benchmark@v1
@@ -56,7 +56,7 @@ jobs:
         with:
           name: Rust Benchmarks
           tool: "cargo"
-          output-file-path: server/output.txt
+          output-file-path: server/benchmarks.txt
           github-token: ${{ secrets.GITHUB_TOKEN }}
           auto-push: true
 
