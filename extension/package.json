@@ -22,7 +22,7 @@
     "webapp": "WEBAPP_MODE=true rspack serve --mode development --config rspack.config.ts",
     "lint": "eslint 'src/**/*.ts' 'scripts/**/*.ts'",
     "lint:fix": "eslint 'src/**/*.ts' 'scripts/**/*.ts' --fix",
-    "lint:fix:generated": "eslint 'src/api/errors/*.ts' 'src/api/models/*.ts' 'src/api/sync/*.ts' --fix",
+    "lint:fix:specific": "eslint --fix",
     "format": "prettier --write 'src/**/*.{ts,html,css}' 'scripts/**/*.ts' 'manifest.json'",
     "typecheck": "tsc --noEmit",
     "quality-check": "pnpm run lint && pnpm run typecheck",
