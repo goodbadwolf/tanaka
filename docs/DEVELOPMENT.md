@@ -393,6 +393,47 @@ pnpm run gen-icons     # Generate icons
 - **Extension**: Mock browser APIs for testing
 - **Focus**: Critical paths and edge cases
 
+#### Server Integration Tests
+
+The `server/tests/sync_integration.rs` file contains comprehensive tests for the CRDT sync protocol:
+
+1. **Basic Operations**
+   - Empty sync requests verification
+   - Single tab creation testing
+
+2. **Authentication**
+   - Invalid token rejection
+   - Bearer token validation
+
+3. **Multi-Device Sync**
+   - Cross-device operation synchronization
+   - Incremental sync with `since_clock`
+
+4. **Complex Operations**
+   - Multiple CRDT operation types in single request
+   - Operation ordering and clock management
+
+5. **Error Handling**
+   - Invalid operation validation
+   - Malformed request handling
+
+```bash
+# Run all integration tests
+cargo test --test sync_integration
+
+# Run specific test
+cargo test test_sync_between_devices
+
+# Run with output
+cargo test --test sync_integration -- --nocapture
+```
+
+Key features:
+- In-memory SQLite database for test isolation
+- Per-test app instances with auth middleware
+- Proper Lamport clock incrementing
+- Device-specific filtering to prevent operation echo
+
 ### Manual Testing
 
 1. Load extension in Firefox
@@ -824,7 +865,7 @@ ENABLE_ADAPTIVE_SYNC=true npm run dev
 import { createSyncManager } from './sync';
 
 const syncManager = await createSyncManager({
-  syncIntervalMs: 5000,
+  syncIntervalMs: 5000,  // Base interval (adapts 1-10s)
   api: tanakaAPI,
   windowTracker: tracker,
   browser: browserAdapter,

@@ -28,7 +28,7 @@
 1. **Both devices configured?**: Ensure same server URL and token on all devices
 2. **Network connectivity?**: Can you reach the server URL in a browser?
 3. **Window tracked?**: Click "Track This Window" in the extension popup
-4. **Wait 5 seconds**: Sync interval is 5 seconds by default
+4. **Wait a moment**: Sync interval adapts from 1-10 seconds based on activity
 
 ---
 

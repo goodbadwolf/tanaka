@@ -83,7 +83,7 @@ sudo cp target/release/tanaka-server /usr/local/bin/
 ### Step 5: Start Syncing!
 
 - Click "Track This Window" to sync tabs from any Firefox window
-- Changes sync automatically every 5 seconds
+- Changes sync automatically (1s during activity, 10s when idle)
 - Open Firefox on another device and repeat setup to sync between them
 
 ---
@@ -118,7 +118,7 @@ shared_token = "change-this-to-something-secure"
 ```toml
 [server]
 bind_addr = "0.0.0.0:443"    # Listen address
-poll_secs = 5                # Sync interval
+poll_secs = 5                # Base sync interval (adaptive: 1-10s)
 flush_secs = 5               # Database flush interval
 
 [tls]

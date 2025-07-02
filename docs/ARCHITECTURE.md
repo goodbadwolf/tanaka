@@ -30,7 +30,7 @@
 
 1. **Capture** – The extension hooks `tabs.*` and `windows.*` events as they happen.
 2. **Encode** – Each change is appended to a local Yjs document and flushed as a binary update (`Uint8Array`).
-3. **Sync** – Every 5 seconds (adjusting to 1 s during activity) the extension POSTs its queued updates and immediately requests any newer ones from the server.
+3. **Sync** – The extension uses adaptive sync intervals (1s during activity, 10s when idle) to POST queued updates and request newer ones from the server.
 
 ## Server Workflow
 
@@ -41,7 +41,7 @@
 ## Data Guarantees
 
 - **Eventual Consistency** – Yjs/yrs ensures replicas converge regardless of network order.
-- **Crash Safety** – WAL mode plus 5 s flush means at most 5 seconds of edits are in memory at any moment.
+- **Crash Safety** – WAL mode plus periodic flush means at most 10 seconds of edits are in memory during idle periods.
 - **Security** – All traffic is TLS-encrypted (`rustls`) and protected by a shared bearer token.
 
 ## CRDT Synchronization Protocol
