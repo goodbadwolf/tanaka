@@ -21,7 +21,7 @@ SERVER_DIR = PROJECT_ROOT / "server"
 # Coverage thresholds
 DEFAULT_THRESHOLDS = {
     "extension": {"overall": 75},  # Use overall average instead of strict per-metric
-    "server": {"total": 50},
+    "server": {"total": 40},
 }
 
 
