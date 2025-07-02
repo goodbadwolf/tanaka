@@ -21,6 +21,7 @@ export default defineConfig({
     'popup/popup': './src/popup/popup.tsx',
     'settings/settings': './src/settings/settings.tsx',
     webapp: './src/webapp/index.tsx',
+    'workers/crdt-worker': './src/workers/crdt-worker.ts',
   },
 
   output: {
