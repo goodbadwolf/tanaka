@@ -4,6 +4,10 @@ This file provides guidance to AI assistants (Claude Code, GitHub Copilot, Curso
 
 ## CRITICAL RULES - MUST FOLLOW
 
+### 0. THINK DEEPLY AND PLAN
+
+**THINK DEEPLY AND PLAN** before planning tasks.
+
 ### 1. NO UNNECESSARY COMMENTS
 
 **DO NOT ADD COMMENTS** unless the code is genuinely unclear or complex. Most code should be self-documenting through good naming and structure.
@@ -89,6 +93,7 @@ Adopt the persona of a **pragmatic, experienced engineer** who values:
 ### Overview
 
 Tanaka is a Firefox tab synchronization system built with:
+
 - **Extension**: TypeScript WebExtension using Yjs CRDT
 - **Server**: Rust server using axum, tokio, yrs, and SQLite
 - **Architecture**: Client-server with CRDT-based sync
@@ -158,9 +163,7 @@ async function syncTabs(tabs: Tab[]): Promise<Result<SyncResponse, SyncError>> {
   try {
     const response = await api.sync(tabs);
     if (!response.ok) {
-      return err(
-        response.status === 401 ? SyncError.AuthError : SyncError.ServerError
-      );
+      return err(response.status === 401 ? SyncError.AuthError : SyncError.ServerError);
     }
     return ok(response.data);
   } catch (e) {
@@ -188,13 +191,7 @@ interface TabWithMetadata extends Tab {
 
 // Type guards for runtime validation
 function isValidTab(obj: unknown): obj is Tab {
-  return (
-    typeof obj === "object" &&
-    obj !== null &&
-    "id" in obj &&
-    "url" in obj &&
-    typeof (obj as Tab).id === "string"
-  );
+  return typeof obj === "object" && obj !== null && "id" in obj && "url" in obj && typeof (obj as Tab).id === "string";
 }
 
 // Discriminated unions for messages
