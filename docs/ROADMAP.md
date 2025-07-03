@@ -5,9 +5,11 @@ This roadmap consolidates extension and server development, focusing on pending 
 ## 🎯 Current Status
 
 - **Completed**: Phase 1 (UI Migration) and Phase 2 (Architecture) ✅
-- **Current**: Phase 3 (UI Redesign & Testing) 🚧 **NEXT**
+- **Current**: Phase 3 (Critical Fixes) 🚨 **URGENT**
 - **Extension**: v0.5.0 with 73% test coverage, React/Preact UI, CRDT Web Worker
 - **Server**: Clean architecture with repositories, services, error handling, CRDT sync
+
+**⚠️ CRITICAL**: Architecture review revealed showstopper bugs preventing multi-device sync. These must be fixed before proceeding with UI redesign.
 
 ---
 
@@ -15,248 +17,131 @@ This roadmap consolidates extension and server development, focusing on pending 
 
 ```
 main
-├── feat/ui-redesign             # Phase 3: UI Redesign & Testing 🚧 NEXT
-│   ├── feat/codebase-refactor   # 3.0: Comprehensive codebase refactoring ⏳ PENDING
-│   ├── feat/design-system       # 3.1: Design token system and accessibility ⏳ PENDING
-│   ├── feat/component-redesign  # 3.2: Component library rebuild ⏳ PENDING
-│   ├── feat/screens-redesign    # 3.3: Main UI screens redesign ⏳ PENDING
-│   ├── feat/comprehensive-testing # 3.4: Automated testing implementation ⏳ PENDING
-│   ├── feat/manual-testing      # 3.5: Manual testing and validation ⏳ PENDING
-│   └── feat/ui-documentation    # 3.6: Documentation and developer experience ⏳ PENDING
-└── feat/production-ready        # Phase 4: Security, observability, optimization, release prep ⏳ PENDING
+├── Phase 3: Critical Fixes (small atomic branches)
+│   ├── fix/device-auth          # Fix device ID authentication preventing multi-device sync
+│   ├── fix/server-persistence   # Restore state from DB on server restart
+│   ├── fix/lamport-clock        # Fix server-side Lamport clock atomicity
+│   ├── fix/queue-threshold      # Complete queue size threshold implementation
+│   ├── fix/message-protocol     # Fix popup message protocol inconsistency
+│   ├── fix/initial-sync         # Fix initial sync truncation beyond 100 tabs
+│   ├── fix/rate-limiter-leak    # Fix rate limiter memory leak
+│   ├── fix/cors-config          # Replace permissive CORS configuration
+│   ├── fix/csp-manifest         # Add Content Security Policy
+│   ├── fix/input-validation     # Add request validation and DOS prevention
+│   ├── fix/permission-checks    # Add dynamic permission verification
+│   ├── fix/sqlx-migrations      # Switch from runtime CREATE to SQLx migrations
+│   ├── fix/operation-idempotency # Add idempotency to operation storage
+│   ├── fix/operation-ids        # Fix operation ID collision issues
+│   └── fix/crdt-materialization # Persist CRDT state to database tables
+├── Phase 4: UI Redesign & Testing
+└── Phase 5: Production Ready
 ```
 
 ---
 
-## 🧪 Phase 3: UI Redesign & Testing
+## 🚨 Phase 3: Critical Fixes
 
-### 3.0 Codebase Refactoring ⏳ **PENDING**
+### Overview
 
-**Branch**: `feat/codebase-refactor`
+Architecture review identified critical bugs that completely break multi-device synchronization. These must be fixed before any UI work.
 
-#### Overview
+### 3.1 Core Functionality Fixes 🔴 **SHOWSTOPPERS**
 
-Comprehensive refactoring of the entire codebase to improve maintainability, consistency, and prepare for UI redesign work.
+These bugs prevent Tanaka from fulfilling its primary purpose:
 
-#### Implementation Steps
+#### `fix/device-auth` - Device ID Authentication Bug
+**Impact**: All devices forced to use same ID, making multi-device sync impossible  
+**Fix**: Trust client-provided device_id instead of deriving from token
 
-```bash
-git checkout -b feat/codebase-refactor
-```
+#### `fix/server-persistence` - Server State Persistence  
+**Impact**: Complete data loss on server restart  
+**Fix**: Reload Lamport clock and operations from database on startup
 
-1. [ ] `refactor(extension): standardize code organization`
+#### `fix/lamport-clock` - Lamport Clock Atomicity
+**Impact**: Race conditions cause incorrect operation ordering  
+**Fix**: Use atomic compare-and-swap for server clock updates
 
-   - Consistent file naming conventions (kebab-case)
-   - Logical directory structure alignment
-   - Extract reusable utilities and helpers
-   - Consolidate duplicate code patterns
-   - Improve module boundaries and exports
+#### `fix/queue-threshold` - Queue Size Threshold
+**Impact**: Users wait up to 10s for sync after rapid changes  
+**Fix**: Trigger immediate sync when queue exceeds threshold
 
-2. [ ] `refactor(extension): improve type safety`
+#### `fix/message-protocol` - Message Protocol Inconsistency
+**Impact**: Popup shows errors or blank window list  
+**Fix**: Align message handler response with popup expectations
 
-   - Replace all `any` types with proper types
-   - Add missing type definitions
-   - Strengthen type guards and validators
-   - Improve generic type constraints
-   - Document complex type relationships
+#### `fix/initial-sync` - Initial Sync Truncation
+**Impact**: New devices silently lose tabs beyond first 100  
+**Fix**: Send CRDT state snapshot for initial sync
 
-3. [ ] `refactor(server): enhance code organization`
+#### `fix/rate-limiter-leak` - Rate Limiter Memory Leak
+**Impact**: Server eventually runs out of memory and crashes  
+**Fix**: Properly schedule cleanup with elapsed time check
 
-   - Align module structure with clean architecture
-   - Extract common patterns into shared modules
-   - Improve error handling consistency
-   - Standardize logging and tracing patterns
-   - Consolidate configuration handling
+### 3.2 Security Fixes 🔒 **REQUIRED FOR RELEASE**
 
-4. [ ] `refactor(both): standardize API contracts`
+#### `fix/cors-config` - CORS Configuration
+**Impact**: Security vulnerability with permissive CORS  
+**Fix**: Allow only browser extension origins and configured domains
 
-   - Align request/response patterns
-   - Consistent error response formats
-   - Standardize pagination and filtering
-   - Improve API versioning strategy
-   - Document all endpoints thoroughly
+#### `fix/csp-manifest` - Content Security Policy
+**Impact**: Required for Mozilla addon store submission  
+**Fix**: Add CSP to manifest.json
 
-5. [ ] `refactor(extension): modernize React patterns`
+#### `fix/input-validation` - Input Validation
+**Impact**: Potential DOS attacks  
+**Fix**: Validate request size and operation count
 
-   - Convert class components to functional (if any remain)
-   - Standardize hook usage patterns
-   - Improve component composition
-   - Extract custom hooks for reusable logic
-   - Optimize context usage and providers
+#### `fix/permission-checks` - Dynamic Permission Verification
+**Impact**: MV3 allows runtime permission revocation  
+**Fix**: Check permissions before each sync attempt
 
-6. [ ] `refactor(both): improve naming consistency`
+### 3.3 Data Integrity Fixes 💾 **PREVENT DATA LOSS**
 
-   - Align naming across TypeScript and Rust
-   - Standardize variable and function names
-   - Consistent acronym handling (URL vs Url)
-   - Clear and descriptive names throughout
-   - Remove ambiguous abbreviations
+#### `fix/sqlx-migrations` - Database Migrations
+**Impact**: Runtime CREATE TABLE is fragile  
+**Fix**: Use proper SQLx migration system
 
-7. [ ] `refactor(tests): enhance test structure`
+#### `fix/operation-idempotency` - Operation Idempotency
+**Impact**: Duplicate operations on retry  
+**Fix**: Use INSERT OR IGNORE with proper operation IDs
 
-   - Consistent test file organization
-   - Standardize test naming patterns
-   - Extract test utilities and helpers
-   - Improve test data factories
-   - Add missing test coverage
+#### `fix/operation-ids` - Operation ID Format
+**Impact**: IDs with underscores break parsing  
+**Fix**: Use non-printable delimiter or composite primary key
 
-8. [ ] `refactor(both): technical debt cleanup`
-   - Remove dead code and unused dependencies
-   - Update deprecated API usage
-   - Fix all TODO and FIXME comments
-   - Improve code comments where needed
-   - Update outdated documentation
+#### `fix/crdt-materialization` - CRDT State Persistence
+**Impact**: Memory state not reflected in database  
+**Fix**: Update database tables atomically with CRDT operations
 
 ---
 
-### 3.1 Design System Foundation ⏳ **PENDING**
+## 🧪 Phase 4: UI Redesign & Testing
 
-**Branch**: `feat/design-system`
+### Overview
 
-#### Overview
+Modernize the extension UI with proper design system, comprehensive testing, and improved developer experience.
 
-Establish comprehensive design system and UI/UX foundation for consistent, accessible user experience.
+### Primary Goals
 
-#### Implementation Steps
-
-```bash
-git checkout -b feat/design-system
-```
-
-1. [ ] `design: create design token system`
-
-   - Color palette (primary, secondary, semantic colors)
-   - Typography scale and font system
-   - Spacing system (4px, 8px, 12px, 16px, 24px, 32px, 48px)
-   - Shadow and elevation system
-   - Border radius and border system
-   - Animation timing and easing functions
-
-2. [ ] `design: accessibility guidelines`
-
-   - WCAG 2.1 AA compliance standards
-   - Color contrast requirements (4.5:1 normal, 3:1 large text)
-   - Focus management and keyboard navigation
-   - Screen reader compatibility requirements
-   - Touch target size standards (44px minimum)
-
-3. [ ] `design: dark mode specifications`
-
-   - Dark mode color palette
-   - Component variations for dark theme
-   - Automatic theme detection
-   - User preference persistence
-   - Smooth theme transitions
-
-4. [ ] `feat(extension): implement design tokens`
-   - CSS custom properties system
-   - TypeScript design token exports
-   - Theme provider component
-   - Design token validation utilities
-   - Token consumption patterns
+1. **Code Quality**: Zero `any` types, consistent patterns, clean architecture
+2. **Design System**: WCAG 2.1 AA compliant, design tokens, dark mode
+3. **Component Library**: Reusable, tested, accessible components
+4. **Testing**: 95%+ coverage, visual regression, E2E user flows
+5. **Developer Experience**: Storybook, documentation, tooling
 
 ---
 
-### 3.2 Component Library Redesign ⏳ **PENDING**
+## 🚀 Phase 5: Production Ready
 
-**Branch**: `feat/component-redesign`
+### Overview
 
-#### Key Areas
+Prepare for v1.0 release with performance optimization, monitoring, and Mozilla addon store submission.
 
-- Foundational components (Button, Input, Card, LoadingSpinner, ErrorMessage)
-- Advanced interactive components (Modal, Tooltip, Dropdown, Toggle, Badge)
-- Layout and structure components (Grid, Stack, Container, Divider)
-- Data display components (Table, List, Progress, Status indicators)
-- Form system with validation and error handling
+### Primary Goals
 
----
-
-### 3.3 Main UI Screens Redesign ⏳ **PENDING**
-
-**Branch**: `feat/screens-redesign`
-
-#### Key Areas
-
-- Popup interface with improved window tracking and sync status
-- Settings page with better organization and configuration UI
-- Status monitoring with real-time indicators and health visualization
-- Onboarding flow with tutorials and contextual help system
-
----
-
-### 3.4 Comprehensive Testing Implementation ⏳ **PENDING**
-
-**Branch**: `feat/comprehensive-testing`
-
-#### Key Areas
-
-- Unit and component testing (95%+ coverage with React Testing Library)
-- Visual regression testing (Chromatic/Percy for cross-browser consistency)
-- Accessibility testing automation (axe-core, keyboard navigation, screen readers)
-- E2E testing with Playwright for complete user flows and sync scenarios
-
----
-
-### 3.5 Manual Testing & Validation ⏳ **PENDING**
-
-**Branch**: `feat/manual-testing`
-
-#### Key Areas
-
-- Cross-platform testing (Windows, macOS, Linux, Firefox versions)
-- Usability testing with 5-10 real users and satisfaction surveys
-- Edge case and stress testing (200+ tabs, network failures, crashes)
-- Manual test protocol documentation and release readiness checklists
-
----
-
-### 3.6 Documentation & Developer Experience ⏳ **PENDING**
-
-**Branch**: `feat/ui-documentation`
-
-#### Key Areas
-
-- Design system documentation with interactive component showcase
-- Developer guidelines for component development and testing
-- User documentation with updated guides and screenshots
-- Development tools (Storybook, design tokens, accessibility CI)
-
----
-
-## 🚀 Phase 4: Production Ready
-
-**Branch**: `feat/production-ready`
-
-### Key Areas
-
-#### Security & Hardening
-
-- Comprehensive security audit (code review, dependency checks, extension permissions)
-- Browser extension security (CSP compliance, message passing validation)
-- TLS implementation with rustls
-
-#### Observability & Monitoring
-
-- Server metrics and health endpoints (Prometheus, /metrics, /healthz)
-- Distributed tracing implementation
-- Extension performance monitoring and debug mode
-- Grafana dashboards and alerting
-
-#### Performance Optimization
-
-- 200+ tabs optimization and stress testing
-- P95 ≤ 10ms sync latency target
-- Database migration system with SQLx
-- DashMap TTL cache implementation
-- Performance benchmarking with Criterion
-
-#### Release Preparation
-
-- E2E test suite with Playwright
-- Single-binary distribution for server
-- Mozilla addon store submission
-- Documentation updates (v1.0 features, migration guide)
-- Release automation scripts
+1. **Monitoring**: Server metrics, distributed tracing, performance dashboards
+2. **Performance**: Handle 200+ tabs smoothly, optimize sync latency
+3. **Release**: Mozilla addon store ready, single-binary server, v1.0 documentation
 
 ---
 
@@ -264,16 +149,22 @@ git checkout -b feat/design-system
 
 | Metric                   | Target         | Phase   |
 | ------------------------ | -------------- | ------- |
-| Extension Test Coverage  | 95%+           | Phase 3 |
-| Overall Test Coverage    | 95%+           | Phase 3 |
-| Accessibility Compliance | WCAG 2.1 AA    | Phase 3 |
-| Visual Regression Tests  | Implemented    | Phase 3 |
-| Cross-browser Testing    | Complete       | Phase 3 |
-| Usability Testing        | User validated | Phase 3 |
-| Sync Latency P95         | ≤ 10ms         | Phase 4 |
-| 200+ Tabs Performance    | Smooth         | Phase 4 |
-| Security Audit           | Passed         | Phase 4 |
-| Mozilla Approval         | Ready          | Phase 4 |
+| Multi-device Sync        | Working        | Phase 3 |
+| Data Persistence         | No loss        | Phase 3 |
+| Operation Ordering       | Correct        | Phase 3 |
+| Sync Latency (Active)    | ≤ 1s           | Phase 3 |
+| Memory Leaks             | None           | Phase 3 |
+| Security Vulnerabilities | Fixed          | Phase 3 |
+| Extension Test Coverage  | 95%+           | Phase 4 |
+| Overall Test Coverage    | 95%+           | Phase 4 |
+| Accessibility Compliance | WCAG 2.1 AA    | Phase 4 |
+| Visual Regression Tests  | Implemented    | Phase 4 |
+| Cross-browser Testing    | Complete       | Phase 4 |
+| Usability Testing        | User validated | Phase 4 |
+| Sync Latency P95         | ≤ 10ms         | Phase 5 |
+| 200+ Tabs Performance    | Smooth         | Phase 5 |
+| Security Audit           | Passed         | Phase 5 |
+| Mozilla Approval         | Ready          | Phase 5 |
 
 ---
 
@@ -300,20 +191,47 @@ git checkout -b feat/design-system
 
 ## ✅ Success Criteria
 
-### Phase 3 (UI Redesign & Testing)
+### Phase 3 (Critical Fixes)
 
-#### 3.0 Codebase Refactoring
+#### Core Functionality ✓
+- [ ] Multiple Firefox instances can sync tabs using same server
+- [ ] Server restarts don't lose data - state restored from database
+- [ ] Operations applied in correct order with atomic Lamport clock
+- [ ] Sync happens within 1s during activity (queue threshold working)
+- [ ] Popup displays correct window list without errors
+- [ ] New devices receive complete state (>100 tabs supported)
+- [ ] Server runs indefinitely without memory leaks
 
-- [ ] All code follows consistent organization patterns
-- [ ] Zero `any` types in TypeScript code
+#### Security & Compliance ✓
+- [ ] CORS properly configured - only extension origins allowed
+- [ ] Content Security Policy added to manifest.json
+- [ ] Input validation prevents DOS attacks
+- [ ] Permissions checked before each sync operation
+
+#### Data Integrity ✓
+- [ ] Database uses SQLx migrations (no runtime CREATE TABLE)
+- [ ] Operations are idempotent - no duplicates on retry
+- [ ] Operation IDs handle all character combinations
+- [ ] CRDT state persisted to database tables
+
+### Phase 4 (UI Redesign & Testing)
+
+- [ ] All code follows consistent organization patterns with zero `any` types
+- [ ] Design token system implemented with WCAG 2.1 AA compliance
+- [ ] Component library built with 95%+ test coverage
+- [ ] Dark mode fully implemented with theme switching
+- [ ] Visual regression tests integrated into CI
+- [ ] E2E test suite covering all user flows
+- [ ] Storybook documentation for all components
 - [ ] Technical debt reduced by 80%+
-- [ ] All TODO/FIXME comments resolved
-- [ ] Code duplication eliminated
-- [ ] Test structure standardized across codebase
 
-#### 3.1 Design System Foundation
+### Phase 5 (Production Ready)
 
-- [ ] Design token system implemented and documented
-- [ ] WCAG 2.1 AA accessibility guidelines established
-- [ ] Dark mode specifications and implementation complete
-- [ ] TypeScript design token system integrated
+- [ ] Server metrics and health endpoints implemented
+- [ ] P95 sync latency ≤ 10ms verified under load
+- [ ] 200+ tabs handled smoothly without performance degradation
+- [ ] Distributed tracing integrated for debugging
+- [ ] Single-binary server distribution created
+- [ ] Mozilla addon store submission ready
+- [ ] v1.0 documentation complete with migration guide
+- [ ] Release automation scripts tested and working
