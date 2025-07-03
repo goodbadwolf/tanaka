@@ -7,13 +7,15 @@ This roadmap consolidates extension and server development, focusing on pending 
 - **Extension**: v0.5.0 with 73% test coverage, modern UI **fully complete**, CRDT Web Worker **implemented**
 - **Server**: Comprehensive architecture with error handling, config management, and CRDT foundation
 - **Key Achievement**: Phase 1 UI Migration, Phase 2.1 Error Handling, Phase 2.2 CRDT Protocol, and Phase 2.3 Repository Layer **COMPLETE**
-- **Current**: Phase 2.5 (Performance Optimization) 🚧 **IN PROGRESS** - Sync debouncing ✅ COMPLETE, Web Worker ✅ COMPLETE, optimizing for 200+ tabs
+- **Current**: Phase 3 (UI Redesign & Testing) 🚧 **NEXT** - Phase 2 Architecture ✅ COMPLETE, moving to UI and testing phase
 - **Phase 1 Status**: ✅ **COMPLETE** - UI fully migrated to React/Preact
 - **Phase 2.1 Status**: ✅ **COMPLETE** - Error handling and configuration fully implemented
 - **Phase 2.2 Status**: ✅ **COMPLETE** - CRDT protocol fully implemented and operational
 - **Phase 2.3 Status**: ✅ **COMPLETE** - Repository layer with full test coverage implemented
 - **Phase 2.4 Status**: ✅ **COMPLETE** - Service layer with dependency injection fully implemented
-- **Next Focus**: Phase 2.5 (Performance Optimization) - Optimize for 200+ tabs with ≤10ms sync latency
+- **Phase 2.5 Status**: ✅ **COMPLETE** - Performance infrastructure implemented
+- **Phase 2 Status**: ✅ **COMPLETE** - All architecture work finished
+- **Next Focus**: Phase 3 (UI Redesign & Testing) - Design system, comprehensive testing, accessibility
 
 ---
 
@@ -21,15 +23,21 @@ This roadmap consolidates extension and server development, focusing on pending 
 
 ```
 main
-├── feat/ui-completion           # Complete v0.5.1 UI work
-├── feat/unified-architecture    # v1.0 Clean architecture for both
-│   ├── feat/error-handling      # Unified error architecture
-│   ├── feat/crdt-protocol       # CRDT sync improvements
-│   ├── feat/repository-layer    # Data access patterns
-│   ├── feat/service-layer       # Business logic
-│   ├── feat/performance         # Optimization & caching
-│   └── feat/observability       # Metrics & monitoring
-└── feat/production-ready        # Final polish & release prep
+├── feat/ui-completion           # Complete v0.5.1 UI work ✅ COMPLETE
+├── feat/unified-architecture    # v1.0 Clean architecture for both ✅ COMPLETE
+│   ├── feat/error-handling      # Unified error architecture ✅ COMPLETE
+│   ├── feat/crdt-protocol       # CRDT sync improvements ✅ COMPLETE
+│   ├── feat/repository-layer    # Data access patterns ✅ COMPLETE
+│   ├── feat/service-layer       # Business logic ✅ COMPLETE
+│   └── feat/performance         # Performance infrastructure ✅ COMPLETE
+├── feat/ui-redesign             # Phase 3: UI Redesign & Testing 🚧 NEXT
+│   ├── feat/design-system       # 3.1: Design token system and accessibility ⏳ PENDING
+│   ├── feat/component-redesign  # 3.2: Component library rebuild ⏳ PENDING
+│   ├── feat/screens-redesign    # 3.3: Main UI screens redesign ⏳ PENDING
+│   ├── feat/comprehensive-testing # 3.4: Automated testing implementation ⏳ PENDING
+│   ├── feat/manual-testing      # 3.5: Manual testing and validation ⏳ PENDING
+│   └── feat/ui-documentation    # 3.6: Documentation and developer experience ⏳ PENDING
+└── feat/production-ready        # Phase 4: Security, observability, optimization, release prep ⏳ PENDING
 ```
 
 ---
@@ -442,12 +450,12 @@ extension/src/
 
 ---
 
-### 2.5 Performance Optimization
+### 2.5 Performance Optimization ✅ **COMPLETE**
 
-**Branch**: `feat/performance`
+**Branch**: `feat/performance` ✅ **MERGED**
 
 #### Overview
-Optimize both extension and server for 200+ tabs, achieving P95 sync latency ≤ 10ms.
+✅ Implemented performance infrastructure and optimizations for extension and server. Load testing, optimization, and validation moved to Phase 3 for final pre-release validation.
 
 #### Implementation Steps
 
@@ -552,44 +560,7 @@ git checkout -b feat/performance
    - ✅ Profile and fix actual performance bottlenecks
    - ⏳ Implement virtualization for large lists when needed (deferred - no large lists yet)
 
-1. [ ] `feat(both): create benchmark suite with criterion`
-   ```toml
-   [dev-dependencies]
-   criterion = { version = "0.5", features = ["html_reports"] }
-   ```
-   ```rust
-   // benches/sync_bench.rs
-   use criterion::{black_box, criterion_group, criterion_main, Criterion};
-
-   fn sync_benchmark(c: &mut Criterion) {
-       c.bench_function("sync 100 operations", |b| {
-           b.iter(|| sync_operations(black_box(generate_100_ops())))
-       });
-   }
-
-   criterion_group!(benches, sync_benchmark);
-   criterion_main!(benches);
-   ```
-   - Automated benchmarks with regression detection
-   - HTML reports for performance analysis
-   - Target: P95 ≤ 10ms sync latency validation
-
-2. [ ] `perf: optimize for 200+ tabs`
-   - Load test scenarios
-   - Profile bottlenecks
-   - Apply optimizations
-
-3. [ ] `perf: achieve P95 ≤ 10ms target`
-   - Server response times
-   - Sync latency
-   - UI responsiveness
-
-4. [ ] `docs: performance tuning guide`
-    - Best practices
-    - Configuration options
-    - Monitoring setup
-
-5. [x] ✅ `perf(ci): integrate improved testing tools in CI`
+1. [x] ✅ `perf(ci): integrate improved testing tools in CI`
    - ✅ CI workflow updated to use cargo-nextest
    - ✅ cargo-llvm-cov replaces cargo-tarpaulin
    - ✅ Benchmark workflow added for performance tracking
@@ -617,89 +588,280 @@ git checkout -b feat/performance
 
 ---
 
-### 2.6 Observability
+## 🧪 Phase 3: UI Redesign & Testing
 
-**Branch**: `feat/observability`
+### 3.1 Design System Foundation ⏳ **PENDING**
+
+**Branch**: `feat/design-system`
 
 #### Overview
-Add comprehensive monitoring and debugging capabilities to both extension and server.
+Establish comprehensive design system and UI/UX foundation for consistent, accessible user experience.
 
 #### Implementation Steps
 
 ```bash
-git checkout -b feat/observability
+git checkout -b feat/design-system
 ```
 
-1. [ ] `feat(server): integrate metrics crate`
-   - Add `metrics = "0.23"` dependency
-   - Define key metrics
-   - Start collecting
+1. [ ] `design: create design token system`
+   - Color palette (primary, secondary, semantic colors)
+   - Typography scale and font system
+   - Spacing system (4px, 8px, 12px, 16px, 24px, 32px, 48px)
+   - Shadow and elevation system
+   - Border radius and border system
+   - Animation timing and easing functions
 
-2. [ ] `feat(server): add Prometheus endpoint`
-   - Add `prometheus = "0.13"`
-   - Expose /metrics endpoint
-   - Configure scrapers
+2. [ ] `design: accessibility guidelines`
+   - WCAG 2.1 AA compliance standards
+   - Color contrast requirements (4.5:1 normal, 3:1 large text)
+   - Focus management and keyboard navigation
+   - Screen reader compatibility requirements
+   - Touch target size standards (44px minimum)
 
-3. [x] `feat(server): implement tracing`
-   - ✅ `tracing` and `tracing-subscriber` dependencies already added
-   - ✅ Basic structured logging foundation exists
-   - ⏳ Need to add trace context and spans throughout codebase
+3. [ ] `design: dark mode specifications`
+   - Dark mode color palette
+   - Component variations for dark theme
+   - Automatic theme detection
+   - User preference persistence
+   - Smooth theme transitions
 
-4. [ ] `feat(server): create health endpoints`
-   - /healthz for liveness
-   - /ready for readiness
-   - Dependency checks
-
-5. [ ] `feat(extension): add performance marks`
-   - Mark key operations
-   - Measure durations
-   - Report to console
-
-6. [ ] `feat(extension): implement error reporting`
-   - Capture unhandled errors
-   - Add context
-   - Optional telemetry
-
-7. [ ] `feat(extension): add debug mode`
-   - Verbose logging
-   - State inspection
-   - Performance profiling
-
-8. [ ] `feat(both): define common metrics`
-   - Sync success rate
-   - Tab count
-   - Error rates
-
-9. [ ] `feat: create monitoring dashboard`
-   - Grafana templates
-   - Key metrics
-   - Alerting rules
-
-10. [ ] `docs: observability guide`
-    - Metric definitions
-    - Dashboard setup
-    - Troubleshooting
-
-11. [ ] `test(extension): setup Playwright for E2E tests`
-    - Configure Playwright for extension testing
-    - Add test fixtures
-    - Create helper utilities
-    - Integrate with CI pipeline
-
-12. [ ] `test(extension): implement E2E test suite`
-    - Test complete user flows
-    - Test sync scenarios
-    - Test error recovery
-    - Performance benchmarks in E2E tests
+4. [ ] `feat(extension): implement design tokens`
+   - CSS custom properties system
+   - TypeScript design token exports
+   - Theme provider component
+   - Design token validation utilities
+   - Token consumption patterns
 
 ---
 
-## 🚀 Phase 3: Production Ready
+### 3.2 Component Library Redesign ⏳ **PENDING**
+
+**Branch**: `feat/component-redesign`
+
+#### Overview
+Redesign and rebuild all UI components using the new design system with enhanced accessibility and functionality.
+
+#### Implementation Steps
+
+```bash
+git checkout -b feat/component-redesign
+```
+
+1. [ ] `feat(extension): redesign foundational components`
+   - Button (primary, secondary, danger, ghost variants)
+   - Input (text, email, password, URL with validation states)
+   - Card (default, outlined, elevated with header/footer)
+   - LoadingSpinner (small, medium, large with color variants)
+   - ErrorMessage (error, warning, info, success types)
+
+2. [ ] `feat(extension): advanced interactive components`
+   - Modal/Dialog with focus trap and backdrop
+   - Tooltip with smart positioning
+   - Dropdown/Select with keyboard navigation
+   - Toggle/Switch with animations
+   - Badge/Label for status indicators
+
+3. [ ] `feat(extension): layout and structure components`
+   - Grid system (responsive columns)
+   - Stack component (vertical/horizontal spacing)
+   - Container with max-width and centering
+   - Divider with text and orientation options
+   - Navigation components
+
+4. [ ] `feat(extension): data display components`
+   - Table/DataTable with sorting and filtering
+   - List components (simple, interactive)
+   - Progress indicators (linear, circular)
+   - Status indicators and sync states
+   - Empty states and placeholders
+
+5. [ ] `feat(extension): form and input system`
+   - Form validation and error handling
+   - Field groups and layouts
+   - Required field indicators
+   - Help text and descriptions
+   - Form submission states
+
+---
+
+### 3.3 Main UI Screens Redesign ⏳ **PENDING**
+
+**Branch**: `feat/screens-redesign`
+
+#### Overview
+Apply the new design system to all main application screens with improved user experience and workflows.
+
+#### Implementation Steps
+
+```bash
+git checkout -b feat/screens-redesign
+```
+
+1. [ ] `feat(extension): popup interface redesign`
+   - Cleaner window tracking interface
+   - Better sync status visualization
+   - Quick actions and shortcuts
+   - Improved information hierarchy
+   - Responsive design for different screen sizes
+
+2. [ ] `feat(extension): settings page enhancement`
+   - Organized sections with clear navigation
+   - Better server configuration UI
+   - Advanced settings with explanations
+   - Import/export configuration options
+   - Reset and troubleshooting tools
+
+3. [ ] `feat(extension): status and monitoring UI`
+   - Real-time sync status indicators
+   - Connection health visualization
+   - Error state management and recovery
+   - Performance metrics display
+   - Notification system for important events
+
+4. [ ] `feat(extension): onboarding and help system`
+   - First-time user setup flow
+   - Interactive tutorials and guides
+   - Contextual help and tooltips
+   - Troubleshooting wizard
+   - Feature discovery and tips
+
+---
+
+### 3.4 Comprehensive Testing Implementation ⏳ **PENDING**
+
+**Branch**: `feat/comprehensive-testing`
+
+#### Overview
+Implement extensive automated and manual testing to ensure quality, accessibility, and cross-platform compatibility.
+
+#### Implementation Steps
+
+```bash
+git checkout -b feat/comprehensive-testing
+```
+
+1. [ ] `test: unit and component testing`
+   - 95%+ unit test coverage for all components
+   - React Testing Library integration tests
+   - Component behavior and interaction testing
+   - Props validation and edge case testing
+   - Mock service integration testing
+
+2. [ ] `test: visual regression testing`
+   - Chromatic/Percy integration for visual diffs
+   - Component screenshot comparisons
+   - Cross-browser visual consistency
+   - Theme variation testing (light/dark)
+   - Responsive design validation
+
+3. [ ] `test: accessibility testing automation`
+   - axe-core integration for automated a11y checks
+   - Keyboard navigation testing
+   - Screen reader compatibility validation
+   - Color contrast verification
+   - Focus management testing
+
+4. [ ] `test: E2E and integration testing`
+   - Playwright test suite for complete user flows
+   - Multi-device sync scenario testing
+   - Error recovery and resilience testing
+   - Cross-browser compatibility (Chrome, Firefox, Edge)
+   - Performance benchmarking during real usage
+
+---
+
+### 3.5 Manual Testing & Validation ⏳ **PENDING**
+
+**Branch**: `feat/manual-testing`
+
+#### Overview
+Comprehensive manual testing protocols and real-user validation to ensure production readiness.
+
+#### Implementation Steps
+
+```bash
+git checkout -b feat/manual-testing
+```
+
+1. [ ] `test: cross-platform manual testing`
+   - Windows 10/11 testing protocols
+   - macOS testing (Intel and Apple Silicon)
+   - Linux distributions testing (Ubuntu, Fedora)
+   - Different Firefox versions (ESR, stable, beta)
+   - Different screen sizes and resolutions
+
+2. [ ] `test: usability and user experience testing`
+   - Real user testing sessions (5-10 users)
+   - Task completion rate measurement
+   - User satisfaction surveys
+   - Accessibility testing with assistive technologies
+   - Performance perception testing
+
+3. [ ] `test: edge case and stress testing`
+   - 200+ tabs stress testing
+   - Network failure and recovery testing
+   - Browser crash and restart scenarios
+   - Extension disable/enable testing
+   - Data corruption and recovery testing
+
+4. [ ] `test: manual test protocol documentation`
+   - Detailed testing checklists
+   - Bug reporting templates and workflows
+   - Test case documentation
+   - Acceptance criteria validation
+   - Release readiness checklists
+
+---
+
+### 3.6 Documentation & Developer Experience ⏳ **PENDING**
+
+**Branch**: `feat/ui-documentation`
+
+#### Overview
+Create comprehensive documentation for the design system, components, and development workflows.
+
+#### Implementation Steps
+
+```bash
+git checkout -b feat/ui-documentation
+```
+
+1. [ ] `docs: design system documentation`
+   - Interactive design token showcase
+   - Component library with live examples
+   - Usage guidelines and best practices
+   - Accessibility implementation guides
+   - Theme customization documentation
+
+2. [ ] `docs: developer documentation`
+   - Component development guidelines
+   - Testing best practices and examples
+   - Build and deployment processes
+   - Code style and naming conventions
+   - Contributing guidelines for UI work
+
+3. [ ] `docs: user documentation`
+   - Updated user guides with new UI
+   - Feature documentation with screenshots
+   - Accessibility features documentation
+   - Troubleshooting guides with visual aids
+   - FAQ updates for new interface
+
+4. [ ] `tools: development workflow improvements`
+   - Storybook integration for component development
+   - Design token synchronization tools
+   - Automated accessibility checking in CI
+   - Visual regression test integration
+   - Component library publishing
+
+---
+
+## 🚀 Phase 4: Production Ready
 
 **Branch**: `feat/production-ready`
 
 ### Overview
-Final preparations for v1.0 release including security hardening, distribution setup, and Mozilla submission.
+Final preparations for v1.0 release including security hardening, observability, performance optimization, and Mozilla submission.
 
 ### Implementation Steps
 
@@ -719,32 +881,74 @@ git checkout -b feat/production-ready
 - Document security measures and best practices
 - Ensure no data leakage or XSS vulnerabilities
 
-1. [x] `feat(server): add TLS support`
+2. [ ] `observability: implement monitoring and metrics`
+   - Add `metrics = "0.23"` dependency to server
+   - Add Prometheus endpoint with `prometheus = "0.13"`
+   - Define key metrics (sync success rate, tab count, error rates)
+   - Expose /metrics endpoint and configure scrapers
+
+3. [ ] `observability: implement health and tracing`
+   - Create /healthz for liveness and /ready for readiness
+   - Add dependency checks to health endpoints
+   - Complete tracing implementation with spans throughout codebase
+   - Add trace context for request tracking
+
+4. [ ] `observability: extension monitoring`
+   - Add performance marks for key operations
+   - Implement error reporting with context
+   - Add debug mode with verbose logging and state inspection
+   - Performance profiling capabilities
+
+5. [ ] `observability: monitoring infrastructure`
+   - Create Grafana templates and dashboards
+   - Set up key metrics visualization
+   - Configure alerting rules
+   - Document observability setup and troubleshooting
+
+6. [ ] `test: E2E test suite implementation`
+   - Setup Playwright for extension testing
+   - Add test fixtures and helper utilities
+   - Integrate with CI pipeline
+   - Implement complete user flow tests
+   - Test sync scenarios and error recovery
+   - Performance benchmarks in E2E tests
+
+7. [x] `feat(server): add TLS support`
    - ✅ TLS configuration structure exists in config.rs
    - ⏳ Need to add `rustls` dependencies and implementation
    - ⏳ Certificate handling logic needed
 
-2. [ ] `build: create release scripts`
+8. [ ] `build: create release scripts`
    - Automated builds
    - Version bumping
    - Asset generation
 
-3. [ ] `feat(server): single-binary distribution`
+9. [ ] `feat(server): single-binary distribution`
    - Static linking
    - Embedded assets
    - Cross-platform
 
-4. [ ] `feat(extension): prepare for Mozilla submission`
+10. [ ] `feat(extension): prepare for Mozilla submission`
    - Policy compliance
    - Required metadata
    - Screenshots
 
-5. [ ] `test: final integration testing`
+11. [ ] `perf: optimize for 200+ tabs`
+   - Load test scenarios
+   - Profile bottlenecks
+   - Apply optimizations
+
+12. [ ] `perf: achieve P95 ≤ 10ms target`
+   - Server response times
+   - Sync latency
+   - UI responsiveness
+
+13. [ ] `test: final integration testing`
    - Full system test
    - Multiple browsers
    - Load testing
 
-6. [ ] `docs: update all documentation`
+14. [ ] `docs: update all documentation`
    - Installation guide
    - User manual
    - API documentation
@@ -753,22 +957,46 @@ git checkout -b feat/production-ready
    - Comprehensive testing guide
    - Performance tuning guide
 
-7. [ ] `docs: create migration guide`
+15. [ ] `docs: create migration guide`
    - From v0.5 to v1.0
    - Breaking changes
    - Upgrade steps
 
-8. [ ] `test: final QA validation`
+16. [ ] `test: final QA validation`
    - Checklist completion
    - Performance validation
    - Sign-off
 
-9. [ ] `release: tag v1.0.0`
+17. [ ] `perf: performance benchmarking & validation`
+   ```toml
+   [dev-dependencies]
+   criterion = { version = "0.5", features = ["html_reports"] }
+   ```
+   ```rust
+   // benches/sync_bench.rs
+   use criterion::{black_box, criterion_group, criterion_main, Criterion};
+
+   fn sync_benchmark(c: &mut Criterion) {
+       c.bench_function("sync 100 operations", |b| {
+           b.iter(|| sync_operations(black_box(generate_100_ops())))
+       });
+   }
+
+   criterion_group!(benches, sync_benchmark);
+   criterion_main!(benches);
+   ```
+   - Automated benchmarks with regression detection
+   - HTML reports for performance analysis
+   - Final validation: P95 ≤ 10ms sync latency
+   - 200+ tabs performance validation
+   - Load testing scenarios
+
+18. [ ] `release: tag v1.0.0`
    - Create release
    - Publish assets
    - Announcement
 
-10. [ ] `feat(extension): add virtual scrolling`
+19. [ ] `feat(extension): add virtual scrolling`
     - For 200+ tabs UI
     - Lazy rendering
     - Smooth scrolling
@@ -780,9 +1008,9 @@ git checkout -b feat/production-ready
 
 | Metric | Target | Current |
 |--------|--------|---------|
-| Extension Test Coverage | 90%+ | 🟡 73% |
+| Extension Test Coverage | 95%+ | 🟡 73% (target raised for Phase 3) |
 | Server Test Coverage | 80%+ | ✅ 83.74% |
-| Overall Test Coverage | 80%+ | ✅ 78.37% |
+| Overall Test Coverage | 95%+ | 🟡 78.37% (target raised for Phase 3) |
 | Bundle Size | < 100KB | ✅ 88.2KB |
 | Test Suite Status | All Pass | ✅ 259 tests passing |
 | CI Configuration | No bypassing | ✅ Fixed |
@@ -798,8 +1026,12 @@ git checkout -b feat/production-ready
 | Worker Test Coverage | Comprehensive | ✅ 7 tests + type safety |
 | Logger Test Coverage | 100% | ✅ Full coverage achieved |
 | CRDT Test Coverage | 90%+ | ✅ 94.63% line coverage |
-| Sync Latency P95 | ≤ 10ms | 🚧 Performance tuning pending |
-| 200+ Tabs Performance | Smooth | 🚧 Performance tuning pending |
+| Accessibility Compliance | WCAG 2.1 AA | 🚧 Phase 3 target |
+| Visual Regression Tests | Implemented | 🚧 Phase 3 target |
+| Cross-browser Testing | Complete | 🚧 Phase 3 target |
+| Usability Testing | User validated | 🚧 Phase 3 target |
+| Sync Latency P95 | ≤ 10ms | 🚧 Benchmarking in Phase 4 |
+| 200+ Tabs Performance | Smooth | 🚧 Benchmarking in Phase 4 |
 
 ---
 
@@ -807,21 +1039,26 @@ git checkout -b feat/production-ready
 
 - **Phase 1** (UI Completion): ✅ **COMPLETE**
   - All UI migrated to React/Preact with testing
-- **Phase 2** (Unified Architecture): 🚧 **85% COMPLETE** (1 week remaining)
+- **Phase 2** (Unified Architecture): ✅ **COMPLETE**
   - ✅ Error Handling: **COMPLETE**
   - ✅ CRDT Protocol: **COMPLETE**
   - ✅ Repository Layer: **COMPLETE**
   - ✅ Service Layer: **COMPLETE**
-  - ✅ Web Worker: **COMPLETE** with comprehensive testing
-  - ⏳ Performance: 3-4 days (React optimization remaining)
-  - 🟡 Observability: 3-4 days (includes E2E testing)
-- **Phase 3** (Production): 🟡 **15% COMPLETE** (2 weeks)
-  - 🟡 TLS config exists, implementation needed
-  - ⏳ Security audit (includes extension security)
-  - ⏳ Documentation updates
-  - ⏳ Other production items pending
+  - ✅ Performance Infrastructure: **COMPLETE**
+- **Phase 3** (UI Redesign & Testing): 🚧 **0% COMPLETE** (3-4 weeks)
+  - ⏳ 3.1: Design System Foundation (4-5 days)
+  - ⏳ 3.2: Component Library Redesign (5-7 days)
+  - ⏳ 3.3: Main UI Screens Redesign (3-4 days)
+  - ⏳ 3.4: Comprehensive Testing Implementation (4-5 days)
+  - ⏳ 3.5: Manual Testing & Validation (3-4 days)
+  - ⏳ 3.6: Documentation & Developer Experience (2-3 days)
+- **Phase 4** (Production Ready): ⏳ **PENDING** (2-3 weeks)
+  - ⏳ Security audit and TLS implementation
+  - ⏳ Observability and monitoring
+  - ⏳ Performance optimization and validation
+  - ⏳ Documentation updates and release preparation
 
-**Total**: 3-4 weeks to v1.0 (significantly ahead of schedule)
+**Total**: 5-7 weeks to v1.0 (extended for comprehensive UI redesign and testing)
 
 ---
 
@@ -855,18 +1092,57 @@ git checkout -b feat/production-ready
 - [x] CI configuration fixed ✅
 - [x] UI fully migrated to React/Preact ✅
 
-### Phase 2 (Unified Architecture)
+### Phase 2 (Unified Architecture) ✅ COMPLETE
 - [x] Clean architecture applied to both sides ✅
 - [x] 80%+ server test coverage achieved ✅ (83.74%)
 - [x] Web Worker implementation complete ✅
-- [ ] 90%+ test coverage with E2E tests
-- [ ] P95 sync latency ≤ 10ms
-- [ ] 200+ tabs handled smoothly
-- [ ] E2E test suite implemented
-- [ ] React performance optimized
+- [x] Performance infrastructure complete ✅
+- [x] All architectural foundations implemented ✅
 
-### Phase 3 (Production Ready)
+### Phase 3 (UI Redesign & Testing)
+
+#### 3.1 Design System Foundation
+- [ ] Design token system implemented and documented
+- [ ] WCAG 2.1 AA accessibility guidelines established
+- [ ] Dark mode specifications and implementation complete
+- [ ] TypeScript design token system integrated
+
+#### 3.2 Component Library Redesign
+- [ ] All foundational components redesigned (Button, Input, Card, etc.)
+- [ ] Advanced interactive components implemented (Modal, Tooltip, etc.)
+- [ ] Layout and data display components built
+- [ ] Form system with validation implemented
+
+#### 3.3 Main UI Screens Redesign
+- [ ] Popup interface completely redesigned
+- [ ] Settings page enhanced with better UX
+- [ ] Status monitoring UI improved
+- [ ] Onboarding and help system implemented
+
+#### 3.4 Comprehensive Testing Implementation
+- [ ] 95%+ unit test coverage achieved
+- [ ] Visual regression testing with Chromatic/Percy
+- [ ] Accessibility testing automation with axe-core
+- [ ] E2E testing with Playwright implemented
+
+#### 3.5 Manual Testing & Validation
+- [ ] Cross-platform testing complete (Windows, macOS, Linux)
+- [ ] Real user testing sessions conducted (5-10 users)
+- [ ] Edge case and stress testing (200+ tabs) completed
+- [ ] Manual test protocol documentation finished
+
+#### 3.6 Documentation & Developer Experience
+- [ ] Interactive design system documentation
+- [ ] Developer guidelines and best practices documented
+- [ ] User documentation updated with new UI
+- [ ] Storybook integration and tooling complete
+
+### Phase 4 (Production Ready)
 - [ ] Security audit passed (including extension security)
+- [ ] Observability implementation complete (metrics, monitoring, health endpoints)
+- [ ] Performance optimization and validation complete
+- [ ] P95 sync latency ≤ 10ms achieved
+- [ ] 200+ tabs handled smoothly
 - [ ] All documentation updated (v1.0 features, testing guide)
 - [ ] Mozilla approval ready
 - [ ] Zero critical bugs
