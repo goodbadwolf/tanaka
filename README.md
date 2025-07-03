@@ -4,6 +4,8 @@
 
 Tanaka keeps your Firefox browsing **entangled** across every computer you use. Open a tab at work and it's already there when you get home; close a noisy article on your laptop and it vanishes from your desktop too. Tanaka selectively mirrors _tracked_ windows so your workspace feels like a single, coherent browser—no matter how many machines you run.
 
+> **⚠️ IMPORTANT**: Tanaka is currently in Phase 3 (Critical Fixes) of development. Multi-device synchronization is temporarily broken due to critical bugs identified in our architecture review. See [Roadmap](docs/ROADMAP.md#-phase-3-critical-fixes) for details and progress.
+
 > **Why "Tanaka"?**  
 > **田中** means "among the fields." Tanaka lives _between_ your devices, weaving isolated browsers into one continuous field of tabs.
 
@@ -49,20 +51,22 @@ See [Getting Started](docs/GETTING-STARTED.md) for detailed instructions.
 
 ## 🗺️ Roadmap
 
-### Current: v0.5.1
-- Modern React UI
+### Current: Phase 3 - Critical Fixes 🚨
+- Fix device authentication preventing multi-device sync
+- Restore server state persistence
+- Fix memory leaks and race conditions
+- Add security hardening
+
+### Next: Phase 4 - UI Redesign & Testing
+- Modern React UI with design system
+- 95%+ test coverage
 - Component library
 - E2E testing
 
-### Next: v1.0
-- Clean architecture
+### Future: Phase 5 - Production Ready
 - Performance optimization (200+ tabs)
-- Mozilla addon store
-
-### Future: v2.0
-- Scroll position sync
-- Tab groups support
-- P2P sync option
+- Mozilla addon store submission
+- v1.0 release
 
 See [Roadmap](docs/ROADMAP.md) for detailed plans.
 

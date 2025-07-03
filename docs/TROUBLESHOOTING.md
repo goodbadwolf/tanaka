@@ -14,6 +14,26 @@
 
 ---
 
+## 🚨 Known Critical Issues (Phase 3)
+
+> **IMPORTANT**: Tanaka is currently undergoing [Phase 3 Critical Fixes](ROADMAP.md#-phase-3-critical-fixes). The following critical issues prevent multi-device synchronization:
+
+### Showstopper Bugs
+1. **Device Authentication Bug** - All devices are forced to use the same device_id, making multi-device sync impossible
+2. **Server State Loss** - Server loses all data on restart (no persistence)
+3. **Memory Leaks** - Server eventually crashes due to rate limiter memory leak
+4. **Sync Delays** - Users may wait up to 10s for sync after rapid changes
+5. **Data Truncation** - New devices lose tabs beyond the first 100
+
+### Security Issues
+- Overly permissive CORS configuration
+- Missing Content Security Policy for Mozilla addon store
+- No input validation (potential DOS attacks)
+
+**Workaround**: Tanaka currently works only for single-device use. Multi-device sync will be restored after Phase 3 completion.
+
+---
+
 ## Quick Fixes
 
 ### Extension Not Working?

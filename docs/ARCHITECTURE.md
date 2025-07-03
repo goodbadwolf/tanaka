@@ -38,7 +38,9 @@
 2. **Persist** – Operations are cached in a `DashMap` for fast read-back and written to `SQLite` in WAL mode for durability.
 3. **Respond** – The server streams back any operations with a clock greater than the client's `since` parameter.
 
-## Data Guarantees
+## Data Guarantees (Post-Phase 3)
+
+> **Note**: These guarantees will be fully functional after [Phase 3 Critical Fixes](ROADMAP.md#-phase-3-critical-fixes) are complete.
 
 - **Eventual Consistency** – Structured CRDT operations ensure replicas converge regardless of network order.
 - **Crash Safety** – WAL mode plus adaptive sync intervals mean at most 10 seconds of operations are in memory during idle periods.
@@ -83,10 +85,12 @@ Tanaka uses a structured JSON-based CRDT protocol for conflict-free synchronizat
 
 ## Performance Considerations
 
-### Targets
+### Targets (Phase 5 Goals)
 - Support 200+ tabs across devices
 - P95 sync latency ≤ 10ms
 - Smooth UI with no blocking operations
+
+> **Current Status**: Performance optimization is planned for [Phase 5](ROADMAP.md#-phase-5-production-ready) after critical fixes and UI redesign are complete.
 
 ### Optimizations
 - DashMap for in-memory caching

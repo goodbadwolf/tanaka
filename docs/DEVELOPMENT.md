@@ -41,9 +41,11 @@
 
 ### 1.3 Data Guarantees
 
-- **Eventual Consistency** – Structured CRDT operations ensure replicas converge regardless of network order.
-- **Crash Safety** – WAL mode plus 5 s flush means at most 5 seconds of operations are in memory at any moment.
-- **Security** – All traffic is TLS-encrypted (`rustls`) and protected by a shared bearer token.
+> **⚠️ Phase 3 Status**: These guarantees are currently compromised due to critical bugs. See [Phase 3 Critical Fixes](ROADMAP.md#-phase-3-critical-fixes) for details.
+
+- **Eventual Consistency** – Structured CRDT operations ensure replicas converge regardless of network order. *(Currently broken due to device ID authentication bug)*
+- **Crash Safety** – WAL mode plus 5 s flush means at most 5 seconds of operations are in memory at any moment. *(Currently server loses all state on restart)*
+- **Security** – All traffic is TLS-encrypted (`rustls`) and protected by a shared bearer token. *(CORS currently too permissive)*
 
 For detailed protocol specification, see [SYNC-PROTOCOL.md](SYNC-PROTOCOL.md).
 
@@ -351,6 +353,8 @@ pnpm run gen-icons     # Generate icons
 ---
 
 ## 7. Testing Strategy
+
+> **Note**: Multi-device sync tests will fail until [Phase 3 Critical Fixes](ROADMAP.md#-phase-3-critical-fixes) are complete.
 
 ### Enhanced Testing Infrastructure
 
