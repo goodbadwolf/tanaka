@@ -16,6 +16,8 @@
 
 ## Quick Start (5 minutes)
 
+> **⚠️ IMPORTANT - Phase 3 Status**: Tanaka is currently undergoing critical fixes. Multi-device synchronization is temporarily non-functional due to authentication bugs. You can still use Tanaka on a single device. See [Phase 3 Critical Fixes](ROADMAP.md#-phase-3-critical-fixes) for details.
+
 ### Step 1: Install the Extension
 
 ```bash
@@ -80,11 +82,11 @@ sudo cp target/release/tanaka-server /usr/local/bin/
 4. Enter your auth token (from config)
 5. Click "Save"
 
-### Step 5: Start Syncing!
+### Step 5: Start Tracking! (Single Device Only)
 
-- Click "Track This Window" to sync tabs from any Firefox window
-- Changes sync automatically (1s during activity, 10s when idle)
-- Open Firefox on another device and repeat setup to sync between them
+- Click "Track This Window" to track tabs from any Firefox window
+- Changes are saved locally and to the server
+- **Note**: Multi-device sync is currently broken (see [Phase 3 fixes](ROADMAP.md#-phase-3-critical-fixes)). Once Phase 3 is complete, you'll be able to sync between devices.
 
 ---
 
@@ -254,7 +256,7 @@ sudo rm -rf /var/lib/tanaka /etc/tanaka
 ## Frequently Asked Questions
 
 **Q: Can I use this with multiple Firefox profiles?**  
-A: Yes, each profile can track different windows independently.
+A: Currently limited to single-device use due to Phase 3 critical fixes. Once these are complete, each profile will be able to track different windows independently across devices.
 
 **Q: How secure is my data?**  
 A: All communication uses HTTPS with your auth token. The server stores only tab URLs and titles.
