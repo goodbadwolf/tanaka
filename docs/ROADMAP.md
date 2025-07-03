@@ -31,6 +31,7 @@ main
 │   ├── feat/service-layer       # Business logic ✅ COMPLETE
 │   └── feat/performance         # Performance infrastructure ✅ COMPLETE
 ├── feat/ui-redesign             # Phase 3: UI Redesign & Testing 🚧 NEXT
+│   ├── feat/codebase-refactor   # 3.0: Comprehensive codebase refactoring ⏳ PENDING
 │   ├── feat/design-system       # 3.1: Design token system and accessibility ⏳ PENDING
 │   ├── feat/component-redesign  # 3.2: Component library rebuild ⏳ PENDING
 │   ├── feat/screens-redesign    # 3.3: Main UI screens redesign ⏳ PENDING
@@ -590,6 +591,77 @@ git checkout -b feat/performance
 
 ## 🧪 Phase 3: UI Redesign & Testing
 
+### 3.0 Codebase Refactoring ⏳ **PENDING**
+
+**Branch**: `feat/codebase-refactor`
+
+#### Overview
+Comprehensive refactoring of the entire codebase to improve maintainability, consistency, and prepare for UI redesign work.
+
+#### Implementation Steps
+
+```bash
+git checkout -b feat/codebase-refactor
+```
+
+1. [ ] `refactor(extension): standardize code organization`
+   - Consistent file naming conventions (kebab-case)
+   - Logical directory structure alignment
+   - Extract reusable utilities and helpers
+   - Consolidate duplicate code patterns
+   - Improve module boundaries and exports
+
+2. [ ] `refactor(extension): improve type safety`
+   - Replace all `any` types with proper types
+   - Add missing type definitions
+   - Strengthen type guards and validators
+   - Improve generic type constraints
+   - Document complex type relationships
+
+3. [ ] `refactor(server): enhance code organization`
+   - Align module structure with clean architecture
+   - Extract common patterns into shared modules
+   - Improve error handling consistency
+   - Standardize logging and tracing patterns
+   - Consolidate configuration handling
+
+4. [ ] `refactor(both): standardize API contracts`
+   - Align request/response patterns
+   - Consistent error response formats
+   - Standardize pagination and filtering
+   - Improve API versioning strategy
+   - Document all endpoints thoroughly
+
+5. [ ] `refactor(extension): modernize React patterns`
+   - Convert class components to functional (if any remain)
+   - Standardize hook usage patterns
+   - Improve component composition
+   - Extract custom hooks for reusable logic
+   - Optimize context usage and providers
+
+6. [ ] `refactor(both): improve naming consistency`
+   - Align naming across TypeScript and Rust
+   - Standardize variable and function names
+   - Consistent acronym handling (URL vs Url)
+   - Clear and descriptive names throughout
+   - Remove ambiguous abbreviations
+
+7. [ ] `refactor(tests): enhance test structure`
+   - Consistent test file organization
+   - Standardize test naming patterns
+   - Extract test utilities and helpers
+   - Improve test data factories
+   - Add missing test coverage
+
+8. [ ] `refactor(both): technical debt cleanup`
+   - Remove dead code and unused dependencies
+   - Update deprecated API usage
+   - Fix all TODO and FIXME comments
+   - Improve code comments where needed
+   - Update outdated documentation
+
+---
+
 ### 3.1 Design System Foundation ⏳ **PENDING**
 
 **Branch**: `feat/design-system`
@@ -1057,7 +1129,8 @@ git checkout -b feat/production-ready
   - ✅ Repository Layer: **COMPLETE**
   - ✅ Service Layer: **COMPLETE**
   - ✅ Performance Infrastructure: **COMPLETE**
-- **Phase 3** (UI Redesign & Testing): 🚧 **0% COMPLETE** (3-4 weeks)
+- **Phase 3** (UI Redesign & Testing): 🚧 **0% COMPLETE** (4-5 weeks)
+  - ⏳ 3.0: Codebase Refactoring (5-7 days)
   - ⏳ 3.1: Design System Foundation (4-5 days)
   - ⏳ 3.2: Component Library Redesign (5-7 days)
   - ⏳ 3.3: Main UI Screens Redesign (3-4 days)
@@ -1070,7 +1143,7 @@ git checkout -b feat/production-ready
   - ⏳ Performance optimization and validation
   - ⏳ Documentation updates and release preparation
 
-**Total**: 5-7 weeks to v1.0 (extended for comprehensive UI redesign and testing)
+**Total**: 6-8 weeks to v1.0 (extended for refactoring and comprehensive UI redesign)
 
 ---
 
@@ -1112,6 +1185,14 @@ git checkout -b feat/production-ready
 - [x] All architectural foundations implemented ✅
 
 ### Phase 3 (UI Redesign & Testing)
+
+#### 3.0 Codebase Refactoring
+- [ ] All code follows consistent organization patterns
+- [ ] Zero `any` types in TypeScript code
+- [ ] Technical debt reduced by 80%+
+- [ ] All TODO/FIXME comments resolved
+- [ ] Code duplication eliminated
+- [ ] Test structure standardized across codebase
 
 #### 3.1 Design System Foundation
 - [ ] Design token system implemented and documented
