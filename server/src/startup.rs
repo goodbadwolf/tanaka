@@ -12,7 +12,6 @@ pub struct ServerBootstrap {
 }
 
 impl ServerBootstrap {
-    /// Creates a new server bootstrap instance
     #[must_use]
     pub fn new(bind_addr: &str) -> Self {
         Self {
