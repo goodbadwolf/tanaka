@@ -424,11 +424,11 @@ async fn test_sync_repository_integration() {
         _ => panic!("Expected UpsertTab operation"),
     }
 
-    // Test 3: Sync without since_clock to cover get_recent() path (lines 290-292)
+    // Test 3: Sync without since_clock to cover get_all() path (lines 291-298) - FIXED
     let request3 = SyncRequest {
         clock: response1.clock,
         device_id: "repo-device-3".to_string(),
-        since_clock: None, // No since_clock, should use get_recent()
+        since_clock: None, // No since_clock, should use get_all() for initial sync
         operations: vec![],
     };
 
@@ -436,7 +436,7 @@ async fn test_sync_repository_integration() {
     assert_eq!(status3, StatusCode::OK);
     let response3: SyncResponse = serde_json::from_str(&body3).unwrap();
 
-    // Should receive recent operations (up to 100)
+    // Should receive ALL operations (not limited to 100)
     assert_eq!(response3.operations.len(), 1);
     match &response3.operations[0] {
         CrdtOperation::UpsertTab { id, data } => {
@@ -572,4 +572,101 @@ async fn test_sync_multiple_operations_storage() {
 
     // Should receive all 3 operations
     assert_eq!(response2.operations.len(), 3);
+}
+
+#[tokio::test]
+async fn test_initial_sync_beyond_100_tabs() {
+    // Test the fix for initial sync truncation - devices should receive ALL operations, not just 100
+    let db_pool = create_test_db().await;
+    let app = create_test_app(db_pool);
+
+    // Device 1 creates more than 100 tab operations to test the truncation fix
+    let mut operations = Vec::new();
+    for i in 0..150 {
+        operations.push(CrdtOperation::UpsertTab {
+            id: format!("tab-{i}"),
+            data: TabData {
+                window_id: "window-1".to_string(),
+                url: format!("https://example{i}.com"),
+                title: format!("Tab {i}"),
+                active: i == 0, // Only first tab is active
+                index: i,
+                updated_at: 123_456_789 + u64::try_from(i).unwrap(),
+            },
+        });
+    }
+
+    // Send operations in batches to avoid hitting request size limits
+    let batch_size = 25;
+    for (batch_idx, chunk) in operations.chunks(batch_size).enumerate() {
+        let request = SyncRequest {
+            clock: (batch_idx + 1) as u64,
+            device_id: "device-1".to_string(),
+            since_clock: if batch_idx == 0 {
+                None
+            } else {
+                Some(batch_idx as u64)
+            },
+            operations: chunk.to_vec(),
+        };
+
+        let (status, body) = make_sync_request(app.clone(), "test-token", request).await;
+        assert_eq!(status, StatusCode::OK, "Batch {batch_idx} failed: {body}");
+    }
+
+    // Device 2 performs initial sync (no since_clock) - should receive ALL 150 operations
+    let initial_sync_request = SyncRequest {
+        clock: 0,
+        device_id: "device-2".to_string(),
+        since_clock: None, // This is the key - initial sync without since_clock
+        operations: vec![],
+    };
+
+    let (status, body) = make_sync_request(app.clone(), "test-token", initial_sync_request).await;
+    assert_eq!(status, StatusCode::OK);
+    let response: SyncResponse = serde_json::from_str(&body).unwrap();
+
+    // CRITICAL: Device 2 should receive ALL 150 operations, not just 100
+    assert_eq!(
+        response.operations.len(),
+        150,
+        "Initial sync should return all {} operations, not just 100. Got: {}",
+        150,
+        response.operations.len()
+    );
+
+    // Verify operations are in chronological order
+    let mut previous_tab_num = -1;
+    for operation in &response.operations {
+        if let CrdtOperation::UpsertTab { id, data } = operation {
+            let tab_num: i32 = id.strip_prefix("tab-").unwrap().parse().unwrap();
+            assert!(
+                tab_num > previous_tab_num,
+                "Operations should be in chronological order"
+            );
+            assert_eq!(data.url, format!("https://example{tab_num}.com"));
+            previous_tab_num = tab_num;
+        } else {
+            panic!("Expected UpsertTab operation, got: {operation:?}");
+        }
+    }
+
+    // Verify device filtering still works - device-1 shouldn't get its own operations back
+    let device1_sync_request = SyncRequest {
+        clock: 0,
+        device_id: "device-1".to_string(), // Same device that created operations
+        since_clock: None,
+        operations: vec![],
+    };
+
+    let (status, body) = make_sync_request(app.clone(), "test-token", device1_sync_request).await;
+    assert_eq!(status, StatusCode::OK);
+    let device1_response: SyncResponse = serde_json::from_str(&body).unwrap();
+
+    // Device 1 should not receive its own operations back
+    assert_eq!(
+        device1_response.operations.len(),
+        0,
+        "Device should not receive its own operations back"
+    );
 }

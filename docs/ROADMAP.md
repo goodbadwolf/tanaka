@@ -73,9 +73,10 @@ These bugs prevent Tanaka from fulfilling its primary purpose:
 **Fix**: Align message handler response with popup expectations  
 **Status**: Completed in PR #72
 
-#### `fix/initial-sync` - Initial Sync Truncation
+#### `fix/initial-sync` - Initial Sync Truncation ✅
 **Impact**: New devices silently lose tabs beyond first 100  
-**Fix**: Send CRDT state snapshot for initial sync
+**Fix**: Send CRDT state snapshot for initial sync  
+**Status**: Completed in PR #73
 
 #### `fix/rate-limiter-leak` - Rate Limiter Memory Leak
 **Impact**: Server eventually runs out of memory and crashes  
@@ -203,7 +204,7 @@ Prepare for v1.0 release with performance optimization, monitoring, and Mozilla 
 - [x] Operations applied in correct order with atomic Lamport clock
 - [x] Sync happens within 1s during activity (queue threshold working)
 - [x] Popup displays correct window list without errors
-- [ ] New devices receive complete state (>100 tabs supported)
+- [x] New devices receive complete state (>100 tabs supported)
 - [ ] Server runs indefinitely without memory leaks
 
 #### Security & Compliance ✓
