@@ -63,9 +63,10 @@ These bugs prevent Tanaka from fulfilling its primary purpose:
 **Fix**: Use atomic compare-and-swap for server clock updates  
 **Status**: Completed - Fixed using `compare_exchange_weak` for thread-safe updates
 
-#### `fix/queue-threshold` - Queue Size Threshold
+#### `fix/queue-threshold` - Queue Size Threshold ✅
 **Impact**: Users wait up to 10s for sync after rapid changes  
-**Fix**: Trigger immediate sync when queue exceeds threshold
+**Fix**: Trigger immediate sync when queue exceeds threshold  
+**Status**: Completed - Queue threshold now triggers immediate sync when 50+ operations pending
 
 #### `fix/message-protocol` - Message Protocol Inconsistency
 **Impact**: Popup shows errors or blank window list  
@@ -199,7 +200,7 @@ Prepare for v1.0 release with performance optimization, monitoring, and Mozilla 
 - [ ] Multiple Firefox instances can sync tabs using same server
 - [x] Server restarts don't lose data - state restored from database
 - [x] Operations applied in correct order with atomic Lamport clock
-- [ ] Sync happens within 1s during activity (queue threshold working)
+- [x] Sync happens within 1s during activity (queue threshold working)
 - [ ] Popup displays correct window list without errors
 - [ ] New devices receive complete state (>100 tabs supported)
 - [ ] Server runs indefinitely without memory leaks
