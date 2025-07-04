@@ -42,12 +42,14 @@ flags:
       - server/
     carryforward: true
 
-comment:
-  layout: "reach,diff,flags,files,footer"
-  behavior: default
-  require_changes: false
-  require_base: false
-  require_head: true
+# comment:
+#   layout: "reach,diff,flags,files,footer"
+#   behavior: default
+#   require_changes: false
+#   require_base: false
+#   require_head: true
+
+comment: false
 
 ignore:
   - "**/*.test.ts"
