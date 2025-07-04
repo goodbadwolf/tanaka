@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use dashmap::DashMap;
 use std::collections::HashMap;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
 use crate::config::AuthConfig;
@@ -12,6 +12,7 @@ use crate::services::{AuthContext, AuthService};
 pub struct SharedTokenAuthService {
     config: AuthConfig,
     rate_limiter: Arc<DashMap<String, RateLimitInfo>>,
+    last_cleanup: Arc<Mutex<Instant>>,
 }
 
 #[derive(Debug, Clone)]
@@ -27,6 +28,7 @@ impl SharedTokenAuthService {
         Self {
             config,
             rate_limiter: Arc::new(DashMap::new()),
+            last_cleanup: Arc::new(Mutex::new(Instant::now())),
         }
     }
 }
@@ -63,9 +65,12 @@ impl AuthService for SharedTokenAuthService {
         let now = Instant::now();
         let max_requests = self.config.max_requests_per_minute;
 
-        // Clean up old entries periodically (simple approach)
-        if now.elapsed().as_secs() % 300 == 0 {
-            self.cleanup_old_rate_limit_entries();
+        // Clean up old entries periodically - check if 5 minutes have passed since last cleanup
+        if let Ok(mut last_cleanup) = self.last_cleanup.try_lock() {
+            if now.duration_since(*last_cleanup) >= Duration::from_secs(300) {
+                self.cleanup_old_rate_limit_entries();
+                *last_cleanup = now;
+            }
         }
 
         let mut within_limit = true;
@@ -302,5 +307,122 @@ mod tests {
         let result = auth_service.validate_token("any-token").await;
 
         assert!(result.is_err());
+    }
+
+    #[tokio::test]
+    async fn test_rate_limiter_cleanup_prevents_memory_leak() {
+        let config = AuthConfig {
+            shared_token: "test-token".to_string(),
+            token_header: "authorization".to_string(),
+            rate_limiting: true,
+            max_requests_per_minute: 100,
+        };
+
+        let auth_service = SharedTokenAuthService::new(config);
+
+        // Simulate many different devices to fill the rate limiter
+        for i in 0..100 {
+            let device_id = format!("device-{i}");
+            auth_service.record_request(&device_id).await.unwrap();
+        }
+
+        // Verify entries were added
+        let initial_count = auth_service.rate_limiter.len();
+        assert_eq!(initial_count, 100);
+
+        // Manually age all entries to be older than 5 minutes
+        for i in 0..100 {
+            let device_id = format!("device-{i}");
+            if let Some(mut entry) = auth_service.rate_limiter.get_mut(&device_id) {
+                entry.window_start = Instant::now()
+                    .checked_sub(Duration::from_secs(301))
+                    .unwrap();
+            }
+        }
+
+        // Force cleanup by setting last_cleanup to 5+ minutes ago
+        {
+            let mut last_cleanup = auth_service.last_cleanup.lock().unwrap();
+            *last_cleanup = Instant::now()
+                .checked_sub(Duration::from_secs(301))
+                .unwrap();
+        }
+
+        // Trigger cleanup by calling check_rate_limit
+        auth_service
+            .check_rate_limit("trigger-cleanup")
+            .await
+            .unwrap();
+
+        // Verify cleanup occurred - all old entries should be removed
+        let final_count = auth_service.rate_limiter.len();
+
+        // Since all entries were aged to be older than 5 minutes, they should be cleaned up
+        // Only the "trigger-cleanup" entry should remain
+        assert_eq!(
+            final_count, 1,
+            "Cleanup should have removed all old entries, leaving only the trigger entry"
+        );
+    }
+
+    #[tokio::test]
+    async fn test_rate_limiter_cleanup_removes_old_entries() {
+        let config = AuthConfig {
+            shared_token: "test-token".to_string(),
+            token_header: "authorization".to_string(),
+            rate_limiting: true,
+            max_requests_per_minute: 100,
+        };
+
+        let auth_service = SharedTokenAuthService::new(config);
+
+        // Add an entry and manually age it by modifying its window_start
+        auth_service.record_request("old-device").await.unwrap();
+
+        // Manually age the entry to be older than 5 minutes
+        if let Some(mut entry) = auth_service.rate_limiter.get_mut("old-device") {
+            entry.window_start = Instant::now()
+                .checked_sub(Duration::from_secs(301))
+                .unwrap();
+        }
+
+        // Add a recent entry that should not be cleaned up
+        auth_service.record_request("new-device").await.unwrap();
+
+        // Verify both entries exist
+        assert_eq!(auth_service.rate_limiter.len(), 2);
+
+        // Force cleanup
+        {
+            let mut last_cleanup = auth_service.last_cleanup.lock().unwrap();
+            *last_cleanup = Instant::now()
+                .checked_sub(Duration::from_secs(301))
+                .unwrap();
+        }
+
+        // Trigger cleanup
+        auth_service.check_rate_limit("trigger").await.unwrap();
+
+        // Old entry should be removed, new entry should remain
+        assert!(!auth_service.rate_limiter.contains_key("old-device"));
+        assert!(auth_service.rate_limiter.contains_key("new-device"));
+    }
+
+    #[tokio::test]
+    async fn test_cleanup_does_not_block_normal_operation() {
+        let config = AuthConfig {
+            shared_token: "test-token".to_string(),
+            token_header: "authorization".to_string(),
+            rate_limiting: true,
+            max_requests_per_minute: 100,
+        };
+
+        let auth_service = SharedTokenAuthService::new(config);
+
+        // Normal operation should work even if cleanup fails
+        // (e.g., if mutex is already locked by another thread)
+        assert!(auth_service.check_rate_limit("device-1").await.unwrap());
+        auth_service.record_request("device-1").await.unwrap();
+        assert!(auth_service.check_rate_limit("device-1").await.unwrap());
     }
 }
