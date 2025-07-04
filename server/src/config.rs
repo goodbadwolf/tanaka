@@ -30,6 +30,17 @@ pub struct ServerConfig {
 
     #[serde(default = "default_request_timeout")]
     pub request_timeout_secs: u64,
+
+    pub cors: CorsConfig,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CorsConfig {
+    #[serde(default = "default_allowed_origins")]
+    pub allowed_origins: Vec<String>,
+
+    #[serde(default = "default_max_age")]
+    pub max_age_secs: u64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -173,6 +184,16 @@ fn default_request_logging() -> bool {
     true
 }
 
+fn default_allowed_origins() -> Vec<String> {
+    vec![
+        "moz-extension://*".to_string(), // Firefox WebExtension origins
+    ]
+}
+
+fn default_max_age() -> u64 {
+    3600 // 1 hour
+}
+
 impl Config {
     /// Load configuration from file and environment
     ///
@@ -305,6 +326,10 @@ impl Default for Config {
                 bind_addr: default_bind_addr(),
                 worker_threads: None,
                 request_timeout_secs: default_request_timeout(),
+                cors: CorsConfig {
+                    allowed_origins: default_allowed_origins(),
+                    max_age_secs: default_max_age(),
+                },
             },
             database: DatabaseConfig {
                 url: default_database_url(),
@@ -380,5 +405,26 @@ mod tests {
 
         let loaded = Config::load(&args).unwrap();
         assert_eq!(loaded.auth.shared_token, "test-token");
+    }
+
+    #[test]
+    fn test_cors_config_defaults() {
+        let config = Config::default();
+        assert_eq!(
+            config.server.cors.allowed_origins,
+            vec!["moz-extension://*".to_string()]
+        );
+        assert_eq!(config.server.cors.max_age_secs, 3600);
+    }
+
+    #[test]
+    fn test_cors_config_serialization() {
+        let config = Config::default();
+        let toml_str = toml::to_string(&config).unwrap();
+
+        // Verify CORS section exists in serialized config
+        assert!(toml_str.contains("[server.cors]"));
+        assert!(toml_str.contains("allowed_origins"));
+        assert!(toml_str.contains("moz-extension://*"));
     }
 }
