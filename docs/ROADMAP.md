@@ -68,9 +68,10 @@ These bugs prevent Tanaka from fulfilling its primary purpose:
 **Fix**: Trigger immediate sync when queue exceeds threshold  
 **Status**: Completed - Queue threshold now triggers immediate sync when 50+ operations pending
 
-#### `fix/message-protocol` - Message Protocol Inconsistency
+#### `fix/message-protocol` - Message Protocol Inconsistency ✅
 **Impact**: Popup shows errors or blank window list  
-**Fix**: Align message handler response with popup expectations
+**Fix**: Align message handler response with popup expectations  
+**Status**: Completed in PR #72
 
 #### `fix/initial-sync` - Initial Sync Truncation
 **Impact**: New devices silently lose tabs beyond first 100  
@@ -201,7 +202,7 @@ Prepare for v1.0 release with performance optimization, monitoring, and Mozilla 
 - [x] Server restarts don't lose data - state restored from database
 - [x] Operations applied in correct order with atomic Lamport clock
 - [x] Sync happens within 1s during activity (queue threshold working)
-- [ ] Popup displays correct window list without errors
+- [x] Popup displays correct window list without errors
 - [ ] New devices receive complete state (>100 tabs supported)
 - [ ] Server runs indefinitely without memory leaks
 

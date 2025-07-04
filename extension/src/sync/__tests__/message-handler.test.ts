@@ -156,6 +156,25 @@ describe('MessageHandler', () => {
       expect(mockWindowTracker.getTrackedWindows).toHaveBeenCalled();
       expect(response).toEqual({ windowIds: [] });
     });
+
+    it('returns response matching new MessageResponse type format', async () => {
+      const message = { type: 'GET_TRACKED_WINDOWS' };
+      (mockWindowTracker.getTrackedWindows as jest.Mock).mockReturnValue([123]);
+
+      const response = await messageHandler.handleMessage(message);
+
+      // Verify response matches { windowIds: number[]; titles?: string[] } format
+      expect(response).toHaveProperty('windowIds');
+      expect(Array.isArray(response.windowIds)).toBe(true);
+      expect(response.windowIds).toEqual([123]);
+
+      // Titles should be optional (undefined is fine)
+      expect(response.titles).toBeUndefined();
+
+      // Response should not have success or error properties for GET_TRACKED_WINDOWS
+      expect(response).not.toHaveProperty('success');
+      expect(response).not.toHaveProperty('error');
+    });
   });
 
   describe('edge cases', () => {

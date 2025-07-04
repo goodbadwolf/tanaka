@@ -36,10 +36,10 @@ export function WindowTracker() {
           error?: string;
         };
 
-        if (response.windowIds && response.titles) {
+        if (response.windowIds) {
           // Initialize the tracked windows state
           const windowsMap = new Map();
-          response.windowIds?.forEach((id: number, index: number) => {
+          response.windowIds.forEach((id: number, index: number) => {
             windowsMap.set(id, {
               id,
               title: response.titles?.[index],

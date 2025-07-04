@@ -179,4 +179,56 @@ describe('WindowTracker', () => {
       expect(checkbox).toBeDisabled();
     });
   });
+
+  it('works with windowIds only (no titles required)', async () => {
+    mockBrowser.runtime.sendMessage.mockResolvedValue({
+      windowIds: [123, 456],
+      // titles not provided - should still work
+    });
+
+    const { getByText, getByRole } = render(<WindowTracker />);
+
+    await waitFor(() => {
+      expect(getByText('✓ This window is being synced')).toBeInTheDocument();
+    });
+
+    const checkbox = getByRole('checkbox') as HTMLInputElement;
+    expect(checkbox.checked).toBe(true);
+    expect(isWindowTracked(123)).toBe(true);
+  });
+
+  it('handles empty windowIds array', async () => {
+    mockBrowser.runtime.sendMessage.mockResolvedValue({
+      windowIds: [],
+    });
+
+    const { getByText, getByRole } = render(<WindowTracker />);
+
+    await waitFor(() => {
+      expect(getByText('This window is not being synced')).toBeInTheDocument();
+    });
+
+    const checkbox = getByRole('checkbox') as HTMLInputElement;
+    expect(checkbox.checked).toBe(false);
+    expect(isWindowTracked(123)).toBe(false);
+  });
+
+  it('handles response with optional titles', async () => {
+    mockBrowser.runtime.sendMessage.mockResolvedValue({
+      windowIds: [123],
+      titles: ['My Window'], // titles provided but optional
+    });
+
+    const { getByText } = render(<WindowTracker />);
+
+    await waitFor(() => {
+      expect(getByText('✓ This window is being synced')).toBeInTheDocument();
+    });
+
+    expect(isWindowTracked(123)).toBe(true);
+
+    // Check that the window was added to the store with the title
+    const window = trackedWindows.value.get(123);
+    expect(window?.title).toBe('My Window');
+  });
 });
