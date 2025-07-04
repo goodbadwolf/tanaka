@@ -5,7 +5,10 @@ export type Message =
   | { type: 'CONFIG_UPDATED' }
   | { type: 'SETTINGS_UPDATED' };
 
-export type MessageResponse = { windowIds: number[] } | { success: boolean } | { error: string };
+export type MessageResponse =
+  | { windowIds: number[]; titles?: string[] }
+  | { success: boolean }
+  | { error: string };
 
 export function asMessage(value: unknown): Message | null {
   if (typeof value !== 'object' || value === null || !('type' in value)) {
