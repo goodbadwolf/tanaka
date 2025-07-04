@@ -384,6 +384,40 @@ export class SyncManagerWithWorker {
   }
 
   private async triggerBatchedSync(priority: OperationPriority): Promise<void> {
+    // Check queue size threshold for immediate sync
+    try {
+      const state = await this.worker.getState();
+      if (state.queueLength >= this.adaptiveConfig.queueSizeThreshold && !this.isSyncing) {
+        debugLog(`Queue size ${state.queueLength} exceeds threshold, triggering immediate sync`);
+
+        // Cancel any pending batch timer
+        if (this.batchTimer) {
+          clearTimeout(this.batchTimer);
+          this.batchTimer = null;
+          this.pendingBatchPriority = null;
+        }
+
+        // Cancel regular sync timer to avoid duplicate sync
+        if (this.syncTimer) {
+          clearTimeout(this.syncTimer);
+        }
+
+        // Trigger immediate sync without waiting for completion
+        this.sync()
+          .then(() => {
+            this.scheduleSyncCheck();
+          })
+          .catch((error) => {
+            debugError('Queue threshold sync failed', error);
+            this.scheduleSyncCheck();
+          });
+        return;
+      }
+    } catch (error) {
+      debugError('Failed to check queue size for threshold', error);
+    }
+
+    // Original priority-based batching logic
     if (this.batchTimer && this.pendingBatchPriority !== null) {
       if (priority < this.pendingBatchPriority) {
         clearTimeout(this.batchTimer);
