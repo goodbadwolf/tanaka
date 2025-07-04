@@ -38,13 +38,13 @@
 2. **Persist** – Operations are cached in a `DashMap` for fast read-back and written to `SQLite` in WAL mode for durability.
 3. **Respond** – The server streams back any operations with a clock greater than the client's `since` parameter.
 
-## Data Guarantees (Post-Phase 3)
+## Data Guarantees
 
-> **Note**: These guarantees will be fully functional after [Phase 3 Critical Fixes](ROADMAP.md#-phase-3-critical-fixes) are complete.
+> **Note**: Some guarantees are partially functional. Full multi-device sync requires completion of remaining [Phase 3 Critical Fixes](ROADMAP.md#-phase-3-critical-fixes).
 
-- **Eventual Consistency** – Structured CRDT operations ensure replicas converge regardless of network order.
-- **Crash Safety** – WAL mode plus adaptive sync intervals mean at most 10 seconds of operations are in memory during idle periods.
-- **Security** – All traffic is TLS-encrypted (`rustls`) and protected by a shared bearer token.
+- **Eventual Consistency** – Structured CRDT operations ensure replicas converge regardless of network order. *(Pending device auth fix for multi-device)*
+- **Crash Safety** – Server state persists across restarts. WAL mode plus adaptive sync intervals mean at most 10 seconds of operations are in memory during idle periods. ✅
+- **Security** – All traffic is TLS-encrypted (`rustls`) and protected by a shared bearer token. *(CORS configuration needs hardening)*
 
 ## CRDT Synchronization Protocol
 
