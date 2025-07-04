@@ -49,9 +49,10 @@ Architecture review identified critical bugs that completely break multi-device 
 
 These bugs prevent Tanaka from fulfilling its primary purpose:
 
-#### `fix/device-auth` - Device ID Authentication Bug
+#### `fix/device-auth` - Device ID Authentication Bug ✅
 **Impact**: All devices forced to use same ID, making multi-device sync impossible  
-**Fix**: Trust client-provided device_id instead of deriving from token
+**Fix**: Trust client-provided device_id instead of deriving from token  
+**Status**: Completed in PR #74
 
 #### `fix/server-persistence` - Server State Persistence ✅
 **Impact**: Complete data loss on server restart  
@@ -199,7 +200,7 @@ Prepare for v1.0 release with performance optimization, monitoring, and Mozilla 
 ### Phase 3 (Critical Fixes)
 
 #### Core Functionality ✓
-- [ ] Multiple Firefox instances can sync tabs using same server
+- [x] Multiple Firefox instances can sync tabs using same server
 - [x] Server restarts don't lose data - state restored from database
 - [x] Operations applied in correct order with atomic Lamport clock
 - [x] Sync happens within 1s during activity (queue threshold working)

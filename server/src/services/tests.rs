@@ -121,12 +121,29 @@ async fn test_service_validation_errors() {
     let container = ServiceContainer::new_mock();
     let auth_context = create_test_auth();
 
-    // Test sync request with invalid device ID
+    // Test sync request with empty device ID (should fail)
     let mut invalid_request = create_test_sync_request();
-    invalid_request.device_id = "different-device".to_string();
+    invalid_request.device_id = String::new(); // Empty device ID is invalid
 
     let result = container.sync.sync(invalid_request, &auth_context).await;
     assert!(result.is_err());
+
+    // Test sync request with reserved device ID (should fail)
+    let mut reserved_request = create_test_sync_request();
+    reserved_request.device_id = "auth-validated".to_string(); // Reserved ID is invalid
+
+    let result2 = container.sync.sync(reserved_request, &auth_context).await;
+    assert!(result2.is_err());
+
+    // Test sync request with different (but valid) device ID (should succeed now)
+    let mut different_request = create_test_sync_request();
+    different_request.device_id = "different-device".to_string();
+
+    let result3 = container.sync.sync(different_request, &auth_context).await;
+    assert!(
+        result3.is_ok(),
+        "Different device IDs should be allowed with shared token auth"
+    );
 }
 
 #[tokio::test]

@@ -19,7 +19,7 @@
 > **IMPORTANT**: Tanaka is currently undergoing [Phase 3 Critical Fixes](ROADMAP.md#-phase-3-critical-fixes). The following critical issues prevent multi-device synchronization:
 
 ### Showstopper Bugs
-1. **Device Authentication Bug** - All devices are forced to use the same device_id, making multi-device sync impossible
+1. ~~**Device Authentication Bug** - All devices are forced to use the same device_id, making multi-device sync impossible~~ ✅ Fixed in PR #74
 2. ~~**Server State Loss** - Server loses all data on restart (no persistence)~~ ✅ Fixed in PR #69
 3. **Memory Leaks** - Server eventually crashes due to rate limiter memory leak
 4. ~~**Sync Delays** - Users may wait up to 10s for sync after rapid changes~~ ✅ Fixed in PR #71
