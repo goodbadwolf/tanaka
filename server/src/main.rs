@@ -1,3 +1,4 @@
+use axum::http::{HeaderValue, Method};
 use axum::{
     middleware,
     routing::{get, post},
@@ -98,13 +99,54 @@ fn create_app(
             .route_layer(auth_middleware_layer),
     );
 
-    app = app.layer(CorsLayer::permissive());
+    app = app.layer(create_cors_layer(&config.server.cors));
 
     if config.logging.request_logging {
         app = app.layer(TraceLayer::new_for_http());
     }
 
     app
+}
+
+fn create_cors_layer(cors_config: &tanaka_server::config::CorsConfig) -> CorsLayer {
+    let mut cors = CorsLayer::new()
+        .allow_methods([Method::GET, Method::POST, Method::OPTIONS])
+        .allow_headers([
+            axum::http::header::AUTHORIZATION,
+            axum::http::header::CONTENT_TYPE,
+            axum::http::header::ACCEPT,
+        ])
+        .max_age(std::time::Duration::from_secs(cors_config.max_age_secs));
+
+    if cors_config.allowed_origins.is_empty() {
+        tracing::warn!("No CORS origins configured - denying all cross-origin requests");
+        return cors; // Return restrictive CORS that allows no origins
+    }
+
+    for origin in &cors_config.allowed_origins {
+        if origin == "*" {
+            tracing::warn!("Wildcard CORS origin detected - this may be a security risk");
+            cors = cors.allow_origin(tower_http::cors::Any);
+            break;
+        } else if origin == "moz-extension://*" {
+            // Special handling for Firefox extension origins
+            use tower_http::cors::AllowOrigin;
+            cors = cors.allow_origin(AllowOrigin::predicate(
+                |origin: &HeaderValue, _: &axum::http::request::Parts| {
+                    origin
+                        .to_str()
+                        .map(|s| s.starts_with("moz-extension://"))
+                        .unwrap_or(false)
+                },
+            ));
+        } else if let Ok(header_value) = origin.parse::<HeaderValue>() {
+            cors = cors.allow_origin(header_value);
+        } else {
+            tracing::error!("Invalid CORS origin: {}", origin);
+        }
+    }
+
+    cors
 }
 
 async fn health() -> Json<HealthResponse> {
@@ -226,5 +268,82 @@ mod tests {
         // Verify we can create the app
         let _app = create_app(&db_pool, &crdt_manager, &config);
         // App creation itself is the test - if it doesn't panic, it works
+    }
+
+    #[test]
+    fn test_cors_layer_creation() {
+        use tanaka_server::config::CorsConfig;
+
+        // Test default configuration
+        let cors_config = CorsConfig {
+            allowed_origins: vec!["moz-extension://*".to_string()],
+            max_age_secs: 3600,
+        };
+        let _cors_layer = create_cors_layer(&cors_config);
+
+        // Test with specific origins
+        let cors_config = CorsConfig {
+            allowed_origins: vec![
+                "https://example.com".to_string(),
+                "https://app.example.com".to_string(),
+            ],
+            max_age_secs: 1800,
+        };
+        let _cors_layer = create_cors_layer(&cors_config);
+
+        // Test with wildcard (should log warning)
+        let cors_config = CorsConfig {
+            allowed_origins: vec!["*".to_string()],
+            max_age_secs: 3600,
+        };
+        let _cors_layer = create_cors_layer(&cors_config);
+
+        // Test with empty origins (should be restrictive)
+        let cors_config = CorsConfig {
+            allowed_origins: vec![],
+            max_age_secs: 3600,
+        };
+        let _cors_layer = create_cors_layer(&cors_config);
+    }
+
+    #[tokio::test]
+    async fn test_cors_integration() {
+        use axum::http::StatusCode;
+        use sqlx::sqlite::SqlitePoolOptions;
+
+        let db_pool = SqlitePoolOptions::new()
+            .connect("sqlite::memory:")
+            .await
+            .unwrap();
+
+        tanaka_server::setup_database(&tanaka_server::config::DatabaseConfig {
+            url: "sqlite::memory:".to_string(),
+            max_connections: 5,
+            connection_timeout_secs: 30,
+        })
+        .await
+        .unwrap();
+
+        let crdt_manager = Arc::new(CrdtManager::new(1));
+        let mut config = Config::default();
+        config.auth.shared_token = "test-token".to_string();
+
+        // Test with secure CORS configuration
+        config.server.cors.allowed_origins = vec!["moz-extension://*".to_string()];
+
+        let app = create_app(&db_pool, &crdt_manager, &config);
+
+        // Test health endpoint works with CORS
+        let response = app
+            .oneshot(
+                axum::http::Request::builder()
+                    .uri("/health")
+                    .body(axum::body::Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
     }
 }

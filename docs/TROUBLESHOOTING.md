@@ -27,11 +27,11 @@
 6. ~~**Data Truncation** - New devices lose tabs beyond the first 100~~ ✅ Fixed in PR #73
 
 ### Security Issues
-- Overly permissive CORS configuration
+- ~~Overly permissive CORS configuration~~ ✅ Fixed in PR #77
 - Missing Content Security Policy for Mozilla addon store
 - No input validation (potential DOS attacks)
 
-**Workaround**: Tanaka currently works only for single-device use. Multi-device sync will be restored after Phase 3 completion.
+**Status**: All core showstopper bugs have been fixed! Multi-device sync is now fully functional. Remaining security and data integrity fixes are in progress.
 
 ---
 

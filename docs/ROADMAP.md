@@ -86,9 +86,10 @@ These bugs prevent Tanaka from fulfilling its primary purpose:
 
 ### 3.2 Security Fixes 🔒 **REQUIRED FOR RELEASE**
 
-#### `fix/cors-config` - CORS Configuration
+#### `fix/cors-config` - CORS Configuration ✅
 **Impact**: Security vulnerability with permissive CORS  
-**Fix**: Allow only browser extension origins and configured domains
+**Fix**: Allow only browser extension origins and configured domains  
+**Status**: Completed in PR #77
 
 #### `fix/csp-manifest` - Content Security Policy
 **Impact**: Required for Mozilla addon store submission  
@@ -210,7 +211,7 @@ Prepare for v1.0 release with performance optimization, monitoring, and Mozilla 
 - [x] Server runs indefinitely without memory leaks
 
 #### Security & Compliance ✓
-- [ ] CORS properly configured - only extension origins allowed
+- [x] CORS properly configured - only extension origins allowed
 - [ ] Content Security Policy added to manifest.json
 - [ ] Input validation prevents DOS attacks
 - [ ] Permissions checked before each sync operation
