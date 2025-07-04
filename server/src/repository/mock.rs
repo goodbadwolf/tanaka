@@ -82,6 +82,27 @@ impl OperationRepository for MockOperationRepository {
         operations.reverse();
         Ok(operations)
     }
+
+    async fn get_max_clock(&self) -> Result<u64, AppError> {
+        let max_clock = self
+            .operations
+            .iter()
+            .map(|entry| entry.clock)
+            .max()
+            .unwrap_or(0);
+        Ok(max_clock)
+    }
+
+    async fn get_all(&self) -> Result<Vec<StoredOperation>, AppError> {
+        let mut operations: Vec<StoredOperation> = self
+            .operations
+            .iter()
+            .map(|entry| entry.value().clone())
+            .collect();
+
+        operations.sort_by_key(|op| op.clock);
+        Ok(operations)
+    }
 }
 
 /// Mock implementation of `TabRepository` for testing

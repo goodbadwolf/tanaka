@@ -192,4 +192,73 @@ impl OperationRepository for SqliteOperationRepository {
 
         Ok(operations)
     }
+
+    async fn get_max_clock(&self) -> Result<u64, AppError> {
+        // Use cached prepared statement
+        self.cache
+            .get_or_prepare(
+                "crdt_operations:get_max_clock",
+                "SELECT COALESCE(MAX(clock), 0) as max_clock FROM crdt_operations",
+            )
+            .await
+            .map_err(|e| AppError::database("Failed to prepare get_max_clock statement", e))?;
+
+        let row: (i64,) =
+            sqlx::query_as("SELECT COALESCE(MAX(clock), 0) as max_clock FROM crdt_operations")
+                .fetch_one(&*self.pool)
+                .await
+                .map_err(|e| AppError::database("Failed to get max clock", e))?;
+
+        Ok(u64::try_from(row.0).unwrap_or(0))
+    }
+
+    async fn get_all(&self) -> Result<Vec<StoredOperation>, AppError> {
+        #[derive(sqlx::FromRow)]
+        #[allow(dead_code)]
+        struct OperationRow {
+            id: String,
+            clock: i64,
+            device_id: String,
+            operation_type: String,
+            target_id: String,
+            operation_data: String,
+            created_at: i64,
+        }
+
+        // Use cached prepared statement
+        self.cache
+            .get_or_prepare(
+                "crdt_operations:get_all",
+                "SELECT id, clock, device_id, operation_type, target_id, operation_data, created_at
+                 FROM crdt_operations
+                 ORDER BY clock ASC",
+            )
+            .await
+            .map_err(|e| AppError::database("Failed to prepare get_all statement", e))?;
+
+        let rows = sqlx::query_as::<_, OperationRow>(
+            "SELECT id, clock, device_id, operation_type, target_id, operation_data, created_at
+             FROM crdt_operations
+             ORDER BY clock ASC",
+        )
+        .fetch_all(&*self.pool)
+        .await
+        .map_err(|e| AppError::database("Failed to fetch all operations", e))?;
+
+        let mut operations = Vec::new();
+        for row in rows {
+            let operation: CrdtOperation = serde_json::from_str(&row.operation_data)
+                .map_err(|e| AppError::internal(format!("Failed to deserialize operation: {e}")))?;
+
+            operations.push(StoredOperation {
+                id: row.id,
+                clock: u64::try_from(row.clock).unwrap_or(0),
+                device_id: row.device_id,
+                operation,
+                created_at: row.created_at,
+            });
+        }
+
+        Ok(operations)
+    }
 }

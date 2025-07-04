@@ -47,6 +47,14 @@ impl LamportClock {
     }
 
     #[must_use]
+    pub fn with_initial_value(node_id: u32, initial_value: u64) -> Self {
+        Self {
+            value: AtomicU64::new(initial_value),
+            node_id,
+        }
+    }
+
+    #[must_use]
     pub fn tick(&self) -> u64 {
         self.value.fetch_add(1, Ordering::SeqCst)
     }
@@ -233,11 +241,58 @@ impl CrdtDocument {
     /// # Errors
     ///
     /// Returns `CrdtError` if the operation fails.
+    #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
     pub fn get_tabs(&self) -> Result<Vec<CrdtTab>, CrdtError> {
-        let tabs = Vec::new();
+        let mut tabs = Vec::new();
+        let txn = self.doc.transact();
 
-        // For now, we'll return an empty list until we fix the yrs integration
-        // TODO: Properly extract tab data from yrs maps
+        // Iterate through all entries in the tabs map
+        for (tab_id, value) in self.tabs_map.iter(&txn) {
+            if let yrs::Out::Any(Any::Map(tab_map)) = value {
+                // Extract fields from the map
+                let id = tab_id.to_string();
+
+                let window_id = match tab_map.get("window_id") {
+                    Some(Any::String(s)) => s.to_string(),
+                    _ => String::new(),
+                };
+
+                let url = match tab_map.get("url") {
+                    Some(Any::String(s)) => s.to_string(),
+                    _ => String::new(),
+                };
+
+                let title = match tab_map.get("title") {
+                    Some(Any::String(s)) => s.to_string(),
+                    _ => String::new(),
+                };
+
+                let active = match tab_map.get("active") {
+                    Some(Any::Bool(b)) => *b,
+                    _ => false,
+                };
+
+                let index = match tab_map.get("index") {
+                    Some(Any::Number(n)) => *n as i32,
+                    _ => 0,
+                };
+
+                let updated_at = match tab_map.get("updated_at") {
+                    Some(Any::Number(n)) => *n as u64,
+                    _ => 0,
+                };
+
+                tabs.push(CrdtTab {
+                    id,
+                    window_id,
+                    url,
+                    title,
+                    active,
+                    index,
+                    updated_at,
+                });
+            }
+        }
 
         Ok(tabs)
     }
@@ -247,11 +302,40 @@ impl CrdtDocument {
     /// # Errors
     ///
     /// Returns `CrdtError` if the operation fails.
+    #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
     pub fn get_windows(&self) -> Result<Vec<CrdtWindow>, CrdtError> {
-        let windows = Vec::new();
+        let mut windows = Vec::new();
+        let txn = self.doc.transact();
 
-        // For now, we'll return an empty list until we fix the yrs integration
-        // TODO: Properly extract window data from yrs maps
+        // Iterate through all entries in the windows map
+        for (window_id, value) in self.windows_map.iter(&txn) {
+            if let yrs::Out::Any(Any::Map(window_map)) = value {
+                // Extract fields from the map
+                let id = window_id.to_string();
+
+                let tracked = match window_map.get("tracked") {
+                    Some(Any::Bool(b)) => *b,
+                    _ => false,
+                };
+
+                let tab_count = match window_map.get("tab_count") {
+                    Some(Any::Number(n)) => *n as u32,
+                    _ => 0,
+                };
+
+                let updated_at = match window_map.get("updated_at") {
+                    Some(Any::Number(n)) => *n as u64,
+                    _ => 0,
+                };
+
+                windows.push(CrdtWindow {
+                    id,
+                    tracked,
+                    tab_count,
+                    updated_at,
+                });
+            }
+        }
 
         Ok(windows)
     }
@@ -274,6 +358,14 @@ impl CrdtManager {
         Self {
             documents: DashMap::new(),
             clock: LamportClock::new(node_id),
+        }
+    }
+
+    #[must_use]
+    pub fn with_initial_clock(node_id: u32, initial_clock: u64) -> Self {
+        Self {
+            documents: DashMap::new(),
+            clock: LamportClock::with_initial_value(node_id, initial_clock),
         }
     }
 
@@ -386,6 +478,106 @@ impl CrdtManager {
     pub fn node_id(&self) -> u32 {
         self.clock.node_id()
     }
+
+    /// Restore state from stored operations.
+    ///
+    /// # Errors
+    ///
+    /// Returns `CrdtError` if any operation fails to apply.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the mutex is poisoned.
+    pub fn restore_from_operations(
+        &self,
+        operations: &[crate::sync::StoredOperation],
+    ) -> Result<(), CrdtError> {
+        let doc_id = "default";
+        let doc_ref = self.get_or_create_document(doc_id);
+        let mut doc = doc_ref.lock().unwrap();
+
+        for stored_op in operations {
+            let operation = &stored_op.operation;
+            let clock = stored_op.clock;
+
+            match operation {
+                crate::sync::CrdtOperation::UpsertTab { id, data } => {
+                    let crdt_tab = CrdtTab {
+                        id: id.clone(),
+                        window_id: data.window_id.clone(),
+                        url: data.url.clone(),
+                        title: data.title.clone(),
+                        active: data.active,
+                        index: data.index,
+                        updated_at: clock,
+                    };
+                    doc.upsert_tab(&crdt_tab)?;
+                }
+                crate::sync::CrdtOperation::CloseTab { id, .. } => {
+                    doc.remove_tab(id)?;
+                }
+                crate::sync::CrdtOperation::SetActive { id, active, .. } => {
+                    let tabs = doc.get_tabs()?;
+                    if let Some(mut tab) = tabs.into_iter().find(|t| t.id == *id) {
+                        tab.active = *active;
+                        tab.updated_at = clock;
+                        doc.upsert_tab(&tab)?;
+                    }
+                }
+                crate::sync::CrdtOperation::MoveTab {
+                    id,
+                    window_id,
+                    index,
+                    ..
+                } => {
+                    let tabs = doc.get_tabs()?;
+                    if let Some(mut tab) = tabs.into_iter().find(|t| t.id == *id) {
+                        tab.window_id.clone_from(window_id);
+                        tab.index = *index;
+                        tab.updated_at = clock;
+                        doc.upsert_tab(&tab)?;
+                    }
+                }
+                crate::sync::CrdtOperation::ChangeUrl { id, url, title, .. } => {
+                    let tabs = doc.get_tabs()?;
+                    if let Some(mut tab) = tabs.into_iter().find(|t| t.id == *id) {
+                        tab.url.clone_from(url);
+                        if let Some(new_title) = title {
+                            tab.title.clone_from(new_title);
+                        }
+                        tab.updated_at = clock;
+                        doc.upsert_tab(&tab)?;
+                    }
+                }
+                crate::sync::CrdtOperation::TrackWindow { id, .. } => {
+                    let crdt_window = CrdtWindow {
+                        id: id.clone(),
+                        tracked: true,
+                        tab_count: 0,
+                        updated_at: clock,
+                    };
+                    doc.upsert_window(&crdt_window)?;
+                }
+                crate::sync::CrdtOperation::UntrackWindow { id, .. } => {
+                    let windows = doc.get_windows()?;
+                    if let Some(mut window) = windows.into_iter().find(|w| w.id == *id) {
+                        window.tracked = false;
+                        window.updated_at = clock;
+                        doc.upsert_window(&window)?;
+                    }
+                }
+                crate::sync::CrdtOperation::SetWindowFocus { id, .. } => {
+                    let windows = doc.get_windows()?;
+                    if let Some(mut window) = windows.into_iter().find(|w| w.id == *id) {
+                        window.updated_at = clock;
+                        doc.upsert_window(&window)?;
+                    }
+                }
+            }
+        }
+
+        Ok(())
+    }
 }
 
 #[cfg(test)]
@@ -454,9 +646,12 @@ mod tests {
 
         doc.upsert_window(&window).unwrap();
 
-        // Test get_windows (currently returns empty but shouldn't error)
+        // Test get_windows
         let windows = doc.get_windows().unwrap();
-        assert_eq!(windows.len(), 0); // TODO: Fix when get_windows is implemented
+        assert_eq!(windows.len(), 1);
+        assert_eq!(windows[0].id, "window1");
+        assert!(windows[0].tracked);
+        assert_eq!(windows[0].tab_count, 5);
     }
 
     #[test]
