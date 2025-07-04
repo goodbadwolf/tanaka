@@ -24,7 +24,7 @@
 3. **Memory Leaks** - Server eventually crashes due to rate limiter memory leak
 4. ~~**Sync Delays** - Users may wait up to 10s for sync after rapid changes~~ ✅ Fixed in PR #71
 5. ~~**Popup Message Protocol** - Popup shows errors or blank window list~~ ✅ Fixed in PR #72
-6. **Data Truncation** - New devices lose tabs beyond the first 100
+6. ~~**Data Truncation** - New devices lose tabs beyond the first 100~~ ✅ Fixed in PR #73
 
 ### Security Issues
 - Overly permissive CORS configuration

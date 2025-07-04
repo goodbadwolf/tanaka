@@ -288,11 +288,12 @@ pub async fn sync_handler(
             .map(|stored_op| stored_op.operation)
             .collect()
     } else {
-        // If no since_clock provided, return recent operations
+        // For initial sync (no since_clock), return ALL operations to ensure complete state
         operation_repo
-            .get_recent(&request.device_id, 100)
+            .get_all()
             .await?
             .into_iter()
+            .filter(|stored_op| stored_op.device_id != request.device_id)
             .map(|stored_op| stored_op.operation)
             .collect()
     };
