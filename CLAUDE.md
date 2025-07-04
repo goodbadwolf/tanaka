@@ -1,12 +1,8 @@
-# CLAUDE.md
-
-This file provides guidance to AI assistants (Claude Code, GitHub Copilot, Cursor, etc.) when working with code in this repository.
-
 ## CRITICAL RULES - MUST FOLLOW
 
 ### 0. THINK DEEPLY AND PLAN
 
-**THINK DEEPLY AND PLAN** before planning tasks.
+**THINK DEEPLY AND PLAN** before acting.
 
 ### 1. NO UNNECESSARY COMMENTS
 
@@ -43,7 +39,7 @@ Only add comments when:
 
 ### 2. ENGINEERING PHILOSOPHY
 
-Adopt the persona of a **pragmatic, experienced engineer** who values:
+Be a **pragmatic, experienced engineer** who values:
 
 **Clean Architecture & DRY Principles**
 
@@ -60,16 +56,8 @@ Adopt the persona of a **pragmatic, experienced engineer** who values:
 - Prefer compile-time errors over runtime errors
 - NEVER use `any` type in TypeScript - the linter will reject it. Use proper types or `unknown` with type guards
 
-**Developer Experience**
-
-- Preserve tool output formatting (colors, progress indicators)
-- Stream command output in real-time, don't buffer
-- Provide clear feedback during long operations
-- Make development workflows smooth and fast
-
 **Code Organization**
 
-- Group related functionality (e.g., all build stages in one file)
 - Keep files small and focused on a single responsibility
 - Maintain clear separation of concerns
 - Use descriptive names that make code self-documenting
@@ -77,14 +65,13 @@ Adopt the persona of a **pragmatic, experienced engineer** who values:
 **Pragmatic Solutions**
 
 - Use existing well-tested libraries over custom implementations
-- Focus on practical improvements that add real value
 - Think deeply before refactoring - make meaningful changes
 - Balance perfectionism with shipping working code
 
 **Quality Assurance**
 
 - ALWAYS run pre-commit hooks before committing (`pre-commit run --all-files`)
-- NEVER use `git commit --no-verify` - it only delays CI failures
+- NEVER use `git commit --no-verify`
 - Fix linting issues locally rather than pushing broken code
 - Understand that CI enforces the same checks as pre-commit
 
@@ -100,13 +87,13 @@ Tanaka is a Firefox tab synchronization system built with:
 
 ### Documentation References
 
-- **Project Overview**: See @README.md
-- **Architecture Details**: See @docs/ARCHITECTURE.md
-- **Development Setup**: See @docs/DEVELOPMENT.md
-- **Git Workflow**: See @docs/GIT.md
-- **Getting Started**: See @docs/GETTING-STARTED.md
-- **Roadmap**: See @docs/ROADMAP.md
-- **Troubleshooting**: See @docs/TROUBLESHOOTING.md
+- **Project Overview**: @README.md
+- **Architecture Details**: @docs/ARCHITECTURE.md
+- **Development Setup**: @docs/DEVELOPMENT.md
+- **Git Workflow**: @docs/GIT.md
+- **Getting Started**: @docs/GETTING-STARTED.md
+- **Roadmap**: @docs/ROADMAP.md
+- **Troubleshooting**: @docs/TROUBLESHOOTING.md
 
 ## AI Agent Guidelines
 
@@ -133,15 +120,6 @@ tanaka/
 ### Git Workflow
 
 For commit guidelines, pre-commit hooks, and git best practices, see @docs/GIT.md
-
-### Common Tasks
-
-- **New API endpoint**: Check `/server/src/routes/`
-- **Modify tab sync**: Look at `/extension/src/sync/`
-- **Config changes**: Update `server/config/example.toml` and docs
-- **Add dependencies**: Update `Cargo.toml` or `package.json`
-- **Generate TS types**: Run `uv run scripts/tanaka.py generate`
-- **Add shared types**: Add `#[derive(TS)]` and `#[ts(export)]` to Rust structs in `/server/src/models.rs`
 
 ### Technical Patterns
 
@@ -228,7 +206,7 @@ class SyncManager {
 
 // Bad - hardcoded dependencies
 class SyncManager {
-  private api = new TanakaAPI("https://hardcoded.com");
+  private api = new TanakaAPI("https://api.com");
 }
 ```
 
@@ -248,45 +226,12 @@ class SyncManager {
 
 ### Common Issues & Solutions
 
-#### Bash Commands
-
-- Avoid `cd` - it fails with "no such file or directory" in subshells
-- Use full paths: `/Users/manish/projects/tanaka/extension`
-- File operations need full paths when not in expected directory
-
-#### String Replacements
-
-- Multi-line replacements often fail due to hidden characters
-- Use `sed` for complex deletions
-- On macOS, use `od -c` instead of `cat -A` (BSD vs GNU tools)
-
 #### Documentation
 
 - Check for redundancy across documentation files
 - Keep configuration examples in GETTING-STARTED.md
 - Follow the documentation structure in docs/
 - AGENTS.md is a symlink to CLAUDE.md (changes affect both)
-
-### Rollback Procedures
-
-#### Emergency Rollback (for major migrations)
-
-If critical issues are found during a major refactor:
-
-```bash
-git checkout main
-git branch -D <feature-branch>
-git checkout <pre-migration-tag> -- .
-pnpm install  # or cargo build for server
-pnpm build:prod
-```
-
-#### Partial Rollback
-
-- Identify failing components/modules
-- Revert specific files while keeping other improvements
-- Document issues for future retry
-- Consider feature flags for gradual rollout
 
 ### Project Organization
 
@@ -300,7 +245,7 @@ pnpm build:prod
 - After compacting, read the docs and this guide to refresh your instructions
 - Proactively suggest adding patterns/lessons to documentation
 - Always run pre-commit checks before committing
-- Fix markdown linting issues (usually missing blank lines)
+- Fix markdown linting issues
 - **File References**: Use @<path> notation for file references in CLAUDE.md (not Markdown links)
 - **Documentation Updates**: Always check and update relevant documentation when making major changes
 - **Before Pull Requests**: Review all docs for accuracy - feature status, version numbers, commands, and technical details must match the code
@@ -315,7 +260,6 @@ For the unified development roadmap covering both extension and server improveme
 
 ### Misc
 
-- This guide was previously named CLAUDE.md
 - AGENTS.md is a symlink to this file for compatibility (used by OpenAI's Codex)
 - The project uses semantic versioning - update versions in `manifest.json` and `Cargo.toml`
 
@@ -326,9 +270,7 @@ Before suggesting code changes:
 1. ✓ Code follows existing patterns in the codebase
 2. ✓ No unnecessary comments added
 3. ✓ Types are properly defined (no `any`)
-4. ✓ Error handling uses Result pattern where appropriate
-5. ✓ Tests would pass with the changes
-6. ✓ Documentation is updated if needed
-7. ✓ Changes are focused and minimal
-8. ✓ Pre-commit hooks run locally (`pre-commit run --all-files`)
-9. ✓ Never suggest using `--no-verify` for commits
+4. ✓ Tests would pass with the changes
+5. ✓ Documentation is updated if needed
+6. ✓ Changes are focused and minimal
+7. ✓ Pre-commit hooks run locally (`pre-commit run --all-files`)

@@ -35,6 +35,12 @@ pub trait OperationRepository: Send + Sync {
         device_id: &str,
         limit: i64,
     ) -> Result<Vec<StoredOperation>, AppError>;
+
+    /// Get the maximum clock value from stored operations
+    async fn get_max_clock(&self) -> Result<u64, AppError>;
+
+    /// Get all operations in chronological order for state reconstruction
+    async fn get_all(&self) -> Result<Vec<StoredOperation>, AppError>;
 }
 
 /// Repository for tab operations

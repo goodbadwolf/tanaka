@@ -10,6 +10,7 @@ use std::sync::Arc;
 use tanaka_server::config::{Args, Config};
 use tanaka_server::crdt::CrdtManager;
 use tanaka_server::error::AppResult;
+use tanaka_server::repository::Repositories;
 use tanaka_server::sync;
 use tower_http::{cors::CorsLayer, trace::TraceLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, Layer};
@@ -35,10 +36,49 @@ async fn main() -> AppResult<()> {
     let db_pool = db::init_db_with_config(&config.database).await?;
     tracing::info!("Database initialized");
 
+    // Create repositories
+    let repositories = Repositories::new_sqlite(db_pool.clone());
+
     // Initialize CRDT manager with node ID based on bind address hash
     let node_id = calculate_node_id(&config.server.bind_addr);
-    let crdt_manager = Arc::new(CrdtManager::new(node_id));
-    tracing::info!("CRDT manager initialized with node ID: {}", node_id);
+
+    // Restore state from database
+    let max_clock = repositories.operations.get_max_clock().await?;
+    let crdt_manager = if max_clock > 0 {
+        tracing::info!("Restoring server state with max clock: {}", max_clock);
+
+        // Create manager with existing clock
+        let manager = Arc::new(CrdtManager::with_initial_clock(node_id, max_clock + 1));
+
+        // Restore operations to rebuild CRDT state
+        let operations = repositories.operations.get_all().await?;
+        let op_count = operations.len();
+
+        if op_count > 0 {
+            tracing::info!("Replaying {} operations to restore CRDT state", op_count);
+            if let Err(e) = manager.restore_from_operations(&operations) {
+                tracing::error!("Failed to restore CRDT state: {}", e);
+                return Err(tanaka_server::error::AppError::internal(format!(
+                    "Failed to restore CRDT state: {e}"
+                )));
+            }
+            tracing::info!(
+                "Successfully restored CRDT state from {} operations",
+                op_count
+            );
+        }
+
+        manager
+    } else {
+        tracing::info!("No existing state found, starting fresh");
+        Arc::new(CrdtManager::new(node_id))
+    };
+
+    tracing::info!(
+        "CRDT manager initialized with node ID: {} and clock: {}",
+        node_id,
+        crdt_manager.current_clock()
+    );
 
     let app = create_app(&db_pool, &crdt_manager, &config);
 
