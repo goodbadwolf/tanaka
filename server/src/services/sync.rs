@@ -162,18 +162,31 @@ impl SyncService for CrdtSyncService {
 
 impl CrdtSyncService {
     /// Validate the sync request structure and authentication
-    fn validate_sync_request(request: &SyncRequest, auth: &AuthContext) -> Result<(), AppError> {
-        // Ensure device_id matches authenticated device
-        if request.device_id != auth.device_id {
-            return Err(AppError::auth_token_invalid(
-                "Device ID in request does not match authenticated device",
-            ));
-        }
+    fn validate_sync_request(request: &SyncRequest, _auth: &AuthContext) -> Result<(), AppError> {
+        // For shared token auth, we trust the client-provided device_id
+        // This allows multiple devices to use the same token with different device IDs
+        // The auth context validates the token, and we trust the device_id from the request
 
         // Validate device_id format
         if request.device_id.is_empty() {
             return Err(AppError::validation(
                 "Device ID cannot be empty",
+                Some("device_id"),
+            ));
+        }
+
+        // Additional validation: device_id should be a reasonable length and format
+        if request.device_id.len() > 128 {
+            return Err(AppError::validation(
+                "Device ID too long (max 128 characters)",
+                Some("device_id"),
+            ));
+        }
+
+        // Prevent auth context placeholder from being used as actual device ID
+        if request.device_id == "auth-validated" {
+            return Err(AppError::validation(
+                "Invalid device ID format",
                 Some("device_id"),
             ));
         }
@@ -281,19 +294,31 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_validate_sync_request_device_mismatch() {
+    async fn test_validate_sync_request_invalid_device_id() {
         let repos = Arc::new(Repositories::new_mock());
         let crdt_manager = Arc::new(CrdtManager::new(1));
         let _service = CrdtSyncService::new(repos, crdt_manager);
 
+        // Test empty device ID
         let request = SyncRequest {
             clock: 5,
-            device_id: "different-device".to_string(), // Different from auth
+            device_id: String::new(), // Empty device ID should fail
             since_clock: Some(3),
             operations: vec![],
         };
 
         let auth = create_test_auth();
+        let result = CrdtSyncService::validate_sync_request(&request, &auth);
+        assert!(result.is_err());
+
+        // Test reserved device ID
+        let request = SyncRequest {
+            clock: 5,
+            device_id: "auth-validated".to_string(), // Reserved ID should fail
+            since_clock: Some(3),
+            operations: vec![],
+        };
+
         let result = CrdtSyncService::validate_sync_request(&request, &auth);
         assert!(result.is_err());
     }

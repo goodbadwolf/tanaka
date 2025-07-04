@@ -575,6 +575,126 @@ async fn test_sync_multiple_operations_storage() {
 }
 
 #[tokio::test]
+async fn test_device_authentication_multi_device_sync() {
+    // Test the fix for device authentication - multiple devices should be able to sync
+    // using the same shared token but different device IDs
+    let db_pool = create_test_db().await;
+    let app = create_test_app(db_pool);
+
+    // Device 1 sends a tab operation
+    let device1_operation = CrdtOperation::UpsertTab {
+        id: "device1-tab".to_string(),
+        data: TabData {
+            window_id: "device1-window".to_string(),
+            url: "https://device1.com".to_string(),
+            title: "Device 1 Tab".to_string(),
+            active: true,
+            index: 0,
+            updated_at: 123_456_789,
+        },
+    };
+
+    let device1_request = SyncRequest {
+        clock: 1,
+        device_id: "unique-device-1".to_string(), // Device 1 uses its own ID
+        since_clock: None,
+        operations: vec![device1_operation],
+    };
+
+    let (status1, body1) = make_sync_request(app.clone(), "test-token", device1_request).await;
+    assert_eq!(status1, StatusCode::OK, "Device 1 sync failed: {body1}");
+    let _response1: SyncResponse = serde_json::from_str(&body1).unwrap();
+
+    // Device 2 sends a different tab operation using same token but different device ID
+    let device2_operation = CrdtOperation::UpsertTab {
+        id: "device2-tab".to_string(),
+        data: TabData {
+            window_id: "device2-window".to_string(),
+            url: "https://device2.com".to_string(),
+            title: "Device 2 Tab".to_string(),
+            active: true,
+            index: 0,
+            updated_at: 123_456_790,
+        },
+    };
+
+    let device2_request = SyncRequest {
+        clock: 1,
+        device_id: "unique-device-2".to_string(), // Device 2 uses its own ID
+        since_clock: None,
+        operations: vec![device2_operation],
+    };
+
+    let (status2, body2) = make_sync_request(app.clone(), "test-token", device2_request).await;
+    assert_eq!(status2, StatusCode::OK, "Device 2 sync failed: {body2}");
+    let _response2: SyncResponse = serde_json::from_str(&body2).unwrap();
+
+    // Device 1 syncs again and should receive Device 2's operation
+    let device1_sync = SyncRequest {
+        clock: 1,
+        device_id: "unique-device-1".to_string(),
+        since_clock: Some(0), // Get all operations since beginning
+        operations: vec![],
+    };
+
+    let (status3, body3) = make_sync_request(app.clone(), "test-token", device1_sync).await;
+    assert_eq!(
+        status3,
+        StatusCode::OK,
+        "Device 1 second sync failed: {body3}"
+    );
+    let response3: SyncResponse = serde_json::from_str(&body3).unwrap();
+
+    // Device 1 should receive Device 2's operation (but not its own)
+    assert_eq!(
+        response3.operations.len(),
+        1,
+        "Device 1 should receive exactly 1 operation from Device 2"
+    );
+
+    match &response3.operations[0] {
+        CrdtOperation::UpsertTab { id, data } => {
+            assert_eq!(id, "device2-tab");
+            assert_eq!(data.url, "https://device2.com");
+            assert_eq!(data.title, "Device 2 Tab");
+        }
+        _ => panic!("Expected UpsertTab operation from Device 2"),
+    }
+
+    // Device 2 syncs and should receive Device 1's operation
+    let device2_sync = SyncRequest {
+        clock: 1,
+        device_id: "unique-device-2".to_string(),
+        since_clock: Some(0),
+        operations: vec![],
+    };
+
+    let (status4, body4) = make_sync_request(app.clone(), "test-token", device2_sync).await;
+    assert_eq!(
+        status4,
+        StatusCode::OK,
+        "Device 2 second sync failed: {body4}"
+    );
+    let response4: SyncResponse = serde_json::from_str(&body4).unwrap();
+
+    // Device 2 should receive Device 1's operation (but not its own)
+    assert_eq!(
+        response4.operations.len(),
+        1,
+        "Device 2 should receive exactly 1 operation from Device 1"
+    );
+
+    match &response4.operations[0] {
+        CrdtOperation::UpsertTab { id, data } => {
+            assert_eq!(id, "device1-tab");
+            assert_eq!(data.url, "https://device1.com");
+            assert_eq!(data.title, "Device 1 Tab");
+        }
+        _ => panic!("Expected UpsertTab operation from Device 1"),
+    }
+}
+
+#[tokio::test]
 async fn test_initial_sync_beyond_100_tabs() {
     // Test the fix for initial sync truncation - devices should receive ALL operations, not just 100
     let db_pool = create_test_db().await;

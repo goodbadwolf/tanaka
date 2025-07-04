@@ -42,9 +42,10 @@ impl AuthService for SharedTokenAuthService {
             return Err(AppError::auth_token_invalid("Invalid token"));
         }
 
-        // For shared token auth, we generate a device ID from the token
-        // In production, this might be extracted from JWT claims or a database lookup
-        let device_id = format!("device-{}", Self::hash_token(token));
+        // For shared token auth with multi-device support, we don't generate device IDs
+        // The device ID will be provided by the client in the sync request
+        // This allows multiple devices to use the same shared token with different device IDs
+        let device_id = "auth-validated".to_string(); // Placeholder - actual device_id comes from request
 
         Ok(AuthContext {
             device_id,
@@ -119,15 +120,8 @@ impl AuthService for SharedTokenAuthService {
 }
 
 impl SharedTokenAuthService {
-    /// Generate a simple hash of the token for device ID generation
-    fn hash_token(token: &str) -> u64 {
-        use std::collections::hash_map::DefaultHasher;
-        use std::hash::{Hash, Hasher};
-
-        let mut hasher = DefaultHasher::new();
-        token.hash(&mut hasher);
-        hasher.finish()
-    }
+    // Note: hash_token method removed as device IDs are now client-provided
+    // This allows multiple devices to use the same shared token with different device IDs
 
     /// Clean up old rate limit entries to prevent memory leaks
     fn cleanup_old_rate_limit_entries(&self) {
@@ -218,7 +212,7 @@ mod tests {
 
         assert!(result.is_ok());
         let context = result.unwrap();
-        assert!(context.device_id.starts_with("device-"));
+        assert_eq!(context.device_id, "auth-validated");
         assert_eq!(context.token, "test-token");
         assert!(context.permissions.contains(&"sync".to_string()));
     }
