@@ -58,9 +58,10 @@ These bugs prevent Tanaka from fulfilling its primary purpose:
 **Fix**: Reload Lamport clock and operations from database on startup  
 **Status**: Completed in PR #69
 
-#### `fix/lamport-clock` - Lamport Clock Atomicity
+#### `fix/lamport-clock` - Lamport Clock Atomicity ✅
 **Impact**: Race conditions cause incorrect operation ordering  
-**Fix**: Use atomic compare-and-swap for server clock updates
+**Fix**: Use atomic compare-and-swap for server clock updates  
+**Status**: Completed - Fixed using `compare_exchange_weak` for thread-safe updates
 
 #### `fix/queue-threshold` - Queue Size Threshold
 **Impact**: Users wait up to 10s for sync after rapid changes  
@@ -197,7 +198,7 @@ Prepare for v1.0 release with performance optimization, monitoring, and Mozilla 
 #### Core Functionality ✓
 - [ ] Multiple Firefox instances can sync tabs using same server
 - [x] Server restarts don't lose data - state restored from database
-- [ ] Operations applied in correct order with atomic Lamport clock
+- [x] Operations applied in correct order with atomic Lamport clock
 - [ ] Sync happens within 1s during activity (queue threshold working)
 - [ ] Popup displays correct window list without errors
 - [ ] New devices receive complete state (>100 tabs supported)

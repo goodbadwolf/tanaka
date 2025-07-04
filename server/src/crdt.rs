@@ -59,12 +59,26 @@ impl LamportClock {
         self.value.fetch_add(1, Ordering::SeqCst)
     }
 
+    /// Updates the clock based on a received clock value using atomic compare-and-swap.
+    /// This ensures thread-safe updates even under concurrent access.
+    ///
+    /// The new clock value will be `max(received_clock, current_clock) + 1`.
     #[must_use]
     pub fn update(&self, received_clock: u64) -> u64 {
-        let current = self.value.load(Ordering::SeqCst);
-        let new_value = received_clock.max(current) + 1;
-        self.value.store(new_value, Ordering::SeqCst);
-        new_value
+        loop {
+            let current = self.value.load(Ordering::SeqCst);
+            let new_value = received_clock.max(current) + 1;
+
+            // Use compare_exchange_weak for better performance on some platforms
+            if self
+                .value
+                .compare_exchange_weak(current, new_value, Ordering::SeqCst, Ordering::SeqCst)
+                .is_ok()
+            {
+                return new_value;
+            }
+            // Retry on concurrent modification
+        }
     }
 
     #[must_use]
@@ -595,6 +609,47 @@ mod tests {
         let new_clock = clock.update(5);
         assert_eq!(new_clock, 6);
         assert_eq!(clock.current(), 6);
+    }
+
+    #[test]
+    fn test_lamport_clock_concurrent_updates() {
+        use std::sync::Arc;
+        use std::thread;
+
+        let clock = Arc::new(LamportClock::new(1));
+        let num_threads = 10u64;
+        let updates_per_thread = 100u64;
+
+        let handles: Vec<_> = (0..num_threads)
+            .map(|i| {
+                let clock_clone = Arc::clone(&clock);
+                thread::spawn(move || {
+                    for j in 0..updates_per_thread {
+                        // Mix of tick and update operations
+                        if (i + j) % 2 == 0 {
+                            let _ = clock_clone.tick();
+                        } else {
+                            let _ = clock_clone.update(i * 1000 + j);
+                        }
+                    }
+                })
+            })
+            .collect();
+
+        // Wait for all threads to complete
+        for handle in handles {
+            handle.join().unwrap();
+        }
+
+        // The clock should be monotonically increasing
+        // At minimum, it should be greater than the number of operations
+        let final_value = clock.current();
+        assert!(
+            final_value >= num_threads * updates_per_thread,
+            "Clock value {} should be at least {}",
+            final_value,
+            num_threads * updates_per_thread
+        );
     }
 
     #[test]
