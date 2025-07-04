@@ -21,7 +21,7 @@
 ### Showstopper Bugs
 1. ~~**Device Authentication Bug** - All devices are forced to use the same device_id, making multi-device sync impossible~~ ✅ Fixed in PR #74
 2. ~~**Server State Loss** - Server loses all data on restart (no persistence)~~ ✅ Fixed in PR #69
-3. **Memory Leaks** - Server eventually crashes due to rate limiter memory leak
+3. ~~**Memory Leaks** - Server eventually crashes due to rate limiter memory leak~~ ✅ Fixed in PR #76
 4. ~~**Sync Delays** - Users may wait up to 10s for sync after rapid changes~~ ✅ Fixed in PR #71
 5. ~~**Popup Message Protocol** - Popup shows errors or blank window list~~ ✅ Fixed in PR #72
 6. ~~**Data Truncation** - New devices lose tabs beyond the first 100~~ ✅ Fixed in PR #73

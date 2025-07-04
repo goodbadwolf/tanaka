@@ -79,9 +79,10 @@ These bugs prevent Tanaka from fulfilling its primary purpose:
 **Fix**: Send CRDT state snapshot for initial sync  
 **Status**: Completed in PR #73
 
-#### `fix/rate-limiter-leak` - Rate Limiter Memory Leak
+#### `fix/rate-limiter-leak` - Rate Limiter Memory Leak ✅
 **Impact**: Server eventually runs out of memory and crashes  
-**Fix**: Properly schedule cleanup with elapsed time check
+**Fix**: Properly schedule cleanup with elapsed time check  
+**Status**: Completed in PR #76
 
 ### 3.2 Security Fixes 🔒 **REQUIRED FOR RELEASE**
 
@@ -206,7 +207,7 @@ Prepare for v1.0 release with performance optimization, monitoring, and Mozilla 
 - [x] Sync happens within 1s during activity (queue threshold working)
 - [x] Popup displays correct window list without errors
 - [x] New devices receive complete state (>100 tabs supported)
-- [ ] Server runs indefinitely without memory leaks
+- [x] Server runs indefinitely without memory leaks
 
 #### Security & Compliance ✓
 - [ ] CORS properly configured - only extension origins allowed
