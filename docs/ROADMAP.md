@@ -53,9 +53,10 @@ These bugs prevent Tanaka from fulfilling its primary purpose:
 **Impact**: All devices forced to use same ID, making multi-device sync impossible  
 **Fix**: Trust client-provided device_id instead of deriving from token
 
-#### `fix/server-persistence` - Server State Persistence  
+#### `fix/server-persistence` - Server State Persistence ✅
 **Impact**: Complete data loss on server restart  
-**Fix**: Reload Lamport clock and operations from database on startup
+**Fix**: Reload Lamport clock and operations from database on startup  
+**Status**: Completed in PR #69
 
 #### `fix/lamport-clock` - Lamport Clock Atomicity
 **Impact**: Race conditions cause incorrect operation ordering  
@@ -195,7 +196,7 @@ Prepare for v1.0 release with performance optimization, monitoring, and Mozilla 
 
 #### Core Functionality ✓
 - [ ] Multiple Firefox instances can sync tabs using same server
-- [ ] Server restarts don't lose data - state restored from database
+- [x] Server restarts don't lose data - state restored from database
 - [ ] Operations applied in correct order with atomic Lamport clock
 - [ ] Sync happens within 1s during activity (queue threshold working)
 - [ ] Popup displays correct window list without errors
