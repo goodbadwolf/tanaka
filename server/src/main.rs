@@ -33,17 +33,14 @@ async fn main() -> AppResult<()> {
     tracing::info!("Starting Tanaka server v{}", env!("CARGO_PKG_VERSION"));
     tracing::debug!("Configuration loaded: {:?}", config);
 
-    // Initialize database
     let db_pool = db::init_db_with_config(&config.database).await?;
     tracing::info!("Database initialized");
 
-    // Create repositories
     let repositories = Repositories::new_sqlite(db_pool.clone());
+    tracing::info!("Repositories initialized");
 
-    // Initialize server bootstrap
     let bootstrap = ServerBootstrap::new(&config.server.bind_addr);
 
-    // Initialize or restore CRDT manager
     let crdt_manager = bootstrap
         .initialize_crdt_manager(&*repositories.operations)
         .await?;
@@ -54,7 +51,6 @@ async fn main() -> AppResult<()> {
         crdt_manager.current_clock()
     );
 
-    // Create and start the application
     let app = create_app(&db_pool, &crdt_manager, &config);
     let addr = parse_bind_address(&config.server.bind_addr)?;
 
@@ -181,10 +177,15 @@ mod tests {
         use tanaka_server::repository::Repositories;
 
         // This test verifies the entire startup sequence works
-        let config = Config::default();
+        let mut config = Config::default();
+
+        // Use in-memory database for testing
+        config.database.url = "sqlite::memory:".to_string();
 
         // Create in-memory database
-        let db_pool = sqlx::SqlitePool::connect("sqlite::memory:").await.unwrap();
+        let db_pool = sqlx::SqlitePool::connect(&config.database.url)
+            .await
+            .unwrap();
 
         // Initialize schema
         tanaka_server::setup_database(&config.database)
