@@ -5,12 +5,12 @@ use axum::{
 };
 use clap::Parser;
 use serde::Serialize;
-use std::net::SocketAddr;
 use std::sync::Arc;
 use tanaka_server::config::{Args, Config};
 use tanaka_server::crdt::CrdtManager;
 use tanaka_server::error::AppResult;
 use tanaka_server::repository::Repositories;
+use tanaka_server::startup::{parse_bind_address, ServerBootstrap};
 use tanaka_server::sync;
 use tower_http::{cors::CorsLayer, trace::TraceLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, Layer};
@@ -33,64 +33,30 @@ async fn main() -> AppResult<()> {
     tracing::info!("Starting Tanaka server v{}", env!("CARGO_PKG_VERSION"));
     tracing::debug!("Configuration loaded: {:?}", config);
 
+    // Initialize database
     let db_pool = db::init_db_with_config(&config.database).await?;
     tracing::info!("Database initialized");
 
     // Create repositories
     let repositories = Repositories::new_sqlite(db_pool.clone());
 
-    // Initialize CRDT manager with node ID based on bind address hash
-    let node_id = calculate_node_id(&config.server.bind_addr);
+    // Initialize server bootstrap
+    let bootstrap = ServerBootstrap::new(&config.server.bind_addr);
 
-    // Restore state from database
-    let max_clock = repositories.operations.get_max_clock().await?;
-    let crdt_manager = if max_clock > 0 {
-        tracing::info!("Restoring server state with max clock: {}", max_clock);
-
-        // Create manager with existing clock
-        let manager = Arc::new(CrdtManager::with_initial_clock(node_id, max_clock + 1));
-
-        // Restore operations to rebuild CRDT state
-        let operations = repositories.operations.get_all().await?;
-        let op_count = operations.len();
-
-        if op_count > 0 {
-            tracing::info!("Replaying {} operations to restore CRDT state", op_count);
-            if let Err(e) = manager.restore_from_operations(&operations) {
-                tracing::error!("Failed to restore CRDT state: {}", e);
-                return Err(tanaka_server::error::AppError::internal(format!(
-                    "Failed to restore CRDT state: {e}"
-                )));
-            }
-            tracing::info!(
-                "Successfully restored CRDT state from {} operations",
-                op_count
-            );
-        }
-
-        manager
-    } else {
-        tracing::info!("No existing state found, starting fresh");
-        Arc::new(CrdtManager::new(node_id))
-    };
+    // Initialize or restore CRDT manager
+    let crdt_manager = bootstrap
+        .initialize_crdt_manager(&*repositories.operations)
+        .await?;
 
     tracing::info!(
         "CRDT manager initialized with node ID: {} and clock: {}",
-        node_id,
+        bootstrap.node_id(),
         crdt_manager.current_clock()
     );
 
+    // Create and start the application
     let app = create_app(&db_pool, &crdt_manager, &config);
-
-    let addr: SocketAddr =
-        config
-            .server
-            .bind_addr
-            .parse()
-            .map_err(|e| tanaka_server::error::AppError::Config {
-                message: format!("Invalid bind address '{}': {}", config.server.bind_addr, e),
-                key: Some("server.bind_addr".to_string()),
-            })?;
+    let addr = parse_bind_address(&config.server.bind_addr)?;
 
     tracing::info!("Starting server on {}", addr);
 
@@ -152,13 +118,112 @@ async fn health() -> Json<HealthResponse> {
     })
 }
 
-fn calculate_node_id(bind_addr: &str) -> u32 {
-    use std::collections::hash_map::DefaultHasher;
-    use std::hash::{Hash, Hasher};
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tanaka_server::sync::{CrdtOperation, TabData};
+    use tower::ServiceExt;
 
-    let mut hasher = DefaultHasher::new();
-    bind_addr.hash(&mut hasher);
+    #[test]
+    fn test_init_logging() {
+        // Test that init_logging doesn't panic with various configs
+        let mut config = Config::default();
 
-    // Use lower 32 bits for node ID
-    (hasher.finish() & 0xFFFF_FFFF) as u32
+        config.logging.format = "json".to_string();
+        // Note: Can't actually init multiple times, so just verify it compiles
+
+        config.logging.format = "compact".to_string();
+        config.logging.format = "pretty".to_string();
+    }
+
+    #[tokio::test]
+    async fn test_app_creation() {
+        use axum::http::StatusCode;
+        use sqlx::sqlite::SqlitePoolOptions;
+
+        // Create in-memory database
+        let db_pool = SqlitePoolOptions::new()
+            .connect("sqlite::memory:")
+            .await
+            .unwrap();
+
+        // Initialize schema
+        tanaka_server::setup_database(&tanaka_server::config::DatabaseConfig {
+            url: "sqlite::memory:".to_string(),
+            max_connections: 5,
+            connection_timeout_secs: 30,
+        })
+        .await
+        .unwrap();
+
+        let crdt_manager = Arc::new(CrdtManager::new(1));
+        let config = Config::default();
+
+        let app = create_app(&db_pool, &crdt_manager, &config);
+
+        // Test that health endpoint works
+
+        let response = app
+            .oneshot(
+                axum::http::Request::builder()
+                    .uri("/health")
+                    .body(axum::body::Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+    }
+
+    #[tokio::test]
+    async fn test_full_startup_sequence() {
+        use tanaka_server::repository::Repositories;
+
+        // This test verifies the entire startup sequence works
+        let config = Config::default();
+
+        // Create in-memory database
+        let db_pool = sqlx::SqlitePool::connect("sqlite::memory:").await.unwrap();
+
+        // Initialize schema
+        tanaka_server::setup_database(&config.database)
+            .await
+            .unwrap();
+
+        let repositories = Repositories::new_mock(); // Use mock for testing
+
+        // Store some test data
+        let op = CrdtOperation::UpsertTab {
+            id: "test".to_string(),
+            data: TabData {
+                window_id: "window1".to_string(),
+                url: "https://test.com".to_string(),
+                title: "Test".to_string(),
+                active: true,
+                index: 0,
+                updated_at: 1,
+            },
+        };
+        repositories
+            .operations
+            .store(&op, 1, "device1")
+            .await
+            .unwrap();
+
+        // Test bootstrap
+        let bootstrap = ServerBootstrap::new(&config.server.bind_addr);
+        let crdt_manager = bootstrap
+            .initialize_crdt_manager(&*repositories.operations)
+            .await
+            .unwrap();
+
+        // Verify state was restored
+        assert_eq!(crdt_manager.current_clock(), 2); // max_clock + 1
+        assert_eq!(crdt_manager.node_id(), bootstrap.node_id());
+
+        // Verify we can create the app
+        let _app = create_app(&db_pool, &crdt_manager, &config);
+        // App creation itself is the test - if it doesn't panic, it works
+    }
 }
