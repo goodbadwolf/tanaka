@@ -1,23 +1,26 @@
 use axum::http::{HeaderValue, Method};
 use axum::{
-    middleware,
+    middleware::{from_fn, from_fn_with_state},
     routing::{get, post},
     Json, Router,
 };
 use clap::Parser;
 use serde::Serialize;
 use std::sync::Arc;
+use std::time::Duration;
 use tanaka_server::config::{Args, Config};
 use tanaka_server::crdt::CrdtManager;
 use tanaka_server::error::AppResult;
 use tanaka_server::repository::Repositories;
 use tanaka_server::startup::{parse_bind_address, ServerBootstrap};
-use tanaka_server::sync;
-use tower_http::{cors::CorsLayer, trace::TraceLayer};
+use tower_http::{
+    cors::CorsLayer, limit::RequestBodyLimitLayer, timeout::TimeoutLayer, trace::TraceLayer,
+};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, Layer};
 
 mod auth;
 mod db;
+mod middleware;
 
 #[derive(Serialize)]
 struct HealthResponse {
@@ -37,7 +40,7 @@ async fn main() -> AppResult<()> {
     let db_pool = db::init_db_with_config(&config.database).await?;
     tracing::info!("Database initialized");
 
-    let repositories = Repositories::new_sqlite(db_pool.clone());
+    let repositories = Arc::new(Repositories::new_sqlite(db_pool.clone()));
     tracing::info!("Repositories initialized");
 
     let bootstrap = ServerBootstrap::new(&config.server.bind_addr);
@@ -52,7 +55,13 @@ async fn main() -> AppResult<()> {
         crdt_manager.current_clock()
     );
 
-    let app = create_app(&db_pool, &crdt_manager, &config);
+    let services = tanaka_server::services::container::create_services(
+        repositories.clone(),
+        crdt_manager.clone(),
+        config.clone(),
+    );
+
+    let app = create_app(&db_pool, &crdt_manager, &config, &services);
     let addr = parse_bind_address(&config.server.bind_addr)?;
 
     tracing::info!("Starting server on {}", addr);
@@ -85,22 +94,37 @@ fn init_logging(config: &Config) {
 }
 
 fn create_app(
-    db_pool: &sqlx::SqlitePool,
-    crdt_manager: &Arc<CrdtManager>,
+    _db_pool: &sqlx::SqlitePool,
+    _crdt_manager: &Arc<CrdtManager>,
     config: &Config,
+    services: &Arc<tanaka_server::services::container::ServiceContainer>,
 ) -> Router {
-    let auth_middleware_layer =
-        middleware::from_fn_with_state(config.auth.clone(), auth::auth_middleware);
+    let auth_middleware_layer = from_fn_with_state(config.auth.clone(), auth::auth_middleware);
 
     let mut app = Router::new().route("/health", get(health)).route(
         "/sync",
-        post(sync::sync_handler)
-            .with_state((crdt_manager.clone(), db_pool.clone()))
+        post(tanaka_server::handlers::sync_handler)
+            .with_state(services.clone())
+            .route_layer(from_fn(middleware::validate_content_type))
             .route_layer(auth_middleware_layer),
     );
 
-    app = app.layer(create_cors_layer(&config.server.cors));
+    // Apply global middleware in the correct order (outermost to innermost)
+    app = app
+        // Add request body size limit
+        .layer(RequestBodyLimitLayer::new(config.sync.max_payload_size))
+        // Add concurrency limit
+        .layer(tower::limit::ConcurrencyLimitLayer::new(
+            config.server.max_concurrent_connections,
+        ))
+        // Add timeout for all requests (using tower-http's timeout layer)
+        .layer(TimeoutLayer::new(Duration::from_secs(
+            config.server.request_timeout_secs,
+        )))
+        // Add CORS
+        .layer(create_cors_layer(&config.server.cors));
 
+    // Add tracing if enabled (must be applied separately)
     if config.logging.request_logging {
         app = app.layer(TraceLayer::new_for_http());
     }
@@ -197,7 +221,8 @@ mod tests {
         let crdt_manager = Arc::new(CrdtManager::new(1));
         let config = Config::default();
 
-        let app = create_app(&db_pool, &crdt_manager, &config);
+        let services = Arc::new(tanaka_server::services::container::ServiceContainer::new_mock());
+        let app = create_app(&db_pool, &crdt_manager, &config, &services);
 
         // Test that health endpoint works
 
@@ -266,7 +291,8 @@ mod tests {
         assert_eq!(crdt_manager.node_id(), bootstrap.node_id());
 
         // Verify we can create the app
-        let _app = create_app(&db_pool, &crdt_manager, &config);
+        let services = Arc::new(tanaka_server::services::container::ServiceContainer::new_mock());
+        let _app = create_app(&db_pool, &crdt_manager, &config, &services);
         // App creation itself is the test - if it doesn't panic, it works
     }
 
@@ -331,7 +357,8 @@ mod tests {
         // Test with secure CORS configuration
         config.server.cors.allowed_origins = vec!["moz-extension://*".to_string()];
 
-        let app = create_app(&db_pool, &crdt_manager, &config);
+        let services = Arc::new(tanaka_server::services::container::ServiceContainer::new_mock());
+        let app = create_app(&db_pool, &crdt_manager, &config, &services);
 
         // Test health endpoint works with CORS
         let response = app

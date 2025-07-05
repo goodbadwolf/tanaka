@@ -1,6 +1,7 @@
 pub mod config;
 pub mod crdt;
 pub mod error;
+pub mod handlers;
 pub mod models;
 pub mod repository;
 pub mod services;

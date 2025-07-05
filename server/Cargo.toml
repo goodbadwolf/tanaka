@@ -29,8 +29,13 @@ tracing-subscriber = { version = "0.3", features = [
   "fmt",
   "json",
 ] }
-tower = "0.5"
-tower-http = { version = "0.6", features = ["trace", "cors"] }
+tower = { version = "0.5", features = ["timeout", "limit"] }
+tower-http = { version = "0.6", features = [
+  "trace",
+  "cors",
+  "limit",
+  "timeout",
+] }
 ts-rs = { version = "10.1", features = ["no-serde-warnings"] }
 thiserror = "2.0"
 uuid = { version = "1.8", features = ["v4"] }

@@ -5,12 +5,13 @@ use axum::{
 };
 use tanaka_server::config::AuthConfig;
 use tanaka_server::error::AppError;
+use tanaka_server::services::AuthContext;
 
 const BEARER_PREFIX: &str = "Bearer ";
 
 pub async fn auth_middleware(
     State(auth_config): State<AuthConfig>,
-    req: Request,
+    mut req: Request,
     next: Next,
 ) -> Result<Response, Response> {
     let auth_header = req
@@ -22,6 +23,16 @@ pub async fn auth_middleware(
         Some(auth) if auth.starts_with(BEARER_PREFIX) => {
             let token = &auth[BEARER_PREFIX.len()..];
             if token == auth_config.shared_token {
+                // Extract device_id from request body or use a placeholder
+                // For now, we'll use a placeholder since we can't easily parse the body here
+                let auth_context = AuthContext {
+                    device_id: "auth-validated".to_string(), // Will be replaced by actual device_id from request
+                    token: token.to_string(),
+                    permissions: vec!["sync".to_string()],
+                    metadata: std::collections::HashMap::new(),
+                };
+
+                req.extensions_mut().insert(auth_context);
                 Ok(next.run(req).await)
             } else {
                 Err(AppError::auth_token_invalid("Invalid authentication token").into_response())
