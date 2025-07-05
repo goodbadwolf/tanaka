@@ -1,6 +1,7 @@
 use async_trait::async_trait;
 use std::sync::Arc;
 
+use crate::config::SyncConfig;
 use crate::crdt::CrdtManager;
 use crate::error::AppError;
 use crate::repository::Repositories;
@@ -11,15 +12,21 @@ use crate::sync::{CrdtOperation, SyncRequest, SyncResponse};
 pub struct CrdtSyncService {
     repositories: Arc<Repositories>,
     crdt_manager: Arc<CrdtManager>,
+    config: SyncConfig,
 }
 
 impl CrdtSyncService {
     /// Create a new `SyncService` with the given dependencies
     #[must_use]
-    pub fn new(repositories: Arc<Repositories>, crdt_manager: Arc<CrdtManager>) -> Self {
+    pub fn new(
+        repositories: Arc<Repositories>,
+        crdt_manager: Arc<CrdtManager>,
+        config: SyncConfig,
+    ) -> Self {
         Self {
             repositories,
             crdt_manager,
+            config,
         }
     }
 }
@@ -109,8 +116,32 @@ impl SyncService for CrdtSyncService {
                     if id.is_empty() {
                         return Err(AppError::validation("Tab ID cannot be empty", Some("id")));
                     }
+                    if id.len() > 256 {
+                        return Err(AppError::validation(
+                            "Tab ID too long (max 256 characters)",
+                            Some("id"),
+                        ));
+                    }
                     if data.url.is_empty() {
                         return Err(AppError::validation("Tab URL cannot be empty", Some("url")));
+                    }
+                    if data.url.len() > self.config.max_url_length {
+                        return Err(AppError::validation(
+                            format!(
+                                "URL too long (max {} characters)",
+                                self.config.max_url_length
+                            ),
+                            Some("url"),
+                        ));
+                    }
+                    if data.title.len() > self.config.max_title_length {
+                        return Err(AppError::validation(
+                            format!(
+                                "Title too long (max {} characters)",
+                                self.config.max_title_length
+                            ),
+                            Some("title"),
+                        ));
                     }
                     if data.window_id.is_empty() {
                         return Err(AppError::validation(
@@ -130,6 +161,15 @@ impl SyncService for CrdtSyncService {
                     }
                     if url.is_empty() {
                         return Err(AppError::validation("URL cannot be empty", Some("url")));
+                    }
+                    if url.len() > self.config.max_url_length {
+                        return Err(AppError::validation(
+                            format!(
+                                "URL too long (max {} characters)",
+                                self.config.max_url_length
+                            ),
+                            Some("url"),
+                        ));
                     }
                 }
                 CrdtOperation::MoveTab { id, window_id, .. } => {
@@ -246,7 +286,8 @@ mod tests {
     async fn test_validate_operations_success() {
         let repos = Arc::new(Repositories::new_mock());
         let crdt_manager = Arc::new(CrdtManager::new(1));
-        let service = CrdtSyncService::new(repos, crdt_manager);
+        let config = crate::config::SyncConfig::default();
+        let service = CrdtSyncService::new(repos, crdt_manager, config);
 
         let operations = vec![create_test_operation()];
         let result = service.validate_operations(&operations).await;
@@ -257,7 +298,8 @@ mod tests {
     async fn test_validate_operations_empty_tab_id() {
         let repos = Arc::new(Repositories::new_mock());
         let crdt_manager = Arc::new(CrdtManager::new(1));
-        let service = CrdtSyncService::new(repos, crdt_manager);
+        let config = crate::config::SyncConfig::default();
+        let service = CrdtSyncService::new(repos, crdt_manager, config);
 
         let operation = CrdtOperation::UpsertTab {
             id: String::new(), // Empty ID should fail
@@ -279,7 +321,8 @@ mod tests {
     async fn test_validate_sync_request_success() {
         let repos = Arc::new(Repositories::new_mock());
         let crdt_manager = Arc::new(CrdtManager::new(1));
-        let _service = CrdtSyncService::new(repos, crdt_manager);
+        let config = crate::config::SyncConfig::default();
+        let _service = CrdtSyncService::new(repos, crdt_manager, config);
 
         let request = SyncRequest {
             clock: 5,
@@ -297,7 +340,8 @@ mod tests {
     async fn test_validate_sync_request_invalid_device_id() {
         let repos = Arc::new(Repositories::new_mock());
         let crdt_manager = Arc::new(CrdtManager::new(1));
-        let _service = CrdtSyncService::new(repos, crdt_manager);
+        let config = crate::config::SyncConfig::default();
+        let _service = CrdtSyncService::new(repos, crdt_manager, config);
 
         // Test empty device ID
         let request = SyncRequest {
@@ -321,5 +365,281 @@ mod tests {
 
         let result = CrdtSyncService::validate_sync_request(&request, &auth);
         assert!(result.is_err());
+    }
+
+    #[tokio::test]
+    async fn test_validate_operations_url_too_long() {
+        let repos = Arc::new(Repositories::new_mock());
+        let crdt_manager = Arc::new(CrdtManager::new(1));
+        let config = crate::config::SyncConfig::default();
+        let service = CrdtSyncService::new(repos, crdt_manager, config);
+
+        let operation = CrdtOperation::UpsertTab {
+            id: "test-tab".to_string(),
+            data: TabData {
+                window_id: "test-window".to_string(),
+                url: "https://".to_string() + &"a".repeat(2050), // Exceeds default max of 2048
+                title: "Test".to_string(),
+                active: true,
+                index: 0,
+                updated_at: 123_456_789,
+            },
+        };
+
+        let result = service.validate_operations(&[operation]).await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("URL too long"));
+    }
+
+    #[tokio::test]
+    async fn test_validate_operations_title_too_long() {
+        let repos = Arc::new(Repositories::new_mock());
+        let crdt_manager = Arc::new(CrdtManager::new(1));
+        let config = crate::config::SyncConfig::default();
+        let service = CrdtSyncService::new(repos, crdt_manager, config);
+
+        let operation = CrdtOperation::UpsertTab {
+            id: "test-tab".to_string(),
+            data: TabData {
+                window_id: "test-window".to_string(),
+                url: "https://example.com".to_string(),
+                title: "a".repeat(513), // Exceeds default max of 512
+                active: true,
+                index: 0,
+                updated_at: 123_456_789,
+            },
+        };
+
+        let result = service.validate_operations(&[operation]).await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Title too long"));
+    }
+
+    #[tokio::test]
+    async fn test_validate_operations_id_too_long() {
+        let repos = Arc::new(Repositories::new_mock());
+        let crdt_manager = Arc::new(CrdtManager::new(1));
+        let config = crate::config::SyncConfig::default();
+        let service = CrdtSyncService::new(repos, crdt_manager, config);
+
+        let operation = CrdtOperation::UpsertTab {
+            id: "a".repeat(257), // Exceeds max of 256
+            data: TabData {
+                window_id: "test-window".to_string(),
+                url: "https://example.com".to_string(),
+                title: "Test".to_string(),
+                active: true,
+                index: 0,
+                updated_at: 123_456_789,
+            },
+        };
+
+        let result = service.validate_operations(&[operation]).await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Tab ID too long"));
+    }
+
+    #[tokio::test]
+    async fn test_validate_operations_empty_window_id() {
+        let repos = Arc::new(Repositories::new_mock());
+        let crdt_manager = Arc::new(CrdtManager::new(1));
+        let config = crate::config::SyncConfig::default();
+        let service = CrdtSyncService::new(repos, crdt_manager, config);
+
+        let operation = CrdtOperation::UpsertTab {
+            id: "test-tab".to_string(),
+            data: TabData {
+                window_id: String::new(), // Empty window ID
+                url: "https://example.com".to_string(),
+                title: "Test".to_string(),
+                active: true,
+                index: 0,
+                updated_at: 123_456_789,
+            },
+        };
+
+        let result = service.validate_operations(&[operation]).await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Window ID cannot be empty"));
+    }
+
+    #[tokio::test]
+    async fn test_validate_operations_move_tab_empty_window_id() {
+        let repos = Arc::new(Repositories::new_mock());
+        let crdt_manager = Arc::new(CrdtManager::new(1));
+        let config = crate::config::SyncConfig::default();
+        let service = CrdtSyncService::new(repos, crdt_manager, config);
+
+        let operation = CrdtOperation::MoveTab {
+            id: "test-tab".to_string(),
+            window_id: String::new(), // Empty window ID
+            index: 0,
+            updated_at: 123_456_789,
+        };
+
+        let result = service.validate_operations(&[operation]).await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Window ID cannot be empty"));
+    }
+
+    #[tokio::test]
+    async fn test_validate_operations_tab_id_at_limit() {
+        let repos = Arc::new(Repositories::new_mock());
+        let crdt_manager = Arc::new(CrdtManager::new(1));
+        let config = crate::config::SyncConfig::default();
+        let service = CrdtSyncService::new(repos, crdt_manager, config);
+
+        let operation = CrdtOperation::UpsertTab {
+            id: "a".repeat(256), // Exactly at the limit
+            data: TabData {
+                window_id: "test-window".to_string(),
+                url: "https://example.com".to_string(),
+                title: "Test".to_string(),
+                active: true,
+                index: 0,
+                updated_at: 123_456_789,
+            },
+        };
+
+        let result = service.validate_operations(&[operation]).await;
+        assert!(result.is_ok()); // Should pass at exactly 256 chars
+    }
+
+    #[tokio::test]
+    async fn test_validate_operations_empty_track_window_id() {
+        let repos = Arc::new(Repositories::new_mock());
+        let crdt_manager = Arc::new(CrdtManager::new(1));
+        let config = crate::config::SyncConfig::default();
+        let service = CrdtSyncService::new(repos, crdt_manager, config);
+
+        let operation = CrdtOperation::TrackWindow {
+            id: String::new(), // Empty window ID
+            tracked: true,
+            updated_at: 123_456_789,
+        };
+
+        let result = service.validate_operations(&[operation]).await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Window ID cannot be empty"));
+    }
+
+    #[tokio::test]
+    async fn test_validate_operations_empty_untrack_window_id() {
+        let repos = Arc::new(Repositories::new_mock());
+        let crdt_manager = Arc::new(CrdtManager::new(1));
+        let config = crate::config::SyncConfig::default();
+        let service = CrdtSyncService::new(repos, crdt_manager, config);
+
+        let operation = CrdtOperation::UntrackWindow {
+            id: String::new(), // Empty window ID
+            updated_at: 123_456_789,
+        };
+
+        let result = service.validate_operations(&[operation]).await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Window ID cannot be empty"));
+    }
+
+    #[tokio::test]
+    async fn test_validate_operations_empty_set_window_focus_id() {
+        let repos = Arc::new(Repositories::new_mock());
+        let crdt_manager = Arc::new(CrdtManager::new(1));
+        let config = crate::config::SyncConfig::default();
+        let service = CrdtSyncService::new(repos, crdt_manager, config);
+
+        let operation = CrdtOperation::SetWindowFocus {
+            id: String::new(), // Empty window ID
+            focused: true,
+            updated_at: 123_456_789,
+        };
+
+        let result = service.validate_operations(&[operation]).await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Window ID cannot be empty"));
+    }
+
+    #[tokio::test]
+    async fn test_validate_operations_empty_close_tab_id() {
+        let repos = Arc::new(Repositories::new_mock());
+        let crdt_manager = Arc::new(CrdtManager::new(1));
+        let config = crate::config::SyncConfig::default();
+        let service = CrdtSyncService::new(repos, crdt_manager, config);
+
+        let operation = CrdtOperation::CloseTab {
+            id: String::new(), // Empty tab ID
+            closed_at: 123_456_789,
+        };
+
+        let result = service.validate_operations(&[operation]).await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Tab ID cannot be empty"));
+    }
+
+    #[tokio::test]
+    async fn test_validate_operations_empty_set_active_id() {
+        let repos = Arc::new(Repositories::new_mock());
+        let crdt_manager = Arc::new(CrdtManager::new(1));
+        let config = crate::config::SyncConfig::default();
+        let service = CrdtSyncService::new(repos, crdt_manager, config);
+
+        let operation = CrdtOperation::SetActive {
+            id: String::new(), // Empty tab ID
+            active: true,
+            updated_at: 123_456_789,
+        };
+
+        let result = service.validate_operations(&[operation]).await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Tab ID cannot be empty"));
+    }
+
+    #[tokio::test]
+    async fn test_validate_operations_empty_change_url_id() {
+        let repos = Arc::new(Repositories::new_mock());
+        let crdt_manager = Arc::new(CrdtManager::new(1));
+        let config = crate::config::SyncConfig::default();
+        let service = CrdtSyncService::new(repos, crdt_manager, config);
+
+        let operation = CrdtOperation::ChangeUrl {
+            id: String::new(), // Empty tab ID
+            url: "https://example.com".to_string(),
+            title: Some("Test".to_string()),
+            updated_at: 123_456_789,
+        };
+
+        let result = service.validate_operations(&[operation]).await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Tab ID cannot be empty"));
+    }
+
+    #[tokio::test]
+    async fn test_validate_operations_empty_move_tab_id() {
+        let repos = Arc::new(Repositories::new_mock());
+        let crdt_manager = Arc::new(CrdtManager::new(1));
+        let config = crate::config::SyncConfig::default();
+        let service = CrdtSyncService::new(repos, crdt_manager, config);
+
+        let operation = CrdtOperation::MoveTab {
+            id: String::new(), // Empty tab ID
+            window_id: "test-window".to_string(),
+            index: 0,
+            updated_at: 123_456_789,
+        };
+
+        let result = service.validate_operations(&[operation]).await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Tab ID cannot be empty"));
     }
 }

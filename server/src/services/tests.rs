@@ -78,7 +78,9 @@ async fn test_service_integration_rate_limiting() {
 
     let repositories = Arc::new(Repositories::new_mock());
     let crdt_manager = Arc::new(CrdtManager::new(1));
-    let container = ServiceContainer::new_production(auth_config, repositories, crdt_manager);
+    let sync_config = crate::config::SyncConfig::default();
+    let container =
+        ServiceContainer::new_production(auth_config, sync_config, repositories, crdt_manager);
 
     // Validate token first
     let auth_result = container.auth.validate_token("test-token").await;

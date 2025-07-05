@@ -29,8 +29,13 @@ tracing-subscriber = { version = "0.3", features = [
   "fmt",
   "json",
 ] }
-tower = "0.5"
-tower-http = { version = "0.6", features = ["trace", "cors"] }
+tower = { version = "0.5", features = ["timeout", "limit"] }
+tower-http = { version = "0.6", features = [
+  "trace",
+  "cors",
+  "limit",
+  "timeout",
+] }
 ts-rs = { version = "10.1", features = ["no-serde-warnings"] }
 thiserror = "2.0"
 uuid = { version = "1.8", features = ["v4"] }
@@ -55,6 +60,7 @@ tempfile = "3"
 tower = { version = "0.5", features = ["util"] }
 hyper = { version = "1.5", features = ["full"] }
 http-body-util = "0.1"
+futures = "0.3"                                  # For concurrent testing
 
 # Testing improvements
 pretty_assertions = "1.4"                                    # Colorful diffs for better test debugging

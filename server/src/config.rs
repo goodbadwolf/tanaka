@@ -31,6 +31,9 @@ pub struct ServerConfig {
     #[serde(default = "default_request_timeout")]
     pub request_timeout_secs: u64,
 
+    #[serde(default = "default_max_concurrent_connections")]
+    pub max_concurrent_connections: usize,
+
     pub cors: CorsConfig,
 }
 
@@ -89,6 +92,12 @@ pub struct SyncConfig {
 
     #[serde(default = "default_compression")]
     pub compression: bool,
+
+    #[serde(default = "default_max_url_length")]
+    pub max_url_length: usize,
+
+    #[serde(default = "default_max_title_length")]
+    pub max_title_length: usize,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -132,6 +141,10 @@ fn default_request_timeout() -> u64 {
     30
 }
 
+fn default_max_concurrent_connections() -> usize {
+    1000
+}
+
 fn default_database_url() -> String {
     "sqlite://tabs.db".to_string()
 }
@@ -170,6 +183,14 @@ fn default_max_payload_size() -> usize {
 
 fn default_compression() -> bool {
     false
+}
+
+fn default_max_url_length() -> usize {
+    2048
+}
+
+fn default_max_title_length() -> usize {
+    512
 }
 
 fn default_log_level() -> String {
@@ -326,6 +347,7 @@ impl Default for Config {
                 bind_addr: default_bind_addr(),
                 worker_threads: None,
                 request_timeout_secs: default_request_timeout(),
+                max_concurrent_connections: default_max_concurrent_connections(),
                 cors: CorsConfig {
                     allowed_origins: default_allowed_origins(),
                     max_age_secs: default_max_age(),
@@ -348,12 +370,27 @@ impl Default for Config {
                 flush_secs: default_flush_secs(),
                 max_payload_size: default_max_payload_size(),
                 compression: default_compression(),
+                max_url_length: default_max_url_length(),
+                max_title_length: default_max_title_length(),
             },
             logging: LoggingConfig {
                 level: default_log_level(),
                 format: default_log_format(),
                 request_logging: default_request_logging(),
             },
+        }
+    }
+}
+
+impl Default for SyncConfig {
+    fn default() -> Self {
+        Self {
+            poll_secs: default_poll_secs(),
+            flush_secs: default_flush_secs(),
+            max_payload_size: default_max_payload_size(),
+            compression: default_compression(),
+            max_url_length: default_max_url_length(),
+            max_title_length: default_max_title_length(),
         }
     }
 }

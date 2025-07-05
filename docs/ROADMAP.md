@@ -95,9 +95,10 @@ These bugs prevent Tanaka from fulfilling its primary purpose:
 **Impact**: Required for Mozilla addon store submission  
 **Fix**: Add CSP to manifest.json
 
-#### `fix/input-validation` - Input Validation
+#### `fix/input-validation` - Input Validation ✅
 **Impact**: Potential DOS attacks  
-**Fix**: Validate request size and operation count
+**Fix**: Validate request size and operation count  
+**Status**: Completed in PR #78
 
 #### `fix/permission-checks` - Dynamic Permission Verification
 **Impact**: MV3 allows runtime permission revocation  
@@ -213,7 +214,7 @@ Prepare for v1.0 release with performance optimization, monitoring, and Mozilla 
 #### Security & Compliance ✓
 - [x] CORS properly configured - only extension origins allowed
 - [ ] Content Security Policy added to manifest.json
-- [ ] Input validation prevents DOS attacks
+- [x] Input validation prevents DOS attacks
 - [ ] Permissions checked before each sync operation
 
 #### Data Integrity ✓
