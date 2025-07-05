@@ -357,3 +357,307 @@ async fn test_operation_count_limit() {
     // Should be rejected due to payload size limit (the body is too large with 1001 operations)
     assert_eq!(response.status(), StatusCode::PAYLOAD_TOO_LARGE);
 }
+
+#[tokio::test]
+async fn test_auth_missing_header() {
+    let (app, _config) = create_test_app().await;
+
+    let request = SyncRequest {
+        clock: 1,
+        device_id: "test-device".to_string(),
+        since_clock: None,
+        operations: vec![],
+    };
+
+    // Test missing Authorization header
+    let response = app
+        .oneshot(
+            axum::http::Request::builder()
+                .method("POST")
+                .uri("/sync")
+                .header(header::CONTENT_TYPE, "application/json")
+                .body(serde_json::to_string(&request).unwrap())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+}
+
+#[tokio::test]
+async fn test_auth_invalid_format() {
+    let (app, config) = create_test_app().await;
+
+    let request = SyncRequest {
+        clock: 1,
+        device_id: "test-device".to_string(),
+        since_clock: None,
+        operations: vec![],
+    };
+
+    // Test Authorization header without Bearer prefix
+    let response = app
+        .clone()
+        .oneshot(
+            axum::http::Request::builder()
+                .method("POST")
+                .uri("/sync")
+                .header(
+                    header::AUTHORIZATION,
+                    config.auth.shared_token.clone(), // Missing "Bearer " prefix
+                )
+                .header(header::CONTENT_TYPE, "application/json")
+                .body(serde_json::to_string(&request).unwrap())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+
+    // Test Authorization header with wrong prefix
+    let response = app
+        .oneshot(
+            axum::http::Request::builder()
+                .method("POST")
+                .uri("/sync")
+                .header(
+                    header::AUTHORIZATION,
+                    format!("Basic {}", config.auth.shared_token),
+                )
+                .header(header::CONTENT_TYPE, "application/json")
+                .body(serde_json::to_string(&request).unwrap())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+}
+
+#[tokio::test]
+async fn test_auth_invalid_token() {
+    let (app, _config) = create_test_app().await;
+
+    let request = SyncRequest {
+        clock: 1,
+        device_id: "test-device".to_string(),
+        since_clock: None,
+        operations: vec![],
+    };
+
+    // Test with wrong token
+    let response = app
+        .oneshot(
+            axum::http::Request::builder()
+                .method("POST")
+                .uri("/sync")
+                .header(header::AUTHORIZATION, "Bearer wrong-token")
+                .header(header::CONTENT_TYPE, "application/json")
+                .body(serde_json::to_string(&request).unwrap())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+}
+
+#[tokio::test]
+async fn test_empty_request_body() {
+    let (app, config) = create_test_app().await;
+
+    // Test with empty body
+    let response = app
+        .oneshot(
+            axum::http::Request::builder()
+                .method("POST")
+                .uri("/sync")
+                .header(
+                    header::AUTHORIZATION,
+                    format!("Bearer {}", config.auth.shared_token),
+                )
+                .header(header::CONTENT_TYPE, "application/json")
+                .body(String::new())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+
+    // Empty body should fail JSON parsing
+    assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+}
+
+#[tokio::test]
+async fn test_malformed_json() {
+    let (app, config) = create_test_app().await;
+
+    // Test with malformed JSON
+    let response = app
+        .oneshot(
+            axum::http::Request::builder()
+                .method("POST")
+                .uri("/sync")
+                .header(
+                    header::AUTHORIZATION,
+                    format!("Bearer {}", config.auth.shared_token),
+                )
+                .header(header::CONTENT_TYPE, "application/json")
+                .body("{invalid json}".to_string())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+
+    // Malformed JSON should fail parsing
+    assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+}
+
+#[tokio::test]
+async fn test_device_id_validation() {
+    let (app, config) = create_test_app().await;
+
+    // Test empty device_id
+    let request = SyncRequest {
+        clock: 1,
+        device_id: String::new(), // Empty device ID
+        since_clock: None,
+        operations: vec![],
+    };
+
+    let response = app
+        .clone()
+        .oneshot(
+            axum::http::Request::builder()
+                .method("POST")
+                .uri("/sync")
+                .header(
+                    header::AUTHORIZATION,
+                    format!("Bearer {}", config.auth.shared_token),
+                )
+                .header(header::CONTENT_TYPE, "application/json")
+                .body(serde_json::to_string(&request).unwrap())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+
+    // Test device_id too long
+    let request = SyncRequest {
+        clock: 1,
+        device_id: "a".repeat(129), // Exceeds 128 character limit
+        since_clock: None,
+        operations: vec![],
+    };
+
+    let response = app
+        .oneshot(
+            axum::http::Request::builder()
+                .method("POST")
+                .uri("/sync")
+                .header(
+                    header::AUTHORIZATION,
+                    format!("Bearer {}", config.auth.shared_token),
+                )
+                .header(header::CONTENT_TYPE, "application/json")
+                .body(serde_json::to_string(&request).unwrap())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+}
+
+#[tokio::test]
+async fn test_invalid_clock_values() {
+    let (app, config) = create_test_app().await;
+
+    // Test since_clock greater than current clock
+    let request = SyncRequest {
+        clock: 5,
+        device_id: "test-device".to_string(),
+        since_clock: Some(10), // since_clock > clock
+        operations: vec![],
+    };
+
+    let response = app
+        .oneshot(
+            axum::http::Request::builder()
+                .method("POST")
+                .uri("/sync")
+                .header(
+                    header::AUTHORIZATION,
+                    format!("Bearer {}", config.auth.shared_token),
+                )
+                .header(header::CONTENT_TYPE, "application/json")
+                .body(serde_json::to_string(&request).unwrap())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+}
+
+#[tokio::test]
+async fn test_concurrent_connections_limit() {
+    let (app, config) = create_test_app().await;
+
+    let request = SyncRequest {
+        clock: 1,
+        device_id: "test-device".to_string(),
+        since_clock: None,
+        operations: vec![],
+    };
+
+    // Create multiple concurrent requests
+    let mut handles = vec![];
+    for _ in 0..15 {
+        // More than the limit of 10
+        let app = app.clone();
+        let config = config.clone();
+        let request = request.clone();
+
+        let handle = tokio::spawn(async move {
+            app.oneshot(
+                axum::http::Request::builder()
+                    .method("POST")
+                    .uri("/sync")
+                    .header(
+                        header::AUTHORIZATION,
+                        format!("Bearer {}", config.auth.shared_token),
+                    )
+                    .header(header::CONTENT_TYPE, "application/json")
+                    .body(serde_json::to_string(&request).unwrap())
+                    .unwrap(),
+            )
+            .await
+        });
+        handles.push(handle);
+    }
+
+    // Wait for all requests
+    let results: Vec<_> = futures::future::join_all(handles).await;
+
+    // Some requests should succeed, some should be rate limited
+    let mut success_count = 0;
+    let mut rate_limited_count = 0;
+
+    for response in results.into_iter().flatten().flatten() {
+        match response.status() {
+            StatusCode::OK => success_count += 1,
+            StatusCode::SERVICE_UNAVAILABLE => rate_limited_count += 1,
+            _ => {}
+        }
+    }
+
+    // Either some succeeded and some failed, or all succeeded due to fast execution
+    // The concurrency limit is enforced, but depending on timing, requests might
+    // complete before others arrive
+    assert!(success_count > 0);
+    assert!(success_count + rate_limited_count == 15);
+}

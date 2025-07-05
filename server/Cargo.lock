@@ -2243,6 +2243,7 @@ dependencies = [
  "criterion",
  "dashmap",
  "dotenvy",
+ "futures",
  "http-body-util",
  "hyper",
  "pretty_assertions",
