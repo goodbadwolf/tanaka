@@ -234,6 +234,20 @@ class SyncManager {
 - AGENTS.md is a symlink to CLAUDE.md (changes affect both)
 - GEMINI.md is a symlink to CLAUDE.md (changes affect both)
 
+#### GitHub CLI with Backticks
+
+When using `gh pr edit` or `gh pr create` with bodies containing backticks, always use a heredoc to prevent shell interpretation:
+
+```bash
+gh pr edit <number> --body "$(cat <<'EOF'
+## Summary
+Text with `backticks` works fine here
+EOF
+)"
+```
+
+The single quotes around 'EOF' prevent variable and command substitution.
+
 ### Project Organization
 
 - Keep language/framework-specific files in their respective directories
