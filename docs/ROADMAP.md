@@ -31,7 +31,7 @@ main
 │   ├── fix/csp-manifest         # Add Content Security Policy
 │   ├── fix/input-validation     # Add request validation and DOS prevention
 │   ├── fix/permission-checks    # Add dynamic permission verification
-│   ├── fix/sqlx-migrations      # Switch from runtime CREATE to SQLx migrations
+│   ├── fix/sqlx-migrations      # Switch from runtime CREATE to SQLx migrations ✅
 │   ├── fix/operation-idempotency # Add idempotency to operation storage
 │   ├── fix/operation-ids        # Fix operation ID collision issues
 │   └── fix/crdt-materialization # Persist CRDT state to database tables
@@ -110,12 +110,12 @@ These bugs prevent Tanaka from fulfilling its primary purpose:
 
 ### 3.3 Data Integrity Fixes 💾 **PREVENT DATA LOSS**
 
-> **Note**: These items were deprioritized as they are not blocking multi-device sync. They will be addressed in Phase 5 for production hardening.
+> **Note**: Most of these items were deprioritized as they are not blocking multi-device sync. SQLx migrations were completed, but other items will be addressed in Phase 5 for production hardening.
 
-#### `fix/sqlx-migrations` - Database Migrations (Deferred to Phase 5)
+#### `fix/sqlx-migrations` - Database Migrations ✅
 **Impact**: Runtime CREATE TABLE is fragile  
 **Fix**: Use proper SQLx migration system  
-**Status**: Deferred - Current approach works, formal migrations for v1.0
+**Status**: Completed - SQLx migrations implemented with initial schema migration
 
 #### `fix/operation-idempotency` - Operation Idempotency (Deferred to Phase 5)
 **Impact**: Duplicate operations on retry  
@@ -161,7 +161,6 @@ Prepare for v1.0 release with performance optimization, monitoring, production h
 1. **Monitoring**: Server metrics, distributed tracing, performance dashboards
 2. **Performance**: Handle 200+ tabs smoothly, optimize sync latency
 3. **Production Hardening**:
-   - SQLx migrations for database schema management
    - Operation idempotency to prevent duplicates
    - Robust operation ID format
    - Full CRDT state materialization to database
@@ -255,7 +254,6 @@ Prepare for v1.0 release with performance optimization, monitoring, production h
 - [ ] P95 sync latency ≤ 10ms verified under load
 - [ ] 200+ tabs handled smoothly without performance degradation
 - [ ] Distributed tracing integrated for debugging
-- [ ] Database uses SQLx migrations (deferred from Phase 3)
 - [ ] Operations are idempotent with no duplicates (deferred from Phase 3)
 - [ ] Operation IDs handle all character combinations (deferred from Phase 3)
 - [ ] CRDT state fully persisted to database (deferred from Phase 3)
