@@ -1,15 +1,13 @@
-# Tanaka Development Roadmap (v1.0)
+# Tanaka Development Roadmap
 
-This roadmap consolidates extension and server development, focusing on pending work with related changes grouped together.
+This roadmap tracks all pending work for the Tanaka project.
 
 ## 🎯 Current Status
 
-- **Completed**: Phase 1 (UI Migration), Phase 2 (Architecture), and Phase 3 (Critical Fixes) ✅
-- **Current**: Phase 4 (Baseline & Architecture) 📊
-- **Extension**: v0.5.0 with 85%+ test coverage, React/Preact UI, CRDT Web Worker, full permission management
+- **Extension**: 85%+ test coverage, React/Preact UI, CRDT Web Worker, full permission management
 - **Server**: Clean architecture with repositories, services, error handling, CRDT sync, complete security hardening
 
-**🎉 MILESTONE**: All critical bugs fixed! Multi-device synchronization is fully functional. Now establishing baselines and architectural decisions before quality improvements.
+**🎉 MILESTONE**: All critical bugs fixed! Multi-device synchronization is fully functional.
 
 --
 
@@ -25,13 +23,11 @@ This roadmap consolidates extension and server development, focusing on pending 
 
 ---
 
-## 📊 Phase 4: Basic Documentation
+## 📋 Pending Tasks
 
-### Overview
+All work to be completed.
 
-Document basic operational procedures before starting implementation work.
-
-### Implementation Tasks
+### Documentation
 
 #### 📝 Branch: `docs/operational-basics`
 
@@ -40,12 +36,6 @@ Document basic operational procedures before starting implementation work.
 - [ ] Write simple deployment steps
 - [ ] Document backup/restore process
 - [ ] List common issues and fixes
-
----
-
-## 📋 Pending Tasks
-
-Work to be completed after Phase 4.
 
 ### Baseline Measurements
 
@@ -143,7 +133,7 @@ Work to be completed after Phase 4.
 
 #### 🚀 Branch: `feat/v1-release`
 
-**v1.0 Release**
+**Release**
 
 - [ ] Submit to Mozilla addon store
 - [ ] Create signed release builds
@@ -163,36 +153,15 @@ Work to be completed after Phase 4.
 
 ---
 
-## ✅ Phase 4 Completion Criteria
+## ✅ Completion Criteria
 
-- [ ] Deployment steps documented
-- [ ] Backup/restore process documented
-- [ ] Common issues documented
-
-## ✅ Pending Tasks Completion Criteria
-
-### Baseline Measurements
-
-- [ ] Performance with 200+ tabs documented
-- [ ] Memory usage patterns understood
-- [ ] Architecture decisions recorded
-
-### Core Stability
-
+- [ ] Basic documentation complete (deployment, backup, common issues)
+- [ ] Performance baselines documented
 - [ ] No memory growth over 24 hours
 - [ ] Handles 200+ tabs smoothly
-- [ ] Recovers from network failures
-- [ ] All tests pass
-
-### User Experience
-
-- [ ] Dark mode works
+- [ ] Error recovery implemented
+- [ ] Dark mode working
 - [ ] 80%+ test coverage
-- [ ] No TypeScript errors
-- [ ] Documentation updated
-
-### Release
-
+- [ ] All TypeScript errors fixed
 - [ ] Submitted to Mozilla addon store
-- [ ] v1.0 release tagged
-- [ ] Installation guide complete
+- [ ] Release tagged and ready
