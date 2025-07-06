@@ -5,11 +5,11 @@ This roadmap consolidates extension and server development, focusing on pending 
 ## 🎯 Current Status
 
 - **Completed**: Phase 1 (UI Migration), Phase 2 (Architecture), and Phase 3 (Critical Fixes) ✅
-- **Current**: Phase 4 (Quality & Resilience) 🎨
+- **Current**: Phase 4 (Baseline & Architecture) 📊
 - **Extension**: v0.5.0 with 85%+ test coverage, React/Preact UI, CRDT Web Worker, full permission management
 - **Server**: Clean architecture with repositories, services, error handling, CRDT sync, complete security hardening
 
-**🎉 MILESTONE**: All critical bugs fixed! Multi-device synchronization is fully functional. Now focusing on quality improvements, resilience, and production readiness.
+**🎉 MILESTONE**: All critical bugs fixed! Multi-device synchronization is fully functional. Now establishing baselines and architectural decisions before quality improvements.
 
 ---
 
@@ -19,8 +19,10 @@ This roadmap consolidates extension and server development, focusing on pending 
 
 ```
 main
-├── Phase 4: Quality & Resilience (CURRENT)
-└── Phase 5: Production Ready
+├── Phase 4: Baseline & Architecture (CURRENT)
+├── Phase 5: Core Stability
+├── Phase 6: Polish & Production
+└── Phase 7: Production Ready
 ```
 
 ---
@@ -31,77 +33,147 @@ Fixed all critical bugs preventing multi-device sync (PRs #69-#80). SQLx migrati
 
 ---
 
-## 🧪 Phase 4: Quality & Resilience
+## 📊 Phase 4: Baseline & Architecture
 
 ### Overview
 
-Phase 4 represents a critical refinement phase where we transform Tanaka from a functional prototype into a polished, production-quality application. With multi-device synchronization now working reliably (Phase 3 complete), we shift focus to user experience, code quality, and long-term maintainability.
-
-This phase addresses technical debt accumulated during rapid feature development while establishing foundations for sustainable growth. We're implementing battle-tested patterns from production systems: proper memory management, resilient error handling, and comprehensive observability.
-
-**Key Transformation Areas:**
-
-1. **From Prototype to Product**: Elevate code quality from "it works" to "it's maintainable, performant, and delightful to use"
-2. **From Reactive to Proactive**: Implement monitoring and observability before issues arise in production
-3. **From Basic to Accessible**: Ensure the extension is usable by everyone, meeting WCAG 2.1 AA standards
-4. **From Fragile to Resilient**: Build in error recovery, offline support, and graceful degradation
+Before implementing improvements, we need to establish clear baselines and document key architectural decisions. This phase ensures we can measure progress and have a solid foundation for future work.
 
 ### Primary Goals
 
-1. **Code Quality**: Zero `any` types, consistent patterns, clean architecture
-   - Eliminate all TypeScript `any` types with proper type definitions
-   - Establish consistent file organization (services/, components/, utils/)
-   - Implement dependency injection for testability
-   - Apply SOLID principles throughout the codebase
-   - Document architectural decisions in ADR format
+1. **Baseline Metrics Collection**
+   - Measure current performance characteristics
+   - Document memory usage patterns
+   - Establish network call frequency
+   - Create reproducible benchmarks
 
-2. **Design System**: WCAG 2.1 AA compliant, design tokens, dark mode
-   - Create comprehensive design token system (colors, spacing, typography)
-   - Implement CSS custom properties for runtime theming
-   - Support system preference detection and manual override
-   - Ensure 4.5:1 contrast ratios for normal text, 3:1 for large text
-   - Test with screen readers (NVDA, JAWS, VoiceOver)
+2. **Architectural Decisions**
+   - Document CRDT library rationale
+   - Define state management strategy
+   - Establish API versioning approach
+   - Create deployment strategy
 
-3. **Component Library**: Reusable, tested, accessible components
-   - Build core components: Button, Input, Card, Modal, Toast
-   - Implement compound components for complex UI patterns
-   - Use React.forwardRef for proper ref handling
-   - Include keyboard navigation and ARIA attributes
-   - Achieve 100% test coverage for all components
+3. **Operational Readiness**
+   - Define rollback procedures
+   - Create incident response playbooks
+   - Establish monitoring thresholds
+   - Document backup/restore procedures
 
-4. **Testing**: 95%+ coverage, visual regression, E2E user flows
-   - Unit tests for all business logic and utilities
-   - Integration tests for API communication
-   - Visual regression tests with Playwright
-   - E2E tests for critical user journeys
-   - Performance benchmarks for sync operations
+### Implementation Tasks
 
-5. **Developer Experience**: Storybook, documentation, tooling
-   - Storybook for component development and documentation
-   - JSDoc comments for all public APIs
-   - Automated API documentation generation
-   - Development mode with hot reload and debug logging
-   - Git hooks for code quality enforcement
+#### 🔧 Branch: `feat/baseline-metrics`
+**Establish Performance Baselines**
 
-6. **Performance & Reliability**: Memory leak fixes, operation batching, error recovery
+- [ ] Measure current sync latency (P50, P95, P99)
+  - Create automated benchmark suite
+  - Test with 10, 50, 100, 200+ tabs
+  - Document results in metrics/baseline.md
+- [ ] Profile memory usage patterns
+  - 24-hour memory usage tracking
+  - Identify growth patterns
+  - Document heap snapshot analysis
+- [ ] Count network calls per user action
+  - Track all API calls during typical usage
+  - Measure payload sizes
+  - Document call frequency by operation type
+- [ ] Document operation processing time
+  - Time each CRDT operation type
+  - Measure queue processing speed
+  - Create performance budget
+
+#### 📐 Branch: `docs/architecture-decisions`
+**Document Key Architecture Decisions**
+
+- [ ] Create ADR-001: CRDT Library Selection
+  - Why Yjs over alternatives
+  - Performance implications
+  - Future migration considerations
+- [ ] Create ADR-002: State Management Strategy
+  - browser.storage.local limitations
+  - Scaling considerations
+  - State size projections
+- [ ] Create ADR-003: Worker Thread Strategy
+  - Fallback handling
+  - Message passing overhead
+  - Browser compatibility
+- [ ] Create ADR-004: API Versioning
+  - Protocol evolution strategy
+  - Backward compatibility approach
+  - Client-server version negotiation
+
+#### 🚀 Branch: `docs/operational-runbook`
+**Create Operational Documentation**
+
+- [ ] Write deployment procedures
+  - Blue-green deployment strategy
+  - Rollback procedures
+  - Version compatibility matrix
+- [ ] Create incident response playbook
+  - Alert thresholds
+  - Escalation procedures
+  - Common issues and fixes
+- [ ] Document data migration strategy
+  - Upgrade procedures
+  - Data compatibility
+  - Rollback data handling
+- [ ] Establish monitoring guidelines
+  - Key metrics to track
+  - Alert configuration
+  - Dashboard setup
+
+### Success Criteria
+
+- [ ] All baseline metrics documented and reproducible
+- [ ] Architecture decisions documented in ADR format
+- [ ] Operational runbook reviewed and tested
+- [ ] Performance budgets established
+- [ ] Team aligned on architectural direction
+
+---
+
+## 🧪 Phase 5: Core Stability
+
+### Overview
+
+Phase 5 focuses on core stability improvements that directly impact reliability and performance. With baselines established in Phase 4, we can now measure the impact of our improvements.
+
+This phase addresses critical technical debt in three key areas: memory management, performance optimization, and error resilience. We implement only the most essential improvements that block v1.0.
+
+**Key Focus Areas:**
+
+1. **Memory Management**: Fix identified leaks and implement proper cleanup
+2. **Performance**: Optimize for 200+ tab scenarios with batching and caching
+3. **Resilience**: Build robust error recovery and offline support
+
+### Primary Goals
+
+1. **Memory Management**: Fix critical leaks and implement proper cleanup
    - Fix all identified memory leaks in event handlers
-   - Implement intelligent operation batching with deduplication
-   - Add circuit breaker for API resilience
-   - Create offline operation queue with persistence
-   - Target sub-100ms sync latency for 95th percentile
+   - Implement AbortController pattern for cleanup
+   - Add proper disposal in destructors
+   - No growing memory leaks over 24-hour usage
 
-7. **Security Hardening**: Input validation, CSP headers, secure configuration
-   - Validate all user inputs with Zod schemas
-   - Implement Content Security Policy for extension pages
-   - Add rate limiting and request size limits
-   - Secure storage for sensitive configuration
-   - Regular dependency vulnerability scanning
+2. **Performance Optimization**: Handle 200+ tabs smoothly
+   - Implement operation batching with deduplication
+   - Optimize database indices and queries
+   - Reduce network calls by 70%+ through batching
+   - Target sub-100ms sync latency for P95
+
+3. **Error Resilience**: Graceful handling of failures
+   - Implement exponential backoff with jitter
+   - Add circuit breaker for cascading failures
+   - Create offline operation queue
+   - Ensure recovery from extended outages
 
 ### Dependencies & Prerequisites
 
-Before starting Phase 4, ensure:
+Before starting Phase 5, ensure:
 
-1. **Phase 3 Complete**: Multi-device sync working reliably without data loss
+1. **Phase 4 Complete**:
+   - Baseline metrics collected and documented
+   - Architecture decisions recorded
+   - Operational runbook created
+   - Performance budgets defined
 2. **Development Environment**:
    - Node.js 24+, pnpm 10.11+, Rust 1.83+
    - SQLx CLI for database migrations
@@ -110,40 +182,27 @@ Before starting Phase 4, ensure:
    - Unit test framework operational
    - CI/CD pipeline running all checks
    - Pre-commit hooks installed and working
-4. **Baseline Metrics**:
-   - Current sync latency measured
-   - Memory usage profile documented
-   - Network call frequency recorded
+   - Benchmark suite ready
 
 ### Sub-phases
 
-Phase 4 is organized into 5 incremental sub-phases, each building on the previous:
+Phase 5 is organized into 3 focused sub-phases:
 
-#### Phase 4.1: Foundation (Memory & Performance)
+#### Phase 5.1: Memory & Performance
 **Focus**: Fix critical memory leaks and implement performance optimizations
 - Branch: `fix/memory-and-event-handling`
 - Branch: `feat/operation-batching`
 - Establishes stable foundation for further improvements
 
-#### Phase 4.2: Resilience
+#### Phase 5.2: Resilience
 **Focus**: Build robust error handling and recovery mechanisms
 - Branch: `feat/error-recovery`
 - Ensures application continues working under adverse conditions
 
-#### Phase 4.3: Security
-**Focus**: Harden the application against security vulnerabilities
+#### Phase 5.3: Basic Security
+**Focus**: Implement essential security measures
 - Branch: `feat/input-validation`
-- Protects user data and prevents malicious inputs
-
-#### Phase 4.4: User Experience
-**Focus**: Create polished UI with accessibility and design system
-- Branch: `feat/ui-components`
-- Delivers delightful, accessible user interface
-
-#### Phase 4.5: Observability
-**Focus**: Add monitoring and debugging capabilities
-- Branch: `feat/monitoring`
-- Enables proactive issue detection and resolution
+- Basic input validation and sanitization only
 
 ### Implementation Notes
 
@@ -190,10 +249,6 @@ Phase 4 is organized into 5 incremental sub-phases, each building on the previou
   - Max batch age: 1 second
   - Deduplication by operation type and target ID
   - Keep only latest operation for same target
-- [ ] Extension: Add operation compression for large payloads
-  - Use lz-string for payloads > 1KB
-  - Compress/decompress in OperationBatcher
-  - Add compression threshold configuration
 - [ ] Extension: Configure priority-based batching delays
   - CRITICAL (close_tab, track/untrack_window): 50ms
   - HIGH (upsert_tab, move_tab): 200ms  
@@ -209,6 +264,7 @@ Phase 4 is organized into 5 incremental sub-phases, each building on the previou
   - Enable memory-mapped I/O (mmap_size = 256MB)
   - Set page_size to 4096
   - Use NORMAL synchronous mode
+  - Schedule VACUUM operations
 - [ ] Server: Implement connection pool optimization
   - Min connections: 2, Max connections: configurable
   - Idle timeout: 10 minutes
@@ -218,6 +274,7 @@ Phase 4 is organized into 5 incremental sub-phases, each building on the previou
   - Measure sync latency with 200+ tabs
   - Profile memory usage under load
   - Verify 70%+ reduction in network calls
+  - Compare against Phase 4 baselines
 
 #### 🔄 Branch: `feat/error-recovery`
 **Enhanced Error Recovery & Resilience**
@@ -228,32 +285,19 @@ Phase 4 is organized into 5 incremental sub-phases, each building on the previou
   - Jitter: ±30% randomization
   - Calculate delay with proper capping
 - [ ] Extension: Add circuit breaker pattern for API calls
-  - Failure threshold: 5 failures
+  - Failure threshold: 5 failures (configurable)
   - Reset timeout: 30 seconds
   - Success threshold: 3 successes to close
   - Half-open state with limited retries
-- [ ] Extension: Enhance retry mechanism
-  - Check abort signals
-  - Categorize errors by retryability
-  - Different retry strategies per error type
-  - Add retry callbacks for monitoring
 - [ ] Extension: Create offline operation queue
   - Persist operations to browser.storage.local
   - Queue up to 1000 operations
   - Resume on connection restore
   - Priority-based queue processing
-- [ ] Extension: Add partial sync recovery
-  - Handle incomplete sync responses
-  - Resume from last successful operation
-  - Validate partial state consistency
 - [ ] Server: Implement request timeout handling
   - Configure per-endpoint timeouts
   - Return partial results on timeout
   - Add timeout headers to responses
-- [ ] Server: Add graceful degradation for CRDT operations
-  - Fallback to last known good state
-  - Return degraded service indicators
-  - Queue operations during degradation
 - [ ] Tests: Failure scenario testing
   - Network failure simulation
   - Timeout testing at various stages
@@ -261,166 +305,161 @@ Phase 4 is organized into 5 incremental sub-phases, each building on the previou
   - Recovery from extended outages
 
 #### 🛡️ Branch: `feat/input-validation`
-**Security Hardening with Input Validation**
+**Basic Security Implementation**
 
-- [ ] Extension: Add Zod schemas for all API inputs
-  - serverUrlSchema: validate URL format, protocol (http/https only)
-  - authTokenSchema: min 16 chars, alphanumeric + underscore/dash only
-  - syncRequestSchema: validate clock, device_id, operations array
-  - tabDataSchema: validate all tab properties with max lengths
+- [ ] Extension: Add basic input validation
+  - serverUrlSchema: validate URL format
+  - authTokenSchema: min length validation
+  - syncRequestSchema: basic structure validation
+  - tabDataSchema: max length limits
 - [ ] Extension: Implement server URL validation
   - Must use HTTP or HTTPS protocol
-  - Localhost must use HTTPS
+  - Allow HTTP for localhost development
   - Reject invalid URL formats
   - Add URL length limits (2048 chars)
-- [ ] Extension: Add CSP headers to extension pages
-  - Restrict script sources to self
-  - Disable inline scripts
-  - Add frame-ancestors directive
-- [ ] Extension: Add settings validation
-  - Validate sync interval (1000-60000ms)
-  - Sanitize all user inputs
-  - Add validateInput helper with Result type
 - [ ] Server: Add request validation middleware
-  - Validate all request bodies against schemas
+  - Validate request size limits
   - Check content-type headers
-  - Reject oversized payloads
-- [ ] Server: Implement rate limiting by operation complexity
-  - Track operation count AND complexity score
-  - Different limits for different operation types
-  - Per-device rate limiting
-- [ ] Tests: Security-focused test suite
-  - Test injection attempts
-  - Validate all error paths
-  - Fuzzing for input validation
+  - Basic schema validation
+- [ ] Tests: Input validation tests
+  - Boundary value testing
+  - Invalid input rejection
+  - Error message validation
+
+### Testing Strategy
+
+#### Phase 5.1: Memory & Performance Testing
+- **Memory Leak Detection**: Automated heap snapshot comparison
+- **Performance Benchmarks**: Compare against Phase 4 baselines
+- **Load Tests**: Verify improvements under stress
+- **Concurrency Tests**: Multi-device sync scenarios
+
+#### Phase 5.2: Resilience Testing
+- **Chaos Testing**: Network failures, timeouts, partial responses
+- **Recovery Testing**: Extended outage scenarios
+- **Circuit Breaker**: State transition verification
+- **Contract Testing**: Extension-server API compatibility
+
+#### Phase 5.3: Security Testing
+- **Input Validation**: Basic sanitization tests
+- **Dependency Scanning**: Automated vulnerability checks
+- **Boundary Testing**: Edge cases for all inputs
+
+### Success Criteria vs Phase 4 Baselines
+
+- Memory usage: No growth over 24 hours (vs current X MB/hour)
+- Sync latency P95: <100ms (vs current Y ms)
+- Network calls: 70% reduction (vs current Z calls/min)
+- Error recovery: 100% recovery from 5-minute outage (vs current failures)
+- Security: Zero critical vulnerabilities (vs current scan results)
+
+---
+
+## 🎨 Phase 6: Polish & Production
+
+### Overview
+
+With core stability achieved in Phase 5, we now focus on user experience, code quality, and production readiness. This phase transforms the functional application into a polished product.
+
+### Primary Goals
+
+1. **Code Quality**: Clean architecture and patterns
+   - Eliminate TypeScript `any` types
+   - Consistent file organization
+   - Apply SOLID principles
+   - Improve test coverage to 95%+
+
+2. **User Interface**: Accessible and delightful
+   - Component library with design tokens
+   - Dark mode support
+   - WCAG 2.1 AA compliance
+   - Loading states and error boundaries
+
+3. **Developer Experience**: Tools and documentation
+   - Storybook for components
+   - API documentation
+   - Debug mode
+   - Performance profiling
+
+4. **Security Hardening**: Beyond basics
+   - CSP headers
+   - Rate limiting strategies
+   - Advanced input validation
+
+### Implementation Branches
 
 #### 🎨 Branch: `feat/ui-components`
 **Component Library & Design System**
 
-- [ ] Extension: Create design token system
-  - Color tokens: primary, secondary, danger, success, warning
-  - Spacing scale: 4px base unit (4, 8, 12, 16, 24, 32, 48)
-  - Typography: font families, sizes, weights, line heights
-  - Shadows, borders, and radius tokens
-- [ ] Extension: Build accessible component library
-  - Button: variants (primary, secondary, danger), sizes, loading state
-  - Input: validation, error states, required field handling
-  - Card: header/footer slots, padding variants, interactive state
-  - LoadingSpinner: sizes, colors, ARIA labels
-  - ErrorMessage: types (error, warning, info), dismissible
-- [ ] Extension: Implement dark mode with theme switching
-  - CSS custom properties for theme values
-  - System preference detection
-  - Manual toggle with persistence
-  - Smooth transitions between themes
-- [ ] Extension: Add loading states and error boundaries
-  - Skeleton loaders for async content
-  - Error boundary component with fallback UI
-  - Retry mechanisms in error states
-  - Loading progress indicators
-- [ ] Storybook: Document all components
-  - Interactive component playground
-  - Props documentation
-  - Usage examples
-  - Accessibility notes
-- [ ] Tests: Visual regression tests
-  - Playwright screenshot tests
-  - Test all component states
-  - Dark/light mode coverage
-  - Responsive design tests
+- [ ] Create design token system
+- [ ] Build accessible component library
+- [ ] Implement dark mode
+- [ ] Add loading states and error boundaries
+- [ ] Visual regression tests
+
+#### 🔒 Branch: `feat/advanced-security`
+**Security Hardening**
+
+- [ ] Implement CSP headers
+- [ ] Add rate limiting by operation complexity
+- [ ] Enhanced input validation with Zod
+- [ ] Security-focused test suite
 
 #### 📊 Branch: `feat/monitoring`
 **Observability & Developer Experience**
 
-- [ ] Extension: Add performance marks for critical operations
-  - Mark sync start/end times
-  - Measure CRDT operation processing
-  - Track API call durations
-  - Monitor memory usage snapshots
-- [ ] Extension: Implement debug mode with verbose logging
-  - Toggle via extension settings
-  - Log all state changes
-  - Show operation queue status
-  - Display sync timing information
-- [ ] Extension: Add performance profiling
-  - Memory usage tracking with performance.memory
-  - Operation count metrics
-  - Network request statistics
-  - Battery impact monitoring
-- [ ] Server: Add health check endpoints
-  - /health endpoint with system status
-  - Database connection check
-  - CRDT state validation
-  - Response time metrics
-- [ ] Server: Implement basic metrics collection
-  - Request count by endpoint
-  - Response time histograms
-  - Operation count by type
-  - Active connections gauge
-- [ ] Server: Add diagnostics endpoints
-  - /metrics for Prometheus scraping
-  - /debug/crdt for state inspection
-  - /debug/operations for recent operations
-- [ ] Docs: Update developer documentation
-  - Performance tuning guide
-  - Debugging handbook
-  - Metrics interpretation
-  - Common issues reference
-- [ ] Tests: Integration tests for monitoring
-  - Health check endpoint tests
-  - Metrics format validation
-  - Performance regression tests
-  - Load testing scenarios
-
-### Testing Strategy
-
-#### Phase 4.1: Foundation Testing
-- **Memory Leak Detection**: Use Chrome DevTools Memory Profiler and heap snapshots
-- **Performance Benchmarks**: Create baseline tests with 10, 50, 100, 200+ tabs
-- **Concurrency Tests**: Simulate multiple devices syncing simultaneously
-- **Load Tests**: Use k6 or similar for server stress testing
-
-#### Phase 4.2: Resilience Testing
-- **Chaos Testing**: Simulate network failures, timeouts, partial responses
-- **Recovery Testing**: Verify system recovers from extended outages
-- **Circuit Breaker**: Test state transitions and thresholds
-- **Offline Testing**: Validate queue persistence and replay
-
-#### Phase 4.3: Security Testing
-- **Input Fuzzing**: Use AFL++ or similar for input validation
-- **Penetration Testing**: OWASP ZAP for extension security
-- **Dependency Scanning**: Automated vulnerability checks in CI
-- **CSP Validation**: Verify Content Security Policy effectiveness
-
-#### Phase 4.4: User Experience Testing
-- **Accessibility Audit**: axe-core automated testing + manual screen reader
-- **Visual Regression**: Playwright screenshots across themes and states
-- **Cross-browser Testing**: Firefox stable, beta, and ESR versions
-- **Usability Testing**: Real user feedback on component interactions
-
-#### Phase 4.5: Observability Testing
-- **Performance Regression**: Automated benchmarks in CI
-- **Metric Validation**: Verify all metrics are accurate and useful
-- **Debug Mode**: Test verbose logging doesn't impact performance
-- **Integration Tests**: Ensure monitoring doesn't interfere with functionality
+- [ ] Add performance marks
+- [ ] Implement debug mode
+- [ ] Create health check endpoints
+- [ ] Basic metrics collection
+- [ ] Update developer documentation
 
 ---
 
-## 🚀 Phase 5: Production Ready
+## 🚀 Phase 7: Production Ready
 
 ### Overview
 
-Prepare for v1.0 release with performance optimization, monitoring, production hardening, and Mozilla addon store submission.
+Prepare for v1.0 release with final optimizations, production monitoring, and Mozilla addon store submission.
 
 ### Primary Goals
 
-1. **Monitoring**: Server metrics, distributed tracing, performance dashboards
-2. **Performance**: Handle 200+ tabs smoothly, optimize sync latency
+1. **Production Monitoring**:
+   - Server metrics and dashboards
+   - Distributed tracing
+   - Alert configuration
+   - Performance tracking
+
+2. **Final Optimizations**:
+   - Meet all performance budgets
+   - Handle 200+ tabs smoothly
+   - Optimize for battery life
+   - Minimize resource usage
+
 3. **Production Hardening**:
-   - Operation idempotency to prevent duplicates
+   - Operation idempotency
    - Robust operation ID format
-   - Full CRDT state materialization to database
-4. **Release**: Mozilla addon store ready, single-binary server, v1.0 documentation
+   - Full CRDT state materialization
+   - Feature flags for gradual rollout
+   - Rollback procedures
+
+4. **Release Preparation**:
+   - Mozilla addon store compliance
+   - Single-binary server distribution
+   - v1.0 documentation
+   - Migration guides
+   - Public announcement prep
+
+### Implementation Tasks
+
+- [ ] Implement production monitoring suite
+- [ ] Pass Mozilla addon review
+- [ ] Create installer packages
+- [ ] Write migration documentation
+- [ ] Performance optimization pass
+- [ ] Security audit
+- [ ] Load testing at scale
+- [ ] Beta testing program
 
 ---
 
@@ -434,16 +473,21 @@ Prepare for v1.0 release with performance optimization, monitoring, production h
 | Sync Latency (Active)    | ≤ 1s           | Phase 3 |
 | Memory Leaks             | None           | Phase 3 |
 | Security Vulnerabilities | Fixed          | Phase 3 |
-| Extension Test Coverage  | 95%+           | Phase 4 |
-| Overall Test Coverage    | 95%+           | Phase 4 |
-| Accessibility Compliance | WCAG 2.1 AA    | Phase 4 |
-| Visual Regression Tests  | Implemented    | Phase 4 |
-| Cross-browser Testing    | Complete       | Phase 4 |
-| Usability Testing        | User validated | Phase 4 |
-| Sync Latency P95         | ≤ 10ms         | Phase 5 |
-| 200+ Tabs Performance    | Smooth         | Phase 5 |
-| Security Audit           | Passed         | Phase 5 |
-| Mozilla Approval         | Ready          | Phase 5 |
+| Baseline Metrics         | Documented     | Phase 4 |
+| Architecture Decisions   | Documented     | Phase 4 |
+| Memory Leaks             | None growing   | Phase 5 |
+| Network Call Reduction   | 70%+           | Phase 5 |
+| Error Recovery           | 100% from 5min | Phase 5 |
+| Extension Test Coverage  | 95%+           | Phase 6 |
+| Overall Test Coverage    | 95%+           | Phase 6 |
+| Accessibility Compliance | WCAG 2.1 AA    | Phase 6 |
+| Visual Regression Tests  | Implemented    | Phase 6 |
+| Cross-browser Testing    | Complete       | Phase 6 |
+| Usability Testing        | User validated | Phase 6 |
+| Sync Latency P95         | ≤ 10ms         | Phase 7 |
+| 200+ Tabs Performance    | Smooth         | Phase 7 |
+| Security Audit           | Passed         | Phase 7 |
+| Mozilla Approval         | Ready          | Phase 7 |
 
 ---
 
@@ -470,37 +514,46 @@ Prepare for v1.0 release with performance optimization, monitoring, production h
 
 ## ✅ Phase 4 Completion Criteria
 
-### Phase 4.1: Foundation (Memory & Performance)
-- [ ] Zero memory leaks verified through automated testing
-- [ ] All event listeners properly cleaned up with AbortController
-- [ ] Operation batching reduces network calls by 70%+
-- [ ] SQLite optimized with composite indices and connection pooling
-- [ ] Sub-100ms sync latency for typical operations
+- [ ] All baseline metrics collected and documented
+- [ ] Performance budgets established
+- [ ] Architecture decisions documented (4+ ADRs)
+- [ ] Operational runbook created and reviewed
+- [ ] Team aligned on architectural direction
 
-### Phase 4.2: Resilience
+## ✅ Phase 5 Completion Criteria
+
+### Phase 5.1: Memory & Performance
+- [ ] No growing memory leaks over 24-hour usage
+- [ ] All event listeners properly cleaned up
+- [ ] Operation batching reduces network calls by 70%+
+- [ ] SQLite optimized with composite indices
+- [ ] Sub-100ms sync latency for P95
+
+### Phase 5.2: Resilience
 - [ ] Exponential backoff with jitter implemented
 - [ ] Circuit breaker prevents cascade failures
-- [ ] Offline operation queue persists up to 1000 operations
-- [ ] Graceful degradation for all failure scenarios
+- [ ] Offline operation queue persists operations
+- [ ] Graceful degradation for failure scenarios
 - [ ] Recovery from extended outages tested
 
-### Phase 4.3: Security
-- [ ] All inputs validated with Zod schemas
-- [ ] CSP headers protect extension pages
-- [ ] Rate limiting prevents abuse
-- [ ] No security vulnerabilities in dependency scan
-- [ ] Security test suite passes with 100% coverage
+### Phase 5.3: Basic Security
+- [ ] Basic input validation implemented
+- [ ] No critical vulnerabilities in dependency scan
+- [ ] Input sanitization for user data
 
-### Phase 4.4: User Experience
-- [ ] Design token system fully implemented
-- [ ] Component library achieves 100% test coverage
-- [ ] Dark mode works with system preference detection
+## ✅ Phase 6 Completion Criteria
+
+- [ ] TypeScript strict mode, no `any` types
+- [ ] Component library with 95%+ coverage
 - [ ] WCAG 2.1 AA compliance verified
-- [ ] Visual regression tests integrated in CI
+- [ ] Visual regression tests in CI
+- [ ] Debug mode and monitoring implemented
+- [ ] Developer documentation complete
 
-### Phase 4.5: Observability
-- [ ] Performance marks track all critical operations
-- [ ] Debug mode provides comprehensive visibility
-- [ ] Health check endpoints respond within 50ms
-- [ ] Metrics available for Prometheus scraping
-- [ ] Developer documentation complete and accurate
+## ✅ Phase 7 Completion Criteria
+
+- [ ] Performance meets all budgets
+- [ ] Security audit passed
+- [ ] Mozilla addon store requirements met
+- [ ] Production monitoring operational
+- [ ] v1.0 documentation complete
