@@ -5,6 +5,7 @@
 **Prerequisites**: Basic understanding of CRDTs and browser extensions
 
 ## Navigation
+
 - [🏠 Home](../README.md)
 - [🚀 Getting Started](GETTING-STARTED.md)
 - [💻 Development](DEVELOPMENT.md)
@@ -19,11 +20,11 @@
 ```
 ┌──────────────┐  JSON Operations via HTTPS  ┌──────────────┐
 │  Extension   │ ─────────────────────────▶  │   Server     │
-│ (TypeScript) │ ◀───────────────────────── │  (Rust)      │
-└──────────────┘    Adaptive 1-10s sync     └─────┬────────┘
+│ (TypeScript) │ ◀─────────────────────────  │  (Rust)      │
+└──────────────┘    Adaptive 1-10s sync      └─────┬────────┘
                                                    │  SQLite WAL
                                                    ▼
-                                             operations.db
+                                                tanaka.db
 ```
 
 ## Browser-side Workflow
@@ -69,16 +70,19 @@ Tanaka uses a structured JSON-based CRDT protocol for conflict-free synchronizat
 ## Security Architecture
 
 ### Authentication
+
 - Shared bearer token in Authorization header
 - Token configured in both extension and server
 - No user accounts or sessions (personal use)
 
 ### Transport Security
+
 - HTTPS/TLS required for all communication
 - Certificate validation on client side
 - Optional self-signed certs for development
 
 ### Data Protection
+
 - No plaintext storage of sensitive data
 - SQLite database with restricted permissions
 - Extension storage API for client-side data
@@ -86,6 +90,7 @@ Tanaka uses a structured JSON-based CRDT protocol for conflict-free synchronizat
 ## Performance Considerations
 
 ### Targets (Phase 5 Goals)
+
 - Support 200+ tabs across devices
 - P95 sync latency ≤ 10ms
 - Smooth UI with no blocking operations
@@ -93,6 +98,7 @@ Tanaka uses a structured JSON-based CRDT protocol for conflict-free synchronizat
 > **Current Status**: Performance optimization is planned for [Phase 5](ROADMAP.md#-phase-5-production-ready) after critical fixes and UI redesign are complete.
 
 ### Optimizations
+
 - DashMap for in-memory caching
 - SQLite WAL mode for concurrent reads
 - Statement caching for prepared queries
@@ -103,13 +109,15 @@ Tanaka uses a structured JSON-based CRDT protocol for conflict-free synchronizat
 ## Storage Architecture
 
 ### Client Storage
+
 - `browser.storage.local` for tab state and sync metadata
 - Operation queue for pending CRDT operations
 - Device ID and Lamport clock persistence
 - Settings in storage.sync
 
 ### Server Storage
-- SQLite database (operations.db) with WAL mode
+
+- SQLite database (tanaka.db) with WAL mode
 - CRDT operations table with Lamport clock indexing
 - Materialized state table for current tab/window data
 - DashMap cache for hot operations
@@ -118,17 +126,20 @@ Tanaka uses a structured JSON-based CRDT protocol for conflict-free synchronizat
 ## Extension Architecture
 
 ### Background Service
+
 - Persistent background script
 - Manages all tab/window events
 - Handles sync operations
 - Message broker for UI components
 
 ### UI Components
+
 - Popup: Window tracking controls
 - Settings: Server configuration
 - Future: Tab search and management
 
 ### Message Passing
+
 - Background ↔ Popup communication
 - Background ↔ Settings communication
 - Structured message types with TypeScript
@@ -155,12 +166,14 @@ Main Thread                 Web Worker Thread
 ```
 
 **Key Benefits:**
+
 - Non-blocking UI during sync operations
 - Parallel processing of CRDT operations
 - Efficient handling of 200+ tabs
 - Reduced memory pressure on main thread
 
 **Components:**
+
 - `CrdtWorker`: Handles operation queuing and deduplication
 - `CrdtWorkerClient`: Main thread interface with timeout protection
 - `SyncManagerWithWorker`: Drop-in replacement for SyncManager
@@ -168,12 +181,14 @@ Main Thread                 Web Worker Thread
 ## Future Architecture Plans
 
 ### v1.0 Enhancements
+
 - Repository pattern for data access
 - Service layer with dependency injection
 - Enhanced CRDT protocol with compression
 - Observability with metrics and tracing
 
 ### v2.0 Vision
+
 - P2P sync option
 - Cross-browser support
 - Collaborative tab sharing

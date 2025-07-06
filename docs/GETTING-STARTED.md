@@ -5,6 +5,7 @@
 **Prerequisites**: Firefox 126+ and basic command line knowledge
 
 ## Navigation
+
 - [🏠 Home](../README.md)
 - [🚀 Getting Started](GETTING-STARTED.md)
 - [💻 Development](DEVELOPMENT.md)
@@ -33,6 +34,7 @@ curl -LO https://github.com/goodbadwolf/tanaka/releases/latest/download/tanaka.x
 ### Step 2: Install the Server
 
 **Option A - Download Pre-built Binary (Recommended)**
+
 ```bash
 # Download server for your platform
 curl -LO https://github.com/goodbadwolf/tanaka/releases/latest/download/tanaka-server-$(uname -m)-$(uname -s | tr '[:upper:]' '[:lower:]')
@@ -41,6 +43,7 @@ sudo mv tanaka-server-* /usr/local/bin/tanaka-server
 ```
 
 **Option B - Build from Source**
+
 ```bash
 # Requires Rust installed (rustup.rs)
 git clone https://github.com/goodbadwolf/tanaka.git
@@ -51,11 +54,13 @@ sudo cp target/release/tanaka-server /usr/local/bin/
 ### Step 3: Configure & Run
 
 1. Create config directory:
+
    ```bash
    mkdir -p ~/.config/tanaka
    ```
 
 2. Create `~/.config/tanaka/tanaka.toml`:
+
    ```toml
    [server]
    bind_addr = "127.0.0.1:8443"  # For local use
@@ -92,11 +97,11 @@ sudo cp target/release/tanaka-server /usr/local/bin/
 
 ## System Requirements
 
-| Component | Requirement |
-|-----------|-------------|
-| Firefox | Version 126 or newer |
-| Server OS | Linux, macOS, or Windows |
-| SQLite | Version 3.40+ (usually pre-installed) |
+| Component       | Requirement                              |
+| --------------- | ---------------------------------------- |
+| Firefox         | Version 126 or newer                     |
+| Server OS       | Linux, macOS, or Windows                 |
+| SQLite          | Version 3.40+ (usually pre-installed)    |
 | TLS Certificate | Self-signed or Let's Encrypt (for HTTPS) |
 
 ---
@@ -150,6 +155,7 @@ shared_token = "dev-token"
 ### Linux (systemd)
 
 1. Create system user:
+
    ```bash
    sudo useradd -r -s /bin/false -d /var/lib/tanaka tanaka
    sudo mkdir -p /var/lib/tanaka
@@ -157,6 +163,7 @@ shared_token = "dev-token"
    ```
 
 2. Create `/etc/systemd/system/tanaka.service`:
+
    ```ini
    [Unit]
    Description=Tanaka Server
@@ -210,16 +217,18 @@ Load with: `launchctl load ~/Library/LaunchAgents/com.tanaka.server.plist`
 ## Backup & Restore
 
 ### Backup Database
+
 ```bash
 # Create backup while server is running
-sqlite3 /var/lib/tanaka/tabs.db ".backup '/backup/tabs-$(date +%Y%m%d).db'"
+sqlite3 /var/lib/tanaka/tanaka.db ".backup '/backup/tabs-$(date +%Y%m%d).db'"
 ```
 
 ### Restore Database
+
 ```bash
 # Stop server, replace database, restart
 sudo systemctl stop tanaka
-sudo cp /backup/tabs-20240315.db /var/lib/tanaka/tabs.db
+sudo cp /backup/tabs-20240315.db /var/lib/tanaka/tanaka.db
 sudo systemctl start tanaka
 ```
 
@@ -228,10 +237,12 @@ sudo systemctl start tanaka
 ## Uninstall
 
 ### Remove Extension
+
 1. Go to `about:addons` in Firefox
 2. Find Tanaka and click Remove
 
 ### Remove Server
+
 ```bash
 # Stop service
 sudo systemctl disable --now tanaka  # Linux

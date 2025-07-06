@@ -5,6 +5,7 @@
 **Prerequisites**: Basic command line knowledge
 
 ## Navigation
+
 - [🏠 Home](../README.md)
 - [🚀 Getting Started](GETTING-STARTED.md)
 - [💻 Development](DEVELOPMENT.md)
@@ -19,6 +20,7 @@
 > **SUCCESS**: All Phase 3 critical fixes have been implemented! Multi-device synchronization is now fully functional.
 
 ### Fixed Issues
+
 1. **Device Authentication** ✅ Fixed in PR #74
 2. **Server State Persistence** ✅ Fixed in PR #69
 3. **Memory Leaks** ✅ Fixed in PR #76
@@ -55,6 +57,7 @@
 ### Extension Not Loading
 
 **Symptoms:**
+
 - Extension doesn't appear in Firefox after installation
 - Icon missing from toolbar
 - "Corrupt add-on" error
@@ -62,18 +65,21 @@
 **Solutions:**
 
 1. **Verify Firefox version**:
+
    ```bash
    # Check version (needs 126+)
    firefox --version
    ```
 
 2. **Check manifest syntax**:
+
    ```bash
    cd extension
    npx web-ext lint
    ```
 
 3. **Reinstall extension**:
+
    - Remove from `about:addons`
    - Download fresh copy
    - Install again
@@ -85,6 +91,7 @@
 ### Server Connection Failures
 
 **Symptoms:**
+
 - "Failed to connect to server" error
 - Red connection indicator
 - Sync not working
@@ -92,11 +99,13 @@
 **Solutions:**
 
 1. **Certificate issues (HTTPS)**:
+
    - Navigate to server URL in browser
    - Accept self-signed certificate
    - Try extension again
 
 2. **Firewall blocking**:
+
    ```bash
    # Check if port is open
    telnet localhost 8443  # or your server port
@@ -106,6 +115,7 @@
    ```
 
 3. **Token mismatch**:
+
    ```bash
    # Check server token
    grep shared_token ~/.config/tanaka/tanaka.toml
@@ -120,6 +130,7 @@
 ### Sync Not Working
 
 **Symptoms:**
+
 - Tabs not appearing on other devices
 - Changes not propagating
 - Sync indicator stuck
@@ -127,10 +138,12 @@
 **Diagnostic Steps:**
 
 1. **Check extension console**:
+
    - `about:debugging` → This Firefox → Tanaka → Inspect
    - Look for sync errors
 
 2. **Verify server logs**:
+
    ```bash
    # Follow server logs
    tail -f ~/.local/share/tanaka/tanaka.log
@@ -139,6 +152,7 @@
    ```
 
 3. **Test server directly**:
+
    ```bash
    # Test sync endpoint
    curl -H "Authorization: Bearer YOUR_TOKEN" https://localhost:8443/sync
@@ -152,6 +166,7 @@
 ### High Memory Usage
 
 **Symptoms:**
+
 - Firefox using excessive RAM
 - Extension becomes sluggish
 - "Out of memory" errors
@@ -159,16 +174,19 @@
 **Solutions:**
 
 1. **Reduce tracked windows**:
+
    - Only track essential windows
    - Untrack before closing Firefox
 
 2. **Clear old data**:
+
    ```javascript
    // In extension console
    await browser.storage.local.clear();
    ```
 
 3. **Limit sync history**:
+
    - Server retains all history by default
    - Consider periodic database cleanup
 
@@ -209,10 +227,11 @@ RUST_BACKTRACE=1 cargo build -vv
 **Slow Extension Startup:**
 
 1. **Check stored data size**:
+
    ```javascript
    // In extension console
    const data = await browser.storage.local.get();
-   console.log('Storage size:', JSON.stringify(data).length);
+   console.log("Storage size:", JSON.stringify(data).length);
    ```
 
 2. **Disable during development**:
@@ -222,6 +241,7 @@ RUST_BACKTRACE=1 cargo build -vv
 **High CPU Usage:**
 
 1. **Check for runaway loops**:
+
    - Profile with Firefox Developer Tools
    - Look for hot functions
 
@@ -234,6 +254,7 @@ RUST_BACKTRACE=1 cargo build -vv
 ### Web Worker Issues
 
 **Symptoms:**
+
 - Extension freezes during sync
 - Worker initialization fails
 - "Worker is not defined" errors
@@ -241,17 +262,20 @@ RUST_BACKTRACE=1 cargo build -vv
 **Solutions:**
 
 1. **Check worker is loaded**:
+
    ```javascript
    // In extension console
    const workers = await browser.runtime.getBackgroundPage();
-   console.log('Worker available:', typeof Worker !== 'undefined');
+   console.log("Worker available:", typeof Worker !== "undefined");
    ```
 
 2. **Verify worker file exists**:
+
    - Check `dist/workers/crdt-worker.js` is present
    - Rebuild if missing: `pnpm run build:dev`
 
 3. **Debug worker errors**:
+
    ```javascript
    // In background script console
    // Look for worker initialization errors
@@ -304,6 +328,7 @@ pnpm run start -- --firefox="/Applications/Firefox.app/Contents/MacOS/firefox"
 ### Extension Debugging
 
 1. **Enable verbose logging**:
+
    ```typescript
    // Add to background.ts
    const DEBUG = true;
@@ -311,17 +336,19 @@ pnpm run start -- --firefox="/Applications/Firefox.app/Contents/MacOS/firefox"
    ```
 
 2. **Inspect storage**:
+
    ```javascript
    // View all stored data
    await browser.storage.local.get();
 
    // Watch for changes
    browser.storage.onChanged.addListener((changes, area) => {
-     console.log('Storage changed:', changes);
+     console.log("Storage changed:", changes);
    });
    ```
 
 3. **Monitor network requests**:
+
    - Open DevTools Network tab
    - Filter by "sync" or your server URL
    - Check request/response details
@@ -330,7 +357,7 @@ pnpm run start -- --firefox="/Applications/Firefox.app/Contents/MacOS/firefox"
    ```typescript
    // Log all messages
    browser.runtime.onMessage.addListener((msg, sender) => {
-     console.log('Message:', msg, 'From:', sender);
+     console.log("Message:", msg, "From:", sender);
      return true;
    });
    ```
@@ -338,13 +365,15 @@ pnpm run start -- --firefox="/Applications/Firefox.app/Contents/MacOS/firefox"
 ### Server Debugging
 
 1. **Enable debug logging**:
+
    ```bash
    RUST_LOG=debug tanaka-server
    ```
 
 2. **Inspect database**:
+
    ```bash
-   sqlite3 ~/.local/share/tanaka/tabs.db
+   sqlite3 ~/.local/share/tanaka/tanaka.db
    .tables
    SELECT * FROM tabs LIMIT 10;
    ```
@@ -359,15 +388,15 @@ pnpm run start -- --firefox="/Applications/Firefox.app/Contents/MacOS/firefox"
 
 ```typescript
 // In extension console
-import * as Y from 'yjs';
+import * as Y from "yjs";
 
 // Get current state
 const doc = syncManager.getDocument();
-console.log('Doc state:', doc.toJSON());
+console.log("Doc state:", doc.toJSON());
 
 // Check for pending updates
 const pending = Y.encodeStateAsUpdate(doc);
-console.log('Pending size:', pending.byteLength);
+console.log("Pending size:", pending.byteLength);
 ```
 
 ---
@@ -377,6 +406,7 @@ console.log('Pending size:', pending.byteLength);
 ### Certificate Problems
 
 1. **Generate new self-signed cert**:
+
    ```bash
    openssl req -x509 -newkey rsa:4096 \
      -keyout key.pem -out cert.pem \
@@ -385,6 +415,7 @@ console.log('Pending size:', pending.byteLength);
    ```
 
 2. **Check certificate details**:
+
    ```bash
    openssl x509 -in cert.pem -text -noout
    ```
@@ -397,16 +428,17 @@ console.log('Pending size:', pending.byteLength);
 ### Permission Issues
 
 1. **Check extension permissions**:
+
    ```javascript
    // List current permissions
    const perms = await browser.permissions.getAll();
-   console.log('Permissions:', perms);
+   console.log("Permissions:", perms);
    ```
 
 2. **Request missing permissions**:
    ```javascript
    await browser.permissions.request({
-     permissions: ['tabs']
+     permissions: ["tabs"],
    });
    ```
 
@@ -427,12 +459,14 @@ When reporting issues, include:
 
 ```markdown
 **Environment:**
+
 - OS: [e.g., macOS 13.5]
 - Firefox: [e.g., 126.0]
 - Tanaka Extension: [version from about:addons]
 - Tanaka Server: [run `tanaka-server --version`]
 
 **Steps to Reproduce:**
+
 1. [First step]
 2. [Second step]
 3. [What happens vs. what you expected]
@@ -455,15 +489,15 @@ When reporting issues, include:
 
 ```javascript
 // Profile sync operation
-console.time('sync');
+console.time("sync");
 await syncManager.sync();
-console.timeEnd('sync');
+console.timeEnd("sync");
 
 // Memory profiling
 if (performance.memory) {
-  console.log('Memory:', {
-    used: Math.round(performance.memory.usedJSHeapSize / 1048576) + 'MB',
-    total: Math.round(performance.memory.totalJSHeapSize / 1048576) + 'MB'
+  console.log("Memory:", {
+    used: Math.round(performance.memory.usedJSHeapSize / 1048576) + "MB",
+    total: Math.round(performance.memory.totalJSHeapSize / 1048576) + "MB",
   });
 }
 ```
