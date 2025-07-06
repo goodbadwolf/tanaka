@@ -148,9 +148,9 @@ repos:
         pass_filenames: false
         additional_dependencies: []
 
-      - id: roadmap-reminder
-        name: Roadmap update reminder
-        entry: python scripts/pre_commit/roadmap_reminder.py
+      - id: todo-reminder
+        name: TODO update reminder
+        entry: python scripts/pre_commit/todo_reminder.py
         language: python
         files: ^(extension|server)/.*\.(ts|tsx|rs)$
         pass_filenames: true

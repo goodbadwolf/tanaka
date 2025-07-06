@@ -710,7 +710,7 @@ import { Button, Input, Card } from "../components";
 3. **Update documentation**:
    - Code comments if needed
    - Update relevant docs
-   - Add to ROADMAP.md if applicable
+   - Add to TODOS.md if applicable
 
 ### Code Style
 
@@ -726,7 +726,7 @@ import { Button, Input, Card } from "../components";
 - **Architecture details**: See [Architecture](ARCHITECTURE.md)
 - **Common issues**: See [Troubleshooting](TROUBLESHOOTING.md)
 - **Git workflow**: See [Git Guidelines](GIT.md)
-- **Project roadmap**: See [Roadmap](ROADMAP.md)
+- **Pending tasks**: See [TODOs](TODOS.md)
 - **Sync protocol**: See [Sync Protocol](SYNC-PROTOCOL.md)
 
 ---
