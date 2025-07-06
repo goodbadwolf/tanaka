@@ -1,5 +1,13 @@
-import type { IBrowser, ITabs, IWindows, ILocalStorage, IRuntime, IEventEmitter } from './core';
-import type { Tabs, Windows, Runtime } from 'webextension-polyfill';
+import type {
+  IBrowser,
+  ITabs,
+  IWindows,
+  ILocalStorage,
+  IRuntime,
+  IPermissions,
+  IEventEmitter,
+} from './core';
+import type { Tabs, Windows, Runtime, Permissions } from 'webextension-polyfill';
 
 // Mock event emitter that matches the interface
 class MockEventEmitter<T extends unknown[]> implements IEventEmitter<T> {
@@ -282,6 +290,37 @@ export class MockBrowser implements IBrowser {
       this.mockStorage.clear();
       console.log('[Mock] Storage cleared');
     },
+  };
+
+  // Permissions API
+  permissions: IPermissions = {
+    contains: async (permissions: Permissions.Permissions): Promise<boolean> => {
+      console.log('[Mock] Checking permissions:', permissions);
+      // For mock, always return true unless explicitly testing permission denial
+      return true;
+    },
+
+    getAll: async (): Promise<Permissions.AnyPermissions> => {
+      console.log('[Mock] Getting all permissions');
+      return {
+        permissions: ['tabs', 'storage'],
+        origins: [],
+      };
+    },
+
+    request: async (permissions: Permissions.Permissions): Promise<boolean> => {
+      console.log('[Mock] Requesting permissions:', permissions);
+      // For mock, simulate user granting permissions
+      return true;
+    },
+
+    remove: async (permissions: Permissions.Permissions): Promise<boolean> => {
+      console.log('[Mock] Removing permissions:', permissions);
+      return true;
+    },
+
+    onAdded: new MockEventEmitter<[permissions: Permissions.Permissions]>(),
+    onRemoved: new MockEventEmitter<[permissions: Permissions.Permissions]>(),
   };
 
   // Runtime API

@@ -6,6 +6,20 @@ import type { IBrowser } from '../core';
 
 export function createMockBrowser(): IBrowser {
   return {
+    permissions: {
+      contains: jest.fn().mockResolvedValue(true),
+      getAll: jest.fn().mockResolvedValue({ permissions: [], origins: [] }),
+      request: jest.fn().mockResolvedValue(true),
+      remove: jest.fn().mockResolvedValue(true),
+      onAdded: {
+        addListener: jest.fn(),
+        removeListener: jest.fn(),
+      },
+      onRemoved: {
+        addListener: jest.fn(),
+        removeListener: jest.fn(),
+      },
+    },
     tabs: {
       query: jest.fn().mockResolvedValue([]),
       create: jest.fn().mockResolvedValue({}),
@@ -58,6 +72,7 @@ export function createMockBrowser(): IBrowser {
 export class MockBrowser implements IBrowser {
   private mockBrowser = createMockBrowser();
 
+  public readonly permissions = this.mockBrowser.permissions;
   public readonly tabs = this.mockBrowser.tabs;
   public readonly windows = this.mockBrowser.windows;
   public readonly localStorage = this.mockBrowser.localStorage;

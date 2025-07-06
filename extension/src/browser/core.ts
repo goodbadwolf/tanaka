@@ -1,4 +1,4 @@
-import type { Tabs, Windows, Runtime } from 'webextension-polyfill';
+import type { Tabs, Windows, Runtime, Permissions } from 'webextension-polyfill';
 
 export interface IEventEmitter<T extends unknown[]> {
   addListener(callback: (...args: T) => void): void;
@@ -41,7 +41,17 @@ export interface IRuntime {
   >;
 }
 
+export interface IPermissions {
+  contains(permissions: Permissions.Permissions): Promise<boolean>;
+  getAll(): Promise<Permissions.AnyPermissions>;
+  request(permissions: Permissions.Permissions): Promise<boolean>;
+  remove(permissions: Permissions.Permissions): Promise<boolean>;
+  onAdded: IEventEmitter<[permissions: Permissions.Permissions]>;
+  onRemoved: IEventEmitter<[permissions: Permissions.Permissions]>;
+}
+
 export interface IBrowser {
+  permissions: IPermissions;
   tabs: ITabs;
   windows: IWindows;
   localStorage: ILocalStorage;
