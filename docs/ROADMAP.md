@@ -11,17 +11,17 @@ This roadmap consolidates extension and server development, focusing on pending 
 
 **🎉 MILESTONE**: All critical bugs fixed! Multi-device synchronization is fully functional. Now establishing baselines and architectural decisions before quality improvements.
 
----
+--
 
-## 🌿 Branch Strategy (Pending Work)
+## 📝 Progress Tracking Rules
 
-**⚠️ IMPORTANT: Always create feature branches with the exact names listed below. NEVER push directly to main.**
-
-```
-main
-├── Phase 4: Basic Documentation (CURRENT)
-└── Pending Tasks
-```
+- Use `[ ]` for pending, `[x]` for completed
+- Update this file as part of each PR
+- Each branch should result in working software
+- Run all tests before marking complete
+- **Always create a PR when a branch is ready for review**
+- Include comprehensive testing and documentation in each PR
+- NEVER push directly to main branch of the remote `origin`
 
 ---
 
@@ -34,6 +34,7 @@ Document basic operational procedures before starting implementation work.
 ### Implementation Tasks
 
 #### 📝 Branch: `docs/operational-basics`
+
 **Basic Documentation**
 
 - [ ] Write simple deployment steps
@@ -49,6 +50,7 @@ Work to be completed after Phase 4.
 ### Baseline Measurements
 
 #### 📊 Branch: `docs/baseline-metrics`
+
 **Establish Baselines**
 
 - [ ] Test with 200+ tabs and note performance
@@ -151,36 +153,6 @@ Work to be completed after Phase 4.
 
 ---
 
-## 📊 Success Metrics
-
-| Metric            | Target      | Status      |
-| ----------------- | ----------- | ----------- |
-| Multi-device Sync | Working     | ✅ Complete |
-| Data Persistence  | No loss     | ✅ Complete |
-| Memory Leaks      | None        | ✅ Complete |
-| Basic Docs        | Written     | Phase 4     |
-| Baseline Metrics  | Documented  | Pending     |
-| Memory Growth     | None        | Pending     |
-| 200+ Tabs         | No freezing | Pending     |
-| Error Recovery    | Works       | Pending     |
-| Test Coverage     | 80%+        | Pending     |
-| Dark Mode         | Implemented | Pending     |
-| Mozilla Approval  | Submitted   | Pending     |
-| v1.0 Release      | Tagged      | Pending     |
-
----
-
-## 📝 Progress Tracking Rules
-
-- Use `[ ]` for pending, `[x]` for completed
-- Update this file as part of each PR
-- Each branch should result in working software
-- Run all tests before marking complete
-- **Always create a PR when a branch is ready for review**
-- Include comprehensive testing and documentation in each PR
-
----
-
 ## 🔑 Key Principles
 
 1. **Unified Changes**: Related extension and server changes in same branch
@@ -200,6 +172,7 @@ Work to be completed after Phase 4.
 ## ✅ Pending Tasks Completion Criteria
 
 ### Baseline Measurements
+
 - [ ] Performance with 200+ tabs documented
 - [ ] Memory usage patterns understood
 - [ ] Architecture decisions recorded
