@@ -173,14 +173,41 @@ All work to be completed.
 
 ### User Experience
 
+#### 🎨 Branch: `feat/ui-redesign`
+
+**Complete UI Redesign**
+
+- [ ] Implement new modern UI design
+  - Create fresh, modern interface design
+  - Ensure consistent design system across all components
+  - Use modern CSS with CSS variables for theming
+  - Follow current UI/UX best practices
+- [ ] Convert to React/Preact components
+  - Create reusable component library
+  - Implement proper state management
+  - Add TypeScript types for all components
+- [ ] Implement animations and transitions
+  - Smooth page transitions
+  - Loading states with skeleton screens
+  - Micro-interactions for better UX
+- [ ] Add comprehensive theming support
+  - Dark mode (default)
+  - Light mode
+  - System preference detection
+  - Theme persistence
+- [ ] Responsive design
+  - Test on different screen sizes
+  - Ensure popup works at various widths
+  - Mobile-friendly settings page
+
 #### 🎨 Branch: `feat/ui-polish`
 
-**UI Improvements**
+**UI Improvements** (after redesign)
 
-- [ ] Add dark mode
-- [ ] Improve error messages
-- [ ] Add loading indicators
-- [ ] Test on different screen sizes
+- [ ] Improve error messages with better copy
+- [ ] Add tooltips for complex features
+- [ ] Optimize performance for smooth 60fps
+- [ ] Add keyboard navigation support
 
 #### 🧹 Branch: `feat/code-cleanup`
 
