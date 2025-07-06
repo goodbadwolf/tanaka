@@ -53,13 +53,14 @@ For detailed protocol specification, see [SYNC-PROTOCOL.md](SYNC-PROTOCOL.md).
 
 ## 2. Prerequisites
 
-| Tool    | Version | Purpose               |
-| ------- | ------- | --------------------- |
-| Rust    | 1.83+   | Server development    |
-| Node.js | 24+     | Extension development |
-| pnpm    | 10.11+  | Package management    |
-| SQLite  | 3.40+   | Database              |
-| Firefox | 126+    | Extension testing     |
+| Tool     | Version | Purpose               |
+| -------- | ------- | --------------------- |
+| Rust     | 1.83+   | Server development    |
+| Node.js  | 24+     | Extension development |
+| pnpm     | 10.11+  | Package management    |
+| SQLite   | 3.40+   | Database              |
+| Firefox  | 126+    | Extension testing     |
+| SQLx CLI | Latest  | Database migrations   |
 
 ### Automated Setup
 
@@ -73,7 +74,7 @@ python3 scripts/tanaka.py setup-dev
 python3 scripts/tanaka.py setup-dev --dry-run
 
 # Install specific tools only
-python3 scripts/tanaka.py setup-dev --include rust node
+python3 scripts/tanaka.py setup-dev --include rust node sqlx
 python3 scripts/tanaka.py setup-dev --exclude pnpm
 
 # Install CI testing tools
@@ -118,14 +119,11 @@ npm install -g pnpm
 </details>
 
 <details>
-<summary>4. Install Optional Tools</summary>
+<summary>4. Install SQLx CLI</summary>
 
 ```bash
-# SQLx CLI for migrations
+# Required for database migrations
 cargo install sqlx-cli --no-default-features --features sqlite
-
-# Python development tools
-pip install uv  # Fast Python package manager
 ```
 
 </details>
@@ -135,16 +133,19 @@ pip install uv  # Fast Python package manager
 This project uses `uv` for Python dependency management:
 
 **Use `uv` when:**
+
 - Installing project dependencies: `uv sync --dev`
 - Running project scripts: `uv run scripts/tanaka.py lint`
 - Working within this project's environment
 
 **Use `pip` when:**
+
 - Installing global tools: `pip install uv`
 - Installing tools outside this project
 - Systems where uv isn't available
 
 **Key differences:**
+
 - `uv` is 10-100x faster than pip
 - `uv` automatically manages virtual environments
 - `uv` has better dependency resolution
@@ -235,7 +236,54 @@ When developing locally, you may not need production certificates. You can:
 
 ---
 
-## 5. Development Workflow
+## 5. Database Migrations
+
+The server uses SQLx migrations for database schema management. Migrations are automatically run on startup, but you can also manage them manually.
+
+### Creating a New Migration
+
+```bash
+cd server
+
+# Create a reversible migration (recommended)
+sqlx migrate add -r <description>
+
+# Example:
+sqlx migrate add -r add_user_preferences_table
+# Creates:
+#   migrations/<timestamp>_add_user_preferences_table.up.sql
+#   migrations/<timestamp>_add_user_preferences_table.down.sql
+
+# Note: After the first reversible migration, all subsequent migrations
+# will be reversible by default
+```
+
+### Running Migrations
+
+```bash
+# Ensure DATABASE_URL is set (or create .env file)
+export DATABASE_URL=sqlite://tabs.db
+
+# Create the database if it doesn't exist
+sqlx database create
+
+# Run all pending migrations
+sqlx migrate run
+
+# Revert the last migration
+sqlx migrate revert
+
+# Check migration status
+sqlx migrate info
+```
+
+### Migration Files
+
+Migrations are stored in `server/migrations/` and are applied in order based on their timestamp prefix. Each migration should be idempotent (safe to run multiple times).
+
+---
+
+## 6. Development Workflow
 
 ### Code Organization
 
@@ -288,7 +336,7 @@ cd extension && pnpm test:watch  # Watch mode
 
 ---
 
-## 6. Essential Commands Reference
+## 7. Essential Commands Reference
 
 ### Server Commands (Rust)
 
@@ -352,7 +400,7 @@ pnpm run gen-icons     # Generate icons
 
 ---
 
-## 7. Testing Strategy
+## 8. Testing Strategy
 
 > **Note**: All tests including multi-device sync tests should now pass.
 
@@ -361,18 +409,21 @@ pnpm run gen-icons     # Generate icons
 #### Rust Testing Tools
 
 - **cargo-nextest**: 2-3× faster test execution with better output
+
   ```bash
   cargo install cargo-nextest --locked
   cargo nextest run
   ```
 
 - **cargo-llvm-cov**: Superior coverage reporting with source-based coverage
+
   ```bash
   cargo install cargo-llvm-cov
   cargo llvm-cov --html  # HTML report at target/llvm-cov/html/
   ```
 
 - **pretty_assertions**: Colorful diffs for better debugging
+
   ```rust
   use pretty_assertions::{assert_eq, assert_ne};
   ```
@@ -402,18 +453,22 @@ pnpm run gen-icons     # Generate icons
 The `server/tests/sync_integration.rs` file contains comprehensive tests for the CRDT sync protocol:
 
 1. **Basic Operations**
+
    - Empty sync requests verification
    - Single tab creation testing
 
 2. **Authentication**
+
    - Invalid token rejection
    - Bearer token validation
 
 3. **Multi-Device Sync**
+
    - Cross-device operation synchronization
    - Incremental sync with `since_clock`
 
 4. **Complex Operations**
+
    - Multiple CRDT operation types in single request
    - Operation ordering and clock management
 
@@ -433,6 +488,7 @@ cargo test --test sync_integration -- --nocapture
 ```
 
 Key features:
+
 - In-memory SQLite database for test isolation
 - Per-test app instances with auth middleware
 - Proper Lamport clock incrementing
@@ -447,7 +503,7 @@ Key features:
 
 ---
 
-## 8. Local Development Configuration
+## 9. Local Development Configuration
 
 ### Server Configuration
 
@@ -486,7 +542,7 @@ key_path = "key.pem"
 
 ---
 
-## 9. Webapp Mode
+## 10. Webapp Mode
 
 Test the extension without Firefox:
 
@@ -511,7 +567,7 @@ Implementation:
 
 ---
 
-## 10. Python Tooling
+## 11. Python Tooling
 
 This project uses `uv` for Python dependency management:
 
@@ -532,7 +588,7 @@ uv run scripts/tanaka.py generate
 
 ---
 
-## 11. Release Process
+## 12. Release Process
 
 1. **Update versions**:
 
@@ -553,7 +609,7 @@ uv run scripts/tanaka.py generate
 
 ---
 
-## 12. Testing GitHub Actions Locally
+## 13. Testing GitHub Actions Locally
 
 Test CI workflows before pushing:
 
@@ -579,7 +635,7 @@ Troubleshooting:
 
 ---
 
-## 13. Component Library
+## 14. Component Library
 
 The extension includes reusable React components. See the full [Component Documentation](#component-library-1) below.
 
@@ -596,7 +652,7 @@ import { Button, Input, Card } from "../components";
 
 ---
 
-## 14. Contributing Guidelines
+## 15. Contributing Guidelines
 
 ### Before Submitting
 
@@ -628,7 +684,7 @@ import { Button, Input, Card } from "../components";
 
 ---
 
-## 15. Next Steps
+## 16. Next Steps
 
 - **Architecture details**: See [Architecture](ARCHITECTURE.md)
 - **Common issues**: See [Troubleshooting](TROUBLESHOOTING.md)
@@ -638,7 +694,7 @@ import { Button, Input, Card } from "../components";
 
 ---
 
-## 16. Component Library
+## 17. Component Library
 
 The extension includes a collection of reusable UI components built with React/Preact.
 
@@ -736,11 +792,7 @@ Container component with optional header and footer sections.
 ```tsx
 import { Card } from "../components";
 
-<Card
-  variant="elevated"
-  header="Settings"
-  footer={<Button>Save Changes</Button>}
->
+<Card variant="elevated" header="Settings" footer={<Button>Save Changes</Button>}>
   <p>Card content goes here</p>
 </Card>;
 ```
@@ -756,7 +808,7 @@ import { Card } from "../components";
 
 ---
 
-## 17. Debugging & Troubleshooting
+## 18. Debugging & Troubleshooting
 
 ### Extension Debugging
 
@@ -782,7 +834,7 @@ For detailed troubleshooting, see [Troubleshooting Guide](TROUBLESHOOTING.md).
 
 ---
 
-## 18. Security Best Practices
+## 19. Security Best Practices
 
 ### WebExtension Security
 
@@ -807,7 +859,7 @@ For detailed troubleshooting, see [Troubleshooting Guide](TROUBLESHOOTING.md).
 
 ---
 
-## 19. Performance Optimization
+## 20. Performance Optimization
 
 ### Extension Performance
 
@@ -837,6 +889,7 @@ The extension includes an optimized sync manager that dynamically adjusts sync b
 #### Key Features
 
 1. **Adaptive Sync Intervals**
+
    - Active: 1s (during user activity)
    - Idle: 10s (no activity for 30s)
    - Error backoff: Exponential (5s, 10s, 20s... up to 60s)
@@ -850,6 +903,7 @@ The extension includes an optimized sync manager that dynamically adjusts sync b
    | LOW | change_url | 1000ms |
 
 3. **Operation Deduplication**
+
    - Multiple URL changes → Keep only latest
    - Redundant updates → Single operation
    - Reduces server load by ~70%
@@ -862,10 +916,10 @@ The extension includes an optimized sync manager that dynamically adjusts sync b
 #### Usage
 
 ```typescript
-import { SyncManager } from './sync';
+import { SyncManager } from "./sync";
 
 const syncManager = new SyncManager({
-  syncIntervalMs: 5000,  // Base interval (adapts 1-10s)
+  syncIntervalMs: 5000, // Base interval (adapts 1-10s)
   api: tanakaAPI,
   windowTracker: tracker,
   browser: browserAdapter,
@@ -880,7 +934,7 @@ npm test -- sync-manager.test.ts
 
 ---
 
-## 20. Error Handling Architecture
+## 21. Error Handling Architecture
 
 ### Extension Error System
 
