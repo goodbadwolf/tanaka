@@ -2,14 +2,15 @@
 
 This roadmap tracks all pending work for the Tanaka project.
 
-## 🎯 Current Status
+## 🔑 Key Principles
 
-- **Extension**: 85%+ test coverage, React/Preact UI, CRDT Web Worker, full permission management
-- **Server**: Clean architecture with repositories, services, error handling, CRDT sync, complete security hardening
+1. **Unified Changes**: Related extension and server changes in same branch
+2. **Incremental Progress**: Each branch should be independently mergeable
+3. **Test Everything**: Both sides need comprehensive tests
+4. **Performance First**: Every change considers 200+ tab scenarios
+5. **Clean Architecture**: Apply same patterns to both extension and server
 
-**🎉 MILESTONE**: All critical bugs fixed! Multi-device synchronization is fully functional.
-
---
+---
 
 ## 📝 Progress Tracking Rules
 
@@ -142,26 +143,3 @@ All work to be completed.
 - [ ] Tag v1.0 release
 
 ---
-
-## 🔑 Key Principles
-
-1. **Unified Changes**: Related extension and server changes in same branch
-2. **Incremental Progress**: Each branch should be independently mergeable
-3. **Test Everything**: Both sides need comprehensive tests
-4. **Performance First**: Every change considers 200+ tab scenarios
-5. **Clean Architecture**: Apply same patterns to both extension and server
-
----
-
-## ✅ Completion Criteria
-
-- [ ] Basic documentation complete (deployment, backup, common issues)
-- [ ] Performance baselines documented
-- [ ] No memory growth over 24 hours
-- [ ] Handles 200+ tabs smoothly
-- [ ] Error recovery implemented
-- [ ] Dark mode working
-- [ ] 80%+ test coverage
-- [ ] All TypeScript errors fixed
-- [ ] Submitted to Mozilla addon store
-- [ ] Release tagged and ready
