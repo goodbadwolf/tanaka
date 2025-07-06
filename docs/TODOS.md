@@ -2,7 +2,7 @@
 
 This file tracks all pending work for the Tanaka project.
 
-## 🔑 Key Principles
+## Key Principles
 
 1. **Unified Changes**: Related extension and server changes in same branch
    - Frontend and backend changes that depend on each other ship together
@@ -34,7 +34,7 @@ This file tracks all pending work for the Tanaka project.
 
 ---
 
-## 📝 Progress Tracking Rules
+## Progress Tracking Rules
 
 ### Task Management
 - Use `[ ]` for pending, `[x]` for completed tasks
@@ -65,13 +65,13 @@ This file tracks all pending work for the Tanaka project.
 
 ---
 
-## 📋 Pending Tasks
+## Pending Tasks
 
 All work to be completed.
 
 ### Documentation
 
-#### 📝 Branch: `docs/operational-basics`
+#### Branch: `docs/operational-basics`
 
 **Basic Documentation**
 
@@ -79,7 +79,7 @@ All work to be completed.
 - [ ] Document backup/restore process
 - [ ] List common issues and fixes
 
-#### 🔧 Branch: `chore/update-cargo-test-references`
+#### Branch: `chore/update-cargo-test-references`
 
 **Update cargo test to cargo nextest**
 
@@ -89,7 +89,7 @@ All work to be completed.
   - Update any scripts that use cargo test
   - Verify pre-commit hooks use nextest
 
-#### 📚 Branch: `docs/git-best-practices`
+#### Branch: `docs/git-best-practices`
 
 **Git Best Practices Documentation**
 
@@ -101,7 +101,7 @@ All work to be completed.
 
 ### Baseline Measurements
 
-#### 📊 Branch: `docs/baseline-metrics`
+#### Branch: `docs/baseline-metrics`
 
 **Establish Baselines**
 
@@ -113,7 +113,7 @@ All work to be completed.
 
 ### Core Stability
 
-#### 🔧 Branch: `fix/memory-leaks`
+#### Branch: `fix/memory-leaks`
 
 **Fix Memory Leaks**
 
@@ -128,7 +128,7 @@ All work to be completed.
   - Consider RwLock instead of Mutex for better read performance
 - [ ] Tests: Verify no memory growth over extended usage
 
-#### 🚀 Branch: `feat/performance`
+#### Branch: `feat/performance`
 
 **Basic Performance Improvements**
 
@@ -150,7 +150,7 @@ All work to be completed.
   - VACUUM periodically
 - [ ] Tests: Verify handles 200+ tabs smoothly
 
-#### 🔄 Branch: `feat/error-recovery`
+#### Branch: `feat/error-recovery`
 
 **Error Recovery**
 
@@ -173,7 +173,7 @@ All work to be completed.
 
 ### User Experience
 
-#### 🎨 Branch: `feat/ui-redesign`
+#### Branch: `feat/ui-redesign`
 
 **Complete UI Redesign**
 
@@ -200,7 +200,7 @@ All work to be completed.
   - Ensure popup works at various widths
   - Mobile-friendly settings page
 
-#### 🎨 Branch: `feat/ui-polish`
+#### Branch: `feat/ui-polish`
 
 **UI Improvements** (after redesign)
 
@@ -209,7 +209,7 @@ All work to be completed.
 - [ ] Optimize performance for smooth 60fps
 - [ ] Add keyboard navigation support
 
-#### 🧹 Branch: `feat/code-cleanup`
+#### Branch: `feat/code-cleanup`
 
 **Code Quality**
 
@@ -220,7 +220,7 @@ All work to be completed.
 
 ### Release Preparation
 
-#### 🚀 Branch: `feat/v1-release`
+#### Branch: `feat/v1-release`
 
 **Release**
 
