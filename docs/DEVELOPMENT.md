@@ -121,7 +121,7 @@ npm install -g pnpm
 <summary>4. Install Optional Tools</summary>
 
 ```bash
-# SQLx CLI for migrations
+# SQLx CLI for migrations (required)
 cargo install sqlx-cli --no-default-features --features sqlite
 
 # Python development tools
@@ -235,7 +235,48 @@ When developing locally, you may not need production certificates. You can:
 
 ---
 
-## 5. Development Workflow
+## 5. Database Migrations
+
+The server uses SQLx migrations for database schema management. Migrations are automatically run on startup, but you can also manage them manually.
+
+### Creating a New Migration
+
+```bash
+cd server
+
+# Create a new migration file
+sqlx migrate add <description>
+
+# Example:
+sqlx migrate add add_user_preferences_table
+```
+
+### Running Migrations
+
+```bash
+# Ensure DATABASE_URL is set (or create .env file)
+export DATABASE_URL=sqlite://tabs.db
+
+# Create the database if it doesn't exist
+sqlx database create
+
+# Run all pending migrations
+sqlx migrate run
+
+# Revert the last migration
+sqlx migrate revert
+
+# Check migration status
+sqlx migrate info
+```
+
+### Migration Files
+
+Migrations are stored in `server/migrations/` and are applied in order based on their timestamp prefix. Each migration should be idempotent (safe to run multiple times).
+
+---
+
+## 6. Development Workflow
 
 ### Code Organization
 
@@ -288,7 +329,7 @@ cd extension && pnpm test:watch  # Watch mode
 
 ---
 
-## 6. Essential Commands Reference
+## 7. Essential Commands Reference
 
 ### Server Commands (Rust)
 
@@ -352,7 +393,7 @@ pnpm run gen-icons     # Generate icons
 
 ---
 
-## 7. Testing Strategy
+## 8. Testing Strategy
 
 > **Note**: All tests including multi-device sync tests should now pass.
 
@@ -447,7 +488,7 @@ Key features:
 
 ---
 
-## 8. Local Development Configuration
+## 9. Local Development Configuration
 
 ### Server Configuration
 
@@ -486,7 +527,7 @@ key_path = "key.pem"
 
 ---
 
-## 9. Webapp Mode
+## 10. Webapp Mode
 
 Test the extension without Firefox:
 
@@ -511,7 +552,7 @@ Implementation:
 
 ---
 
-## 10. Python Tooling
+## 11. Python Tooling
 
 This project uses `uv` for Python dependency management:
 
@@ -532,7 +573,7 @@ uv run scripts/tanaka.py generate
 
 ---
 
-## 11. Release Process
+## 12. Release Process
 
 1. **Update versions**:
 
@@ -553,7 +594,7 @@ uv run scripts/tanaka.py generate
 
 ---
 
-## 12. Testing GitHub Actions Locally
+## 13. Testing GitHub Actions Locally
 
 Test CI workflows before pushing:
 
@@ -579,7 +620,7 @@ Troubleshooting:
 
 ---
 
-## 13. Component Library
+## 14. Component Library
 
 The extension includes reusable React components. See the full [Component Documentation](#component-library-1) below.
 
@@ -596,7 +637,7 @@ import { Button, Input, Card } from "../components";
 
 ---
 
-## 14. Contributing Guidelines
+## 15. Contributing Guidelines
 
 ### Before Submitting
 
@@ -628,7 +669,7 @@ import { Button, Input, Card } from "../components";
 
 ---
 
-## 15. Next Steps
+## 16. Next Steps
 
 - **Architecture details**: See [Architecture](ARCHITECTURE.md)
 - **Common issues**: See [Troubleshooting](TROUBLESHOOTING.md)
@@ -638,7 +679,7 @@ import { Button, Input, Card } from "../components";
 
 ---
 
-## 16. Component Library
+## 17. Component Library
 
 The extension includes a collection of reusable UI components built with React/Preact.
 
@@ -756,7 +797,7 @@ import { Card } from "../components";
 
 ---
 
-## 17. Debugging & Troubleshooting
+## 18. Debugging & Troubleshooting
 
 ### Extension Debugging
 
@@ -782,7 +823,7 @@ For detailed troubleshooting, see [Troubleshooting Guide](TROUBLESHOOTING.md).
 
 ---
 
-## 18. Security Best Practices
+## 19. Security Best Practices
 
 ### WebExtension Security
 
@@ -807,7 +848,7 @@ For detailed troubleshooting, see [Troubleshooting Guide](TROUBLESHOOTING.md).
 
 ---
 
-## 19. Performance Optimization
+## 20. Performance Optimization
 
 ### Extension Performance
 
@@ -880,7 +921,7 @@ npm test -- sync-manager.test.ts
 
 ---
 
-## 20. Error Handling Architecture
+## 21. Error Handling Architecture
 
 ### Extension Error System
 
