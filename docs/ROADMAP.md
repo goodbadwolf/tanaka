@@ -15,6 +15,8 @@ This roadmap consolidates extension and server development, focusing on pending 
 
 ## 🌿 Branch Strategy (Pending Work)
 
+**⚠️ IMPORTANT: Always create feature branches with the exact names listed below. NEVER push directly to main.**
+
 ```
 main
 ├── Phase 3: Critical Fixes (small atomic branches)
@@ -91,9 +93,10 @@ These bugs prevent Tanaka from fulfilling its primary purpose:
 **Fix**: Allow only browser extension origins and configured domains  
 **Status**: Completed in PR #77
 
-#### `fix/csp-manifest` - Content Security Policy
+#### `fix/csp-manifest` - Content Security Policy ✅
 **Impact**: Required for Mozilla addon store submission  
-**Fix**: Add CSP to manifest.json
+**Fix**: Add CSP to manifest.json  
+**Status**: Completed - Added comprehensive CSP with strict security policy
 
 #### `fix/input-validation` - Input Validation ✅
 **Impact**: Potential DOS attacks  
@@ -213,7 +216,7 @@ Prepare for v1.0 release with performance optimization, monitoring, and Mozilla 
 
 #### Security & Compliance ✓
 - [x] CORS properly configured - only extension origins allowed
-- [ ] Content Security Policy added to manifest.json
+- [x] Content Security Policy added to manifest.json
 - [x] Input validation prevents DOS attacks
 - [ ] Permissions checked before each sync operation
 
