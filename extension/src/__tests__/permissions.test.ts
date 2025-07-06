@@ -100,6 +100,18 @@ describe('PermissionsService', () => {
       expect(browser.permissions.request).not.toHaveBeenCalled();
     });
 
+    it('should propagate error from getMissingPermissions', async () => {
+      const error = new Error('Permission API error');
+      browser.permissions.getAll = jest.fn().mockRejectedValue(error);
+
+      const result = await service.requestPermissions();
+
+      expect(result.isErr()).toBe(true);
+      const err = result._unsafeUnwrapErr();
+      expect(err.code).toBe(EXTENSION_PERMISSION_DENIED);
+      expect(browser.permissions.request).not.toHaveBeenCalled();
+    });
+
     it('should request missing permissions', async () => {
       browser.permissions.getAll = jest.fn().mockResolvedValue({
         permissions: ['storage'],
