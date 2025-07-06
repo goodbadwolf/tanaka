@@ -24,7 +24,7 @@
 └──────────────┘      5 s poll       └─────┬────────┘
                                            │  SQLite WAL
                                            ▼
-                                   operations.db
+                                        tanaka.db
 ```
 
 ### 1.1 Browser-side Workflow
@@ -53,15 +53,16 @@ For detailed protocol specification, see [SYNC-PROTOCOL.md](SYNC-PROTOCOL.md).
 
 ## 2. Prerequisites
 
-| Tool    | Version | Purpose               | Required |
-| ------- | ------- | --------------------- | -------- |
-| Rust    | 1.83+   | Server development    | Yes      |
-| Node.js | 24+     | Extension development | Yes      |
-| pnpm    | 10.11+  | Package management    | Yes      |
-| SQLite  | 3.40+   | Database              | Yes      |
-| Firefox | 126+    | Extension testing     | Yes      |
-| Python  | 3.10+   | Build tools/scripts   | Yes      |
-| uv      | 0.5+    | Python pkg management | Yes      |
+| Tool     | Version | Purpose               | Required |
+| -------- | ------- | --------------------- | -------- |
+| Rust     | 1.83+   | Server development    | Yes      |
+| Node.js  | 24+     | Extension development | Yes      |
+| pnpm     | 10.11+  | Package management    | Yes      |
+| SQLite   | 3.40+   | Database              | Yes      |
+| Firefox  | 126+    | Extension testing     | Yes      |
+| Python   | 3.10+   | Build tools/scripts   | Yes      |
+| uv       | 0.5+    | Python pkg management | Yes      |
+| SQLx CLI | Latest  | Database migrations   | Yes      |
 
 ### Automated Setup
 
@@ -75,7 +76,7 @@ python3 scripts/tanaka.py setup-dev
 python3 scripts/tanaka.py setup-dev --dry-run
 
 # Install specific tools only
-python3 scripts/tanaka.py setup-dev --include rust node
+python3 scripts/tanaka.py setup-dev --include rust node sqlx
 python3 scripts/tanaka.py setup-dev --exclude pnpm
 
 # Install CI testing tools
@@ -272,7 +273,54 @@ When developing locally, you may not need production certificates. You can:
 
 ---
 
-## 5. Development Workflow
+## 5. Database Migrations
+
+The server uses SQLx migrations for database schema management. Migrations are automatically run on startup, but you can also manage them manually.
+
+### Creating a New Migration
+
+```bash
+cd server
+
+# Create a reversible migration (recommended)
+sqlx migrate add -r <description>
+
+# Example:
+sqlx migrate add -r add_user_preferences_table
+# Creates:
+#   migrations/<timestamp>_add_user_preferences_table.up.sql
+#   migrations/<timestamp>_add_user_preferences_table.down.sql
+
+# Note: After the first reversible migration, all subsequent migrations
+# will be reversible by default
+```
+
+### Running Migrations
+
+```bash
+# Ensure DATABASE_URL is set (or create .env file)
+export DATABASE_URL=sqlite://tanaka.db
+
+# Create the database if it doesn't exist
+sqlx database create
+
+# Run all pending migrations
+sqlx migrate run
+
+# Revert the last migration
+sqlx migrate revert
+
+# Check migration status
+sqlx migrate info
+```
+
+### Migration Files
+
+Migrations are stored in `server/migrations/` and are applied in order based on their timestamp prefix. Each migration should be idempotent (safe to run multiple times).
+
+---
+
+## 6. Development Workflow
 
 ### Code Organization
 
@@ -325,7 +373,7 @@ cd extension && pnpm test:watch  # Watch mode
 
 ---
 
-## 6. Essential Commands Reference
+## 7. Essential Commands Reference
 
 ### Server Commands (Rust)
 
@@ -389,7 +437,7 @@ pnpm run gen-icons     # Generate icons
 
 ---
 
-## 7. Testing Strategy
+## 8. Testing Strategy
 
 > **Note**: All tests including multi-device sync tests should now pass.
 
@@ -492,7 +540,7 @@ Key features:
 
 ---
 
-## 8. Local Development Configuration
+## 9. Local Development Configuration
 
 ### Server Configuration
 
@@ -500,7 +548,7 @@ Create `server/.env` for development:
 
 ```bash
 RUST_LOG=debug
-DATABASE_URL=sqlite://tabs.db
+DATABASE_URL=sqlite://tanaka.db
 BIND_ADDR=127.0.0.1:8000
 AUTH_TOKEN=dev-token
 ```
@@ -531,7 +579,7 @@ key_path = "key.pem"
 
 ---
 
-## 9. Webapp Mode
+## 10. Webapp Mode
 
 Test the extension without Firefox:
 
@@ -556,7 +604,7 @@ Implementation:
 
 ---
 
-## 10. Python Tooling
+## 11. Python Tooling
 
 This project uses `uv` for Python dependency management:
 
@@ -577,7 +625,7 @@ uv run scripts/tanaka.py generate
 
 ---
 
-## 11. Release Process
+## 12. Release Process
 
 1. **Update versions**:
 
@@ -598,7 +646,7 @@ uv run scripts/tanaka.py generate
 
 ---
 
-## 12. Testing GitHub Actions Locally
+## 13. Testing GitHub Actions Locally
 
 Test CI workflows before pushing:
 
@@ -624,7 +672,7 @@ Troubleshooting:
 
 ---
 
-## 13. Component Library
+## 14. Component Library
 
 The extension includes reusable React components. See the full [Component Documentation](#component-library-1) below.
 
@@ -641,7 +689,7 @@ import { Button, Input, Card } from "../components";
 
 ---
 
-## 14. Contributing Guidelines
+## 15. Contributing Guidelines
 
 ### Before Submitting
 
@@ -673,7 +721,7 @@ import { Button, Input, Card } from "../components";
 
 ---
 
-## 15. Next Steps
+## 16. Next Steps
 
 - **Architecture details**: See [Architecture](ARCHITECTURE.md)
 - **Common issues**: See [Troubleshooting](TROUBLESHOOTING.md)
@@ -683,7 +731,7 @@ import { Button, Input, Card } from "../components";
 
 ---
 
-## 16. Component Library
+## 17. Component Library
 
 The extension includes a collection of reusable UI components built with React/Preact.
 
@@ -797,7 +845,7 @@ import { Card } from "../components";
 
 ---
 
-## 17. Debugging & Troubleshooting
+## 18. Debugging & Troubleshooting
 
 ### Extension Debugging
 
@@ -809,7 +857,7 @@ import { Card } from "../components";
 ### Server Debugging
 
 1. **Enable debug logging**: `RUST_LOG=debug cargo run`
-2. **Database inspection**: `sqlite3 tabs.db .tables`
+2. **Database inspection**: `sqlite3 tanaka.db .tables`
 3. **Monitor performance**: Check request logs and response times
 
 ### Common Issues
@@ -823,7 +871,7 @@ For detailed troubleshooting, see [Troubleshooting Guide](TROUBLESHOOTING.md).
 
 ---
 
-## 18. Security Best Practices
+## 19. Security Best Practices
 
 ### WebExtension Security
 
@@ -848,7 +896,7 @@ For detailed troubleshooting, see [Troubleshooting Guide](TROUBLESHOOTING.md).
 
 ---
 
-## 19. Performance Optimization
+## 20. Performance Optimization
 
 ### Extension Performance
 
@@ -923,7 +971,7 @@ npm test -- sync-manager.test.ts
 
 ---
 
-## 20. Error Handling Architecture
+## 21. Error Handling Architecture
 
 ### Extension Error System
 

@@ -97,43 +97,15 @@ pub async fn auth_middleware(
 pub async fn setup_database(
     config: &config::DatabaseConfig,
 ) -> Result<SqlitePool, error::AppError> {
-    use sqlx::sqlite::SqlitePoolOptions;
+    use sqlx::{migrate::MigrateDatabase, sqlite::SqlitePoolOptions, Sqlite};
     use std::time::Duration;
 
-    const CREATE_TABS_TABLE_SQL: &str = r#"
-        CREATE TABLE IF NOT EXISTS tabs (
-            id TEXT PRIMARY KEY,
-            window_id TEXT NOT NULL,
-            url TEXT NOT NULL,
-            title TEXT NOT NULL,
-            active INTEGER NOT NULL DEFAULT 0,
-            "index" INTEGER NOT NULL DEFAULT 0,
-            updated_at INTEGER NOT NULL
-        )
-    "#;
-
-    const CREATE_CRDT_OPERATIONS_TABLE_SQL: &str = r"
-        CREATE TABLE IF NOT EXISTS crdt_operations (
-            id TEXT PRIMARY KEY,
-            clock INTEGER NOT NULL,
-            device_id TEXT NOT NULL,
-            operation_type TEXT NOT NULL,
-            target_id TEXT NOT NULL,
-            operation_data TEXT NOT NULL,
-            created_at INTEGER NOT NULL
-        )
-    ";
-
-    const CREATE_CRDT_STATE_TABLE_SQL: &str = r"
-        CREATE TABLE IF NOT EXISTS crdt_state (
-            entity_type TEXT NOT NULL,
-            entity_id TEXT NOT NULL,
-            current_data TEXT NOT NULL,
-            last_clock INTEGER NOT NULL,
-            updated_at INTEGER NOT NULL,
-            PRIMARY KEY (entity_type, entity_id)
-        )
-    ";
+    // Create database if it doesn't exist
+    if !Sqlite::database_exists(&config.url).await.unwrap_or(false) {
+        Sqlite::create_database(&config.url)
+            .await
+            .map_err(|e| error::AppError::database(format!("Failed to create database: {e}"), e))?;
+    }
 
     let pool = SqlitePoolOptions::new()
         .max_connections(config.max_connections)
@@ -159,34 +131,14 @@ pub async fn setup_database(
         .await
         .map_err(|e| error::AppError::database("Failed to set synchronous mode", e))?;
 
-    // Create tables
-    sqlx::query(CREATE_TABS_TABLE_SQL)
-        .execute(&pool)
+    // Run migrations
+    sqlx::migrate!()
+        .run(&pool)
         .await
-        .map_err(|e| error::AppError::database("Failed to create tabs table", e))?;
-
-    sqlx::query(CREATE_CRDT_OPERATIONS_TABLE_SQL)
-        .execute(&pool)
-        .await
-        .map_err(|e| error::AppError::database("Failed to create CRDT operations table", e))?;
-
-    sqlx::query(CREATE_CRDT_STATE_TABLE_SQL)
-        .execute(&pool)
-        .await
-        .map_err(|e| error::AppError::database("Failed to create CRDT state table", e))?;
-
-    // Create indexes
-    sqlx::query("CREATE INDEX IF NOT EXISTS idx_crdt_operations_clock ON crdt_operations(clock)")
-        .execute(&pool)
-        .await
-        .map_err(|e| error::AppError::database("Failed to create clock index", e))?;
-
-    sqlx::query(
-        "CREATE INDEX IF NOT EXISTS idx_crdt_operations_target ON crdt_operations(target_id)",
-    )
-    .execute(&pool)
-    .await
-    .map_err(|e| error::AppError::database("Failed to create target index", e))?;
+        .map_err(|e| error::AppError::Database {
+            message: format!("Failed to run migrations: {e}"),
+            source: sqlx::Error::Protocol(e.to_string()),
+        })?;
 
     Ok(pool)
 }

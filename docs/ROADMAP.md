@@ -232,8 +232,8 @@ Prepare for v1.0 release with performance optimization, monitoring, production h
 - [x] Input validation prevents DOS attacks
 - [x] Permissions checked before each sync operation
 
-#### Data Integrity (Deferred to Phase 5)
-- [ ] Database uses SQLx migrations (no runtime CREATE TABLE) - *Deferred to Phase 5*
+#### Data Integrity
+- [x] Database uses SQLx migrations (no runtime CREATE TABLE) ✓
 - [ ] Operations are idempotent - no duplicates on retry - *Deferred to Phase 5*
 - [ ] Operation IDs handle all character combinations - *Deferred to Phase 5*
 - [ ] CRDT state persisted to database tables - *Deferred to Phase 5*
