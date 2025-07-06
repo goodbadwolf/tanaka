@@ -28,10 +28,11 @@ Thumbs.db
 
 # Repomix
 .repomix/
-repomix-output.*
+repomix*
 
 # AI Agents
 AGENTS.md
+GEMINI.md
 .claude/
 
 # Environment variables

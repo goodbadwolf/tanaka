@@ -101,7 +101,7 @@ This repository uses the [pre-commit](https://pre-commit.com/) framework to ensu
 - **Auto-formatting**: Automatically fixes many issues (formatting, import ordering)
 - **Multi-language Support**: TypeScript, Rust, Python, Markdown, and Shell scripts
 - **Commit Message Validation**: Ensures conventional commit format
-- **Custom Checks**: Documentation and roadmap reminders
+- **Custom Checks**: Documentation and TODO reminders
 - **Emergency Bypass**: Skip hooks when needed
 
 ### Usage

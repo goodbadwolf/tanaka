@@ -92,7 +92,7 @@ Tanaka is a Firefox tab synchronization system built with:
 - **Development Setup**: @docs/DEVELOPMENT.md
 - **Git Workflow**: @docs/GIT.md
 - **Getting Started**: @docs/GETTING-STARTED.md
-- **Roadmap**: @docs/ROADMAP.md
+- **TODOs**: @docs/TODOS.md
 - **Troubleshooting**: @docs/TROUBLESHOOTING.md
 
 ## AI Agent Guidelines
@@ -232,6 +232,7 @@ class SyncManager {
 - Keep configuration examples in GETTING-STARTED.md
 - Follow the documentation structure in docs/
 - AGENTS.md is a symlink to CLAUDE.md (changes affect both)
+- GEMINI.md is a symlink to CLAUDE.md (changes affect both)
 
 ### Project Organization
 
@@ -254,13 +255,73 @@ class SyncManager {
 
 See @docs/DEVELOPMENT.md for all development commands.
 
-### Development Roadmap
+### Development TODOs
 
-For the unified development roadmap covering both extension and server improvements, see @docs/ROADMAP.md.
+For all pending development tasks, see @docs/TODOS.md.
+
+#### Key Development Principles
+
+1. **Unified Changes**: Related extension and server changes in same branch
+   - Frontend and backend changes that depend on each other ship together
+   - Reduces integration bugs and deployment complexity
+   - Example: New CRDT operation needs both extension handler and server endpoint
+
+2. **Incremental Progress**: Each branch should be independently mergeable
+   - No "big bang" PRs - break work into digestible pieces
+   - Each PR should leave the system in a working state
+   - Feature flags for gradual rollout of larger changes
+
+3. **Test Everything**: Both sides need comprehensive tests
+   - Unit tests for business logic (aim for 80%+ coverage)
+   - Integration tests for critical paths (sync, auth, persistence)
+   - Manual testing checklist for UI changes
+   - Performance benchmarks for changes affecting 200+ tabs
+
+4. **Performance First**: Every change considers 200+ tab scenarios
+   - Profile memory usage before and after changes
+   - Measure sync latency impact
+   - Consider battery life implications
+   - Use Web Workers for heavy operations
+
+5. **Clean Architecture**: Apply same patterns to both extension and server
+   - Consistent error handling (Result types)
+   - Shared domain models via code generation
+   - Repository pattern for data access
+   - Service layer for business logic
+
+#### Progress Tracking Rules
+
+##### Task Management
+- Use `[ ]` for pending, `[x]` for completed tasks
+- Break large tasks into subtasks when complexity emerges
+- Add discovered work as new tasks rather than expanding existing ones
+- Mark tasks complete only when fully done (not partially)
+
+##### Pull Request Workflow
+- **Always create a PR when a branch is ready for review**
+- Update TODO file as part of each PR that completes tasks
+- Include in PR description:
+  - Which TODO tasks are addressed
+  - Testing performed (automated + manual)
+  - Performance impact analysis
+  - Screenshots for UI changes
+
+##### Quality Gates
+- Run all tests before marking complete (`cargo nextest run` + `pnpm test`)
+- Ensure pre-commit hooks pass (`pre-commit run --all-files`)
+- Verify no memory leaks introduced (test with 200+ tabs)
+- Update relevant documentation (user guides, API docs, comments)
+
+##### Branch Protection
+- NEVER push directly to main branch of the remote `origin`
+- All changes must go through PR review process
+- Squash commits for clean history when merging
+- Delete feature branches after merge
 
 ### Misc
 
 - AGENTS.md is a symlink to this file for compatibility (used by OpenAI's Codex)
+- GEMINI.md is a symlink to this file for compatibility (used by Google's Gemini)
 - The project uses semantic versioning - update versions in `manifest.json` and `Cargo.toml`
 
 ## Quality Checklist

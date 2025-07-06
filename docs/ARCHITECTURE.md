@@ -41,7 +41,7 @@
 
 ## Data Guarantees
 
-> **✅ All guarantees fully functional**: Phase 3 critical fixes are complete.
+> **✅ All guarantees fully functional**: All critical fixes are complete.
 
 - **Eventual Consistency** – Structured CRDT operations ensure replicas converge regardless of network order. ✅
 - **Crash Safety** – Server state persists across restarts. WAL mode plus adaptive sync intervals mean at most 10 seconds of operations are in memory during idle periods. ✅
@@ -89,13 +89,13 @@ Tanaka uses a structured JSON-based CRDT protocol for conflict-free synchronizat
 
 ## Performance Considerations
 
-### Targets (Phase 5 Goals)
+### Performance Targets
 
 - Support 200+ tabs across devices
 - P95 sync latency ≤ 10ms
 - Smooth UI with no blocking operations
 
-> **Current Status**: Performance optimization is planned for [Phase 5](ROADMAP.md#-phase-5-production-ready) after critical fixes and UI redesign are complete.
+> **Current Status**: Performance optimization is tracked in [TODOs](TODOS.md).
 
 ### Optimizations
 
@@ -198,4 +198,4 @@ Main Thread                 Web Worker Thread
 
 - [Development Setup](DEVELOPMENT.md) - Get started with the codebase
 - [Troubleshooting](TROUBLESHOOTING.md) - Debug common issues
-- [Roadmap](ROADMAP.md) - Detailed implementation plans
+- [TODOs](TODOS.md) - Pending development tasks
