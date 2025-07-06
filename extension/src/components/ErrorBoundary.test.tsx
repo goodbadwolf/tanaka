@@ -103,7 +103,7 @@ describe('ErrorBoundary', () => {
   it('should show error details when expanded', () => {
     const testError = new ExtensionError('DATABASE_ERROR', 'DB error', {
       source: 'test',
-      context: { database: 'tabs.db' },
+      context: { database: 'tanaka.db' },
     });
 
     render(
@@ -117,7 +117,7 @@ describe('ErrorBoundary', () => {
 
     expect(screen.getByText('Error Code:')).toBeInTheDocument();
     expect(screen.getByText('DATABASE_ERROR')).toBeInTheDocument();
-    expect(screen.getByText(/"database": "tabs.db"/)).toBeInTheDocument();
+    expect(screen.getByText(/"database": "tanaka.db"/)).toBeInTheDocument();
   });
 
   it('should handle retry functionality', () => {

@@ -146,7 +146,7 @@ fn default_max_concurrent_connections() -> usize {
 }
 
 fn default_database_url() -> String {
-    "sqlite://tabs.db".to_string()
+    "sqlite://tanaka.db".to_string()
 }
 
 fn default_pool_size() -> u32 {
@@ -404,7 +404,7 @@ mod tests {
     fn test_default_config() {
         let config = Config::default();
         assert_eq!(config.server.bind_addr, "127.0.0.1:8443");
-        assert_eq!(config.database.url, "sqlite://tabs.db");
+        assert_eq!(config.database.url, "sqlite://tanaka.db");
         assert_eq!(config.sync.poll_secs, 5);
     }
 

@@ -24,7 +24,7 @@
 └──────────────┘      5 s poll       └─────┬────────┘
                                            │  SQLite WAL
                                            ▼
-                                   operations.db
+                                        tanaka.db
 ```
 
 ### 1.1 Browser-side Workflow
@@ -262,7 +262,7 @@ sqlx migrate add -r add_user_preferences_table
 
 ```bash
 # Ensure DATABASE_URL is set (or create .env file)
-export DATABASE_URL=sqlite://tabs.db
+export DATABASE_URL=sqlite://tanaka.db
 
 # Create the database if it doesn't exist
 sqlx database create
@@ -511,7 +511,7 @@ Create `server/.env` for development:
 
 ```bash
 RUST_LOG=debug
-DATABASE_URL=sqlite://tabs.db
+DATABASE_URL=sqlite://tanaka.db
 BIND_ADDR=127.0.0.1:8000
 AUTH_TOKEN=dev-token
 ```
@@ -820,7 +820,7 @@ import { Card } from "../components";
 ### Server Debugging
 
 1. **Enable debug logging**: `RUST_LOG=debug cargo run`
-2. **Database inspection**: `sqlite3 tabs.db .tables`
+2. **Database inspection**: `sqlite3 tanaka.db .tables`
 3. **Monitor performance**: Check request logs and response times
 
 ### Common Issues

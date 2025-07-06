@@ -11,7 +11,7 @@ request_timeout_secs = 30
 
 [database]
 # Database URL (SQLite example)
-url = "sqlite://tabs.db"
+url = "sqlite://tanaka.db"
 # Maximum database connections
 max_connections = 5
 # Connection timeout in seconds
