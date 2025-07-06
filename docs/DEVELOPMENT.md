@@ -53,13 +53,15 @@ For detailed protocol specification, see [SYNC-PROTOCOL.md](SYNC-PROTOCOL.md).
 
 ## 2. Prerequisites
 
-| Tool    | Version | Purpose               |
-| ------- | ------- | --------------------- |
-| Rust    | 1.83+   | Server development    |
-| Node.js | 24+     | Extension development |
-| pnpm    | 10.11+  | Package management    |
-| SQLite  | 3.40+   | Database              |
-| Firefox | 126+    | Extension testing     |
+| Tool    | Version | Purpose               | Required |
+| ------- | ------- | --------------------- | -------- |
+| Rust    | 1.83+   | Server development    | Yes      |
+| Node.js | 24+     | Extension development | Yes      |
+| pnpm    | 10.11+  | Package management    | Yes      |
+| SQLite  | 3.40+   | Database              | Yes      |
+| Firefox | 126+    | Extension testing     | Yes      |
+| Python  | 3.10+   | Build tools/scripts   | Yes      |
+| uv      | 0.5+    | Python pkg management | Yes      |
 
 ### Automated Setup
 
@@ -124,8 +126,35 @@ npm install -g pnpm
 # SQLx CLI for migrations (required)
 cargo install sqlx-cli --no-default-features --features sqlite
 
-# Python development tools
+# Testing tools for Rust (required for development)
+cargo install cargo-nextest --locked  # Faster test runner
+cargo install cargo-llvm-cov --locked  # Code coverage
+
+# Python package manager (required for scripts)
 pip install uv  # Fast Python package manager
+
+# Pre-commit framework (required for contributions)
+pip install pre-commit
+pre-commit install
+pre-commit install --hook-type commit-msg
+```
+
+</details>
+
+<details>
+<summary>5. Install Optional Tools</summary>
+
+```bash
+# Performance optimization
+cargo install sccache  # Faster Rust compilation cache
+
+# Shell script linting (for script contributions)
+brew install shellcheck  # macOS
+brew install shfmt       # macOS
+
+# CI testing locally
+brew install act         # Run GitHub Actions locally
+brew install podman      # Container runtime for act
 ```
 
 </details>
@@ -170,9 +199,14 @@ cd tanaka
 # Python tools (linting, code generation)
 uv sync --dev
 
-# Pre-commit hooks
+# Pre-commit hooks (if not already installed)
 uv run pre-commit install
 uv run pre-commit install --hook-type commit-msg
+
+# Install required Rust tools (if not already installed)
+cargo install sqlx-cli --no-default-features --features sqlite
+cargo install cargo-nextest --locked
+cargo install cargo-llvm-cov --locked
 ```
 
 ### 3. Build Server
