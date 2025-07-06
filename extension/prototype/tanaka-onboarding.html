@@ -1,0 +1,962 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome to Tanaka</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
+          sans-serif;
+        background: #0a0a0b;
+        color: #e7e7e8;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      }
+
+      /* Background Animation */
+      .background-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        opacity: 0.5;
+      }
+
+      .floating-orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(40px);
+        animation: float 20s infinite ease-in-out;
+      }
+
+      .orb1 {
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, transparent 70%);
+        top: -200px;
+        left: -200px;
+        animation-delay: 0s;
+      }
+
+      .orb2 {
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(139, 92, 246, 0.3) 0%, transparent 70%);
+        bottom: -150px;
+        right: -150px;
+        animation-delay: 5s;
+      }
+
+      .orb3 {
+        width: 250px;
+        height: 250px;
+        background: radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, transparent 70%);
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        animation-delay: 10s;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translate(0, 0) scale(1);
+        }
+        33% {
+          transform: translate(100px, -100px) scale(1.1);
+        }
+        66% {
+          transform: translate(-100px, 100px) scale(0.9);
+        }
+      }
+
+      /* Main Container */
+      .onboarding-container {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 600px;
+        padding: 20px;
+      }
+
+      /* Progress Bar */
+      .progress-bar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 60px;
+        gap: 30px;
+      }
+
+      .progress-step {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+
+      .step-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.3s ease;
+      }
+
+      .step-circle.active {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        border-color: transparent;
+        color: white;
+        transform: scale(1.1);
+      }
+
+      .step-circle.completed {
+        background: #22c55e;
+        border-color: transparent;
+        color: white;
+      }
+
+      .step-line {
+        width: 80px;
+        height: 2px;
+        background: rgba(255, 255, 255, 0.1);
+        margin: 0 -15px;
+        transition: all 0.3s ease;
+      }
+
+      .step-line.active {
+        background: linear-gradient(90deg, #22c55e 0%, #6366f1 100%);
+      }
+
+      /* Content Area */
+      .content-area {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 20px;
+        padding: 60px 50px;
+        min-height: 500px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .content-area::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.5), transparent);
+      }
+
+      /* Step Content */
+      .step-content {
+        display: none;
+        animation: fadeIn 0.5s ease-out;
+      }
+
+      .step-content.active {
+        display: block;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Welcome Step */
+      .welcome-header {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+
+      .app-logo-large {
+        width: 100px;
+        height: 100px;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        border-radius: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 48px;
+        font-weight: bold;
+        margin: 0 auto 30px;
+        box-shadow: 0 10px 40px rgba(99, 102, 241, 0.3);
+        animation: logoFloat 3s ease-in-out infinite;
+      }
+
+      @keyframes logoFloat {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+
+      .welcome-title {
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 12px;
+        background: linear-gradient(135deg, #e7e7e8 0%, #a1a1aa 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .welcome-subtitle {
+        font-size: 18px;
+        color: #6b7280;
+        line-height: 1.5;
+      }
+
+      .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin-top: 40px;
+      }
+
+      .feature-card {
+        text-align: center;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 12px;
+        transition: all 0.3s ease;
+      }
+
+      .feature-card:hover {
+        background: rgba(255, 255, 255, 0.05);
+        transform: translateY(-2px);
+      }
+
+      .feature-icon {
+        font-size: 32px;
+        margin-bottom: 12px;
+      }
+
+      .feature-name {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+
+      .feature-desc {
+        font-size: 12px;
+        color: #6b7280;
+      }
+
+      /* Form Elements */
+      .form-group {
+        margin-bottom: 24px;
+      }
+
+      .form-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 500;
+        color: #a1a1aa;
+        margin-bottom: 8px;
+      }
+
+      .form-input {
+        width: 100%;
+        padding: 14px 18px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        color: #e7e7e8;
+        font-size: 15px;
+        transition: all 0.3s ease;
+      }
+
+      .form-input:focus {
+        outline: none;
+        background: rgba(255, 255, 255, 0.08);
+        border-color: #6366f1;
+      }
+
+      .form-input.error {
+        border-color: #ef4444;
+      }
+
+      .form-hint {
+        font-size: 13px;
+        color: #6b7280;
+        margin-top: 8px;
+      }
+
+      .form-error {
+        font-size: 13px;
+        color: #ef4444;
+        margin-top: 8px;
+        display: none;
+      }
+
+      /* Connection Test */
+      .connection-test {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 12px;
+        padding: 30px;
+        text-align: center;
+        margin: 30px 0;
+      }
+
+      .test-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 20px;
+        position: relative;
+      }
+
+      .test-icon svg {
+        width: 100%;
+        height: 100%;
+      }
+
+      .spinner {
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .test-status {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+
+      .test-message {
+        font-size: 14px;
+        color: #6b7280;
+      }
+
+      /* Window Selection */
+      .window-selection {
+        display: grid;
+        gap: 12px;
+        margin: 30px 0;
+        max-height: 300px;
+        overflow-y: auto;
+        padding-right: 10px;
+      }
+
+      .window-option {
+        display: flex;
+        align-items: center;
+        padding: 16px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 2px solid rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .window-option:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(99, 102, 241, 0.3);
+      }
+
+      .window-option.selected {
+        background: rgba(99, 102, 241, 0.1);
+        border-color: #6366f1;
+      }
+
+      .window-checkbox {
+        width: 20px;
+        height: 20px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 6px;
+        margin-right: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+      }
+
+      .window-option.selected .window-checkbox {
+        background: #6366f1;
+        border-color: #6366f1;
+      }
+
+      .window-option.selected .window-checkbox::after {
+        content: '✓';
+        color: white;
+        font-size: 14px;
+      }
+
+      .window-details {
+        flex: 1;
+      }
+
+      .window-name {
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+
+      .window-info {
+        font-size: 13px;
+        color: #6b7280;
+      }
+
+      /* Navigation Buttons */
+      .nav-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 40px;
+      }
+
+      .nav-button {
+        padding: 14px 28px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .nav-button.secondary {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #a1a1aa;
+      }
+
+      .nav-button.secondary:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: #e7e7e8;
+      }
+
+      .nav-button.primary {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        color: white;
+      }
+
+      .nav-button.primary:hover {
+        background: linear-gradient(135deg, #5558e3 0%, #7c4ce6 100%);
+        transform: translateY(-1px);
+      }
+
+      .nav-button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      /* Success Animation */
+      .success-animation {
+        text-align: center;
+        padding: 60px 0;
+      }
+
+      .checkmark-circle {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 30px;
+      }
+
+      .checkmark-circle svg {
+        width: 100%;
+        height: 100%;
+      }
+
+      .circle-path {
+        stroke-dasharray: 380;
+        stroke-dashoffset: 380;
+        animation: drawCircle 0.8s ease-out forwards;
+      }
+
+      .check-path {
+        stroke-dasharray: 100;
+        stroke-dashoffset: 100;
+        animation: drawCheck 0.5s ease-out 0.8s forwards;
+      }
+
+      @keyframes drawCircle {
+        to {
+          stroke-dashoffset: 0;
+        }
+      }
+
+      @keyframes drawCheck {
+        to {
+          stroke-dashoffset: 0;
+        }
+      }
+
+      /* Skip button */
+      .skip-button {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        padding: 8px 16px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        color: #6b7280;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .skip-button:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: #a1a1aa;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Background Animation -->
+    <div class="background-canvas">
+      <div class="floating-orb orb1"></div>
+      <div class="floating-orb orb2"></div>
+      <div class="floating-orb orb3"></div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="onboarding-container">
+      <!-- Progress Bar -->
+      <div class="progress-bar">
+        <div class="progress-step">
+          <div class="step-circle active" id="step1">1</div>
+        </div>
+        <div class="step-line" id="line1"></div>
+        <div class="progress-step">
+          <div class="step-circle" id="step2">2</div>
+        </div>
+        <div class="step-line" id="line2"></div>
+        <div class="progress-step">
+          <div class="step-circle" id="step3">3</div>
+        </div>
+        <div class="step-line" id="line3"></div>
+        <div class="progress-step">
+          <div class="step-circle" id="step4">4</div>
+        </div>
+      </div>
+
+      <!-- Content Area -->
+      <div class="content-area">
+        <button class="skip-button" onclick="skipOnboarding()">Skip Setup</button>
+
+        <!-- Step 1: Welcome -->
+        <div class="step-content active" id="content1">
+          <div class="welcome-header">
+            <div class="app-logo-large">T</div>
+            <h1 class="welcome-title">Welcome to Tanaka</h1>
+            <p class="welcome-subtitle">Sync your Firefox tabs across all your devices</p>
+          </div>
+
+          <div class="feature-grid">
+            <div class="feature-card">
+              <div class="feature-icon">🔄</div>
+              <div class="feature-name">Real-time Sync</div>
+              <div class="feature-desc">Changes sync in 1-10 seconds</div>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">🔒</div>
+              <div class="feature-name">Private & Secure</div>
+              <div class="feature-desc">Your own server, your data</div>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">⚡</div>
+              <div class="feature-name">Fast & Light</div>
+              <div class="feature-desc">Handles 200+ tabs easily</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Server Configuration -->
+        <div class="step-content" id="content2">
+          <div class="welcome-header">
+            <h2 class="welcome-title">Connect to Your Server</h2>
+            <p class="welcome-subtitle">Enter your Tanaka server details</p>
+          </div>
+
+          <form id="serverForm">
+            <div class="form-group">
+              <label class="form-label">Server URL</label>
+              <input
+                type="url"
+                class="form-input"
+                id="serverUrl"
+                placeholder="https://your-server.com:8443"
+                value=""
+              />
+              <p class="form-hint">The URL where your Tanaka server is running</p>
+              <p class="form-error" id="urlError">Please enter a valid URL</p>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Authentication Token</label>
+              <input
+                type="password"
+                class="form-input"
+                id="authToken"
+                placeholder="Enter your shared token"
+              />
+              <p class="form-hint">Found in your server's tanaka.toml config file</p>
+              <p class="form-error" id="tokenError">Token is required</p>
+            </div>
+          </form>
+        </div>
+
+        <!-- Step 3: Connection Test -->
+        <div class="step-content" id="content3">
+          <div class="welcome-header">
+            <h2 class="welcome-title">Testing Connection</h2>
+            <p class="welcome-subtitle">Verifying your server configuration</p>
+          </div>
+
+          <div class="connection-test">
+            <div class="test-icon" id="testIcon">
+              <!-- Loading spinner -->
+              <svg class="spinner" viewBox="0 0 50 50">
+                <circle
+                  cx="25"
+                  cy="25"
+                  r="20"
+                  fill="none"
+                  stroke="#6366f1"
+                  stroke-width="4"
+                  stroke-dasharray="80, 200"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </div>
+            <div class="test-status" id="testStatus">Connecting to server...</div>
+            <div class="test-message" id="testMessage">This may take a few seconds</div>
+          </div>
+        </div>
+
+        <!-- Step 4: Window Selection -->
+        <div class="step-content" id="content4">
+          <div class="welcome-header">
+            <h2 class="welcome-title">Select Windows to Track</h2>
+            <p class="welcome-subtitle">Choose which browser windows to sync</p>
+          </div>
+
+          <div class="window-selection" id="windowSelection">
+            <div class="window-option" data-window-id="1">
+              <div class="window-checkbox"></div>
+              <div class="window-details">
+                <div class="window-name">Current Window</div>
+                <div class="window-info">12 tabs • Active now</div>
+              </div>
+            </div>
+            <div class="window-option" data-window-id="2">
+              <div class="window-checkbox"></div>
+              <div class="window-details">
+                <div class="window-name">Work Window</div>
+                <div class="window-info">8 tabs • Last active 5m ago</div>
+              </div>
+            </div>
+            <div class="window-option" data-window-id="3">
+              <div class="window-checkbox"></div>
+              <div class="window-details">
+                <div class="window-name">Research Window</div>
+                <div class="window-info">23 tabs • Last active 1h ago</div>
+              </div>
+            </div>
+          </div>
+
+          <p class="form-hint" style="text-align: center; margin-top: 20px">
+            You can always change this later in the extension popup
+          </p>
+        </div>
+
+        <!-- Success Screen -->
+        <div class="step-content" id="contentSuccess" style="display: none">
+          <div class="success-animation">
+            <div class="checkmark-circle">
+              <svg viewBox="0 0 120 120">
+                <circle
+                  class="circle-path"
+                  cx="60"
+                  cy="60"
+                  r="50"
+                  fill="none"
+                  stroke="#22c55e"
+                  stroke-width="6"
+                />
+                <path
+                  class="check-path"
+                  fill="none"
+                  stroke="#22c55e"
+                  stroke-width="6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M40 60 L55 75 L80 45"
+                />
+              </svg>
+            </div>
+            <h2 class="welcome-title">All Set!</h2>
+            <p class="welcome-subtitle">Tanaka is ready to sync your tabs</p>
+          </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="nav-buttons">
+          <button
+            class="nav-button secondary"
+            id="backBtn"
+            onclick="previousStep()"
+            style="display: none"
+          >
+            <span>←</span>
+            <span>Back</span>
+          </button>
+          <button class="nav-button primary" id="nextBtn" onclick="nextStep()">
+            <span>Get Started</span>
+            <span>→</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let currentStep = 1;
+      const totalSteps = 4;
+      let selectedWindows = new Set();
+
+      // Navigation functions
+      function updateProgress() {
+        // Update step circles
+        for (let i = 1; i <= totalSteps; i++) {
+          const circle = document.getElementById(`step${i}`);
+          if (i < currentStep) {
+            circle.classList.add('completed');
+            circle.classList.remove('active');
+            circle.innerHTML = '✓';
+          } else if (i === currentStep) {
+            circle.classList.add('active');
+            circle.classList.remove('completed');
+            circle.innerHTML = i;
+          } else {
+            circle.classList.remove('active', 'completed');
+            circle.innerHTML = i;
+          }
+        }
+
+        // Update step lines
+        for (let i = 1; i < totalSteps; i++) {
+          const line = document.getElementById(`line${i}`);
+          if (i < currentStep) {
+            line.classList.add('active');
+          } else {
+            line.classList.remove('active');
+          }
+        }
+
+        // Update content
+        document.querySelectorAll('.step-content').forEach((content) => {
+          content.classList.remove('active');
+        });
+        document.getElementById(`content${currentStep}`).classList.add('active');
+
+        // Update buttons
+        updateButtons();
+      }
+
+      function updateButtons() {
+        const backBtn = document.getElementById('backBtn');
+        const nextBtn = document.getElementById('nextBtn');
+
+        // Back button
+        if (currentStep === 1) {
+          backBtn.style.display = 'none';
+        } else {
+          backBtn.style.display = 'flex';
+        }
+
+        // Next button
+        if (currentStep === 1) {
+          nextBtn.innerHTML = '<span>Get Started</span><span>→</span>';
+        } else if (currentStep === 2) {
+          nextBtn.innerHTML = '<span>Test Connection</span><span>→</span>';
+        } else if (currentStep === 3) {
+          nextBtn.innerHTML = '<span>Continue</span><span>→</span>';
+          nextBtn.style.display = 'none'; // Hide during test
+        } else if (currentStep === 4) {
+          nextBtn.innerHTML = '<span>Finish Setup</span><span>→</span>';
+          nextBtn.disabled = selectedWindows.size === 0;
+        }
+      }
+
+      function nextStep() {
+        if (currentStep === 2) {
+          // Validate server form
+          if (!validateServerForm()) return;
+
+          currentStep++;
+          updateProgress();
+
+          // Start connection test
+          testConnection();
+        } else if (currentStep === 4) {
+          // Show success screen
+          document.getElementById('content4').style.display = 'none';
+          document.getElementById('contentSuccess').style.display = 'block';
+          document.querySelector('.nav-buttons').style.display = 'none';
+          document.querySelector('.skip-button').style.display = 'none';
+
+          // Redirect after animation
+          setTimeout(() => {
+            console.log('Setup complete! Redirecting to extension...');
+            // In real implementation, close tab or redirect to extension
+          }, 3000);
+        } else if (currentStep < totalSteps) {
+          currentStep++;
+          updateProgress();
+        }
+      }
+
+      function previousStep() {
+        if (currentStep > 1) {
+          currentStep--;
+          updateProgress();
+        }
+      }
+
+      function skipOnboarding() {
+        if (confirm('Are you sure you want to skip setup? You can configure settings later.')) {
+          console.log('Skipping onboarding...');
+          // In real implementation, close tab or redirect
+        }
+      }
+
+      // Form validation
+      function validateServerForm() {
+        const urlInput = document.getElementById('serverUrl');
+        const tokenInput = document.getElementById('authToken');
+        const urlError = document.getElementById('urlError');
+        const tokenError = document.getElementById('tokenError');
+        let valid = true;
+
+        // Reset errors
+        urlInput.classList.remove('error');
+        tokenInput.classList.remove('error');
+        urlError.style.display = 'none';
+        tokenError.style.display = 'none';
+
+        // Validate URL
+        if (!urlInput.value || !isValidUrl(urlInput.value)) {
+          urlInput.classList.add('error');
+          urlError.style.display = 'block';
+          valid = false;
+        }
+
+        // Validate token
+        if (!tokenInput.value) {
+          tokenInput.classList.add('error');
+          tokenError.style.display = 'block';
+          valid = false;
+        }
+
+        return valid;
+      }
+
+      function isValidUrl(string) {
+        try {
+          new URL(string);
+          return true;
+        } catch (_) {
+          return false;
+        }
+      }
+
+      // Connection test simulation
+      function testConnection() {
+        const testIcon = document.getElementById('testIcon');
+        const testStatus = document.getElementById('testStatus');
+        const testMessage = document.getElementById('testMessage');
+        const nextBtn = document.getElementById('nextBtn');
+
+        // Simulate connection test
+        setTimeout(() => {
+          // Success state
+          testIcon.innerHTML = `
+                    <svg viewBox="0 0 80 80">
+                        <circle cx="40" cy="40" r="35" fill="#22c55e" opacity="0.1"/>
+                        <circle cx="40" cy="40" r="30" fill="none" stroke="#22c55e" stroke-width="3"/>
+                        <path fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" d="M25 40 L35 50 L55 30"/>
+                    </svg>
+                `;
+          testStatus.textContent = 'Connection Successful!';
+          testStatus.style.color = '#22c55e';
+          testMessage.textContent = 'Your server is configured correctly';
+
+          // Show next button
+          nextBtn.style.display = 'flex';
+        }, 2000);
+      }
+
+      // Window selection
+      document.querySelectorAll('.window-option').forEach((option) => {
+        option.addEventListener('click', () => {
+          const windowId = option.dataset.windowId;
+
+          if (selectedWindows.has(windowId)) {
+            selectedWindows.delete(windowId);
+            option.classList.remove('selected');
+          } else {
+            selectedWindows.add(windowId);
+            option.classList.add('selected');
+          }
+
+          // Update next button state
+          const nextBtn = document.getElementById('nextBtn');
+          nextBtn.disabled = selectedWindows.size === 0;
+        });
+      });
+
+      // Password field focus behavior
+      const authTokenInput = document.getElementById('authToken');
+      if (authTokenInput) {
+        authTokenInput.addEventListener('focus', () => {
+          authTokenInput.type = 'text';
+        });
+        authTokenInput.addEventListener('blur', () => {
+          authTokenInput.type = 'password';
+        });
+      }
+
+      // Initialize
+      updateProgress();
+    </script>
+  </body>
+</html>

@@ -177,18 +177,18 @@ All work to be completed.
 
 **Add UI Prototypes**
 
-- [ ] Commit all prototype files as-is
-  - [ ] Popup redesign with window tracking animation
-  - [ ] Settings page with tabbed navigation
-  - [ ] Onboarding flow with step-by-step setup
-  - [ ] Error states and troubleshooting page
-  - [ ] Context menu with quick actions
-  - [ ] Empty states for all scenarios
-  - [ ] Notification system (toasts, progress, inline)
-  - [ ] Sync history timeline view
-  - [ ] Advanced tab search interface
-  - [ ] Window details management panel
-  - [ ] Extension icon with gradient design
+- [x] Commit all prototype files as-is
+  - [x] Popup redesign with window tracking animation
+  - [x] Settings page with tabbed navigation
+  - [x] Onboarding flow with step-by-step setup
+  - [x] Error states and troubleshooting page
+  - [x] Context menu with quick actions
+  - [x] Empty states for all scenarios
+  - [x] Notification system (toasts, progress, inline)
+  - [x] Sync history timeline view
+  - [x] Advanced tab search interface
+  - [x] Window details management panel
+  - [x] Extension icon with gradient design
 
 #### Branch: `feat/consolidate-prototypes`
 

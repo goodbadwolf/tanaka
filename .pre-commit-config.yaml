@@ -67,6 +67,22 @@ repos:
         args: [--format, parsable, --strict]
         files: \.(yml|yaml)$
 
+  # HTML/CSS formatting and linting
+  - repo: local
+    hooks:
+      - id: prettier-html-css
+        name: Format HTML/CSS files
+        entry: |
+          bash -c 'for file in "$@"; do
+            if [[ -f "$file" ]]; then
+              cd extension && pnpm prettier --write "../$file"
+            fi
+          done' --
+        language: system
+        types_or: [html, css]
+        pass_filenames: true
+        require_serial: true
+
   # Rust checks
   - repo: local
     hooks:

@@ -1,0 +1,1198 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tanaka - Tab Search</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
+          sans-serif;
+        background: #0a0a0b;
+        color: #e7e7e8;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      /* Header */
+      .header {
+        background: linear-gradient(135deg, #1a1a1c 0%, #0f0f10 100%);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        backdrop-filter: blur(20px);
+      }
+
+      .header-content {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px 30px;
+        display: flex;
+        align-items: center;
+        gap: 30px;
+      }
+
+      .logo-section {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-right: auto;
+      }
+
+      .logo {
+        width: 36px;
+        height: 36px;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 20px;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+      }
+
+      .page-title {
+        font-size: 20px;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+      }
+
+      /* Search Bar */
+      .search-container {
+        flex: 1;
+        max-width: 600px;
+        position: relative;
+      }
+
+      .search-input-wrapper {
+        position: relative;
+      }
+
+      .search-icon {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6b7280;
+        font-size: 18px;
+        pointer-events: none;
+      }
+
+      .search-input {
+        width: 100%;
+        padding: 12px 48px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        color: #e7e7e8;
+        font-size: 15px;
+        transition: all 0.3s ease;
+      }
+
+      .search-input:focus {
+        outline: none;
+        background: rgba(255, 255, 255, 0.08);
+        border-color: #6366f1;
+      }
+
+      .search-input::placeholder {
+        color: #6b7280;
+      }
+
+      .search-clear {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 24px;
+        height: 24px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .search-input:not(:placeholder-shown) ~ .search-clear {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      .search-clear:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      /* Header Actions */
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .action-button {
+        padding: 10px 16px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        color: #e7e7e8;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .action-button:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-1px);
+      }
+
+      .action-button.primary {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        border: none;
+        color: white;
+      }
+
+      .action-button.primary:hover {
+        background: linear-gradient(135deg, #5558e3 0%, #7c4ce6 100%);
+      }
+
+      /* Main Layout */
+      .main-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 30px;
+        display: flex;
+        gap: 30px;
+      }
+
+      /* Sidebar Filters */
+      .sidebar {
+        width: 280px;
+        flex-shrink: 0;
+      }
+
+      .filter-section {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+
+      .filter-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #a1a1aa;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 16px;
+      }
+
+      .filter-option {
+        display: flex;
+        align-items: center;
+        padding: 10px 12px;
+        margin-bottom: 8px;
+        background: transparent;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .filter-option:hover {
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .filter-option.active {
+        background: rgba(99, 102, 241, 0.15);
+        color: #e7e7e8;
+      }
+
+      .filter-checkbox {
+        width: 18px;
+        height: 18px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 4px;
+        margin-right: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+      }
+
+      .filter-option.active .filter-checkbox {
+        background: #6366f1;
+        border-color: #6366f1;
+      }
+
+      .filter-option.active .filter-checkbox::after {
+        content: '✓';
+        color: white;
+        font-size: 12px;
+      }
+
+      .filter-label {
+        flex: 1;
+        font-size: 14px;
+      }
+
+      .filter-count {
+        font-size: 12px;
+        color: #6b7280;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 2px 8px;
+        border-radius: 10px;
+      }
+
+      /* Date Range */
+      .date-range {
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .date-input {
+        flex: 1;
+        padding: 8px 12px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 6px;
+        color: #e7e7e8;
+        font-size: 13px;
+      }
+
+      /* Content Area */
+      .content {
+        flex: 1;
+        min-width: 0;
+      }
+
+      /* Results Header */
+      .results-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+      }
+
+      .results-info {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .results-count {
+        font-size: 16px;
+        font-weight: 600;
+      }
+
+      .results-count span {
+        color: #6366f1;
+      }
+
+      .view-options {
+        display: flex;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.03);
+        padding: 4px;
+        border-radius: 8px;
+      }
+
+      .view-button {
+        padding: 6px 12px;
+        background: transparent;
+        border: none;
+        border-radius: 6px;
+        color: #6b7280;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .view-button:hover {
+        color: #a1a1aa;
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .view-button.active {
+        background: rgba(99, 102, 241, 0.15);
+        color: #e7e7e8;
+      }
+
+      /* Bulk Actions Bar */
+      .bulk-actions {
+        background: rgba(99, 102, 241, 0.1);
+        border: 1px solid rgba(99, 102, 241, 0.3);
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        animation: slideDown 0.3s ease-out;
+      }
+
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .bulk-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .bulk-actions-buttons {
+        display: flex;
+        gap: 8px;
+      }
+
+      .bulk-button {
+        padding: 6px 14px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 6px;
+        color: #e7e7e8;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .bulk-button:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      .bulk-button.danger {
+        background: rgba(239, 68, 68, 0.1);
+        border-color: rgba(239, 68, 68, 0.3);
+        color: #ef4444;
+      }
+
+      .bulk-button.danger:hover {
+        background: rgba(239, 68, 68, 0.2);
+      }
+
+      /* Tab Grid */
+      .tab-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 16px;
+      }
+
+      /* Tab List */
+      .tab-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      /* Tab Card */
+      .tab-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        padding: 16px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .tab-card:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(99, 102, 241, 0.3);
+        transform: translateY(-2px);
+      }
+
+      .tab-card.selected {
+        background: rgba(99, 102, 241, 0.1);
+        border-color: #6366f1;
+      }
+
+      .tab-checkbox {
+        position: absolute;
+        top: 16px;
+        left: 16px;
+        width: 20px;
+        height: 20px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        opacity: 0;
+      }
+
+      .tab-card:hover .tab-checkbox,
+      .tab-card.selected .tab-checkbox {
+        opacity: 1;
+      }
+
+      .tab-card.selected .tab-checkbox {
+        background: #6366f1;
+        border-color: #6366f1;
+      }
+
+      .tab-card.selected .tab-checkbox::after {
+        content: '✓';
+        color: white;
+        font-size: 12px;
+      }
+
+      .tab-content {
+        display: flex;
+        gap: 12px;
+        align-items: start;
+      }
+
+      .tab-favicon {
+        width: 32px;
+        height: 32px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 16px;
+      }
+
+      .tab-info {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .tab-title {
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 4px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .tab-url {
+        font-size: 12px;
+        color: #6b7280;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .tab-meta {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 8px;
+        font-size: 11px;
+        color: #6b7280;
+      }
+
+      .tab-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .tab-actions {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        display: flex;
+        gap: 6px;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+      }
+
+      .tab-card:hover .tab-actions {
+        opacity: 1;
+      }
+
+      .tab-action {
+        width: 28px;
+        height: 28px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 14px;
+      }
+
+      .tab-action:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: scale(1.1);
+      }
+
+      /* List View Specific */
+      .tab-list .tab-card {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+      }
+
+      .tab-list .tab-checkbox {
+        position: static;
+        margin-right: 16px;
+        opacity: 1;
+      }
+
+      .tab-list .tab-content {
+        flex: 1;
+      }
+
+      .tab-list .tab-actions {
+        position: static;
+        opacity: 1;
+      }
+
+      /* Empty State */
+      .empty-state {
+        text-align: center;
+        padding: 80px 40px;
+      }
+
+      .empty-icon {
+        width: 100px;
+        height: 100px;
+        background: rgba(99, 102, 241, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 24px;
+        font-size: 48px;
+      }
+
+      .empty-title {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+
+      .empty-description {
+        font-size: 15px;
+        color: #6b7280;
+      }
+
+      /* Loading State */
+      .loading-spinner {
+        display: flex;
+        justify-content: center;
+        padding: 60px;
+      }
+
+      .spinner {
+        width: 48px;
+        height: 48px;
+        border: 3px solid rgba(99, 102, 241, 0.1);
+        border-top-color: #6366f1;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Stats Bar */
+      .stats-bar {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        padding: 16px;
+        margin-top: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+      }
+
+      .stat-item {
+        text-align: center;
+      }
+
+      .stat-value {
+        font-size: 24px;
+        font-weight: 700;
+        color: #6366f1;
+        margin-bottom: 4px;
+      }
+
+      .stat-label {
+        font-size: 12px;
+        color: #6b7280;
+      }
+
+      /* Pagination */
+      .pagination {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 30px;
+      }
+
+      .page-button {
+        width: 36px;
+        height: 36px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 14px;
+      }
+
+      .page-button:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .page-button.active {
+        background: #6366f1;
+        border-color: #6366f1;
+        color: white;
+      }
+
+      .page-button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <div class="header">
+      <div class="header-content">
+        <div class="logo-section">
+          <div class="logo">T</div>
+          <h1 class="page-title">Tab Search</h1>
+        </div>
+
+        <div class="search-container">
+          <div class="search-input-wrapper">
+            <span class="search-icon">🔍</span>
+            <input
+              type="text"
+              class="search-input"
+              placeholder="Search tabs by title, URL, or content..."
+              autofocus
+            />
+            <button class="search-clear" onclick="clearSearch()">✕</button>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <button class="action-button" onclick="toggleSelectAll()">
+            <span>☐</span>
+            <span>Select All</span>
+          </button>
+          <button class="action-button primary" onclick="syncNow()">
+            <span>🔄</span>
+            <span>Sync Now</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <!-- Device Filter -->
+        <div class="filter-section">
+          <h3 class="filter-title">Devices</h3>
+          <div class="filter-option active" data-device="all">
+            <div class="filter-checkbox"></div>
+            <span class="filter-label">All Devices</span>
+            <span class="filter-count">247</span>
+          </div>
+          <div class="filter-option" data-device="current">
+            <div class="filter-checkbox"></div>
+            <span class="filter-label">This Device</span>
+            <span class="filter-count">89</span>
+          </div>
+          <div class="filter-option" data-device="work-laptop">
+            <div class="filter-checkbox"></div>
+            <span class="filter-label">Work Laptop</span>
+            <span class="filter-count">78</span>
+          </div>
+          <div class="filter-option" data-device="home-desktop">
+            <div class="filter-checkbox"></div>
+            <span class="filter-label">Home Desktop</span>
+            <span class="filter-count">80</span>
+          </div>
+        </div>
+
+        <!-- Window Filter -->
+        <div class="filter-section">
+          <h3 class="filter-title">Windows</h3>
+          <div class="filter-option active">
+            <div class="filter-checkbox"></div>
+            <span class="filter-label">All Windows</span>
+            <span class="filter-count">247</span>
+          </div>
+          <div class="filter-option">
+            <div class="filter-checkbox"></div>
+            <span class="filter-label">Work Project</span>
+            <span class="filter-count">45</span>
+          </div>
+          <div class="filter-option">
+            <div class="filter-checkbox"></div>
+            <span class="filter-label">Research</span>
+            <span class="filter-count">67</span>
+          </div>
+          <div class="filter-option">
+            <div class="filter-checkbox"></div>
+            <span class="filter-label">Personal</span>
+            <span class="filter-count">89</span>
+          </div>
+          <div class="filter-option">
+            <div class="filter-checkbox"></div>
+            <span class="filter-label">Shopping</span>
+            <span class="filter-count">46</span>
+          </div>
+        </div>
+
+        <!-- Date Filter -->
+        <div class="filter-section">
+          <h3 class="filter-title">Date Range</h3>
+          <div class="filter-option active">
+            <div class="filter-checkbox"></div>
+            <span class="filter-label">All Time</span>
+          </div>
+          <div class="filter-option">
+            <div class="filter-checkbox"></div>
+            <span class="filter-label">Today</span>
+          </div>
+          <div class="filter-option">
+            <div class="filter-checkbox"></div>
+            <span class="filter-label">Last 7 Days</span>
+          </div>
+          <div class="filter-option">
+            <div class="filter-checkbox"></div>
+            <span class="filter-label">Last 30 Days</span>
+          </div>
+          <div class="date-range">
+            <input type="date" class="date-input" placeholder="From" />
+            <input type="date" class="date-input" placeholder="To" />
+          </div>
+        </div>
+
+        <!-- Domain Filter -->
+        <div class="filter-section">
+          <h3 class="filter-title">Top Domains</h3>
+          <div class="filter-option">
+            <div class="filter-checkbox"></div>
+            <span class="filter-label">github.com</span>
+            <span class="filter-count">34</span>
+          </div>
+          <div class="filter-option">
+            <div class="filter-checkbox"></div>
+            <span class="filter-label">google.com</span>
+            <span class="filter-count">28</span>
+          </div>
+          <div class="filter-option">
+            <div class="filter-checkbox"></div>
+            <span class="filter-label">stackoverflow.com</span>
+            <span class="filter-count">23</span>
+          </div>
+          <div class="filter-option">
+            <div class="filter-checkbox"></div>
+            <span class="filter-label">reddit.com</span>
+            <span class="filter-count">19</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Content -->
+      <main class="content">
+        <!-- Results Header -->
+        <div class="results-header">
+          <div class="results-info">
+            <div class="results-count">Found <span>247</span> tabs</div>
+          </div>
+          <div class="view-options">
+            <button class="view-button active" onclick="setView('grid')">
+              <span>⊞</span>
+              <span>Grid</span>
+            </button>
+            <button class="view-button" onclick="setView('list')">
+              <span>☰</span>
+              <span>List</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Bulk Actions (shown when items selected) -->
+        <div class="bulk-actions" id="bulkActions" style="display: none">
+          <div class="bulk-info">
+            <span>3 tabs selected</span>
+          </div>
+          <div class="bulk-actions-buttons">
+            <button class="bulk-button" onclick="bulkBookmark()">
+              <span>⭐</span>
+              <span>Bookmark</span>
+            </button>
+            <button class="bulk-button" onclick="bulkMove()">
+              <span>→</span>
+              <span>Move to Window</span>
+            </button>
+            <button class="bulk-button danger" onclick="bulkClose()">
+              <span>✕</span>
+              <span>Close Tabs</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Tab Grid -->
+        <div class="tab-grid" id="tabContainer">
+          <!-- Tab Cards -->
+          <div class="tab-card" onclick="toggleSelect(this)">
+            <div class="tab-checkbox"></div>
+            <div class="tab-content">
+              <div class="tab-favicon">🔍</div>
+              <div class="tab-info">
+                <div class="tab-title">Getting Started with Tanaka - Documentation</div>
+                <div class="tab-url">github.com/goodbadwolf/tanaka/docs</div>
+                <div class="tab-meta">
+                  <span class="tab-meta-item">💻 Work Laptop</span>
+                  <span class="tab-meta-item">🪟 Project Window</span>
+                  <span class="tab-meta-item">🕒 2 min ago</span>
+                </div>
+              </div>
+            </div>
+            <div class="tab-actions">
+              <button class="tab-action" title="Open tab">↗</button>
+              <button class="tab-action" title="Bookmark">⭐</button>
+              <button class="tab-action" title="Close">✕</button>
+            </div>
+          </div>
+
+          <div class="tab-card" onclick="toggleSelect(this)">
+            <div class="tab-checkbox"></div>
+            <div class="tab-content">
+              <div class="tab-favicon">📊</div>
+              <div class="tab-info">
+                <div class="tab-title">Dashboard - Analytics Overview Q1 2024</div>
+                <div class="tab-url">app.analytics.com/dashboard</div>
+                <div class="tab-meta">
+                  <span class="tab-meta-item">💻 Work Laptop</span>
+                  <span class="tab-meta-item">🪟 Work Window</span>
+                  <span class="tab-meta-item">🕒 15 min ago</span>
+                </div>
+              </div>
+            </div>
+            <div class="tab-actions">
+              <button class="tab-action" title="Open tab">↗</button>
+              <button class="tab-action" title="Bookmark">⭐</button>
+              <button class="tab-action" title="Close">✕</button>
+            </div>
+          </div>
+
+          <div class="tab-card" onclick="toggleSelect(this)">
+            <div class="tab-checkbox"></div>
+            <div class="tab-content">
+              <div class="tab-favicon">🛒</div>
+              <div class="tab-info">
+                <div class="tab-title">Shopping Cart - Electronics Store</div>
+                <div class="tab-url">store.example.com/cart</div>
+                <div class="tab-meta">
+                  <span class="tab-meta-item">🏠 Home Desktop</span>
+                  <span class="tab-meta-item">🪟 Shopping Window</span>
+                  <span class="tab-meta-item">🕒 1 hour ago</span>
+                </div>
+              </div>
+            </div>
+            <div class="tab-actions">
+              <button class="tab-action" title="Open tab">↗</button>
+              <button class="tab-action" title="Bookmark">⭐</button>
+              <button class="tab-action" title="Close">✕</button>
+            </div>
+          </div>
+
+          <div class="tab-card" onclick="toggleSelect(this)">
+            <div class="tab-checkbox"></div>
+            <div class="tab-content">
+              <div class="tab-favicon">📺</div>
+              <div class="tab-info">
+                <div class="tab-title">Web Development Tutorial - Advanced React Patterns</div>
+                <div class="tab-url">youtube.com/watch?v=abc123</div>
+                <div class="tab-meta">
+                  <span class="tab-meta-item">🏠 Home Desktop</span>
+                  <span class="tab-meta-item">🪟 Learning Window</span>
+                  <span class="tab-meta-item">🕒 2 hours ago</span>
+                </div>
+              </div>
+            </div>
+            <div class="tab-actions">
+              <button class="tab-action" title="Open tab">↗</button>
+              <button class="tab-action" title="Bookmark">⭐</button>
+              <button class="tab-action" title="Close">✕</button>
+            </div>
+          </div>
+
+          <div class="tab-card" onclick="toggleSelect(this)">
+            <div class="tab-checkbox"></div>
+            <div class="tab-content">
+              <div class="tab-favicon">💬</div>
+              <div class="tab-info">
+                <div class="tab-title">Team Chat - Project Discussion #general</div>
+                <div class="tab-url">slack.com/messages/general</div>
+                <div class="tab-meta">
+                  <span class="tab-meta-item">💻 Work Laptop</span>
+                  <span class="tab-meta-item">🪟 Communication</span>
+                  <span class="tab-meta-item">🕒 3 hours ago</span>
+                </div>
+              </div>
+            </div>
+            <div class="tab-actions">
+              <button class="tab-action" title="Open tab">↗</button>
+              <button class="tab-action" title="Bookmark">⭐</button>
+              <button class="tab-action" title="Close">✕</button>
+            </div>
+          </div>
+
+          <div class="tab-card" onclick="toggleSelect(this)">
+            <div class="tab-checkbox"></div>
+            <div class="tab-content">
+              <div class="tab-favicon">📰</div>
+              <div class="tab-info">
+                <div class="tab-title">Breaking: Major Tech Industry News Today</div>
+                <div class="tab-url">techcrunch.com/2024/03/major-announcement</div>
+                <div class="tab-meta">
+                  <span class="tab-meta-item">📱 This Device</span>
+                  <span class="tab-meta-item">🪟 News Window</span>
+                  <span class="tab-meta-item">🕒 5 hours ago</span>
+                </div>
+              </div>
+            </div>
+            <div class="tab-actions">
+              <button class="tab-action" title="Open tab">↗</button>
+              <button class="tab-action" title="Bookmark">⭐</button>
+              <button class="tab-action" title="Close">✕</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+          <div class="stat-item">
+            <div class="stat-value">247</div>
+            <div class="stat-label">Total Tabs</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">3</div>
+            <div class="stat-label">Devices</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">12</div>
+            <div class="stat-label">Windows</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">38</div>
+            <div class="stat-label">Domains</div>
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination">
+          <button class="page-button" disabled>←</button>
+          <button class="page-button active">1</button>
+          <button class="page-button">2</button>
+          <button class="page-button">3</button>
+          <button class="page-button">4</button>
+          <button class="page-button">5</button>
+          <span style="color: #6b7280">...</span>
+          <button class="page-button">25</button>
+          <button class="page-button">→</button>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      // Search functionality
+      const searchInput = document.querySelector('.search-input');
+      let searchTimeout;
+
+      searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+          performSearch(e.target.value);
+        }, 300);
+      });
+
+      function clearSearch() {
+        searchInput.value = '';
+        searchInput.focus();
+        performSearch('');
+      }
+
+      function performSearch(query) {
+        console.log('Searching for:', query);
+        // Implement search logic
+      }
+
+      // Filter functionality
+      document.querySelectorAll('.filter-option').forEach((option) => {
+        option.addEventListener('click', () => {
+          const section = option.closest('.filter-section');
+          const isMultiSelect =
+            section.querySelector('.filter-title').textContent === 'Top Domains';
+
+          if (!isMultiSelect) {
+            // Single select - deselect others in section
+            section.querySelectorAll('.filter-option').forEach((opt) => {
+              opt.classList.remove('active');
+            });
+          }
+
+          option.classList.toggle('active');
+          applyFilters();
+        });
+      });
+
+      function applyFilters() {
+        console.log('Applying filters...');
+        // Implement filter logic
+      }
+
+      // View toggle
+      function setView(viewType) {
+        const container = document.getElementById('tabContainer');
+        const buttons = document.querySelectorAll('.view-button');
+
+        buttons.forEach((btn) => btn.classList.remove('active'));
+        event.target.closest('.view-button').classList.add('active');
+
+        if (viewType === 'list') {
+          container.classList.remove('tab-grid');
+          container.classList.add('tab-list');
+        } else {
+          container.classList.remove('tab-list');
+          container.classList.add('tab-grid');
+        }
+      }
+
+      // Selection functionality
+      let selectedTabs = new Set();
+
+      function toggleSelect(card, event) {
+        if (event && event.target.closest('.tab-actions')) return;
+
+        card.classList.toggle('selected');
+        const tabId = card.dataset.tabId || Math.random().toString();
+
+        if (card.classList.contains('selected')) {
+          selectedTabs.add(tabId);
+        } else {
+          selectedTabs.delete(tabId);
+        }
+
+        updateBulkActions();
+      }
+
+      function toggleSelectAll() {
+        const cards = document.querySelectorAll('.tab-card');
+        const allSelected = selectedTabs.size === cards.length;
+
+        cards.forEach((card) => {
+          if (allSelected) {
+            card.classList.remove('selected');
+            selectedTabs.clear();
+          } else {
+            card.classList.add('selected');
+            selectedTabs.add(card.dataset.tabId || Math.random().toString());
+          }
+        });
+
+        updateBulkActions();
+      }
+
+      function updateBulkActions() {
+        const bulkActions = document.getElementById('bulkActions');
+        const count = selectedTabs.size;
+
+        if (count > 0) {
+          bulkActions.style.display = 'flex';
+          bulkActions.querySelector('.bulk-info span').textContent =
+            `${count} tab${count > 1 ? 's' : ''} selected`;
+        } else {
+          bulkActions.style.display = 'none';
+        }
+      }
+
+      // Bulk actions
+      function bulkBookmark() {
+        console.log('Bookmarking', selectedTabs.size, 'tabs');
+      }
+
+      function bulkMove() {
+        console.log('Moving', selectedTabs.size, 'tabs');
+      }
+
+      function bulkClose() {
+        if (confirm(`Close ${selectedTabs.size} tabs?`)) {
+          console.log('Closing', selectedTabs.size, 'tabs');
+        }
+      }
+
+      // Individual tab actions
+      document.querySelectorAll('.tab-action').forEach((button) => {
+        button.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const action = button.getAttribute('title');
+          console.log('Tab action:', action);
+        });
+      });
+
+      // Sync functionality
+      function syncNow() {
+        const button = event.target.closest('.action-button');
+        button.innerHTML = '<span>⏳</span><span>Syncing...</span>';
+        button.disabled = true;
+
+        setTimeout(() => {
+          button.innerHTML = '<span>🔄</span><span>Sync Now</span>';
+          button.disabled = false;
+        }, 2000);
+      }
+    </script>
+  </body>
+</html>
