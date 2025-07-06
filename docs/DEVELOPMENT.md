@@ -1,7 +1,7 @@
 # Tanaka Development Guide
 
-**Purpose**: Complete developer setup and workflow documentation  
-**Audience**: Contributors and developers working on Tanaka  
+**Purpose**: Complete developer setup and workflow documentation
+**Audience**: Contributors and developers working on Tanaka
 **Prerequisites**: Basic knowledge of Rust, TypeScript, and browser extensions
 
 ## Navigation
@@ -135,16 +135,19 @@ pip install uv  # Fast Python package manager
 This project uses `uv` for Python dependency management:
 
 **Use `uv` when:**
+
 - Installing project dependencies: `uv sync --dev`
 - Running project scripts: `uv run scripts/tanaka.py lint`
 - Working within this project's environment
 
 **Use `pip` when:**
+
 - Installing global tools: `pip install uv`
 - Installing tools outside this project
 - Systems where uv isn't available
 
 **Key differences:**
+
 - `uv` is 10-100x faster than pip
 - `uv` automatically manages virtual environments
 - `uv` has better dependency resolution
@@ -361,18 +364,21 @@ pnpm run gen-icons     # Generate icons
 #### Rust Testing Tools
 
 - **cargo-nextest**: 2-3× faster test execution with better output
+
   ```bash
   cargo install cargo-nextest --locked
   cargo nextest run
   ```
 
 - **cargo-llvm-cov**: Superior coverage reporting with source-based coverage
+
   ```bash
   cargo install cargo-llvm-cov
   cargo llvm-cov --html  # HTML report at target/llvm-cov/html/
   ```
 
 - **pretty_assertions**: Colorful diffs for better debugging
+
   ```rust
   use pretty_assertions::{assert_eq, assert_ne};
   ```
@@ -402,18 +408,22 @@ pnpm run gen-icons     # Generate icons
 The `server/tests/sync_integration.rs` file contains comprehensive tests for the CRDT sync protocol:
 
 1. **Basic Operations**
+
    - Empty sync requests verification
    - Single tab creation testing
 
 2. **Authentication**
+
    - Invalid token rejection
    - Bearer token validation
 
 3. **Multi-Device Sync**
+
    - Cross-device operation synchronization
    - Incremental sync with `since_clock`
 
 4. **Complex Operations**
+
    - Multiple CRDT operation types in single request
    - Operation ordering and clock management
 
@@ -433,6 +443,7 @@ cargo test --test sync_integration -- --nocapture
 ```
 
 Key features:
+
 - In-memory SQLite database for test isolation
 - Per-test app instances with auth middleware
 - Proper Lamport clock incrementing
@@ -736,11 +747,7 @@ Container component with optional header and footer sections.
 ```tsx
 import { Card } from "../components";
 
-<Card
-  variant="elevated"
-  header="Settings"
-  footer={<Button>Save Changes</Button>}
->
+<Card variant="elevated" header="Settings" footer={<Button>Save Changes</Button>}>
   <p>Card content goes here</p>
 </Card>;
 ```
@@ -837,6 +844,7 @@ The extension includes an optimized sync manager that dynamically adjusts sync b
 #### Key Features
 
 1. **Adaptive Sync Intervals**
+
    - Active: 1s (during user activity)
    - Idle: 10s (no activity for 30s)
    - Error backoff: Exponential (5s, 10s, 20s... up to 60s)
@@ -850,6 +858,7 @@ The extension includes an optimized sync manager that dynamically adjusts sync b
    | LOW | change_url | 1000ms |
 
 3. **Operation Deduplication**
+
    - Multiple URL changes → Keep only latest
    - Redundant updates → Single operation
    - Reduces server load by ~70%
@@ -862,10 +871,10 @@ The extension includes an optimized sync manager that dynamically adjusts sync b
 #### Usage
 
 ```typescript
-import { SyncManager } from './sync';
+import { SyncManager } from "./sync";
 
 const syncManager = new SyncManager({
-  syncIntervalMs: 5000,  // Base interval (adapts 1-10s)
+  syncIntervalMs: 5000, // Base interval (adapts 1-10s)
   api: tanakaAPI,
   windowTracker: tracker,
   browser: browserAdapter,
