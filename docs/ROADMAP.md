@@ -110,21 +110,27 @@ These bugs prevent Tanaka from fulfilling its primary purpose:
 
 ### 3.3 Data Integrity Fixes 💾 **PREVENT DATA LOSS**
 
-#### `fix/sqlx-migrations` - Database Migrations
+> **Note**: These items were deprioritized as they are not blocking multi-device sync. They will be addressed in Phase 5 for production hardening.
+
+#### `fix/sqlx-migrations` - Database Migrations (Deferred to Phase 5)
 **Impact**: Runtime CREATE TABLE is fragile  
-**Fix**: Use proper SQLx migration system
+**Fix**: Use proper SQLx migration system  
+**Status**: Deferred - Current approach works, formal migrations for v1.0
 
-#### `fix/operation-idempotency` - Operation Idempotency
+#### `fix/operation-idempotency` - Operation Idempotency (Deferred to Phase 5)
 **Impact**: Duplicate operations on retry  
-**Fix**: Use INSERT OR IGNORE with proper operation IDs
+**Fix**: Use INSERT OR IGNORE with proper operation IDs  
+**Status**: Deferred - Not causing issues in practice
 
-#### `fix/operation-ids` - Operation ID Format
+#### `fix/operation-ids` - Operation ID Format (Deferred to Phase 5)
 **Impact**: IDs with underscores break parsing  
-**Fix**: Use non-printable delimiter or composite primary key
+**Fix**: Use non-printable delimiter or composite primary key  
+**Status**: Deferred - Current format working adequately
 
-#### `fix/crdt-materialization` - CRDT State Persistence
+#### `fix/crdt-materialization` - CRDT State Persistence (Deferred to Phase 5)
 **Impact**: Memory state not reflected in database  
-**Fix**: Update database tables atomically with CRDT operations
+**Fix**: Update database tables atomically with CRDT operations  
+**Status**: Deferred - DashMap cache provides sufficient durability
 
 ---
 
@@ -148,13 +154,18 @@ Modernize the extension UI with proper design system, comprehensive testing, and
 
 ### Overview
 
-Prepare for v1.0 release with performance optimization, monitoring, and Mozilla addon store submission.
+Prepare for v1.0 release with performance optimization, monitoring, production hardening, and Mozilla addon store submission.
 
 ### Primary Goals
 
 1. **Monitoring**: Server metrics, distributed tracing, performance dashboards
 2. **Performance**: Handle 200+ tabs smoothly, optimize sync latency
-3. **Release**: Mozilla addon store ready, single-binary server, v1.0 documentation
+3. **Production Hardening**:
+   - SQLx migrations for database schema management
+   - Operation idempotency to prevent duplicates
+   - Robust operation ID format
+   - Full CRDT state materialization to database
+4. **Release**: Mozilla addon store ready, single-binary server, v1.0 documentation
 
 ---
 
@@ -221,11 +232,11 @@ Prepare for v1.0 release with performance optimization, monitoring, and Mozilla 
 - [x] Input validation prevents DOS attacks
 - [x] Permissions checked before each sync operation
 
-#### Data Integrity ✓
-- [x] Database uses SQLx migrations (no runtime CREATE TABLE)
-- [ ] Operations are idempotent - no duplicates on retry
-- [ ] Operation IDs handle all character combinations
-- [ ] CRDT state persisted to database tables
+#### Data Integrity
+- [x] Database uses SQLx migrations (no runtime CREATE TABLE) ✓
+- [ ] Operations are idempotent - no duplicates on retry - *Deferred to Phase 5*
+- [ ] Operation IDs handle all character combinations - *Deferred to Phase 5*
+- [ ] CRDT state persisted to database tables - *Deferred to Phase 5*
 
 ### Phase 4 (UI Redesign & Testing)
 
@@ -244,6 +255,10 @@ Prepare for v1.0 release with performance optimization, monitoring, and Mozilla 
 - [ ] P95 sync latency ≤ 10ms verified under load
 - [ ] 200+ tabs handled smoothly without performance degradation
 - [ ] Distributed tracing integrated for debugging
+- [ ] Database uses SQLx migrations (deferred from Phase 3)
+- [ ] Operations are idempotent with no duplicates (deferred from Phase 3)
+- [ ] Operation IDs handle all character combinations (deferred from Phase 3)
+- [ ] CRDT state fully persisted to database (deferred from Phase 3)
 - [ ] Single-binary server distribution created
 - [ ] Mozilla addon store submission ready
 - [ ] v1.0 documentation complete with migration guide

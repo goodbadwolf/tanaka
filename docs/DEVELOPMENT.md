@@ -1,7 +1,7 @@
 # Tanaka Development Guide
 
-**Purpose**: Complete developer setup and workflow documentation  
-**Audience**: Contributors and developers working on Tanaka  
+**Purpose**: Complete developer setup and workflow documentation
+**Audience**: Contributors and developers working on Tanaka
 **Prerequisites**: Basic knowledge of Rust, TypeScript, and browser extensions
 
 ## Navigation
@@ -53,14 +53,16 @@ For detailed protocol specification, see [SYNC-PROTOCOL.md](SYNC-PROTOCOL.md).
 
 ## 2. Prerequisites
 
-| Tool     | Version | Purpose               |
-| -------- | ------- | --------------------- |
-| Rust     | 1.83+   | Server development    |
-| Node.js  | 24+     | Extension development |
-| pnpm     | 10.11+  | Package management    |
-| SQLite   | 3.40+   | Database              |
-| Firefox  | 126+    | Extension testing     |
-| SQLx CLI | Latest  | Database migrations   |
+| Tool     | Version | Purpose               | Required |
+| -------- | ------- | --------------------- | -------- |
+| Rust     | 1.83+   | Server development    | Yes      |
+| Node.js  | 24+     | Extension development | Yes      |
+| pnpm     | 10.11+  | Package management    | Yes      |
+| SQLite   | 3.40+   | Database              | Yes      |
+| Firefox  | 126+    | Extension testing     | Yes      |
+| Python   | 3.10+   | Build tools/scripts   | Yes      |
+| uv       | 0.5+    | Python pkg management | Yes      |
+| SQLx CLI | Latest  | Database migrations   | Yes      |
 
 ### Automated Setup
 
@@ -119,11 +121,41 @@ npm install -g pnpm
 </details>
 
 <details>
-<summary>4. Install SQLx CLI</summary>
+<summary>4. Install Required Tools</summary>
 
 ```bash
-# Required for database migrations
+# SQLx CLI for migrations (required)
 cargo install sqlx-cli --no-default-features --features sqlite
+
+# Testing tools for Rust (required for development)
+cargo install cargo-nextest --locked  # Faster test runner
+cargo install cargo-llvm-cov --locked  # Code coverage
+
+# Python package manager (required for scripts)
+pip install uv  # Fast Python package manager
+
+# Pre-commit framework (required for contributions)
+pip install pre-commit
+pre-commit install
+pre-commit install --hook-type commit-msg
+```
+
+</details>
+
+<details>
+<summary>5. Install Optional Tools</summary>
+
+```bash
+# Performance optimization
+cargo install sccache  # Faster Rust compilation cache
+
+# Shell script linting (for script contributions)
+brew install shellcheck  # macOS
+brew install shfmt       # macOS
+
+# CI testing locally
+brew install act         # Run GitHub Actions locally
+brew install podman      # Container runtime for act
 ```
 
 </details>
@@ -168,9 +200,14 @@ cd tanaka
 # Python tools (linting, code generation)
 uv sync --dev
 
-# Pre-commit hooks
+# Pre-commit hooks (if not already installed)
 uv run pre-commit install
 uv run pre-commit install --hook-type commit-msg
+
+# Install required Rust tools (if not already installed)
+cargo install sqlx-cli --no-default-features --features sqlite
+cargo install cargo-nextest --locked
+cargo install cargo-llvm-cov --locked
 ```
 
 ### 3. Build Server
