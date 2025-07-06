@@ -1,0 +1,897 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tanaka Popup Redesign</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
+          sans-serif;
+        width: 380px;
+        min-height: 500px;
+        background: #0a0a0b;
+        color: #e7e7e8;
+        overflow: hidden;
+        position: relative;
+      }
+
+      /* Header */
+      .header {
+        background: linear-gradient(135deg, #1a1a1c 0%, #0f0f10 100%);
+        padding: 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+        animation: pulse 4s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 0.5;
+        }
+        50% {
+          transform: scale(1.1);
+          opacity: 0.8;
+        }
+      }
+
+      .header-content {
+        position: relative;
+        z-index: 1;
+      }
+
+      .app-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+
+      .logo {
+        width: 32px;
+        height: 32px;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 18px;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+      }
+
+      h1 {
+        font-size: 20px;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+      }
+
+      /* Sync Status */
+      .sync-status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: #a1a1aa;
+      }
+
+      .status-indicator {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #22c55e;
+        box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+        animation: statusPulse 2s ease-in-out infinite;
+      }
+
+      @keyframes statusPulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.2);
+        }
+      }
+
+      .status-indicator.syncing {
+        background: #f59e0b;
+        box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Quick Actions */
+      .quick-actions {
+        padding: 16px 20px;
+        background: #0f0f10;
+        display: flex;
+        gap: 8px;
+      }
+
+      .action-button {
+        flex: 1;
+        padding: 12px;
+        background: rgba(99, 102, 241, 0.1);
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        border-radius: 8px;
+        color: #e7e7e8;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        text-decoration: none;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .action-button:hover {
+        background: rgba(99, 102, 241, 0.2);
+        border-color: rgba(99, 102, 241, 0.4);
+        transform: translateY(-1px);
+      }
+
+      .action-button.primary {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        border: none;
+        color: white;
+      }
+
+      .action-button.primary:hover {
+        background: linear-gradient(135deg, #5558e3 0%, #7c4ce6 100%);
+      }
+
+      /* Windows Section */
+      .windows-section {
+        padding: 20px;
+        flex: 1;
+        overflow-y: auto;
+        position: relative;
+      }
+
+      .section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+      }
+
+      .section-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #a1a1aa;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .device-count {
+        font-size: 12px;
+        color: #6b7280;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 4px 8px;
+        border-radius: 12px;
+      }
+
+      /* Window Cards */
+      .window-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 12px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .window-card:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(99, 102, 241, 0.3);
+        transform: translateX(2px);
+      }
+
+      .window-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+      }
+
+      .window-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex: 1;
+      }
+
+      .window-icon {
+        width: 36px;
+        height: 36px;
+        background: rgba(99, 102, 241, 0.1);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+      }
+
+      .window-details {
+        flex: 1;
+      }
+
+      .window-details h3 {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 2px;
+        display: inline-block;
+        cursor: text;
+        padding: 2px 4px;
+        margin-left: -4px;
+        border-radius: 4px;
+        position: relative;
+      }
+
+      .window-details h3:hover {
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .window-details h3:hover::after {
+        content: '✏️';
+        position: absolute;
+        right: -20px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 12px;
+        opacity: 0.5;
+      }
+
+      .window-details h3.editing {
+        background: rgba(255, 255, 255, 0.1);
+        outline: 2px solid #6366f1;
+        outline-offset: -2px;
+      }
+
+      .window-name-input {
+        font-size: 14px;
+        font-weight: 600;
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid #6366f1;
+        border-radius: 4px;
+        color: #e7e7e8;
+        padding: 2px 8px;
+        outline: none;
+        font-family: inherit;
+        width: 100%;
+        margin-bottom: 2px;
+      }
+
+      .window-meta {
+        font-size: 12px;
+        color: #6b7280;
+      }
+
+      .tracking-toggle {
+        width: 44px;
+        height: 24px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        position: relative;
+        cursor: pointer;
+        transition: background 0.3s ease;
+        flex-shrink: 0;
+      }
+
+      .tracking-toggle.active {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      }
+
+      .tracking-toggle::after {
+        content: '';
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        background: white;
+        border-radius: 50%;
+        top: 2px;
+        left: 2px;
+        transition: transform 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .tracking-toggle.active::after {
+        transform: translateX(20px);
+      }
+
+      .tab-preview {
+        display: flex;
+        gap: 4px;
+        margin-top: 8px;
+      }
+
+      .tab-icon {
+        width: 20px;
+        height: 20px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 4px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .tab-count {
+        width: 20px;
+        height: 20px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        font-weight: 600;
+        color: #a1a1aa;
+      }
+
+      /* Settings Icon */
+      .settings-button {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 32px;
+        height: 32px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        z-index: 2;
+      }
+
+      .settings-button:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2);
+        transform: rotate(45deg);
+      }
+
+      /* Track Window Animation Overlay */
+      .track-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(10, 10, 11, 0.95);
+        backdrop-filter: blur(10px);
+        display: none;
+        z-index: 100;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+      }
+
+      .track-overlay.active {
+        display: flex;
+      }
+
+      /* Scanner Animation */
+      .scanner-container {
+        position: relative;
+        width: 200px;
+        height: 200px;
+        margin-bottom: 30px;
+      }
+
+      .scanner-window {
+        width: 100%;
+        height: 100%;
+        background: rgba(99, 102, 241, 0.1);
+        border: 2px solid #6366f1;
+        border-radius: 16px;
+        position: relative;
+        overflow: hidden;
+        animation: scannerGlow 2s ease-in-out infinite;
+      }
+
+      @keyframes scannerGlow {
+        0%,
+        100% {
+          box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+        }
+        50% {
+          box-shadow: 0 0 40px rgba(99, 102, 241, 0.8);
+        }
+      }
+
+      .scanner-line {
+        position: absolute;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, #6366f1, transparent);
+        animation: scan 2s linear infinite;
+      }
+
+      @keyframes scan {
+        0% {
+          top: -3px;
+        }
+        100% {
+          top: 100%;
+        }
+      }
+
+      /* Floating Tabs Animation */
+      .floating-tab {
+        position: absolute;
+        width: 40px;
+        height: 30px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        animation: floatIn 0.8s ease-out forwards;
+        opacity: 0;
+      }
+
+      @keyframes floatIn {
+        0% {
+          transform: translate(var(--start-x), var(--start-y)) scale(0.5);
+          opacity: 0;
+        }
+        50% {
+          opacity: 1;
+        }
+        100% {
+          transform: translate(0, 0) scale(1);
+          opacity: 1;
+        }
+      }
+
+      .scanner-status {
+        text-align: center;
+        animation: fadeIn 0.5s ease-out;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .scanner-status h3 {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+
+      .scanner-status p {
+        font-size: 14px;
+        color: #a1a1aa;
+      }
+
+      .tab-counter {
+        font-size: 24px;
+        font-weight: 700;
+        color: #6366f1;
+        margin-top: 10px;
+      }
+
+      /* Success State */
+      .success-checkmark {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 20px;
+        opacity: 0;
+      }
+
+      .success-checkmark.show {
+        animation: successPop 0.6s ease-out forwards;
+      }
+
+      @keyframes successPop {
+        0% {
+          transform: scale(0);
+          opacity: 0;
+        }
+        50% {
+          transform: scale(1.2);
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      .checkmark-circle {
+        stroke-dasharray: 166;
+        stroke-dashoffset: 166;
+        stroke-width: 3;
+        stroke-miterlimit: 10;
+        stroke: #6366f1;
+        fill: none;
+        animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+      }
+
+      .checkmark-check {
+        transform-origin: 50% 50%;
+        stroke-dasharray: 48;
+        stroke-dashoffset: 48;
+        stroke: #6366f1;
+        stroke-width: 3;
+        animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.6s forwards;
+      }
+
+      @keyframes stroke {
+        100% {
+          stroke-dashoffset: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <div class="header">
+      <div class="header-content">
+        <div class="app-title">
+          <div class="logo">T</div>
+          <h1>Tanaka</h1>
+        </div>
+        <div class="sync-status">
+          <div class="status-indicator"></div>
+          <span>Synced • 2 devices</span>
+        </div>
+      </div>
+      <div class="settings-button">⚙️</div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <button class="action-button primary" id="trackWindowBtn">
+        <span>🪟</span>
+        <span>Track Current Window</span>
+      </button>
+      <button class="action-button">
+        <span>🔄</span>
+        <span>Sync Now</span>
+      </button>
+    </div>
+
+    <!-- Windows Section -->
+    <div class="windows-section">
+      <div class="section-header">
+        <h2 class="section-title">Your Windows</h2>
+        <span class="device-count">2 windows • 35 tabs</span>
+      </div>
+
+      <!-- Window Card 1 -->
+      <div class="window-card">
+        <div class="window-header">
+          <div class="window-info">
+            <div class="window-icon">💻</div>
+            <div class="window-details">
+              <h3>Work - MacBook Pro</h3>
+              <div class="window-meta">12 tabs • Updated 2m ago</div>
+            </div>
+          </div>
+          <div class="tracking-toggle active"></div>
+        </div>
+        <div class="tab-preview">
+          <div class="tab-icon">📧</div>
+          <div class="tab-icon">📊</div>
+          <div class="tab-icon">💬</div>
+          <div class="tab-icon">📝</div>
+          <div class="tab-count">+8</div>
+        </div>
+      </div>
+
+      <!-- Window Card 2 -->
+      <div class="window-card">
+        <div class="window-header">
+          <div class="window-info">
+            <div class="window-icon">🏠</div>
+            <div class="window-details">
+              <h3>Personal - Desktop</h3>
+              <div class="window-meta">23 tabs • Updated 5m ago</div>
+            </div>
+          </div>
+          <div class="tracking-toggle active"></div>
+        </div>
+        <div class="tab-preview">
+          <div class="tab-icon">🎵</div>
+          <div class="tab-icon">📺</div>
+          <div class="tab-icon">🛒</div>
+          <div class="tab-icon">📰</div>
+          <div class="tab-count">+19</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Track Window Animation Overlay -->
+    <div class="track-overlay" id="trackOverlay">
+      <div class="scanner-container" id="scannerContainer">
+        <div class="scanner-window">
+          <div class="scanner-line"></div>
+        </div>
+      </div>
+      <svg class="success-checkmark" viewBox="0 0 52 52" style="display: none">
+        <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none" />
+        <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+      </svg>
+      <div class="scanner-status">
+        <h3 id="statusTitle">Scanning Window...</h3>
+        <p id="statusText">Discovering open tabs</p>
+        <div class="tab-counter" id="tabCounter" style="display: none">0</div>
+      </div>
+    </div>
+
+    <script>
+      // Toggle tracking switches
+      document.querySelectorAll('.tracking-toggle').forEach((toggle) => {
+        toggle.addEventListener('click', (e) => {
+          e.stopPropagation();
+          toggle.classList.toggle('active');
+        });
+      });
+
+      // Window name editing
+      document.querySelectorAll('.window-details h3').forEach((heading) => {
+        heading.addEventListener('click', (e) => {
+          e.stopPropagation();
+
+          // Don't allow editing if already editing
+          if (heading.classList.contains('editing')) return;
+
+          const originalText = heading.textContent;
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.className = 'window-name-input';
+          input.value = originalText;
+
+          heading.classList.add('editing');
+          heading.style.display = 'none';
+          heading.parentNode.insertBefore(input, heading);
+          input.focus();
+          input.select();
+
+          const saveEdit = () => {
+            const newText = input.value.trim() || originalText;
+            heading.textContent = newText;
+            heading.style.display = 'inline-block';
+            heading.classList.remove('editing');
+            input.remove();
+          };
+
+          input.addEventListener('blur', saveEdit);
+          input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              saveEdit();
+            } else if (e.key === 'Escape') {
+              input.value = originalText;
+              saveEdit();
+            }
+          });
+        });
+      });
+
+      // Track Window Animation
+      const trackBtn = document.getElementById('trackWindowBtn');
+      const overlay = document.getElementById('trackOverlay');
+      const scannerContainer = document.getElementById('scannerContainer');
+      const statusTitle = document.getElementById('statusTitle');
+      const statusText = document.getElementById('statusText');
+      const tabCounter = document.getElementById('tabCounter');
+      const successCheckmark = document.querySelector('.success-checkmark');
+
+      trackBtn.addEventListener('click', () => {
+        overlay.classList.add('active');
+        scannerContainer.style.display = 'block';
+        successCheckmark.style.display = 'none';
+        statusTitle.textContent = 'Scanning Window...';
+        statusText.textContent = 'Discovering open tabs';
+        tabCounter.style.display = 'none';
+
+        // Simulate tab discovery
+        let tabCount = 0;
+        const tabIcons = ['📄', '🔍', '💼', '🎨', '📊', '🛒', '💬', '📧', '🎵', '📺', '🌐', '💡'];
+
+        setTimeout(() => {
+          tabCounter.style.display = 'block';
+          statusText.textContent = 'Found tabs:';
+
+          // Animate tab counter
+          const targetCount = 15;
+          const increment = targetCount / 20;
+          const counterInterval = setInterval(() => {
+            tabCount += increment;
+            if (tabCount >= targetCount) {
+              tabCount = targetCount;
+              clearInterval(counterInterval);
+            }
+            tabCounter.textContent = Math.floor(tabCount);
+          }, 50);
+
+          // Create floating tabs
+          for (let i = 0; i < 8; i++) {
+            setTimeout(
+              () => {
+                const tab = document.createElement('div');
+                tab.className = 'floating-tab';
+                tab.textContent = tabIcons[i % tabIcons.length];
+
+                // Random starting position
+                const angle = (Math.PI * 2 * i) / 8;
+                const radius = 150;
+                const startX = Math.cos(angle) * radius;
+                const startY = Math.sin(angle) * radius;
+
+                tab.style.setProperty('--start-x', `${startX}px`);
+                tab.style.setProperty('--start-y', `${startY}px`);
+                tab.style.animationDelay = `${i * 0.1}s`;
+
+                scannerContainer.appendChild(tab);
+              },
+              500 + i * 100,
+            );
+          }
+        }, 1000);
+
+        // Show success state
+        setTimeout(() => {
+          scannerContainer.style.display = 'none';
+          successCheckmark.style.display = 'block';
+          successCheckmark.classList.add('show');
+          statusTitle.textContent = 'Window Tracked!';
+          statusText.textContent = '15 tabs synced to cloud';
+          tabCounter.style.display = 'none';
+
+          // Update UI and close overlay
+          setTimeout(() => {
+            overlay.classList.remove('active');
+
+            // Add new window card
+            const windowsSection = document.querySelector('.windows-section');
+            const newCard = document.createElement('div');
+            newCard.className = 'window-card';
+            newCard.style.opacity = '0';
+            newCard.innerHTML = `
+                        <div class="window-header">
+                            <div class="window-info">
+                                <div class="window-icon">🌟</div>
+                                <div class="window-details">
+                                    <h3>Current Window - This Device</h3>
+                                    <div class="window-meta">15 tabs • Just now</div>
+                                </div>
+                            </div>
+                            <div class="tracking-toggle active"></div>
+                        </div>
+                        <div class="tab-preview">
+                            <div class="tab-icon">📄</div>
+                            <div class="tab-icon">🔍</div>
+                            <div class="tab-icon">💼</div>
+                            <div class="tab-icon">🎨</div>
+                            <div class="tab-count">+11</div>
+                        </div>
+                    `;
+
+            // Insert at the top after the section header
+            const sectionHeader = windowsSection.querySelector('.section-header');
+            sectionHeader.after(newCard);
+
+            // Animate in
+            requestAnimationFrame(() => {
+              newCard.style.transition = 'all 0.5s ease';
+              newCard.style.opacity = '1';
+            });
+
+            // Add event listeners to new elements
+            const newToggle = newCard.querySelector('.tracking-toggle');
+            newToggle.addEventListener('click', (e) => {
+              e.stopPropagation();
+              newToggle.classList.toggle('active');
+            });
+
+            const newHeading = newCard.querySelector('.window-details h3');
+            newHeading.addEventListener('click', (e) => {
+              e.stopPropagation();
+
+              if (newHeading.classList.contains('editing')) return;
+
+              const originalText = newHeading.textContent;
+              const input = document.createElement('input');
+              input.type = 'text';
+              input.className = 'window-name-input';
+              input.value = originalText;
+
+              newHeading.classList.add('editing');
+              newHeading.style.display = 'none';
+              newHeading.parentNode.insertBefore(input, newHeading);
+              input.focus();
+              input.select();
+
+              const saveEdit = () => {
+                const newText = input.value.trim() || originalText;
+                newHeading.textContent = newText;
+                newHeading.style.display = 'inline-block';
+                newHeading.classList.remove('editing');
+                input.remove();
+              };
+
+              input.addEventListener('blur', saveEdit);
+              input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  saveEdit();
+                } else if (e.key === 'Escape') {
+                  input.value = originalText;
+                  saveEdit();
+                }
+              });
+            });
+
+            // Update count
+            document.querySelector('.device-count').textContent = '3 windows • 50 tabs';
+
+            // Clean up scanner elements
+            const floatingTabs = scannerContainer.querySelectorAll('.floating-tab');
+            floatingTabs.forEach((tab) => tab.remove());
+            successCheckmark.classList.remove('show');
+          }, 1500);
+        }, 3500);
+      });
+
+      // Window card interactions
+      document.querySelectorAll('.window-card').forEach((card) => {
+        card.addEventListener('click', (e) => {
+          if (!e.target.closest('.tracking-toggle') && !e.target.closest('.window-details h3')) {
+            card.style.transform = 'scale(0.98)';
+            setTimeout(() => {
+              card.style.transform = '';
+            }, 100);
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
