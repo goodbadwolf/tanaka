@@ -118,10 +118,10 @@ npm install -g pnpm
 </details>
 
 <details>
-<summary>4. Install Optional Tools</summary>
+<summary>4. Install Required Tools</summary>
 
 ```bash
-# SQLx CLI for migrations
+# SQLx CLI for migrations (required)
 cargo install sqlx-cli --no-default-features --features sqlite
 
 # Python development tools
