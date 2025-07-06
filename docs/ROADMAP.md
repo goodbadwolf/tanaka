@@ -222,7 +222,7 @@ Prepare for v1.0 release with performance optimization, monitoring, and Mozilla 
 - [x] Permissions checked before each sync operation
 
 #### Data Integrity ✓
-- [ ] Database uses SQLx migrations (no runtime CREATE TABLE)
+- [x] Database uses SQLx migrations (no runtime CREATE TABLE)
 - [ ] Operations are idempotent - no duplicates on retry
 - [ ] Operation IDs handle all character combinations
 - [ ] CRDT state persisted to database tables

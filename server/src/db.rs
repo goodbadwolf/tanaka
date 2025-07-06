@@ -1,49 +1,18 @@
-use sqlx::{sqlite::SqlitePoolOptions, SqlitePool};
+use sqlx::{migrate::MigrateDatabase, sqlite::SqlitePoolOptions, Sqlite, SqlitePool};
 use std::time::Duration;
 use tanaka_server::config::DatabaseConfig;
 use tanaka_server::error::AppResult;
 use tanaka_server::repository::sqlite::StatementCache;
 
-const CREATE_TABS_TABLE_SQL: &str = r"
-    CREATE TABLE IF NOT EXISTS tabs (
-        id TEXT PRIMARY KEY,
-        window_id TEXT NOT NULL,
-        data TEXT NOT NULL,
-        updated_at INTEGER NOT NULL
-    )
-";
-
-const CREATE_CRDT_OPERATIONS_TABLE_SQL: &str = r"
-    CREATE TABLE IF NOT EXISTS crdt_operations (
-        id TEXT PRIMARY KEY,
-        clock INTEGER NOT NULL,
-        device_id TEXT NOT NULL,
-        operation_type TEXT NOT NULL,
-        target_id TEXT NOT NULL,
-        operation_data TEXT NOT NULL,
-        created_at INTEGER NOT NULL
-    )
-";
-
-const CREATE_CRDT_STATE_TABLE_SQL: &str = r"
-    CREATE TABLE IF NOT EXISTS crdt_state (
-        entity_type TEXT NOT NULL,
-        entity_id TEXT NOT NULL,
-        current_data TEXT NOT NULL,
-        last_clock INTEGER NOT NULL,
-        updated_at INTEGER NOT NULL,
-        PRIMARY KEY (entity_type, entity_id)
-    )
-";
-
 const MILLIS_PER_SECOND: u64 = 1000;
 
 #[allow(clippy::too_many_lines)] // Database initialization requires many sequential setup steps
 pub async fn init_db_with_config(config: &DatabaseConfig) -> AppResult<SqlitePool> {
-    let db_path = config.url.strip_prefix("sqlite://").unwrap_or(&config.url);
-
-    if !db_path.starts_with(":memory:") {
-        let _ = tokio::fs::File::create(db_path).await;
+    // Create database if it doesn't exist
+    if !Sqlite::database_exists(&config.url).await.unwrap_or(false) {
+        Sqlite::create_database(&config.url).await.map_err(|e| {
+            tanaka_server::error::AppError::database(format!("Failed to create database: {e}"), e)
+        })?;
     }
 
     let pool = SqlitePoolOptions::new()
@@ -97,26 +66,16 @@ pub async fn init_db_with_config(config: &DatabaseConfig) -> AppResult<SqlitePoo
         .await
         .map_err(|e| tanaka_server::error::AppError::database("Failed to set mmap size", e))?;
 
-    sqlx::query(CREATE_TABS_TABLE_SQL)
-        .execute(&pool)
+    // Run migrations
+    sqlx::migrate!()
+        .run(&pool)
         .await
-        .map_err(|e| tanaka_server::error::AppError::database("Failed to create tabs table", e))?;
-
-    sqlx::query(CREATE_CRDT_OPERATIONS_TABLE_SQL)
-        .execute(&pool)
-        .await
-        .map_err(|e| {
-            tanaka_server::error::AppError::database("Failed to create CRDT operations table", e)
+        .map_err(|e| tanaka_server::error::AppError::Database {
+            message: format!("Failed to run migrations: {e}"),
+            source: sqlx::Error::Protocol(e.to_string()),
         })?;
 
-    sqlx::query(CREATE_CRDT_STATE_TABLE_SQL)
-        .execute(&pool)
-        .await
-        .map_err(|e| {
-            tanaka_server::error::AppError::database("Failed to create CRDT state table", e)
-        })?;
-
-    // Create strategic indexes for optimal query performance
+    tracing::info!("Database migrations completed successfully");
 
     // Warm up statement cache for better performance
     let cache = StatementCache::new(std::sync::Arc::new(pool.clone()));
@@ -130,51 +89,119 @@ pub async fn init_db_with_config(config: &DatabaseConfig) -> AppResult<SqlitePoo
         );
     }
 
-    // CRDT Operations indexes (optimized for sync queries)
-    sqlx::query("CREATE INDEX IF NOT EXISTS idx_crdt_operations_clock ON crdt_operations(clock)")
-        .execute(&pool)
-        .await
-        .map_err(|e| tanaka_server::error::AppError::database("Failed to create clock index", e))?;
-
-    sqlx::query("CREATE INDEX IF NOT EXISTS idx_crdt_operations_device_clock ON crdt_operations(device_id, clock)")
-        .execute(&pool)
-        .await
-        .map_err(|e| tanaka_server::error::AppError::database("Failed to create device-clock index", e))?;
-
-    sqlx::query(
-        "CREATE INDEX IF NOT EXISTS idx_crdt_operations_target ON crdt_operations(target_id)",
-    )
-    .execute(&pool)
-    .await
-    .map_err(|e| tanaka_server::error::AppError::database("Failed to create target index", e))?;
-
-    sqlx::query("CREATE INDEX IF NOT EXISTS idx_crdt_operations_type_target ON crdt_operations(operation_type, target_id)")
-        .execute(&pool)
-        .await
-        .map_err(|e| tanaka_server::error::AppError::database("Failed to create type-target index", e))?;
-
-    // Tabs table indexes (optimized for window-based queries)
-    sqlx::query("CREATE INDEX IF NOT EXISTS idx_tabs_window ON tabs(window_id)")
-        .execute(&pool)
-        .await
-        .map_err(|e| {
-            tanaka_server::error::AppError::database("Failed to create window index", e)
-        })?;
-
-    sqlx::query("CREATE INDEX IF NOT EXISTS idx_tabs_updated ON tabs(updated_at)")
-        .execute(&pool)
-        .await
-        .map_err(|e| {
-            tanaka_server::error::AppError::database("Failed to create updated index", e)
-        })?;
-
-    // CRDT State indexes (optimized for entity lookups)
-    sqlx::query("CREATE INDEX IF NOT EXISTS idx_crdt_state_type ON crdt_state(entity_type)")
-        .execute(&pool)
-        .await
-        .map_err(|e| {
-            tanaka_server::error::AppError::database("Failed to create state type index", e)
-        })?;
-
     Ok(pool)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use sqlx::Row;
+    use tanaka_server::config::DatabaseConfig;
+    use tempfile::tempdir;
+
+    #[tokio::test]
+    async fn test_init_db_with_config_success() {
+        let temp_dir = tempdir().unwrap();
+        let db_path = temp_dir.path().join("test.db");
+        let config = DatabaseConfig {
+            url: format!("sqlite://{}", db_path.display()),
+            max_connections: 5,
+            connection_timeout_secs: 10,
+        };
+
+        let pool = init_db_with_config(&config).await.unwrap();
+
+        // Verify database was created
+        assert!(db_path.exists());
+
+        // Verify migrations were applied
+        let result = sqlx::query("SELECT name FROM sqlite_master WHERE type='table'")
+            .fetch_all(&pool)
+            .await
+            .unwrap();
+
+        let table_names: Vec<String> = result
+            .iter()
+            .map(|row| row.get::<String, _>("name"))
+            .collect();
+
+        assert!(table_names.contains(&"crdt_operations".to_string()));
+        assert!(table_names.contains(&"crdt_state".to_string()));
+        assert!(table_names.contains(&"_sqlx_migrations".to_string()));
+    }
+
+    #[tokio::test]
+    async fn test_init_db_with_memory_database() {
+        let config = DatabaseConfig {
+            url: "sqlite::memory:".to_string(),
+            max_connections: 1,
+            connection_timeout_secs: 5,
+        };
+
+        let pool = init_db_with_config(&config).await.unwrap();
+
+        // Verify migrations were applied to in-memory database
+        let result = sqlx::query("SELECT COUNT(*) as count FROM sqlite_master WHERE type='table'")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+
+        let count: i32 = result.get("count");
+        assert!(count >= 3); // At least crdt_operations, crdt_state, and _sqlx_migrations
+    }
+
+    #[tokio::test]
+    async fn test_init_db_idempotent() {
+        let temp_dir = tempdir().unwrap();
+        let db_path = temp_dir.path().join("test.db");
+        let config = DatabaseConfig {
+            url: format!("sqlite://{}", db_path.display()),
+            max_connections: 5,
+            connection_timeout_secs: 10,
+        };
+
+        // Initialize database twice
+        let pool1 = init_db_with_config(&config).await.unwrap();
+        drop(pool1);
+
+        let pool2 = init_db_with_config(&config).await.unwrap();
+
+        // Should succeed without errors
+        let result = sqlx::query("SELECT COUNT(*) as count FROM _sqlx_migrations")
+            .fetch_one(&pool2)
+            .await
+            .unwrap();
+
+        let count: i32 = result.get("count");
+        assert_eq!(count, 1); // Only one migration should be recorded
+    }
+
+    #[tokio::test]
+    async fn test_init_db_verifies_pragma_settings() {
+        let temp_dir = tempdir().unwrap();
+        let db_path = temp_dir.path().join("test.db");
+        let config = DatabaseConfig {
+            url: format!("sqlite://{}", db_path.display()),
+            max_connections: 1,
+            connection_timeout_secs: 5,
+        };
+
+        let pool = init_db_with_config(&config).await.unwrap();
+
+        // Verify WAL mode is set (only works with file-based databases)
+        let result = sqlx::query("PRAGMA journal_mode")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+        let mode: String = result.get(0);
+        assert_eq!(mode, "wal");
+
+        // Verify synchronous mode
+        let result = sqlx::query("PRAGMA synchronous")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+        let sync_mode: i32 = result.get(0);
+        assert_eq!(sync_mode, 1); // NORMAL = 1
+    }
 }
