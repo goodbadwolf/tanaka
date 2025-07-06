@@ -173,32 +173,140 @@ All work to be completed.
 
 ### User Experience
 
+#### Branch: `feat/add-ui-prototypes`
+
+**Add UI Prototypes**
+
+- [ ] Commit all prototype files as-is
+  - [ ] Popup redesign with window tracking animation
+  - [ ] Settings page with tabbed navigation
+  - [ ] Onboarding flow with step-by-step setup
+  - [ ] Error states and troubleshooting page
+  - [ ] Context menu with quick actions
+  - [ ] Empty states for all scenarios
+  - [ ] Notification system (toasts, progress, inline)
+  - [ ] Sync history timeline view
+  - [ ] Advanced tab search interface
+  - [ ] Window details management panel
+  - [ ] Extension icon with gradient design
+
+#### Branch: `feat/consolidate-prototypes`
+
+**Consolidate Prototype Styles**
+
+- [ ] Extract common CSS into shared stylesheet
+  - [ ] Color variables and gradients
+  - [ ] Typography scale and fonts
+  - [ ] Spacing and sizing system
+  - [ ] Animation keyframes and transitions
+  - [ ] Common component styles (buttons, cards, inputs)
+- [ ] Extract design system tokens
+  - [ ] Colors: Primary (#6366f1, #8b5cf6), Background (#0a0a0b, #0f0f10), Text (#e7e7e8, #a1a1aa, #6b7280)
+  - [ ] Spacing: 4px base unit (8, 12, 16, 20, 24, 30, 40px scale)
+  - [ ] Border radius: Small (6-8px), Medium (10-12px), Large (16-20px)
+  - [ ] Shadows: Consistent elevation system
+  - [ ] Animation: Standard easings and durations
+- [ ] Create TypeScript interfaces for prototype data
+  - [ ] Window and tab types
+  - [ ] Sync status states
+  - [ ] Notification types
+  - [ ] Settings structure
+- [ ] Consolidate JavaScript behaviors
+  - [ ] Toggle interactions
+  - [ ] Form validations
+  - [ ] Animation triggers
+  - [ ] State management patterns
+
+#### Branch: `feat/create-design-system`
+
+**Convert to React Component Library**
+
+- [ ] Set up component library structure
+  - [ ] Create components directory
+  - [ ] Set up Storybook for component development
+  - [ ] Configure CSS modules or styled-components
+- [ ] Build core design system components
+  - [ ] Button (primary, secondary, danger)
+  - [ ] Card (default, elevated, interactive)
+  - [ ] Input/TextArea with validation
+  - [ ] Toggle switch
+  - [ ] Badge/Status indicators
+  - [ ] Toast notifications
+  - [ ] Modal/Overlay
+  - [ ] Dropdown/Select
+  - [ ] Tooltip
+  - [ ] LoadingSpinner/Skeleton
+
 #### Branch: `feat/ui-redesign`
 
-**Complete UI Redesign**
+**Implement Redesigned Pages**
 
-- [ ] Implement new modern UI design
-  - Create fresh, modern interface design
-  - Ensure consistent design system across all components
-  - Use modern CSS with CSS variables for theming
-  - Follow current UI/UX best practices
-- [ ] Convert to React/Preact components
-  - Create reusable component library
-  - Implement proper state management
-  - Add TypeScript types for all components
-- [ ] Implement animations and transitions
-  - Smooth page transitions
-  - Loading states with skeleton screens
-  - Micro-interactions for better UX
-- [ ] Add comprehensive theming support
-  - Dark mode (default)
-  - Light mode
-  - System preference detection
-  - Theme persistence
-- [ ] Responsive design
-  - Test on different screen sizes
-  - Ensure popup works at various widths
-  - Mobile-friendly settings page
+- [ ] Popup page redesign
+  - [ ] WindowCard with tracking toggle
+  - [ ] SyncStatus indicator
+  - [ ] QuickActions bar
+  - [ ] TrackingAnimation overlay
+- [ ] Settings page redesign
+  - [ ] TabNavigation component
+  - [ ] SettingsSection cards
+  - [ ] Form components integration
+  - [ ] Device management
+- [ ] Onboarding flow
+  - [ ] ProgressBar stepper
+  - [ ] Connection test
+  - [ ] Window selection
+  - [ ] Success animation
+- [ ] Error/troubleshooting page
+  - [ ] DiagnosticPanel
+  - [ ] Common issues accordion
+  - [ ] Debug info display
+- [ ] Additional pages
+  - [ ] Context menu implementation
+  - [ ] Empty states for all views
+  - [ ] Notification system
+  - [ ] Sync history timeline
+  - [ ] Tab search interface
+  - [ ] Window details panel
+- [ ] Implement state management integration
+  - [ ] Window tracking state
+  - [ ] Sync status and progress
+  - [ ] Settings persistence
+  - [ ] Error/warning states
+  - [ ] Onboarding progress
+- [ ] Add missing UI states
+  - [ ] Loading states (skeleton screens, progress indicators)
+  - [ ] Offline mode indicators
+  - [ ] Sync conflict resolution UI
+  - [ ] Bulk actions (select multiple windows)
+- [ ] Accessibility improvements
+  - [ ] ARIA labels and roles
+  - [ ] Keyboard navigation (Tab, Enter, Escape)
+  - [ ] Focus management and trapping
+  - [ ] Screen reader announcements
+  - [ ] High contrast mode support
+- [ ] Animation refinements
+  - [ ] Page transitions (slide, fade)
+  - [ ] Stagger animations for lists
+  - [ ] Smooth height transitions
+  - [ ] Loading progress animations
+  - [ ] Success/error state transitions
+- [ ] Theme system implementation
+  - [ ] CSS custom properties for all tokens
+  - [ ] Theme provider component
+  - [ ] Light theme variant
+  - [ ] System preference detection
+  - [ ] Smooth theme transitions
+- [ ] Responsive improvements
+  - [ ] Popup: Fixed 380px with internal responsiveness
+  - [ ] Settings: Adapt to window width
+  - [ ] Onboarding: Center and scale appropriately
+  - [ ] Touch-friendly tap targets (min 44px)
+- [ ] Performance optimizations
+  - [ ] Virtualized window lists for 200+ items
+  - [ ] Debounced search/filter inputs
+  - [ ] Lazy load heavy components
+  - [ ] Optimize animation performance
+  - [ ] Reduce re-renders with memo
 
 #### Branch: `feat/ui-polish`
 
