@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tanaka - Empty States</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0a0a0b;
+            color: #e7e7e8;
+            padding: 40px;
+        }
+
+        /* Gallery Layout */
+        .gallery-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .gallery-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .gallery-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #e7e7e8 0%, #a1a1aa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gallery-subtitle {
+            font-size: 18px;
+            color: #6b7280;
+        }
+
+        .states-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 30px;
+        }
+
+        .state-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .state-header {
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .state-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #a1a1aa;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .state-container {
+            height: 400px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Base Empty State Styles */
+        .empty-state {
+            text-align: center;
+            max-width: 320px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .empty-illustration {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 24px;
+            position: relative;
+        }
+
+        .empty-icon {
+            width: 100%;
+            height: 100%;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .empty-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #e7e7e8;
+        }
+
+        .empty-description {
+            font-size: 14px;
+            color: #6b7280;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .empty-action {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .empty-action:hover {
+            background: linear-gradient(135deg, #5558e3 0%, #7c4ce6 100%);
+            transform: translateY(-1px);
+        }
+
+        .empty-secondary-action {
+            display: inline-block;
+            margin-top: 12px;
+            color: #6366f1;
+            font-size: 13px;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .empty-secondary-action:hover {
+            color: #8b5cf6;
+            text-decoration: underline;
+        }
+
+        /* Animated Elements */
+        .floating-element {
+            position: absolute;
+            opacity: 0.1;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            33% {
+                transform: translate(30px, -30px) rotate(120deg);
+            }
+            66% {
+                transform: translate(-20px, 20px) rotate(240deg);
+            }
+        }
+
+        .pulse-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            border-radius: 50%;
+            animation: pulse 3s infinite ease-out;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        /* Specific Empty States */
+
+        /* No Windows */
+        .empty-windows .empty-icon {
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .floating-window {
+            position: absolute;
+            width: 60px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+        }
+
+        .floating-window::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 6px 6px 0 0;
+        }
+
+        /* No Search Results */
+        .empty-search .empty-icon {
+            background: rgba(245, 158, 11, 0.1);
+        }
+
+        .search-particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(245, 158, 11, 0.5);
+            border-radius: 50%;
+            animation: particle 3s infinite ease-out;
+        }
+
+        @keyframes particle {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--x), var(--y)) scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* Offline State */
+        .empty-offline .empty-icon {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .wifi-waves {
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .wave {
+            width: 60px;
+            height: 30px;
+            border: 3px solid rgba(239, 68, 68, 0.3);
+            border-bottom: none;
+            border-radius: 60px 60px 0 0;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: wave 2s infinite ease-out;
+        }
+
+        .wave:nth-child(2) {
+            width: 40px;
+            height: 20px;
+            animation-delay: 0.5s;
+        }
+
+        .wave:nth-child(3) {
+            width: 20px;
+            height: 10px;
+            animation-delay: 1s;
+        }
+
+        @keyframes wave {
+            0% {
+                opacity: 0.8;
+                transform: translateX(-50%) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(-50%) scale(1.5);
+            }
+        }
+
+        /* First Sync */
+        .empty-first-sync .empty-icon {
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        .sync-arrows {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .sync-arrow {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            opacity: 0.3;
+        }
+
+        .sync-arrow::before {
+            content: '↻';
+            position: absolute;
+            font-size: 24px;
+            color: #22c55e;
+        }
+
+        /* No Tabs */
+        .empty-tabs .empty-icon {
+            background: rgba(139, 92, 246, 0.1);
+        }
+
+        .tab-stack {
+            position: absolute;
+            width: 50px;
+            height: 35px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .tab-stack::before,
+        .tab-stack::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: inherit;
+            border-radius: inherit;
+            box-shadow: inherit;
+        }
+
+        .tab-stack::before {
+            top: -5px;
+            left: -5px;
+            opacity: 0.7;
+        }
+
+        .tab-stack::after {
+            top: -10px;
+            left: -10px;
+            opacity: 0.4;
+        }
+
+        /* Loading State */
+        .empty-loading .empty-icon {
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 3px solid rgba(99, 102, 241, 0.1);
+            border-top-color: #6366f1;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Permission Denied */
+        .empty-permission .empty-icon {
+            background: rgba(245, 158, 11, 0.1);
+        }
+
+        .lock-icon {
+            position: relative;
+        }
+
+        .lock-icon::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 25px;
+            border: 4px solid rgba(245, 158, 11, 0.5);
+            border-bottom: none;
+            border-radius: 20px 20px 0 0;
+        }
+
+        /* No History */
+        .empty-history .empty-icon {
+            background: rgba(107, 114, 128, 0.1);
+        }
+
+        .clock-hands {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .clock-hand {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform-origin: bottom center;
+            background: rgba(107, 114, 128, 0.5);
+        }
+
+        .hour-hand {
+            width: 3px;
+            height: 25px;
+            transform: translate(-50%, -100%) rotate(45deg);
+        }
+
+        .minute-hand {
+            width: 2px;
+            height: 35px;
+            transform: translate(-50%, -100%) rotate(120deg);
+        }
+
+        /* Error State */
+        .empty-error .empty-icon {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .error-glitch {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            animation: glitch 3s infinite;
+        }
+
+        @keyframes glitch {
+            0%, 90%, 100% {
+                transform: translate(0);
+                filter: hue-rotate(0deg);
+            }
+            92% {
+                transform: translate(-2px, 2px);
+                filter: hue-rotate(90deg);
+            }
+            94% {
+                transform: translate(2px, -2px);
+                filter: hue-rotate(180deg);
+            }
+            96% {
+                transform: translate(-2px, -2px);
+                filter: hue-rotate(270deg);
+            }
+        }
+
+        /* Tutorial Hints */
+        .tutorial-hint {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 20px;
+            padding: 12px 16px;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 8px;
+            font-size: 13px;
+            color: #a1a1aa;
+        }
+
+        .hint-icon {
+            width: 20px;
+            height: 20px;
+            background: rgba(99, 102, 241, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6366f1;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        /* List of Features */
+        .feature-list {
+            text-align: left;
+            margin-top: 20px;
+            padding: 0 20px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            color: #a1a1aa;
+        }
+
+        .feature-icon {
+            width: 24px;
+            height: 24px;
+            background: rgba(34, 197, 94, 0.1);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #22c55e;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="gallery-container">
+        <div class="gallery-header">
+            <h1 class="gallery-title">Tanaka Empty States</h1>
+            <p class="gallery-subtitle">Guiding users when there's no data to display</p>
+        </div>
+
+        <div class="states-grid">
+            <!-- No Windows Tracked -->
+            <div class="state-card">
+                <div class="state-header">
+                    <h3 class="state-title">No Windows Tracked</h3>
+                </div>
+                <div class="state-container">
+                    <div class="floating-window floating-element" style="top: 20%; left: 10%; animation-delay: 0s;"></div>
+                    <div class="floating-window floating-element" style="top: 70%; right: 15%; animation-delay: 2s;"></div>
+                    <div class="floating-window floating-element" style="bottom: 20%; left: 20%; animation-delay: 4s;"></div>
+
+                    <div class="empty-state empty-windows">
+                        <div class="empty-illustration">
+                            <div class="pulse-ring"></div>
+                            <div class="empty-icon">🪟</div>
+                        </div>
+                        <h2 class="empty-title">No Windows Tracked Yet</h2>
+                        <p class="empty-description">Start tracking your browser windows to sync tabs across all your devices.</p>
+                        <button class="empty-action">
+                            <span>🎯</span>
+                            <span>Track Current Window</span>
+                        </button>
+                        <a href="#" class="empty-secondary-action">Learn how tracking works</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- No Search Results -->
+            <div class="state-card">
+                <div class="state-header">
+                    <h3 class="state-title">No Search Results</h3>
+                </div>
+                <div class="state-container">
+                    <div class="empty-state empty-search">
+                        <div class="empty-illustration">
+                            <div class="search-particles">
+                                <div class="particle" style="--x: -50px; --y: -50px; animation-delay: 0s;"></div>
+                                <div class="particle" style="--x: 50px; --y: -50px; animation-delay: 0.5s;"></div>
+                                <div class="particle" style="--x: 50px; --y: 50px; animation-delay: 1s;"></div>
+                                <div class="particle" style="--x: -50px; --y: 50px; animation-delay: 1.5s;"></div>
+                            </div>
+                            <div class="empty-icon">🔍</div>
+                        </div>
+                        <h2 class="empty-title">No Tabs Found</h2>
+                        <p class="empty-description">Try adjusting your search terms or filters to find what you're looking for.</p>
+                        <button class="empty-action">
+                            <span>🔄</span>
+                            <span>Clear Filters</span>
+                        </button>
+                        <div class="tutorial-hint">
+                            <div class="hint-icon">💡</div>
+                            <span>Tip: Use "site:github.com" to search within a domain</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Offline State -->
+            <div class="state-card">
+                <div class="state-header">
+                    <h3 class="state-title">Offline / Disconnected</h3>
+                </div>
+                <div class="state-container">
+                    <div class="empty-state empty-offline">
+                        <div class="empty-illustration">
+                            <div class="wifi-waves">
+                                <div class="wave"></div>
+                                <div class="wave"></div>
+                                <div class="wave"></div>
+                            </div>
+                            <div class="empty-icon">📡</div>
+                        </div>
+                        <h2 class="empty-title">Connection Lost</h2>
+                        <p class="empty-description">Unable to reach the sync server. Your tabs are saved locally and will sync when reconnected.</p>
+                        <button class="empty-action">
+                            <span>🔄</span>
+                            <span>Retry Connection</span>
+                        </button>
+                        <a href="#" class="empty-secondary-action">Check server settings</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- First Sync Pending -->
+            <div class="state-card">
+                <div class="state-header">
+                    <h3 class="state-title">First Sync Pending</h3>
+                </div>
+                <div class="state-container">
+                    <div class="empty-state empty-first-sync">
+                        <div class="empty-illustration">
+                            <div class="sync-arrows">
+                                <div class="sync-arrow" style="top: 10%; left: 50%;"></div>
+                                <div class="sync-arrow" style="top: 50%; right: 10%; transform: rotate(90deg);"></div>
+                                <div class="sync-arrow" style="bottom: 10%; left: 50%; transform: rotate(180deg);"></div>
+                                <div class="sync-arrow" style="top: 50%; left: 10%; transform: rotate(270deg);"></div>
+                            </div>
+                            <div class="empty-icon">🔄</div>
+                        </div>
+                        <h2 class="empty-title">Getting Ready to Sync</h2>
+                        <p class="empty-description">Tanaka is preparing to sync your tabs for the first time. This usually takes just a moment.</p>
+                        <div class="feature-list">
+                            <div class="feature-item">
+                                <div class="feature-icon">✓</div>
+                                <span>Server connected</span>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-icon">✓</div>
+                                <span>Authentication verified</span>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-icon">⋯</div>
+                                <span>Initializing sync...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- No Tabs in Window -->
+            <div class="state-card">
+                <div class="state-header">
+                    <h3 class="state-title">No Tabs in Window</h3>
+                </div>
+                <div class="state-container">
+                    <div class="empty-state empty-tabs">
+                        <div class="empty-illustration">
+                            <div class="tab-stack floating-element" style="top: 30%; left: 20%; animation-delay: 1s;"></div>
+                            <div class="tab-stack floating-element" style="bottom: 30%; right: 20%; animation-delay: 3s;"></div>
+                            <div class="empty-icon">📑</div>
+                        </div>
+                        <h2 class="empty-title">No Tabs Open</h2>
+                        <p class="empty-description">This window doesn't have any tabs yet. Open some tabs to start syncing!</p>
+                        <button class="empty-action">
+                            <span>➕</span>
+                            <span>Open New Tab</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div class="state-card">
+                <div class="state-header">
+                    <h3 class="state-title">Loading State</h3>
+                </div>
+                <div class="state-container">
+                    <div class="empty-state empty-loading">
+                        <div class="empty-illustration">
+                            <div class="empty-icon">
+                                <div class="loading-spinner"></div>
+                            </div>
+                        </div>
+                        <h2 class="empty-title">Loading Your Tabs</h2>
+                        <p class="empty-description">Fetching your synchronized tabs from the server...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Permission Denied -->
+            <div class="state-card">
+                <div class="state-header">
+                    <h3 class="state-title">Permission Denied</h3>
+                </div>
+                <div class="state-container">
+                    <div class="empty-state empty-permission">
+                        <div class="empty-illustration">
+                            <div class="empty-icon lock-icon">🔒</div>
+                        </div>
+                        <h2 class="empty-title">Permissions Required</h2>
+                        <p class="empty-description">Tanaka needs permission to access your tabs for synchronization.</p>
+                        <button class="empty-action">
+                            <span>🔓</span>
+                            <span>Grant Permissions</span>
+                        </button>
+                        <a href="#" class="empty-secondary-action">Why these permissions?</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- No Sync History -->
+            <div class="state-card">
+                <div class="state-header">
+                    <h3 class="state-title">No Sync History</h3>
+                </div>
+                <div class="state-container">
+                    <div class="empty-state empty-history">
+                        <div class="empty-illustration">
+                            <div class="clock-hands">
+                                <div class="clock-hand hour-hand"></div>
+                                <div class="clock-hand minute-hand"></div>
+                            </div>
+                            <div class="empty-icon">🕒</div>
+                        </div>
+                        <h2 class="empty-title">No Activity Yet</h2>
+                        <p class="empty-description">Your sync history will appear here once you start using Tanaka.</p>
+                        <button class="empty-action">
+                            <span>🚀</span>
+                            <span>Start Syncing</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Generic Error -->
+            <div class="state-card">
+                <div class="state-header">
+                    <h3 class="state-title">Generic Error</h3>
+                </div>
+                <div class="state-container">
+                    <div class="empty-state empty-error">
+                        <div class="empty-illustration">
+                            <div class="error-glitch"></div>
+                            <div class="empty-icon">⚠️</div>
+                        </div>
+                        <h2 class="empty-title">Something Went Wrong</h2>
+                        <p class="empty-description">We encountered an unexpected error. Please try again or contact support if the issue persists.</p>
+                        <button class="empty-action">
+                            <span>🔄</span>
+                            <span>Try Again</span>
+                        </button>
+                        <a href="#" class="empty-secondary-action">View error details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

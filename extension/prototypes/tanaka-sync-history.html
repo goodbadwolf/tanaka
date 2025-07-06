@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tanaka - Sync Activity</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0a0a0b;
+            color: #e7e7e8;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1a1a1c 0%, #0f0f10 100%);
+            padding: 20px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .back-button {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #e7e7e8;
+            text-decoration: none;
+            font-size: 18px;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(-2px);
+        }
+
+        .page-title {
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .sync-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            font-size: 13px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-button {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #e7e7e8;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px;
+            width: 100%;
+            display: flex;
+            gap: 30px;
+            flex: 1;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            flex-shrink: 0;
+        }
+
+        .stats-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .stats-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #a1a1aa;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            margin-bottom: 16px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #6366f1;
+        }
+
+        .stat-change {
+            font-size: 12px;
+            color: #22c55e;
+            margin-left: 8px;
+        }
+
+        .stat-change.negative {
+            color: #ef4444;
+        }
+
+        /* Device Filter */
+        .device-filter {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .filter-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #a1a1aa;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 16px;
+        }
+
+        .device-option {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            background: transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .device-option:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .device-option.active {
+            background: rgba(99, 102, 241, 0.15);
+        }
+
+        .device-checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .device-option.active .device-checkbox {
+            background: #6366f1;
+            border-color: #6366f1;
+        }
+
+        .device-option.active .device-checkbox::after {
+            content: '✓';
+            color: white;
+            font-size: 12px;
+        }
+
+        .device-name {
+            flex: 1;
+            font-size: 14px;
+        }
+
+        .device-status {
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+        }
+
+        .device-option.inactive .device-status {
+            background: #6b7280;
+        }
+
+        /* Timeline */
+        .timeline-container {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .timeline-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .time-range-selector {
+            display: flex;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .time-button {
+            padding: 6px 14px;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            color: #6b7280;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .time-button:hover {
+            color: #a1a1aa;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .time-button.active {
+            background: rgba(99, 102, 241, 0.15);
+            color: #e7e7e8;
+        }
+
+        /* Timeline Items */
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .timeline-group {
+            margin-bottom: 32px;
+        }
+
+        .timeline-date {
+            font-size: 14px;
+            font-weight: 600;
+            color: #a1a1aa;
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .timeline-date::before {
+            content: '';
+            position: absolute;
+            left: -31px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 12px;
+            background: #0a0a0b;
+            border: 2px solid #6366f1;
+            border-radius: 50%;
+        }
+
+        .timeline-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 12px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(99, 102, 241, 0.3);
+            transform: translateX(2px);
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -25px;
+            top: 24px;
+            width: 8px;
+            height: 8px;
+            background: #6366f1;
+            border-radius: 50%;
+        }
+
+        .timeline-item.sync {
+            border-left: 3px solid #22c55e;
+        }
+
+        .timeline-item.add {
+            border-left: 3px solid #6366f1;
+        }
+
+        .timeline-item.remove {
+            border-left: 3px solid #ef4444;
+        }
+
+        .timeline-item.conflict {
+            border-left: 3px solid #f59e0b;
+        }
+
+        .item-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .item-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .item-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .item-title {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .item-time {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .item-details {
+            font-size: 13px;
+            color: #a1a1aa;
+            margin-bottom: 8px;
+        }
+
+        .item-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Expandable Details */
+        .expand-button {
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            font-size: 12px;
+            color: #a1a1aa;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .expand-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e7e7e8;
+        }
+
+        .expanded-content {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: none;
+        }
+
+        .timeline-item.expanded .expanded-content {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .tab-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .tab-entry {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .tab-action {
+            width: 18px;
+            height: 18px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            flex-shrink: 0;
+        }
+
+        .tab-action.added {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .tab-action.removed {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .tab-action.moved {
+            background: rgba(99, 102, 241, 0.2);
+            color: #6366f1;
+        }
+
+        /* Live Updates */
+        .live-indicator {
+            position: fixed;
+            top: 80px;
+            right: 30px;
+            padding: 8px 16px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            animation: blink 1s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 40px;
+        }
+
+        .empty-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 36px;
+        }
+
+        .empty-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .empty-text {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        /* Load More */
+        .load-more {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .load-more-button {
+            padding: 10px 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #a1a1aa;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .load-more-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e7e7e8;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <a href="#" class="back-button">←</a>
+                <h1 class="page-title">Sync Activity</h1>
+                <div class="sync-status">
+                    <span class="status-dot"></span>
+                    <span>Live Updates</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="action-button" onclick="clearHistory()">
+                    <span>🗑️</span>
+                    <span>Clear History</span>
+                </button>
+                <button class="action-button" onclick="exportHistory()">
+                    <span>📥</span>
+                    <span>Export</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Update Indicator -->
+    <div class="live-indicator" id="liveIndicator" style="display: none;">
+        <span class="live-dot"></span>
+        <span>New activity</span>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <!-- Stats -->
+            <div class="stats-card">
+                <h3 class="stats-title">Activity Summary</h3>
+                <div class="stat-item">
+                    <div class="stat-label">Total Syncs Today</div>
+                    <div class="stat-value">147<span class="stat-change">+23</span></div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Tabs Added</div>
+                    <div class="stat-value">89<span class="stat-change">+12</span></div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Tabs Closed</div>
+                    <div class="stat-value">58<span class="stat-change negative">-8</span></div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Conflicts Resolved</div>
+                    <div class="stat-value">3</div>
+                </div>
+            </div>
+
+            <!-- Device Filter -->
+            <div class="device-filter">
+                <h3 class="filter-title">Filter by Device</h3>
+                <div class="device-option active">
+                    <div class="device-checkbox"></div>
+                    <span class="device-name">All Devices</span>
+                </div>
+                <div class="device-option">
+                    <div class="device-checkbox"></div>
+                    <span class="device-name">This Device</span>
+                    <span class="device-status"></span>
+                </div>
+                <div class="device-option">
+                    <div class="device-checkbox"></div>
+                    <span class="device-name">Work Laptop</span>
+                    <span class="device-status"></span>
+                </div>
+                <div class="device-option inactive">
+                    <div class="device-checkbox"></div>
+                    <span class="device-name">Home Desktop</span>
+                    <span class="device-status"></span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Timeline -->
+        <main class="timeline-container">
+            <div class="timeline-header">
+                <h2 style="font-size: 18px; font-weight: 600;">Recent Activity</h2>
+                <div class="time-range-selector">
+                    <button class="time-button active">Today</button>
+                    <button class="time-button">Yesterday</button>
+                    <button class="time-button">Last 7 Days</button>
+                    <button class="time-button">Last 30 Days</button>
+                    <button class="time-button">All Time</button>
+                </div>
+            </div>
+
+            <div class="timeline">
+                <!-- Today's Activity -->
+                <div class="timeline-group">
+                    <div class="timeline-date">Today, March 15</div>
+
+                    <div class="timeline-item sync">
+                        <div class="item-header">
+                            <div class="item-info">
+                                <div class="item-icon">🔄</div>
+                                <div>
+                                    <div class="item-title">Bulk Sync Completed</div>
+                                    <div class="item-time">2 minutes ago</div>
+                                </div>
+                            </div>
+                            <button class="expand-button" onclick="toggleExpand(this)">Details</button>
+                        </div>
+                        <div class="item-details">Successfully synced 15 operations from Work Laptop</div>
+                        <div class="item-meta">
+                            <span class="meta-item">💻 Work Laptop</span>
+                            <span class="meta-item">🔢 15 operations</span>
+                            <span class="meta-item">⚡ 0.3s</span>
+                        </div>
+                        <div class="expanded-content">
+                            <div class="tab-list">
+                                <div class="tab-entry">
+                                    <span class="tab-action added">+</span>
+                                    <span>GitHub - Pull Request #234</span>
+                                </div>
+                                <div class="tab-entry">
+                                    <span class="tab-action added">+</span>
+                                    <span>Figma - Design System Updates</span>
+                                </div>
+                                <div class="tab-entry">
+                                    <span class="tab-action removed">−</span>
+                                    <span>Stack Overflow - Answered Question</span>
+                                </div>
+                                <div class="tab-entry">
+                                    <span class="tab-action moved">→</span>
+                                    <span>Slack moved to Work Window</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item add">
+                        <div class="item-header">
+                            <div class="item-info">
+                                <div class="item-icon">➕</div>
+                                <div>
+                                    <div class="item-title">New Window Tracked</div>
+                                    <div class="item-time">15 minutes ago</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item-details">Started tracking "Research" window with 23 tabs</div>
+                        <div class="item-meta">
+                            <span class="meta-item">📱 This Device</span>
+                            <span class="meta-item">🪟 Research Window</span>
+                            <span class="meta-item">📑 23 tabs</span>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item conflict">
+                        <div class="item-header">
+                            <div class="item-info">
+                                <div class="item-icon">⚠️</div>
+                                <div>
+                                    <div class="item-title">Conflict Resolved</div>
+                                    <div class="item-time">1 hour ago</div>
+                                </div>
+                            </div>
+                            <button class="expand-button" onclick="toggleExpand(this)">Details</button>
+                        </div>
+                        <div class="item-details">Tab URL changed on multiple devices simultaneously</div>
+                        <div class="item-meta">
+                            <span class="meta-item">💻 2 devices</span>
+                            <span class="meta-item">🔀 Auto-merged</span>
+                        </div>
+                        <div class="expanded-content">
+                            <p style="font-size: 13px; color: #a1a1aa; margin-bottom: 12px;">
+                                The tab "Project Dashboard" was updated on both devices. The most recent change was kept.
+                            </p>
+                            <div class="tab-list">
+                                <div class="tab-entry">
+                                    <span class="tab-action removed">−</span>
+                                    <span>dashboard.com/old-view (Work Laptop)</span>
+                                </div>
+                                <div class="tab-entry">
+                                    <span class="tab-action added">+</span>
+                                    <span>dashboard.com/new-view (Home Desktop)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item remove">
+                        <div class="item-header">
+                            <div class="item-info">
+                                <div class="item-icon">🗑️</div>
+                                <div>
+                                    <div class="item-title">Bulk Close</div>
+                                    <div class="item-time">2 hours ago</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item-details">Closed 12 tabs from Shopping window</div>
+                        <div class="item-meta">
+                            <span class="meta-item">🏠 Home Desktop</span>
+                            <span class="meta-item">🛒 Shopping Window</span>
+                            <span class="meta-item">📑 12 tabs</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Yesterday's Activity -->
+                <div class="timeline-group">
+                    <div class="timeline-date">Yesterday, March 14</div>
+
+                    <div class="timeline-item sync">
+                        <div class="item-header">
+                            <div class="item-info">
+                                <div class="item-icon">🔄</div>
+                                <div>
+                                    <div class="item-title">Large Sync Operation</div>
+                                    <div class="item-time">11:45 PM</div>
+                                </div>
+                            </div>
+                            <button class="expand-button" onclick="toggleExpand(this)">Details</button>
+                        </div>
+                        <div class="item-details">Synced 47 operations across 3 windows</div>
+                        <div class="item-meta">
+                            <span class="meta-item">💻 Work Laptop</span>
+                            <span class="meta-item">🔢 47 operations</span>
+                            <span class="meta-item">⚡ 1.2s</span>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item add">
+                        <div class="item-header">
+                            <div class="item-info">
+                                <div class="item-icon">🌐</div>
+                                <div>
+                                    <div class="item-title">New Device Connected</div>
+                                    <div class="item-time">9:30 PM</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item-details">Home Desktop joined sync network</div>
+                        <div class="item-meta">
+                            <span class="meta-item">🏠 Home Desktop</span>
+                            <span class="meta-item">🎉 First sync</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Load More -->
+            <div class="load-more">
+                <button class="load-more-button" onclick="loadMore()">Load More Activity</button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Expand/Collapse details
+        function toggleExpand(button) {
+            const item = button.closest('.timeline-item');
+            item.classList.toggle('expanded');
+            button.textContent = item.classList.contains('expanded') ? 'Hide' : 'Details';
+        }
+
+        // Time range selection
+        document.querySelectorAll('.time-button').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.time-button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                button.classList.add('active');
+                loadTimeRange(button.textContent);
+            });
+        });
+
+        // Device filter
+        document.querySelectorAll('.device-option').forEach(option => {
+            option.addEventListener('click', () => {
+                option.classList.toggle('active');
+                applyDeviceFilter();
+            });
+        });
+
+        function applyDeviceFilter() {
+            console.log('Applying device filter...');
+            // Implement filter logic
+        }
+
+        // Load more activity
+        function loadMore() {
+            const button = event.target;
+            button.textContent = 'Loading...';
+            button.disabled = true;
+
+            setTimeout(() => {
+                button.textContent = 'Load More Activity';
+                button.disabled = false;
+                // Add more items to timeline
+            }, 1000);
+        }
+
+        // Clear history
+        function clearHistory() {
+            if (confirm('Clear all sync history? This cannot be undone.')) {
+                console.log('Clearing history...');
+            }
+        }
+
+        // Export history
+        function exportHistory() {
+            console.log('Exporting sync history...');
+            const data = {
+                exported: new Date().toISOString(),
+                activities: []
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `tanaka-sync-history-${Date.now()}.json`;
+            a.click();
+        }
+
+        // Simulate live updates
+        let updateCount = 0;
+        function simulateLiveUpdate() {
+            const indicator = document.getElementById('liveIndicator');
+            indicator.style.display = 'flex';
+
+            setTimeout(() => {
+                indicator.style.display = 'none';
+                updateCount++;
+
+                // Add new item to timeline
+                const newItem = createNewTimelineItem();
+                const todayGroup = document.querySelector('.timeline-group');
+                const firstItem = todayGroup.querySelector('.timeline-item');
+                todayGroup.insertBefore(newItem, firstItem.nextSibling);
+
+                // Update stats
+                updateStats();
+            }, 2000);
+        }
+
+        function createNewTimelineItem() {
+            const div = document.createElement('div');
+            div.className = 'timeline-item sync';
+            div.style.animation = 'fadeIn 0.5s ease-out';
+            div.innerHTML = `
+                <div class="item-header">
+                    <div class="item-info">
+                        <div class="item-icon">🔄</div>
+                        <div>
+                            <div class="item-title">New Sync Activity</div>
+                            <div class="item-time">Just now</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="item-details">Live update #${updateCount} - Tab changes synced</div>
+                <div class="item-meta">
+                    <span class="meta-item">📱 This Device</span>
+                    <span class="meta-item">🔢 3 operations</span>
+                </div>
+            `;
+            return div;
+        }
+
+        function updateStats() {
+            const syncCount = document.querySelector('.stat-value');
+            const currentValue = parseInt(syncCount.textContent);
+            syncCount.innerHTML = `${currentValue + 1}<span class="stat-change">+${updateCount}</span>`;
+        }
+
+        // Simulate periodic updates
+        setInterval(() => {
+            if (Math.random() > 0.7) {
+                simulateLiveUpdate();
+            }
+        }, 10000);
+
+        // Load time range
+        function loadTimeRange(range) {
+            console.log('Loading time range:', range);
+            // Implement time range loading
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tanaka - Error & Troubleshooting</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0a0a0b;
+            color: #e7e7e8;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1a1a1c 0%, #0f0f10 100%);
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-button {
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #e7e7e8;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(-2px);
+        }
+
+        .page-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .refresh-button {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #e7e7e8;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .refresh-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* Error Banner */
+        .error-banner {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .error-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(239, 68, 68, 0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 20px;
+        }
+
+        .error-content {
+            flex: 1;
+        }
+
+        .error-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .error-message {
+            font-size: 14px;
+            color: #a1a1aa;
+            line-height: 1.4;
+        }
+
+        /* Warning Banner */
+        .warning-banner {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .warning-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(245, 158, 11, 0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 20px;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .action-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .action-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(99, 102, 241, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .action-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-size: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .action-card:hover .action-icon {
+            background: rgba(99, 102, 241, 0.2);
+            transform: scale(1.1);
+        }
+
+        .action-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .action-desc {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        /* Diagnostic Panel */
+        .diagnostic-panel {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .panel-title {
+            font-size: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-badge.error {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .status-badge.warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+
+        .status-badge.success {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .panel-content {
+            padding: 20px;
+        }
+
+        /* Check Items */
+        .check-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .check-status {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .check-status.loading {
+            background: rgba(99, 102, 241, 0.2);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 0.5;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.1);
+            }
+        }
+
+        .check-status.success {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .check-status.error {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .check-status.warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+
+        .check-details {
+            flex: 1;
+        }
+
+        .check-name {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .check-info {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .check-action {
+            font-size: 12px;
+            color: #6366f1;
+            cursor: pointer;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .check-action:hover {
+            color: #8b5cf6;
+            text-decoration: underline;
+        }
+
+        /* Debug Info */
+        .debug-section {
+            margin-top: 30px;
+        }
+
+        .debug-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .debug-toggle:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .debug-toggle-title {
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toggle-arrow {
+            transition: transform 0.3s ease;
+        }
+
+        .debug-toggle.active .toggle-arrow {
+            transform: rotate(180deg);
+        }
+
+        .debug-content {
+            margin-top: 12px;
+            padding: 16px;
+            background: #000;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            overflow-x: auto;
+            display: none;
+        }
+
+        .debug-content.active {
+            display: block;
+        }
+
+        .debug-line {
+            margin-bottom: 8px;
+        }
+
+        .debug-key {
+            color: #8b5cf6;
+        }
+
+        .debug-value {
+            color: #22c55e;
+        }
+
+        .debug-error {
+            color: #ef4444;
+        }
+
+        /* Common Issues */
+        .issues-section {
+            margin-top: 30px;
+        }
+
+        .issues-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .issue-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .issue-header {
+            padding: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .issue-header:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .issue-title {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .issue-expand {
+            transition: transform 0.3s ease;
+        }
+
+        .issue-card.expanded .issue-expand {
+            transform: rotate(180deg);
+        }
+
+        .issue-content {
+            padding: 0 16px;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .issue-card.expanded .issue-content {
+            max-height: 500px;
+            padding: 0 16px 16px;
+        }
+
+        .issue-solution {
+            font-size: 13px;
+            color: #a1a1aa;
+            line-height: 1.5;
+        }
+
+        .issue-steps {
+            margin-top: 12px;
+            padding-left: 20px;
+        }
+
+        .issue-steps li {
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: #a1a1aa;
+        }
+
+        /* Copy Button */
+        .copy-button {
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            font-size: 12px;
+            color: #a1a1aa;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .copy-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e7e7e8;
+        }
+
+        .copy-button.copied {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: rgba(34, 197, 94, 0.3);
+            color: #22c55e;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <a href="#" class="back-button">←</a>
+            <h1 class="page-title">Troubleshooting</h1>
+        </div>
+        <button class="refresh-button" onclick="runDiagnostics()">
+            <span>🔄</span>
+            <span>Run Diagnostics</span>
+        </button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Error Banner (Dynamic based on issue) -->
+        <div class="error-banner" id="errorBanner">
+            <div class="error-icon">⚠️</div>
+            <div class="error-content">
+                <div class="error-title">Connection to Server Failed</div>
+                <div class="error-message">Unable to reach the sync server at https://localhost:8443. Please check your network connection and server configuration.</div>
+            </div>
+        </div>
+
+        <!-- Warning Banner (if applicable) -->
+        <div class="warning-banner" id="warningBanner" style="display: none;">
+            <div class="warning-icon">⚡</div>
+            <div class="error-content">
+                <div class="error-title">Sync Delayed</div>
+                <div class="error-message">Last successful sync was 10 minutes ago. Automatic retry in progress.</div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <div class="action-card" onclick="retrySyncNow()">
+                <div class="action-icon">🔄</div>
+                <div class="action-title">Retry Sync</div>
+                <div class="action-desc">Attempt to sync again</div>
+            </div>
+            <div class="action-card" onclick="openSettings()">
+                <div class="action-icon">⚙️</div>
+                <div class="action-title">Check Settings</div>
+                <div class="action-desc">Verify configuration</div>
+            </div>
+            <div class="action-card" onclick="clearLocalData()">
+                <div class="action-icon">🗑️</div>
+                <div class="action-title">Clear Cache</div>
+                <div class="action-desc">Reset local data</div>
+            </div>
+            <div class="action-card" onclick="exportDebugInfo()">
+                <div class="action-icon">📋</div>
+                <div class="action-title">Export Debug</div>
+                <div class="action-desc">Download logs</div>
+            </div>
+        </div>
+
+        <!-- Diagnostic Panel -->
+        <div class="diagnostic-panel">
+            <div class="panel-header">
+                <div class="panel-title">
+                    <span>🔍</span>
+                    <span>System Status</span>
+                </div>
+                <div class="status-badge error">3 Issues</div>
+            </div>
+            <div class="panel-content">
+                <div class="check-list">
+                    <div class="check-item">
+                        <div class="check-status error">✕</div>
+                        <div class="check-details">
+                            <div class="check-name">Server Connection</div>
+                            <div class="check-info">Failed - ERR_CONNECTION_REFUSED</div>
+                        </div>
+                        <a href="#" class="check-action" onclick="fixServerConnection()">Fix</a>
+                    </div>
+                    <div class="check-item">
+                        <div class="check-status error">✕</div>
+                        <div class="check-details">
+                            <div class="check-name">Authentication</div>
+                            <div class="check-info">Invalid token - 401 Unauthorized</div>
+                        </div>
+                        <a href="#" class="check-action" onclick="updateAuthToken()">Update</a>
+                    </div>
+                    <div class="check-item">
+                        <div class="check-status warning">!</div>
+                        <div class="check-details">
+                            <div class="check-name">Permissions</div>
+                            <div class="check-info">Missing tabs permission</div>
+                        </div>
+                        <a href="#" class="check-action" onclick="requestPermissions()">Grant</a>
+                    </div>
+                    <div class="check-item">
+                        <div class="check-status success">✓</div>
+                        <div class="check-details">
+                            <div class="check-name">Extension Version</div>
+                            <div class="check-info">v0.5.0 - Up to date</div>
+                        </div>
+                    </div>
+                    <div class="check-item">
+                        <div class="check-status success">✓</div>
+                        <div class="check-details">
+                            <div class="check-name">Local Storage</div>
+                            <div class="check-info">2.1 MB used of 10 MB</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Debug Info Section -->
+        <div class="debug-section">
+            <div class="debug-toggle" onclick="toggleDebug()">
+                <div class="debug-toggle-title">
+                    <span>🛠️</span>
+                    <span>Debug Information</span>
+                </div>
+                <span class="toggle-arrow">▼</span>
+            </div>
+            <div class="debug-content" id="debugContent">
+                <div class="debug-line">
+                    <span class="debug-key">Server URL:</span> <span class="debug-value">https://localhost:8443</span>
+                </div>
+                <div class="debug-line">
+                    <span class="debug-key">Device ID:</span> <span class="debug-value">device-uuid-123456</span>
+                </div>
+                <div class="debug-line">
+                    <span class="debug-key">Last Sync:</span> <span class="debug-value">2024-03-15T10:30:45Z</span>
+                </div>
+                <div class="debug-line">
+                    <span class="debug-key">Sync Queue:</span> <span class="debug-value">47 operations pending</span>
+                </div>
+                <div class="debug-line">
+                    <span class="debug-key">Lamport Clock:</span> <span class="debug-value">12345</span>
+                </div>
+                <div class="debug-line">
+                    <span class="debug-key">Error Stack:</span>
+                </div>
+                <div class="debug-line debug-error">
+                    Error: Failed to fetch<br>
+                    &nbsp;&nbsp;at SyncManager.sync (sync.js:123)<br>
+                    &nbsp;&nbsp;at async BackgroundService.performSync (background.js:456)
+                </div>
+            </div>
+        </div>
+
+        <!-- Common Issues -->
+        <div class="issues-section">
+            <h2 class="issues-title">
+                <span>💡</span>
+                <span>Common Issues & Solutions</span>
+            </h2>
+
+            <div class="issue-card" onclick="toggleIssue(this)">
+                <div class="issue-header">
+                    <div class="issue-title">Server Connection Failed</div>
+                    <span class="issue-expand">▼</span>
+                </div>
+                <div class="issue-content">
+                    <p class="issue-solution">This usually happens when the server is not running or the URL is incorrect.</p>
+                    <ol class="issue-steps">
+                        <li>Verify server is running: <code>ps aux | grep tanaka</code></li>
+                        <li>Check server logs: <code>tail -f ~/.local/share/tanaka/tanaka.log</code></li>
+                        <li>Test connection: <code>curl https://localhost:8443/health</code></li>
+                        <li>If using self-signed cert, accept it in browser first</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="issue-card" onclick="toggleIssue(this)">
+                <div class="issue-header">
+                    <div class="issue-title">Authentication Failed</div>
+                    <span class="issue-expand">▼</span>
+                </div>
+                <div class="issue-content">
+                    <p class="issue-solution">Your auth token doesn't match the server configuration.</p>
+                    <ol class="issue-steps">
+                        <li>Check token in server config: <code>~/.config/tanaka/tanaka.toml</code></li>
+                        <li>Update token in extension settings</li>
+                        <li>Ensure no extra spaces in token</li>
+                        <li>Restart server after config changes</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="issue-card" onclick="toggleIssue(this)">
+                <div class="issue-header">
+                    <div class="issue-title">Sync Stuck or Delayed</div>
+                    <span class="issue-expand">▼</span>
+                </div>
+                <div class="issue-content">
+                    <p class="issue-solution">Large numbers of operations can cause sync delays.</p>
+                    <ol class="issue-steps">
+                        <li>Check operation queue size in debug info</li>
+                        <li>Force sync: Click "Sync Now" in popup</li>
+                        <li>Clear cache if queue is corrupted</li>
+                        <li>Increase sync frequency in settings</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="issue-card" onclick="toggleIssue(this)">
+                <div class="issue-header">
+                    <div class="issue-title">Missing Permissions</div>
+                    <span class="issue-expand">▼</span>
+                </div>
+                <div class="issue-content">
+                    <p class="issue-solution">Firefox may have revoked extension permissions.</p>
+                    <ol class="issue-steps">
+                        <li>Go to <code>about:addons</code></li>
+                        <li>Click on Tanaka extension</li>
+                        <li>Select "Permissions" tab</li>
+                        <li>Enable all required permissions</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- Help Section -->
+        <div style="margin-top: 40px; text-align: center; padding: 20px;">
+            <p style="color: #6b7280; font-size: 14px; margin-bottom: 16px;">
+                Still having issues? Check out our comprehensive guides:
+            </p>
+            <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                <button class="copy-button" onclick="copyDebugInfo()">
+                    <span>📋</span>
+                    <span>Copy Debug Info</span>
+                </button>
+                <a href="#" class="copy-button" style="text-decoration: none;">
+                    <span>📖</span>
+                    <span>Documentation</span>
+                </a>
+                <a href="#" class="copy-button" style="text-decoration: none;">
+                    <span>💬</span>
+                    <span>Get Help</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle debug info
+        function toggleDebug() {
+            const toggle = document.querySelector('.debug-toggle');
+            const content = document.getElementById('debugContent');
+            toggle.classList.toggle('active');
+            content.classList.toggle('active');
+        }
+
+        // Toggle issue cards
+        function toggleIssue(card) {
+            card.classList.toggle('expanded');
+        }
+
+        // Simulate diagnostics run
+        function runDiagnostics() {
+            const button = document.querySelector('.refresh-button');
+            button.innerHTML = '<span>⏳</span><span>Running...</span>';
+            button.disabled = true;
+
+            // Update check items to loading state
+            document.querySelectorAll('.check-status').forEach(status => {
+                status.className = 'check-status loading';
+                status.textContent = '⋯';
+            });
+
+            // Simulate async checks
+            setTimeout(() => {
+                // Restore check states (in real app, would run actual checks)
+                const statuses = ['error', 'error', 'warning', 'success', 'success'];
+                const icons = ['✕', '✕', '!', '✓', '✓'];
+
+                document.querySelectorAll('.check-status').forEach((status, index) => {
+                    setTimeout(() => {
+                        status.className = `check-status ${statuses[index]}`;
+                        status.textContent = icons[index];
+                    }, index * 200);
+                });
+
+                // Restore button
+                setTimeout(() => {
+                    button.innerHTML = '<span>🔄</span><span>Run Diagnostics</span>';
+                    button.disabled = false;
+                }, 1200);
+            }, 1000);
+        }
+
+        // Quick action functions
+        function retrySyncNow() {
+            console.log('Retrying sync...');
+            // Show toast or update UI
+        }
+
+        function openSettings() {
+            console.log('Opening settings...');
+        }
+
+        function clearLocalData() {
+            if (confirm('This will clear all local data. Are you sure?')) {
+                console.log('Clearing local data...');
+            }
+        }
+
+        function exportDebugInfo() {
+            const debugInfo = document.getElementById('debugContent').innerText;
+            const blob = new Blob([debugInfo], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `tanaka-debug-${Date.now()}.txt`;
+            a.click();
+        }
+
+        // Fix functions
+        function fixServerConnection() {
+            console.log('Opening connection troubleshooter...');
+        }
+
+        function updateAuthToken() {
+            console.log('Opening settings to update token...');
+        }
+
+        function requestPermissions() {
+            console.log('Requesting permissions...');
+        }
+
+        // Copy debug info
+        function copyDebugInfo() {
+            const debugInfo = document.getElementById('debugContent').innerText;
+            navigator.clipboard.writeText(debugInfo).then(() => {
+                const button = event.target.closest('.copy-button');
+                button.classList.add('copied');
+                button.innerHTML = '<span>✓</span><span>Copied!</span>';
+
+                setTimeout(() => {
+                    button.classList.remove('copied');
+                    button.innerHTML = '<span>📋</span><span>Copy Debug Info</span>';
+                }, 2000);
+            });
+        }
+
+        // Simulate different error states
+        function showError(type) {
+            const errorBanner = document.getElementById('errorBanner');
+            const warningBanner = document.getElementById('warningBanner');
+
+            if (type === 'connection') {
+                errorBanner.style.display = 'flex';
+                warningBanner.style.display = 'none';
+            } else if (type === 'warning') {
+                errorBanner.style.display = 'none';
+                warningBanner.style.display = 'flex';
+            } else if (type === 'both') {
+                errorBanner.style.display = 'flex';
+                warningBanner.style.display = 'flex';
+            }
+        }
+
+        // Initialize with connection error
+        showError('connection');
+    </script>
+</body>
+</html>
