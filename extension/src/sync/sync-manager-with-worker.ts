@@ -4,9 +4,11 @@ import type { WindowTracker } from './window-tracker';
 import { TabEventHandler } from './tab-event-handler';
 import type { CrdtOperation, SyncRequest } from '../api/sync';
 import { ExtensionError } from '../error/types';
+import { EXTENSION_PERMISSION_DENIED } from '../api/errors';
 import { debugLog, debugError } from '../utils/logger';
 import type { IBrowser } from '../browser/core';
 import { CrdtWorkerClient } from '../workers/crdt-worker-client';
+import { PermissionsService } from '../services/permissions';
 
 interface SyncManagerConfig {
   syncIntervalMs?: number;
@@ -67,6 +69,7 @@ export class SyncManagerWithWorker {
   private adaptiveConfig: AdaptiveConfig;
   private pendingBatchPriority: OperationPriority | null = null;
   private worker: CrdtWorkerClient;
+  private permissionsService: PermissionsService;
 
   constructor(config: SyncManagerConfig) {
     this.baseInterval = config.syncIntervalMs ?? 5000;
@@ -77,6 +80,7 @@ export class SyncManagerWithWorker {
     this.deviceId = config.deviceId ?? this.generateDeviceId();
     this.adaptiveConfig = DEFAULT_ADAPTIVE_CONFIG;
     this.worker = new CrdtWorkerClient();
+    this.permissionsService = new PermissionsService(this.browser);
   }
 
   private generateDeviceId(): string {
@@ -211,6 +215,29 @@ export class SyncManagerWithWorker {
     if (this.isSyncing) {
       debugLog('Sync already in progress, skipping');
       return ok(undefined);
+    }
+
+    // Check permissions before attempting to sync
+    const permissionCheck = await this.permissionsService.checkPermissions();
+    if (permissionCheck.isErr()) {
+      debugError('Permission check failed', permissionCheck.error);
+      return err(permissionCheck.error);
+    }
+
+    if (!permissionCheck.value) {
+      debugLog('Missing required permissions for sync');
+      const missingPermsResult = await this.permissionsService.getMissingPermissions();
+      const missingPerms = missingPermsResult.isOk() ? missingPermsResult.value.permissions : [];
+
+      return err(
+        new ExtensionError(EXTENSION_PERMISSION_DENIED, 'Missing required permissions for sync', {
+          context: { missingPermissions: missingPerms },
+          recoveryActions: [
+            'Grant the required permissions',
+            'Click the extension icon and follow the permission prompt',
+          ],
+        }),
+      );
     }
 
     this.isSyncing = true;

@@ -103,9 +103,10 @@ These bugs prevent Tanaka from fulfilling its primary purpose:
 **Fix**: Validate request size and operation count  
 **Status**: Completed in PR #78
 
-#### `fix/permission-checks` - Dynamic Permission Verification
+#### `fix/permission-checks` - Dynamic Permission Verification ✅
 **Impact**: MV3 allows runtime permission revocation  
-**Fix**: Check permissions before each sync attempt
+**Fix**: Check permissions before each sync attempt  
+**Status**: Completed - Added PermissionsService and integrated permission checks into sync flow
 
 ### 3.3 Data Integrity Fixes 💾 **PREVENT DATA LOSS**
 
@@ -218,7 +219,7 @@ Prepare for v1.0 release with performance optimization, monitoring, and Mozilla 
 - [x] CORS properly configured - only extension origins allowed
 - [x] Content Security Policy added to manifest.json
 - [x] Input validation prevents DOS attacks
-- [ ] Permissions checked before each sync operation
+- [x] Permissions checked before each sync operation
 
 #### Data Integrity ✓
 - [ ] Database uses SQLx migrations (no runtime CREATE TABLE)
