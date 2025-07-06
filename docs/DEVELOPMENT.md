@@ -41,11 +41,11 @@
 
 ### 1.3 Data Guarantees
 
-> **⚠️ Phase 3 Status**: Some guarantees are still being restored. See [Phase 3 Critical Fixes](ROADMAP.md#-phase-3-critical-fixes) for details.
+> **✅ Phase 3 Complete**: All data guarantees have been restored. Multi-device synchronization is fully functional.
 
-- **Eventual Consistency** – Structured CRDT operations ensure replicas converge regardless of network order. *(Currently broken due to device ID authentication bug)*
-- **Crash Safety** – Server state now persists across restarts. WAL mode plus 5s flush means at most 5 seconds of operations are in memory at any moment. ✅
-- **Security** – All traffic is TLS-encrypted (`rustls`) and protected by a shared bearer token. *(CORS currently too permissive)*
+- **Eventual Consistency** – Structured CRDT operations ensure replicas converge regardless of network order. ✅
+- **Crash Safety** – Server state persists across restarts. WAL mode plus 5s flush means at most 5 seconds of operations are in memory at any moment. ✅
+- **Security** – All traffic is TLS-encrypted (`rustls`) and protected by a shared bearer token with proper CORS configuration. ✅
 
 For detailed protocol specification, see [SYNC-PROTOCOL.md](SYNC-PROTOCOL.md).
 
@@ -354,7 +354,7 @@ pnpm run gen-icons     # Generate icons
 
 ## 7. Testing Strategy
 
-> **Note**: Multi-device sync tests will fail until [Phase 3 Critical Fixes](ROADMAP.md#-phase-3-critical-fixes) are complete.
+> **Note**: All tests including multi-device sync tests should now pass.
 
 ### Enhanced Testing Infrastructure
 

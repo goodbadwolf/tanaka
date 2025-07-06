@@ -40,11 +40,11 @@
 
 ## Data Guarantees
 
-> **Note**: Some guarantees are partially functional. Full multi-device sync requires completion of remaining [Phase 3 Critical Fixes](ROADMAP.md#-phase-3-critical-fixes).
+> **✅ All guarantees fully functional**: Phase 3 critical fixes are complete.
 
-- **Eventual Consistency** – Structured CRDT operations ensure replicas converge regardless of network order. *(Pending device auth fix for multi-device)*
+- **Eventual Consistency** – Structured CRDT operations ensure replicas converge regardless of network order. ✅
 - **Crash Safety** – Server state persists across restarts. WAL mode plus adaptive sync intervals mean at most 10 seconds of operations are in memory during idle periods. ✅
-- **Security** – All traffic is TLS-encrypted (`rustls`) and protected by a shared bearer token. *(CORS configuration needs hardening)*
+- **Security** – All traffic is TLS-encrypted (`rustls`) and protected by a shared bearer token with hardened CORS configuration. ✅
 
 ## CRDT Synchronization Protocol
 
