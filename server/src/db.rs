@@ -91,3 +91,117 @@ pub async fn init_db_with_config(config: &DatabaseConfig) -> AppResult<SqlitePoo
 
     Ok(pool)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use sqlx::Row;
+    use tanaka_server::config::DatabaseConfig;
+    use tempfile::tempdir;
+
+    #[tokio::test]
+    async fn test_init_db_with_config_success() {
+        let temp_dir = tempdir().unwrap();
+        let db_path = temp_dir.path().join("test.db");
+        let config = DatabaseConfig {
+            url: format!("sqlite://{}", db_path.display()),
+            max_connections: 5,
+            connection_timeout_secs: 10,
+        };
+
+        let pool = init_db_with_config(&config).await.unwrap();
+
+        // Verify database was created
+        assert!(db_path.exists());
+
+        // Verify migrations were applied
+        let result = sqlx::query("SELECT name FROM sqlite_master WHERE type='table'")
+            .fetch_all(&pool)
+            .await
+            .unwrap();
+
+        let table_names: Vec<String> = result
+            .iter()
+            .map(|row| row.get::<String, _>("name"))
+            .collect();
+
+        assert!(table_names.contains(&"crdt_operations".to_string()));
+        assert!(table_names.contains(&"crdt_state".to_string()));
+        assert!(table_names.contains(&"_sqlx_migrations".to_string()));
+    }
+
+    #[tokio::test]
+    async fn test_init_db_with_memory_database() {
+        let config = DatabaseConfig {
+            url: "sqlite::memory:".to_string(),
+            max_connections: 1,
+            connection_timeout_secs: 5,
+        };
+
+        let pool = init_db_with_config(&config).await.unwrap();
+
+        // Verify migrations were applied to in-memory database
+        let result = sqlx::query("SELECT COUNT(*) as count FROM sqlite_master WHERE type='table'")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+
+        let count: i32 = result.get("count");
+        assert!(count >= 3); // At least crdt_operations, crdt_state, and _sqlx_migrations
+    }
+
+    #[tokio::test]
+    async fn test_init_db_idempotent() {
+        let temp_dir = tempdir().unwrap();
+        let db_path = temp_dir.path().join("test.db");
+        let config = DatabaseConfig {
+            url: format!("sqlite://{}", db_path.display()),
+            max_connections: 5,
+            connection_timeout_secs: 10,
+        };
+
+        // Initialize database twice
+        let pool1 = init_db_with_config(&config).await.unwrap();
+        drop(pool1);
+
+        let pool2 = init_db_with_config(&config).await.unwrap();
+
+        // Should succeed without errors
+        let result = sqlx::query("SELECT COUNT(*) as count FROM _sqlx_migrations")
+            .fetch_one(&pool2)
+            .await
+            .unwrap();
+
+        let count: i32 = result.get("count");
+        assert_eq!(count, 1); // Only one migration should be recorded
+    }
+
+    #[tokio::test]
+    async fn test_init_db_verifies_pragma_settings() {
+        let temp_dir = tempdir().unwrap();
+        let db_path = temp_dir.path().join("test.db");
+        let config = DatabaseConfig {
+            url: format!("sqlite://{}", db_path.display()),
+            max_connections: 1,
+            connection_timeout_secs: 5,
+        };
+
+        let pool = init_db_with_config(&config).await.unwrap();
+
+        // Verify WAL mode is set (only works with file-based databases)
+        let result = sqlx::query("PRAGMA journal_mode")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+        let mode: String = result.get(0);
+        assert_eq!(mode, "wal");
+
+        // Verify synchronous mode
+        let result = sqlx::query("PRAGMA synchronous")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+        let sync_mode: i32 = result.get(0);
+        assert_eq!(sync_mode, 1); // NORMAL = 1
+    }
+}

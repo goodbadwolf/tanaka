@@ -128,16 +128,6 @@ cargo install sqlx-cli --no-default-features --features sqlite
 
 </details>
 
-<details>
-<summary>5. Install Optional Tools</summary>
-
-```bash
-# Python development tools
-pip install uv  # Fast Python package manager
-```
-
-</details>
-
 ### Python Package Management: uv vs pip
 
 This project uses `uv` for Python dependency management:
