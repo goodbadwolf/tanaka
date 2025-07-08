@@ -1,0 +1,15 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <title>Tanaka Extension Icon</title>
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366F1" />
+      <stop offset="100%" stop-color="#8B5CF6" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background rounded square -->
+  <rect width="128" height="128" rx="32" fill="url(#gradient)"/>
+
+  <!-- T letter -->
+  <path d="M 32 36 L 96 36 L 96 52 L 76 52 L 76 92 L 52 92 L 52 52 L 32 52 Z" fill="white"/>
+</svg>

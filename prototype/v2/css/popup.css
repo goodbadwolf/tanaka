@@ -1,0 +1,403 @@
+/* Tanaka Extension - Popup-specific Styles */
+
+/* ===== Reset & Base ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Note: Color variables and gradients are defined in styles.css */
+
+/* ===== State Classes ===== */
+.is-hidden {
+  display: none !important;
+}
+
+.is-editing {
+  outline: 2px solid var(--color-primary);
+}
+
+.is-editing-hidden {
+  display: none !important;
+}
+
+/* ===== Layout Utilities ===== */
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gap-sm {
+  gap: var(--space-sm);
+}
+
+.gap-md {
+  gap: var(--space-md);
+}
+
+/* ===== Popup Layout ===== */
+body.popup-body {
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
+    sans-serif;
+  width: 380px;
+  min-height: 500px;
+  background: var(--color-background);
+  color: var(--color-text-primary);
+  overflow: hidden;
+  position: relative;
+}
+
+/* ===== Shared Components ===== */
+
+/* Header */
+.header {
+  background: var(--gradient-header);
+  padding: 20px;
+  border-bottom: 1px solid var(--color-border-subtle);
+  position: relative;
+  overflow: hidden;
+}
+
+.header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+  animation: pulse 4s ease-in-out infinite;
+}
+
+.header-content {
+  position: relative;
+  z-index: 1;
+}
+
+.app-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.logo {
+  width: 32px;
+  height: 32px;
+  background: var(--gradient-primary);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 18px;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+h1 {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* Sync Status */
+.sync-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+/* Quick Actions */
+.quick-actions {
+  padding: 16px 20px;
+  background: var(--color-background-secondary);
+  display: flex;
+  gap: 8px;
+}
+
+/* Windows Section */
+.windows-section {
+  padding: 20px;
+  flex: 1;
+  overflow-y: auto;
+  position: relative;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ===== Window Management ===== */
+.window-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.window-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.window-details {
+  flex: 1;
+}
+
+.window-details h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 2px;
+  display: inline-block;
+  cursor: text;
+  padding: 2px 4px;
+  margin-left: -4px;
+  border-radius: 4px;
+  position: relative;
+}
+
+.window-details h3:hover {
+  background: var(--color-surface-2);
+}
+
+.window-details h3:hover::after {
+  content: '✏️';
+  position: absolute;
+  right: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  opacity: 0.5;
+}
+
+.window-details h3.editing {
+  background: var(--color-surface-3);
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+.window-name-input {
+  font-size: 14px;
+  font-weight: 600;
+  background: var(--color-surface-3);
+  border: 2px solid var(--color-primary);
+  border-radius: 4px;
+  color: var(--color-text-primary);
+  padding: 2px 8px;
+  outline: none;
+  font-family: inherit;
+  width: 100%;
+  margin-bottom: 2px;
+}
+
+.tab-preview {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.tab-icon {
+  width: 20px;
+  height: 20px;
+  background: var(--color-surface-2);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.tab-count {
+  width: 20px;
+  height: 20px;
+  background: var(--color-surface-3);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+/* Settings Icon */
+.settings-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 32px;
+  height: 32px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-surface-3);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 2;
+}
+
+.settings-button:hover {
+  background: var(--color-surface-3);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: rotate(45deg);
+}
+
+.settings-button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ===== State Classes ===== */
+.is-hidden {
+  display: none !important;
+}
+
+.is-active {
+  /* Context-dependent styling */
+}
+
+.is-editing {
+  background: var(--color-surface-3);
+  outline: 2px solid var(--color-primary);
+}
+
+/* ===== Track Overlay System ===== */
+.track-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(10, 10, 11, 0.95);
+  backdrop-filter: blur(10px);
+  display: none;
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.track-overlay.active {
+  display: flex;
+}
+
+/* Scanner Animation */
+.scanner-container {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  margin-bottom: 30px;
+}
+
+.scanner-window {
+  width: 100%;
+  height: 100%;
+  background: rgba(99, 102, 241, 0.1);
+  border: 2px solid var(--color-primary);
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+  animation: scannerGlow 2s ease-in-out infinite;
+}
+
+.scanner-line {
+  position: absolute;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--color-primary), transparent);
+  animation: scan 2s linear infinite;
+}
+
+/* Floating Tabs Animation */
+.floating-tab {
+  position: absolute;
+  width: 40px;
+  height: 30px;
+  background: var(--color-surface-3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  animation: floatIn 0.8s ease-out forwards;
+  opacity: 0;
+}
+
+.scanner-status {
+  text-align: center;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.scanner-status h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.scanner-status p {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.tab-counter {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-top: 10px;
+}
+
+/* Success State */
+.success-checkmark {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 20px;
+  opacity: 0;
+}
+
+.success-checkmark.show {
+  animation: successPop 0.6s ease-out forwards;
+}
+
+.checkmark-circle {
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  stroke-width: 3;
+  stroke-miterlimit: 10;
+  stroke: var(--color-primary);
+  fill: none;
+  animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+.checkmark-check {
+  transform-origin: 50% 50%;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  stroke: var(--color-primary);
+  stroke-width: 3;
+  animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.6s forwards;
+}
