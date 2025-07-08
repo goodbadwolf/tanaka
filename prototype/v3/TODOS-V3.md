@@ -4,7 +4,7 @@
 
 ### Branch Rules
 
-- **ALWAYS**: Feature branches only, use `git add -p` (not `-A`), get confirmation for destructive ops
+- **ALWAYS**: Feature branches only, use `git add -p` (not `-A`), get confirmation for destructive ops (rm, restore, reset, rebase)
 - **NEVER**: Commit/push to main, use `git add -A`
 - **ALL** changes via pull request
 
@@ -55,4 +55,4 @@ git push origin feat/your-task-name
    g. [x] Test all remaining pages still work correctly
    h. [x] Update grid layout in index.html if needed
    i. [x] Use 4 columns in index
-   j. [ ] Consolidate design items but not actual pages into a single page
+   j. [x] Consolidate pages that contain design items, but are not actual pages for the extension, into a single page.
