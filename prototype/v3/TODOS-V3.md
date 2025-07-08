@@ -31,9 +31,15 @@ git add -p prototype/v3/TODOS-V3.md
 git commit -m "docs: mark task complete"
 
 git push origin feat/your-task-name
+
+# Create PR targeting feat/prototype-v3 (NOT main)
+gh pr create --base feat/prototype-v3
 ```
 
-**IMPORTANT**: ALWAYS COMMIT after completing EACH lettered item in a task. This creates a clear history and allows for easier rollback if needed.
+**IMPORTANT**:
+
+- ALWAYS COMMIT after completing EACH lettered item in a task. This creates a clear history and allows for easier rollback if needed.
+- ALWAYS create PRs targeting `feat/prototype-v3` branch, NEVER `main`
 
 **PR Requirements:**
 
