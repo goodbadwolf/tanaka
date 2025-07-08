@@ -12,9 +12,7 @@
       }
 
       body {
-        font-family:
-          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
-          sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         background: #0a0a0b;
         color: #e7e7e8;
         min-height: 100vh;
@@ -161,7 +159,7 @@
       }
 
       .prototype-card::before {
-        content: '';
+        content: "";
         position: absolute;
         top: 0;
         left: 0;
@@ -297,18 +295,14 @@
           <span class="card-badge">Core</span>
           <div class="card-icon">🪟</div>
           <h3 class="card-title">Popup</h3>
-          <p class="card-description">
-            Main extension popup with window tracking animations and sync status
-          </p>
+          <p class="card-description">Main extension popup with window tracking animations and sync status</p>
         </a>
 
         <a href="tanaka-settings.html" class="prototype-card">
           <span class="card-badge">Core</span>
           <div class="card-icon">⚙️</div>
           <h3 class="card-title">Settings</h3>
-          <p class="card-description">
-            Comprehensive settings with tabbed navigation and device management
-          </p>
+          <p class="card-description">Comprehensive settings with tabbed navigation and device management</p>
         </a>
 
         <a href="tanaka-onboarding.html" class="prototype-card">
@@ -368,16 +362,12 @@
       <div class="info-section">
         <h2 class="info-title">Design System</h2>
         <p class="info-text">
-          These prototypes showcase Tanaka's new design language with consistent spacing,
-          typography, and interactions. Each component follows the same visual principles for a
-          cohesive user experience.
+          These prototypes showcase Tanaka's new design language with consistent spacing, typography, and interactions.
+          Each component follows the same visual principles for a cohesive user experience.
         </p>
         <div class="design-tokens">
           <div class="token">
-            <div
-              class="color-swatch"
-              style="background: linear-gradient(135deg, #6366f1, #8b5cf6)"
-            ></div>
+            <div class="color-swatch" style="background: linear-gradient(135deg, #6366f1, #8b5cf6)"></div>
             <span>Primary Gradient</span>
           </div>
           <div class="token">
@@ -402,16 +392,16 @@
 
     <script>
       // Add some interactive hover effects
-      document.querySelectorAll('.prototype-card').forEach((card) => {
-        card.addEventListener('mouseenter', (e) => {
-          const icon = card.querySelector('.card-icon');
-          icon.style.transform = 'scale(1.1) rotate(5deg)';
-          icon.style.transition = 'transform 0.3s ease';
+      document.querySelectorAll(".prototype-card").forEach((card) => {
+        card.addEventListener("mouseenter", (e) => {
+          const icon = card.querySelector(".card-icon");
+          icon.style.transform = "scale(1.1) rotate(5deg)";
+          icon.style.transition = "transform 0.3s ease";
         });
 
-        card.addEventListener('mouseleave', (e) => {
-          const icon = card.querySelector('.card-icon');
-          icon.style.transform = 'scale(1) rotate(0deg)';
+        card.addEventListener("mouseleave", (e) => {
+          const icon = card.querySelector(".card-icon");
+          icon.style.transform = "scale(1) rotate(0deg)";
         });
       });
     </script>
