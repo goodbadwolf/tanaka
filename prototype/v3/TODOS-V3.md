@@ -44,7 +44,7 @@ git push origin feat/your-task-name
 
 ## Pending Tasks
 
-1. **Branch: `feat/remove-redundant-pages`** ✅
+1. **Branch: `feat/remove-redundant-pages`**
 
    a. [x] Add a scrollbar to index.html
    b. [x] Delete tab-search
@@ -54,3 +54,5 @@ git push origin feat/your-task-name
    f. [x] Verify no broken references remain
    g. [x] Test all remaining pages still work correctly
    h. [x] Update grid layout in index.html if needed
+   i. [x] Use 4 columns in index
+   j. [ ] Consolidate design items but not actual pages into a single page
