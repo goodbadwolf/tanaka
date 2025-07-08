@@ -56,3 +56,4 @@ git push origin feat/your-task-name
    h. [x] Update grid layout in index.html if needed
    i. [x] Use 4 columns in index
    j. [x] Consolidate pages that contain design items, but are not actual pages for the extension, into a single page.
+   k. [x] Verify the consolidation
