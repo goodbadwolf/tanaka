@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tanaka - Window Details</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/animations.css" />
+    <link rel="stylesheet" href="css/utilities.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/window-details.css" />
+  </head>
+  <body>
+    <div class="window-details">
+      <!-- Header -->
+      <div class="details-header">
+        <div class="header-top">
+          <button class="back-button" onclick="goBack()">←</button>
+          <div class="header-actions">
+            <button class="action-button" onclick="duplicateWindow()">
+              <span>📋</span>
+              <span>Duplicate</span>
+            </button>
+            <button class="action-button" onclick="shareWindow()">
+              <span>🔗</span>
+              <span>Share</span>
+            </button>
+            <button class="action-button primary" onclick="openAllTabs()">
+              <span>↗</span>
+              <span>Open All</span>
+            </button>
+          </div>
+        </div>
+        <div class="window-info">
+          <div class="window-title-row">
+            <div class="window-icon">💻</div>
+            <h1 class="window-title" onclick="editTitle(this)">Work - MacBook Pro</h1>
+          </div>
+          <div class="window-meta">
+            <span class="meta-item">
+              <span>📍</span>
+              <span>MacBook Pro</span>
+            </span>
+            <span class="meta-item">
+              <span>🔄</span>
+              <span>Synced 2 min ago</span>
+            </span>
+            <span class="meta-item">
+              <span>📅</span>
+              <span>Created March 10, 2024</span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search and Filter -->
+      <div class="search-filter-bar">
+        <div class="search-box">
+          <input type="text" class="search-input" placeholder="Search tabs in this window..." />
+          <button class="search-clear" onclick="clearSearch()">✕</button>
+        </div>
+        <button class="filter-button" onclick="toggleFilter('active')">
+          <span>⚡</span>
+          <span>Active</span>
+        </button>
+        <button class="filter-button" onclick="toggleFilter('pinned')">
+          <span>📌</span>
+          <span>Pinned</span>
+        </button>
+      </div>
+
+      <!-- Tab Stats -->
+      <div class="tab-stats">
+        <div class="stat">
+          <div class="stat-value">45</div>
+          <div class="stat-label">Total Tabs</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">3</div>
+          <div class="stat-label">Pinned</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">12</div>
+          <div class="stat-label">Active Today</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">8</div>
+          <div class="stat-label">Domains</div>
+        </div>
+      </div>
+
+      <!-- Tab List -->
+      <div class="tab-list">
+        <!-- Pinned Tabs Group -->
+        <div class="tab-group">
+          <div class="group-header">
+            <span class="group-title">
+              <span>📌</span>
+              <span>Pinned Tabs</span>
+            </span>
+            <span class="group-count">3</span>
+          </div>
+
+          <div class="tab-item pinned" onclick="toggleSelect(this)">
+            <div class="tab-checkbox"></div>
+            <div class="tab-favicon">📧</div>
+            <div class="tab-content">
+              <div class="tab-title">Gmail - Inbox (47)</div>
+              <div class="tab-url">mail.google.com</div>
+            </div>
+            <div class="tab-actions">
+              <button class="tab-action" title="Open">↗</button>
+              <button class="tab-action" title="Unpin">📌</button>
+              <button class="tab-action" title="Close">✕</button>
+            </div>
+          </div>
+
+          <div class="tab-item pinned" onclick="toggleSelect(this)">
+            <div class="tab-checkbox"></div>
+            <div class="tab-favicon">💬</div>
+            <div class="tab-content">
+              <div class="tab-title">Slack - General Channel</div>
+              <div class="tab-url">app.slack.com</div>
+            </div>
+            <div class="tab-actions">
+              <button class="tab-action" title="Open">↗</button>
+              <button class="tab-action" title="Unpin">📌</button>
+              <button class="tab-action" title="Close">✕</button>
+            </div>
+          </div>
+
+          <div class="tab-item pinned" onclick="toggleSelect(this)">
+            <div class="tab-checkbox"></div>
+            <div class="tab-favicon">📊</div>
+            <div class="tab-content">
+              <div class="tab-title">Analytics Dashboard</div>
+              <div class="tab-url">analytics.company.com</div>
+            </div>
+            <div class="tab-actions">
+              <button class="tab-action" title="Open">↗</button>
+              <button class="tab-action" title="Unpin">📌</button>
+              <button class="tab-action" title="Close">✕</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Active Tabs Group -->
+        <div class="tab-group">
+          <div class="group-header">
+            <span class="group-title">
+              <span>🔥</span>
+              <span>Active Tabs</span>
+            </span>
+            <span class="group-count">12</span>
+          </div>
+
+          <div class="tab-item active" onclick="toggleSelect(this)">
+            <div class="tab-checkbox"></div>
+            <div class="tab-favicon">🔍</div>
+            <div class="tab-content">
+              <div class="tab-title">GitHub - Tanaka Project</div>
+              <div class="tab-url">github.com/goodbadwolf/tanaka</div>
+            </div>
+            <div class="tab-actions">
+              <button class="tab-action" title="Open">↗</button>
+              <button class="tab-action" title="Pin">📌</button>
+              <button class="tab-action" title="Close">✕</button>
+            </div>
+          </div>
+
+          <div class="tab-item" onclick="toggleSelect(this)">
+            <div class="tab-checkbox"></div>
+            <div class="tab-favicon">📝</div>
+            <div class="tab-content">
+              <div class="tab-title">Google Docs - Q1 Report Draft</div>
+              <div class="tab-url">docs.google.com/document/d/1234...</div>
+            </div>
+            <div class="tab-actions">
+              <button class="tab-action" title="Open">↗</button>
+              <button class="tab-action" title="Pin">📌</button>
+              <button class="tab-action" title="Close">✕</button>
+            </div>
+          </div>
+
+          <div class="tab-item" onclick="toggleSelect(this)">
+            <div class="tab-checkbox"></div>
+            <div class="tab-favicon">🎨</div>
+            <div class="tab-content">
+              <div class="tab-title">Figma - UI Design System</div>
+              <div class="tab-url">figma.com/file/abc123...</div>
+            </div>
+            <div class="tab-actions">
+              <button class="tab-action" title="Open">↗</button>
+              <button class="tab-action" title="Pin">📌</button>
+              <button class="tab-action" title="Close">✕</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Other Tabs Group -->
+        <div class="tab-group">
+          <div class="group-header">
+            <span class="group-title">
+              <span>📁</span>
+              <span>Other Tabs</span>
+            </span>
+            <span class="group-count">30</span>
+          </div>
+
+          <div class="tab-item" onclick="toggleSelect(this)">
+            <div class="tab-checkbox"></div>
+            <div class="tab-favicon">🔧</div>
+            <div class="tab-content">
+              <div class="tab-title">Stack Overflow - How to implement CRDT</div>
+              <div class="tab-url">stackoverflow.com/questions/...</div>
+            </div>
+            <div class="tab-actions">
+              <button class="tab-action" title="Open">↗</button>
+              <button class="tab-action" title="Pin">📌</button>
+              <button class="tab-action" title="Close">✕</button>
+            </div>
+          </div>
+
+          <div class="tab-item" onclick="toggleSelect(this)">
+            <div class="tab-checkbox"></div>
+            <div class="tab-favicon">📖</div>
+            <div class="tab-content">
+              <div class="tab-title">MDN - Web Workers API</div>
+              <div class="tab-url">developer.mozilla.org/en-US/docs/...</div>
+            </div>
+            <div class="tab-actions">
+              <button class="tab-action" title="Open">↗</button>
+              <button class="tab-action" title="Pin">📌</button>
+              <button class="tab-action" title="Close">✕</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Actions -->
+      <div class="footer-actions">
+        <span class="selection-info"> <span id="selectionCount">0</span> tabs selected </span>
+        <div class="bulk-actions">
+          <button class="action-button" onclick="bookmarkSelected()">
+            <span>⭐</span>
+            <span>Bookmark</span>
+          </button>
+          <button class="action-button" onclick="closeSelected()">
+            <span>✕</span>
+            <span>Close</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Window title editing
+      function editTitle(element) {
+        if (element.classList.contains('editing')) return;
+
+        const originalText = element.textContent;
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'edit-input';
+        input.value = originalText;
+
+        element.classList.add('editing');
+        element.style.display = 'none';
+        element.parentNode.insertBefore(input, element.nextSibling);
+        input.focus();
+        input.select();
+
+        const saveEdit = () => {
+          const newText = input.value.trim() || originalText;
+          element.textContent = newText;
+          element.style.display = 'block';
+          element.classList.remove('editing');
+          input.remove();
+        };
+
+        input.addEventListener('blur', saveEdit);
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            saveEdit();
+          } else if (e.key === 'Escape') {
+            input.value = originalText;
+            saveEdit();
+          }
+        });
+      }
+
+      // Tab selection
+      let selectedTabs = new Set();
+
+      function toggleSelect(tabItem) {
+        if (event.target.closest('.tab-actions')) return;
+
+        tabItem.classList.toggle('selected');
+        const tabId = tabItem.dataset.tabId || Math.random().toString();
+
+        if (tabItem.classList.contains('selected')) {
+          selectedTabs.add(tabId);
+        } else {
+          selectedTabs.delete(tabId);
+        }
+
+        updateSelectionCount();
+      }
+
+      function updateSelectionCount() {
+        document.getElementById('selectionCount').textContent = selectedTabs.size;
+      }
+
+      // Search functionality
+      const searchInput = document.querySelector('.search-input');
+      searchInput.addEventListener('input', (e) => {
+        performSearch(e.target.value);
+      });
+
+      function clearSearch() {
+        searchInput.value = '';
+        performSearch('');
+      }
+
+      function performSearch(query) {
+        console.log('Searching for:', query);
+        // Implement search logic
+      }
+
+      // Filter functionality
+      function toggleFilter(filterType) {
+        const button = event.target.closest('.filter-button');
+        button.classList.toggle('active');
+        applyFilters();
+      }
+
+      function applyFilters() {
+        console.log('Applying filters...');
+        // Implement filter logic
+      }
+
+      // Group collapsing
+      document.querySelectorAll('.group-header').forEach((header) => {
+        header.addEventListener('click', () => {
+          const group = header.parentElement;
+          group.classList.toggle('collapsed');
+          // In real implementation, hide/show tabs
+        });
+      });
+
+      // Actions
+      function goBack() {
+        // Slide out animation
+        const details = document.querySelector('.window-details');
+        details.style.animation = 'slideOut 0.3s ease-out forwards';
+
+        setTimeout(() => {
+          console.log('Going back to popup');
+        }, 300);
+      }
+
+      function duplicateWindow() {
+        console.log('Duplicating window');
+      }
+
+      function shareWindow() {
+        console.log('Sharing window');
+      }
+
+      function openAllTabs() {
+        if (confirm('Open all 45 tabs? This may affect browser performance.')) {
+          console.log('Opening all tabs');
+        }
+      }
+
+      function bookmarkSelected() {
+        console.log('Bookmarking', selectedTabs.size, 'tabs');
+      }
+
+      function closeSelected() {
+        if (confirm(`Close ${selectedTabs.size} tabs?`)) {
+          console.log('Closing selected tabs');
+        }
+      }
+
+      // Tab actions
+      document.querySelectorAll('.tab-action').forEach((button) => {
+        button.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const action = button.getAttribute('title');
+          console.log('Tab action:', action);
+        });
+      });
+
+      // Drag and drop (basic implementation)
+      let draggedItem = null;
+
+      document.querySelectorAll('.tab-item').forEach((item) => {
+        item.draggable = true;
+
+        item.addEventListener('dragstart', (e) => {
+          draggedItem = item;
+          item.classList.add('dragging');
+        });
+
+        item.addEventListener('dragend', () => {
+          item.classList.remove('dragging');
+        });
+
+        item.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          item.classList.add('drag-over');
+        });
+
+        item.addEventListener('dragleave', () => {
+          item.classList.remove('drag-over');
+        });
+
+        item.addEventListener('drop', (e) => {
+          e.preventDefault();
+          item.classList.remove('drag-over');
+
+          if (draggedItem && draggedItem !== item) {
+            const parent = item.parentNode;
+            const nextSibling = item.nextSibling;
+            parent.insertBefore(draggedItem, nextSibling);
+          }
+        });
+      });
+
+      // Add slide out animation
+      const style = document.createElement('style');
+      style.textContent = `
+            @keyframes slideOut {
+                to {
+                    transform: translateX(100%);
+                }
+            }
+        `;
+      document.head.appendChild(style);
+    </script>
+  </body>
+</html>

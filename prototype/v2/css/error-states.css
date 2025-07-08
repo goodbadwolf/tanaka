@@ -1,0 +1,549 @@
+/* Tanaka Error States - Page-specific Styles */
+
+/**
+ * Error & Troubleshooting Page Layout
+ *
+ * Displays various error states, diagnostics, and troubleshooting steps
+ * Includes error banners, diagnostic panels, and solution cards
+ *
+ * Dependencies: styles.css, animations.css, components.css
+ * Used in: tanaka-error-states-updated.html
+ */
+
+/* ===== Base Styles ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background: var(--color-background);
+  color: var(--color-text-primary);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== Header ===== */
+.header {
+  background: var(--gradient-header);
+  padding: var(--space-lg) var(--space-xl);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.back-button {
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--color-text-primary);
+  text-decoration: none;
+  font-size: 16px;
+}
+
+.back-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(-2px);
+}
+
+.page-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.refresh-button {
+  padding: var(--space-sm) var(--space-lg);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.refresh-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* ===== Main Content ===== */
+.main-content {
+  flex: 1;
+  padding: var(--space-xl);
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ===== Error Banner ===== */
+.error-banner {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-xl);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Note: slideIn animation is already defined in animations.css */
+
+.error-icon {
+  width: 40px;
+  height: 40px;
+  background: rgba(239, 68, 68, 0.2);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 20px;
+}
+
+.error-content {
+  flex: 1;
+}
+
+.error-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.error-message {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+/* ===== Warning Banner ===== */
+.warning-banner {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-xl);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+}
+
+.warning-icon {
+  width: 40px;
+  height: 40px;
+  background: rgba(245, 158, 11, 0.2);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 20px;
+}
+
+/* ===== Quick Actions ===== */
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-md);
+  margin-bottom: 30px;
+}
+
+.action-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  text-align: center;
+}
+
+.action-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(99, 102, 241, 0.3);
+  transform: translateY(-2px);
+}
+
+.action-icon {
+  width: 48px;
+  height: 48px;
+  background: rgba(99, 102, 241, 0.1);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--space-md);
+  font-size: 24px;
+  transition: all var(--transition-base);
+}
+
+.action-card:hover .action-icon {
+  background: rgba(99, 102, 241, 0.2);
+  transform: scale(1.1);
+}
+
+.action-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.action-desc {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+/* ===== Diagnostic Panel ===== */
+.diagnostic-panel {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.panel-header {
+  background: rgba(255, 255, 255, 0.03);
+  padding: var(--space-lg) var(--space-xl);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.panel-title {
+  font-size: 15px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-badge.error {
+  background: rgba(239, 68, 68, 0.2);
+  color: var(--color-error);
+}
+
+.status-badge.warning {
+  background: rgba(245, 158, 11, 0.2);
+  color: var(--color-warning);
+}
+
+.status-badge.success {
+  background: rgba(34, 197, 94, 0.2);
+  color: var(--color-success);
+}
+
+.panel-content {
+  padding: var(--space-xl);
+}
+
+/* ===== Check Items ===== */
+.check-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.check-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base);
+}
+
+.check-status {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.check-status.loading {
+  background: rgba(99, 102, 241, 0.2);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Note: pulse animation is already defined in animations.css */
+
+.check-status.success {
+  background: rgba(34, 197, 94, 0.2);
+  color: var(--color-success);
+}
+
+.check-status.error {
+  background: rgba(239, 68, 68, 0.2);
+  color: var(--color-error);
+}
+
+.check-status.warning {
+  background: rgba(245, 158, 11, 0.2);
+  color: var(--color-warning);
+}
+
+.check-details {
+  flex: 1;
+}
+
+.check-name {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.check-info {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.check-action {
+  font-size: 12px;
+  color: var(--color-primary);
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.check-action:hover {
+  color: var(--color-secondary);
+  text-decoration: underline;
+}
+
+/* ===== Debug Info ===== */
+.debug-section {
+  margin-top: 30px;
+}
+
+.debug-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-lg);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.debug-toggle:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.debug-toggle-title {
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.toggle-arrow {
+  transition: transform var(--transition-base);
+}
+
+.debug-toggle.active .toggle-arrow {
+  transform: rotate(180deg);
+}
+
+.debug-content {
+  margin-top: var(--space-md);
+  padding: var(--space-lg);
+  background: #000;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  font-family: 'SF Mono', Monaco, monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-x: auto;
+  display: none;
+}
+
+.debug-content.active {
+  display: block;
+}
+
+.debug-line {
+  margin-bottom: var(--space-sm);
+}
+
+.debug-key {
+  color: var(--color-secondary);
+}
+
+.debug-value {
+  color: var(--color-success);
+}
+
+.debug-error {
+  color: var(--color-error);
+}
+
+/* ===== Common Issues ===== */
+.issues-section {
+  margin-top: 30px;
+}
+
+.issues-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: var(--space-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.issue-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-md);
+  overflow: hidden;
+  transition: all var(--transition-base);
+}
+
+.issue-header {
+  padding: var(--space-lg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.issue-header:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.issue-title {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.issue-expand {
+  transition: transform var(--transition-base);
+}
+
+.issue-card.expanded .issue-expand {
+  transform: rotate(180deg);
+}
+
+.issue-content {
+  padding: 0 var(--space-lg);
+  max-height: 0;
+  overflow: hidden;
+  transition: all var(--transition-base);
+}
+
+.issue-card.expanded .issue-content {
+  max-height: 500px;
+  padding: 0 var(--space-lg) var(--space-lg);
+}
+
+.issue-solution {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.issue-steps {
+  margin-top: var(--space-md);
+  padding-left: var(--space-xl);
+}
+
+.issue-steps li {
+  margin-bottom: var(--space-sm);
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+/* ===== Copy Button ===== */
+.copy-button {
+  padding: 6px var(--space-md);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.copy-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-text-primary);
+}
+
+.copy-button.copied {
+  background: rgba(34, 197, 94, 0.1);
+  border-color: rgba(34, 197, 94, 0.3);
+  color: var(--color-success);
+}
+
+/* ===== Help Section ===== */
+.help-section {
+  margin-top: 40px;
+  text-align: center;
+  padding: 20px;
+}
+
+.help-text {
+  color: #6b7280;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.help-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.help-link {
+  text-decoration: none;
+}
+
+/* ===== Visibility Utilities ===== */
+.hidden {
+  display: none;
+}

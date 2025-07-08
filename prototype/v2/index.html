@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tanaka UI Prototypes</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/animations.css" />
+    <link rel="stylesheet" href="css/utilities.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/index.css" />
+  </head>
+  <body>
+    <!-- Background Animation -->
+    <div class="background-canvas">
+      <div class="floating-orb orb1"></div>
+      <div class="floating-orb orb2"></div>
+      <div class="floating-orb orb3"></div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+      <!-- Header -->
+      <div class="header">
+        <div class="app-logo-large">T</div>
+        <h1>Tanaka UI Prototypes</h1>
+        <p class="subtitle">Explore the redesigned interface components</p>
+      </div>
+
+      <!-- Prototype Grid -->
+      <div class="prototype-grid">
+        <a href="tanaka-popup.html" class="prototype-card">
+          <span class="card-badge">Core</span>
+          <div class="card-icon">🪟</div>
+          <h3 class="card-title">Popup</h3>
+          <p class="card-description">
+            Main extension popup with window tracking animations and sync status
+          </p>
+        </a>
+
+        <a href="tanaka-settings.html" class="prototype-card">
+          <span class="card-badge">Core</span>
+          <div class="card-icon">⚙️</div>
+          <h3 class="card-title">Settings</h3>
+          <p class="card-description">
+            Comprehensive settings with tabbed navigation and device management
+          </p>
+        </a>
+
+        <a href="tanaka-onboarding.html" class="prototype-card">
+          <span class="card-badge">Core</span>
+          <div class="card-icon">🚀</div>
+          <h3 class="card-title">Onboarding</h3>
+          <p class="card-description">Step-by-step setup flow for first-time users</p>
+        </a>
+
+        <a href="tanaka-tab-search.html" class="prototype-card">
+          <span class="card-badge new">New</span>
+          <div class="card-icon">🔍</div>
+          <h3 class="card-title">Tab Search</h3>
+          <p class="card-description">Advanced search interface with filters and bulk actions</p>
+        </a>
+
+        <a href="tanaka-window-details.html" class="prototype-card">
+          <span class="card-badge new">New</span>
+          <div class="card-icon">📊</div>
+          <h3 class="card-title">Window Details</h3>
+          <p class="card-description">Detailed window view with tab management and statistics</p>
+        </a>
+
+        <a href="tanaka-sync-history.html" class="prototype-card">
+          <span class="card-badge new">New</span>
+          <div class="card-icon">📅</div>
+          <h3 class="card-title">Sync History</h3>
+          <p class="card-description">Timeline view of sync activity with device filtering</p>
+        </a>
+
+        <a href="tanaka-context-menu.html" class="prototype-card">
+          <div class="card-icon">🖱️</div>
+          <h3 class="card-title">Context Menu</h3>
+          <p class="card-description">Right-click menu with quick actions and sync status</p>
+        </a>
+
+        <a href="tanaka-notifications.html" class="prototype-card">
+          <div class="card-icon">🔔</div>
+          <h3 class="card-title">Notifications</h3>
+          <p class="card-description">Toast notifications, progress updates, and inline alerts</p>
+        </a>
+
+        <a href="tanaka-empty-states.html" class="prototype-card">
+          <div class="card-icon">📭</div>
+          <h3 class="card-title">Empty States</h3>
+          <p class="card-description">Informative states for various empty scenarios</p>
+        </a>
+
+        <a href="tanaka-error-states.html" class="prototype-card">
+          <div class="card-icon">⚠️</div>
+          <h3 class="card-title">Error & Troubleshooting</h3>
+          <p class="card-description">Error handling and diagnostic tools</p>
+        </a>
+      </div>
+
+      <!-- Info Section -->
+      <div class="info-section">
+        <h2 class="info-title">Design System</h2>
+        <p class="info-text">
+          These prototypes showcase Tanaka's new design language with consistent spacing,
+          typography, and interactions. Each component follows the same visual principles for a
+          cohesive user experience.
+        </p>
+        <div class="design-tokens">
+          <div class="token">
+            <div
+              class="color-swatch"
+              style="background: linear-gradient(135deg, #6366f1, #8b5cf6)"
+            ></div>
+            <span>Primary Gradient</span>
+          </div>
+          <div class="token">
+            <div class="color-swatch" style="background: #0a0a0b"></div>
+            <span>Background</span>
+          </div>
+          <div class="token">
+            <div class="color-swatch" style="background: #e7e7e8"></div>
+            <span>Text Primary</span>
+          </div>
+          <div class="token">
+            <div class="color-swatch" style="background: #22c55e"></div>
+            <span>Success</span>
+          </div>
+          <div class="token">
+            <div class="color-swatch" style="background: #ef4444"></div>
+            <span>Error</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Add some interactive hover effects
+      document.querySelectorAll('.prototype-card').forEach((card) => {
+        card.addEventListener('mouseenter', (e) => {
+          const icon = card.querySelector('.card-icon');
+          icon.style.transform = 'scale(1.1) rotate(5deg)';
+          icon.style.transition = 'transform 0.3s ease';
+        });
+
+        card.addEventListener('mouseleave', (e) => {
+          const icon = card.querySelector('.card-icon');
+          icon.style.transform = 'scale(1) rotate(0deg)';
+        });
+      });
+    </script>
+  </body>
+</html>
