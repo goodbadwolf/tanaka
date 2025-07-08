@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tanaka - Design System</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/animations.css" />
+    <link rel="stylesheet" href="css/utilities.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/design-system.css" />
+  </head>
+  <body>
+    <div class="design-system-container">
+      <!-- Header -->
+      <div class="design-header">
+        <h1 class="design-title">Tanaka Design System</h1>
+        <p class="design-subtitle">UI patterns and components for consistent user experience</p>
+      </div>
+
+      <!-- Tab Navigation -->
+      <div class="tab-navigation">
+        <button class="tab-button active" data-tab="empty-states">Empty States</button>
+        <button class="tab-button" data-tab="notifications">Notifications</button>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="tab-content">
+        <!-- Empty States Tab -->
+        <div id="empty-states-tab" class="tab-pane active">
+          <div class="gallery-header">
+            <h2 class="gallery-title">Empty States</h2>
+            <p class="gallery-subtitle">Guiding users when there's no data to display</p>
+          </div>
+
+          <div class="states-grid">
+            <!-- No Windows Tracked -->
+            <div class="state-card">
+              <div class="state-header">
+                <h3 class="state-title">No Windows Tracked</h3>
+              </div>
+              <div class="state-container">
+                <div
+                  class="floating-window floating-element"
+                  style="top: 20%; left: 10%; animation-delay: 0s"
+                ></div>
+                <div
+                  class="floating-window floating-element"
+                  style="top: 40%; right: 15%; animation-delay: 1s"
+                ></div>
+                <div
+                  class="floating-window floating-element"
+                  style="bottom: 30%; left: 20%; animation-delay: 2s"
+                ></div>
+                <div class="empty-icon">🪟</div>
+                <h3 class="empty-title">No Windows Tracked</h3>
+                <p class="empty-description">
+                  Start tracking windows to sync your tabs across devices
+                </p>
+                <button class="button button-primary">Track This Window</button>
+              </div>
+            </div>
+
+            <!-- No Tabs -->
+            <div class="state-card">
+              <div class="state-header">
+                <h3 class="state-title">No Tabs in Window</h3>
+              </div>
+              <div class="state-container">
+                <div class="empty-icon">📑</div>
+                <h3 class="empty-title">Window is Empty</h3>
+                <p class="empty-description">This window doesn't have any tabs to sync</p>
+                <div class="empty-hint">Open some tabs to start syncing</div>
+              </div>
+            </div>
+
+            <!-- Offline State -->
+            <div class="state-card">
+              <div class="state-header">
+                <h3 class="state-title">Offline</h3>
+              </div>
+              <div class="state-container">
+                <div class="offline-animation">
+                  <div class="wifi-icon">
+                    <div class="wifi-dot"></div>
+                    <div class="wifi-ring wifi-ring-1"></div>
+                    <div class="wifi-ring wifi-ring-2"></div>
+                    <div class="wifi-ring wifi-ring-3"></div>
+                  </div>
+                </div>
+                <h3 class="empty-title">You're Offline</h3>
+                <p class="empty-description">
+                  Tanaka will sync your tabs when connection is restored
+                </p>
+                <div class="status-badge badge-warning">Last synced 5 min ago</div>
+              </div>
+            </div>
+
+            <!-- No History -->
+            <div class="state-card">
+              <div class="state-header">
+                <h3 class="state-title">No Sync History</h3>
+              </div>
+              <div class="state-container">
+                <div class="empty-icon">📅</div>
+                <h3 class="empty-title">No Activity Yet</h3>
+                <p class="empty-description">
+                  Your sync history will appear here once you start tracking windows
+                </p>
+              </div>
+            </div>
+
+            <!-- Welcome State -->
+            <div class="state-card">
+              <div class="state-header">
+                <h3 class="state-title">Welcome</h3>
+              </div>
+              <div class="state-container">
+                <div class="welcome-animation">
+                  <div class="welcome-icon">🎉</div>
+                  <div class="confetti confetti-1"></div>
+                  <div class="confetti confetti-2"></div>
+                  <div class="confetti confetti-3"></div>
+                </div>
+                <h3 class="empty-title">Welcome to Tanaka!</h3>
+                <p class="empty-description">
+                  Let's get you set up to sync tabs across your devices
+                </p>
+                <button class="button button-primary">Get Started</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notifications Tab -->
+        <div id="notifications-tab" class="tab-pane">
+          <div class="gallery-header">
+            <h2 class="gallery-title">Notification System</h2>
+            <p class="gallery-subtitle">Consistent feedback across all interfaces</p>
+          </div>
+
+          <!-- Trigger Buttons -->
+          <div class="trigger-grid">
+            <button class="trigger-button" onclick="showNotification('success')">
+              ✅ Success Notification
+            </button>
+            <button class="trigger-button" onclick="showNotification('error')">
+              ❌ Error Notification
+            </button>
+            <button class="trigger-button" onclick="showNotification('warning')">
+              ⚠️ Warning Notification
+            </button>
+            <button class="trigger-button" onclick="showNotification('info')">
+              ℹ️ Info Notification
+            </button>
+            <button class="trigger-button" onclick="showProgress()">
+              📊 Progress Notification
+            </button>
+            <button class="trigger-button" onclick="showInline()">
+              📌 Inline Notification
+            </button>
+          </div>
+
+          <!-- Notification Types -->
+          <div class="notification-types">
+            <h3 class="section-title">Toast Notifications</h3>
+            <div class="type-grid">
+              <div class="type-example">
+                <div class="toast toast-success" style="position: static; transform: translateX(0); opacity: 1;">
+                  <div class="toast-icon">✓</div>
+                  <div class="toast-content">
+                    <h4 class="toast-title">Success!</h4>
+                    <p class="toast-message">Your tabs have been synced</p>
+                  </div>
+                  <button class="toast-close">✕</button>
+                </div>
+              </div>
+
+              <div class="type-example">
+                <div class="toast toast-error" style="position: static; transform: translateX(0); opacity: 1;">
+                  <div class="toast-icon">✕</div>
+                  <div class="toast-content">
+                    <h4 class="toast-title">Error</h4>
+                    <p class="toast-message">Failed to connect to server</p>
+                  </div>
+                  <button class="toast-close">✕</button>
+                </div>
+              </div>
+
+              <div class="type-example">
+                <div class="toast toast-warning" style="position: static; transform: translateX(0); opacity: 1;">
+                  <div class="toast-icon">!</div>
+                  <div class="toast-content">
+                    <h4 class="toast-title">Warning</h4>
+                    <p class="toast-message">Some tabs couldn't be synced</p>
+                  </div>
+                  <button class="toast-close">✕</button>
+                </div>
+              </div>
+            </div>
+
+            <h3 class="section-title">Progress Notifications</h3>
+            <div class="progress-example">
+              <div class="progress-notification" style="position: static; transform: translateX(0); opacity: 1;">
+                <div class="progress-header">
+                  <h4 class="progress-title">Syncing tabs...</h4>
+                  <span class="progress-percentage">75%</span>
+                </div>
+                <div class="progress-bar-container">
+                  <div class="progress-bar-fill" style="width: 75%"></div>
+                </div>
+                <p class="progress-status">Syncing 18 of 24 tabs</p>
+              </div>
+            </div>
+
+            <h3 class="section-title">Inline Notifications</h3>
+            <div class="inline-examples">
+              <div class="inline-notification inline-info">
+                <div class="inline-icon">ℹ️</div>
+                <p class="inline-message">
+                  Tip: Use keyboard shortcut Ctrl+Shift+T to quickly search tabs
+                </p>
+              </div>
+
+              <div class="inline-notification inline-success">
+                <div class="inline-icon">✓</div>
+                <p class="inline-message">
+                  Settings saved successfully
+                </p>
+              </div>
+
+              <div class="inline-notification inline-warning">
+                <div class="inline-icon">⚠️</div>
+                <p class="inline-message">
+                  You have unsaved changes. Save before leaving?
+                </p>
+                <div class="inline-actions">
+                  <button class="button-small button-primary">Save</button>
+                  <button class="button-small button-secondary">Discard</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script>
+      // Tab Navigation
+      document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', () => {
+          // Remove active class from all
+          document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+          document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+
+          // Add active to clicked
+          button.classList.add('active');
+          const tabName = button.getAttribute('data-tab');
+          document.getElementById(`${tabName}-tab`).classList.add('active');
+        });
+      });
+
+      // Notification Functions
+      function showNotification(type) {
+        const messages = {
+          success: { title: 'Success!', message: 'Operation completed successfully' },
+          error: { title: 'Error', message: 'Something went wrong' },
+          warning: { title: 'Warning', message: 'Please check your settings' },
+          info: { title: 'Info', message: 'New update available' }
+        };
+
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.innerHTML = `
+          <div class="toast-icon">${type === 'success' ? '✓' : type === 'error' ? '✕' : type === 'warning' ? '!' : 'i'}</div>
+          <div class="toast-content">
+            <h4 class="toast-title">${messages[type].title}</h4>
+            <p class="toast-message">${messages[type].message}</p>
+          </div>
+          <button class="toast-close" onclick="this.parentElement.remove()">✕</button>
+        `;
+
+        const container = document.getElementById('toastContainer');
+        container.appendChild(toast);
+
+        setTimeout(() => toast.classList.add('show'), 10);
+        setTimeout(() => {
+          toast.classList.remove('show');
+          setTimeout(() => toast.remove(), 300);
+        }, 3000);
+      }
+
+      function showProgress() {
+        const toast = document.createElement('div');
+        toast.className = 'progress-notification';
+        let progress = 0;
+
+        toast.innerHTML = `
+          <div class="progress-header">
+            <h4 class="progress-title">Syncing tabs...</h4>
+            <span class="progress-percentage">0%</span>
+          </div>
+          <div class="progress-bar-container">
+            <div class="progress-bar-fill" style="width: 0%"></div>
+          </div>
+          <p class="progress-status">Starting sync...</p>
+        `;
+
+        const container = document.getElementById('toastContainer');
+        container.appendChild(toast);
+        setTimeout(() => toast.classList.add('show'), 10);
+
+        const interval = setInterval(() => {
+          progress += 10;
+          if (progress > 100) {
+            clearInterval(interval);
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+            showNotification('success');
+            return;
+          }
+
+          toast.querySelector('.progress-percentage').textContent = `${progress}%`;
+          toast.querySelector('.progress-bar-fill').style.width = `${progress}%`;
+          toast.querySelector('.progress-status').textContent = `Syncing ${Math.round(progress/4)} of 25 tabs`;
+        }, 200);
+      }
+
+      function showInline() {
+        const inline = document.createElement('div');
+        inline.className = 'inline-notification inline-info';
+        inline.innerHTML = `
+          <div class="inline-icon">ℹ️</div>
+          <p class="inline-message">This is a temporary inline notification</p>
+          <button class="inline-close" onclick="this.parentElement.remove()">✕</button>
+        `;
+
+        document.querySelector('.trigger-grid').appendChild(inline);
+        setTimeout(() => inline.classList.add('show'), 10);
+        setTimeout(() => {
+          inline.classList.remove('show');
+          setTimeout(() => inline.remove(), 300);
+        }, 5000);
+      }
+    </script>
+  </body>
+</html>
