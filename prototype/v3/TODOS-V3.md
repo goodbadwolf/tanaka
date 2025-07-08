@@ -14,10 +14,17 @@
 
 ```bash
 git checkout -b feat/your-task-name
-# Complete ALL checkboxes [ ] → [x]
 
-git add -p                    # Review & stage changes
-git commit -m "feat: ..."     # Feature commits
+# Work on each item and commit after EACH one
+# Example: After completing item 1
+git add -p
+git commit -m "feat: add scrollbar to index.html"
+
+# After completing item 2
+git add -p
+git commit -m "feat: delete tab-search page"
+
+# Continue this pattern for ALL items
 
 # Update BOTH TODO files before PR
 git add -p docs/TODOS.md prototype/v3/TODOS-V3.md
@@ -25,6 +32,8 @@ git commit -m "docs: mark task complete"
 
 git push origin feat/your-task-name
 ```
+
+**IMPORTANT**: ALWAYS COMMIT after completing EACH numbered item in a task. This creates a clear history and allows for easier rollback if needed.
 
 **PR Requirements:**
 
