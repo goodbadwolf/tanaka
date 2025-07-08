@@ -4,7 +4,7 @@
 
 ### Branch Rules
 
-- **ALWAYS**: Feature branches only, use `git add -p` (not `-A`), get confirmation for destructive ops
+- **ALWAYS**: Feature branches only, use `git add -p` (not `-A`), get confirmation for destructive ops (rm, restore, reset, rebase)
 - **NEVER**: Commit/push to main, use `git add -A`
 - **ALL** changes via pull request
 
@@ -16,29 +16,35 @@
 git checkout -b feat/your-task-name
 
 # Work on each item and commit after EACH one
-# Example: After completing item 1
+# Example: After completing item a
 git add -p
 git commit -m "feat: add scrollbar to index.html"
 
-# After completing item 2
+# After completing item b
 git add -p
 git commit -m "feat: delete tab-search page"
 
 # Continue this pattern for ALL items
 
-# Update BOTH TODO files before PR
-git add -p docs/TODOS.md prototype/v3/TODOS-V3.md
+# Update TODO file before PR
+git add -p prototype/v3/TODOS-V3.md
 git commit -m "docs: mark task complete"
 
 git push origin feat/your-task-name
+
+# Create PR targeting feat/prototype-v3 (NOT main)
+gh pr create --base feat/prototype-v3
 ```
 
-**IMPORTANT**: ALWAYS COMMIT after completing EACH numbered item in a task. This creates a clear history and allows for easier rollback if needed.
+**IMPORTANT**:
+
+- ALWAYS COMMIT after completing EACH lettered item in a task. This creates a clear history and allows for easier rollback if needed.
+- ALWAYS create PRs targeting `feat/prototype-v3` branch, NEVER `main`
 
 **PR Requirements:**
 
 1. ✅ All checkboxes complete (no partial PRs)
-2. 📝 Both TODO files updated in your branch
+2. 📝 TODO file updated in your branch
 3. 📋 Before merge: Review commits & update PR description
 4. 🗑️ After merge: Delete local branch
 
@@ -46,11 +52,14 @@ git push origin feat/your-task-name
 
 1. **Branch: `feat/remove-redundant-pages`**
 
-   1. [ ] Add a scrollbar to index.html
-   2. [ ] Delete tab-search
-   3. [ ] Delete window-details
-   4. [ ] Check all HTML files for links to removed pages
-   5. [ ] Update tanaka.js if it references removed pages
-   6. [ ] Verify no broken references remain
-   7. [ ] Test all remaining pages still work correctly
-   8. [ ] Update grid layout in index.html if needed
+   a. [x] Add a scrollbar to index.html
+   b. [x] Delete tab-search
+   c. [x] Delete window-details
+   d. [x] Check all HTML files for links to removed pages
+   e. [x] Update tanaka.js if it references removed pages
+   f. [x] Verify no broken references remain
+   g. [x] Test all remaining pages still work correctly
+   h. [x] Update grid layout in index.html if needed
+   i. [x] Use 4 columns in index
+   j. [x] Consolidate pages that contain design items, but are not actual pages for the extension, into a single page.
+   k. [x] Verify the consolidation

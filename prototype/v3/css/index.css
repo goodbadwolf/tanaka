@@ -6,15 +6,15 @@
 }
 
 body {
-  font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   background: #0a0a0b;
   color: #e7e7e8;
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* ===== Background Animation ===== */
@@ -83,6 +83,7 @@ body {
   width: 100%;
   max-width: 900px;
   padding: 40px 20px;
+  margin: 0 auto;
 }
 
 /* ===== Header ===== */
@@ -134,9 +135,21 @@ h1 {
 /* ===== Prototype Grid ===== */
 .prototype-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   margin-bottom: 40px;
+}
+
+@media (max-width: 900px) {
+  .prototype-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .prototype-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .prototype-card {
@@ -154,7 +167,7 @@ h1 {
 }
 
 .prototype-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;

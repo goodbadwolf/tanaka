@@ -52,33 +52,6 @@
       "requireSameDimensions": false
     },
     {
-      "label": "ContextMenu_Comparison",
-      "url": "file:///Users/manish/projects/tanaka/prototype/v2/context-menu.html",
-      "referenceUrl": "file:///Users/manish/projects/tanaka/prototype/v1/context-menu.html",
-      "selectors": ["document"],
-      "delay": 500,
-      "misMatchThreshold": 0.5,
-      "requireSameDimensions": true
-    },
-    {
-      "label": "TabSearch_Comparison",
-      "url": "file:///Users/manish/projects/tanaka/prototype/v2/tab-search.html",
-      "referenceUrl": "file:///Users/manish/projects/tanaka/prototype/v1/tab-search.html",
-      "selectors": ["document"],
-      "delay": 500,
-      "misMatchThreshold": 0.5,
-      "requireSameDimensions": true
-    },
-    {
-      "label": "WindowDetails_Comparison",
-      "url": "file:///Users/manish/projects/tanaka/prototype/v2/window-details.html",
-      "referenceUrl": "file:///Users/manish/projects/tanaka/prototype/v1/window-details.html",
-      "selectors": ["document"],
-      "delay": 500,
-      "misMatchThreshold": 0.5,
-      "requireSameDimensions": true
-    },
-    {
       "label": "SyncHistory_Comparison",
       "url": "file:///Users/manish/projects/tanaka/prototype/v2/sync-history.html",
       "referenceUrl": "file:///Users/manish/projects/tanaka/prototype/v1/sync-history.html",
