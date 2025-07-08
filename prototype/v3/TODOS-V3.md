@@ -64,13 +64,22 @@ gh pr create --base feat/prototype-v3
    j. [x] Consolidate pages that contain design items, but are not actual pages for the extension, into a single page.
    k. [x] Verify the consolidation
 
-2. **Branch: `feat/refactor-v3-html-css`**
+2. **Branch: `feat/refactor-v3-html-css-2`**
 
    **Goal**: Standardize HTML components with BEM methodology and prepare for CSS consolidation (Task 3).
 
    **⚠️ MANDATORY BackstopJS Testing ⚠️**:
-   - **BEFORE STARTING**: Capture reference screenshots with `npx backstop reference --config=backstop.json`
-   - **AFTER EACH LETTERED ITEM**: Run `npx backstop test --config=backstop.json`
+
+   - **BEFORE STARTING**:
+     1. Create backup copies of all HTML and CSS files:
+        ```bash
+        mkdir -p backup
+        cp *.html backup/
+        cp -r css backup/
+        ```
+     2. Update `backstop.json` to use backup files as reference
+     3. Capture reference screenshots with `pnpm dlx backstopjs reference --config=backstop.json`
+   - **AFTER EACH LETTERED ITEM**: Run `pnpm dlx backstopjs test --config=backstop.json`
    - **🛑 STOP if regression > 0.1%** - Do NOT proceed to next item
    - **🛑 STOP and investigate** any visual differences before continuing
    - **Expected**: 0% visual change (refactoring should be invisible)

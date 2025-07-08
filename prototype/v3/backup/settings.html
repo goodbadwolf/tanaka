@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tanaka Settings</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/animations.css" />
+    <link rel="stylesheet" href="css/utilities.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/settings.css" />
+    <style>
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <div class="header">
+      <div class="header-content">
+        <a href="#" class="back-button">←</a>
+        <h1 class="page-title">Settings</h1>
+        <button class="save-button" id="saveBtn">Save Changes</button>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Navigation Tabs -->
+      <div class="nav-tabs">
+        <button class="nav-tab active" data-tab="general">
+          <span>⚙️</span>
+          <span>General</span>
+        </button>
+        <button class="nav-tab" data-tab="sync">
+          <span>🔄</span>
+          <span>Sync</span>
+        </button>
+        <button class="nav-tab" data-tab="devices">
+          <span>💻</span>
+          <span>Devices</span>
+        </button>
+        <button class="nav-tab" data-tab="advanced">
+          <span>🔧</span>
+          <span>Advanced</span>
+        </button>
+        <button class="nav-tab" data-tab="about">
+          <span>ℹ️</span>
+          <span>About</span>
+        </button>
+      </div>
+
+      <!-- General Tab -->
+      <div class="tab-content active" id="general-tab">
+        <div class="settings-section">
+          <div class="section-header">
+            <div class="section-icon">🎨</div>
+            <div class="section-title">
+              <h3>Appearance</h3>
+              <p>Customize how Tanaka looks and feels</p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Theme</label>
+            <select class="form-select">
+              <option>Dark (Default)</option>
+              <option>Light</option>
+              <option>System</option>
+            </select>
+          </div>
+
+          <div class="toggle-group">
+            <div class="toggle-label">
+              <span>Compact Mode</span>
+              <small>Show more windows in less space</small>
+            </div>
+            <div class="toggle-switch"></div>
+          </div>
+
+          <div class="toggle-group">
+            <div class="toggle-label">
+              <span>Show Tab Previews</span>
+              <small>Display favicon previews for each window</small>
+            </div>
+            <div class="toggle-switch active"></div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="section-header">
+            <div class="section-icon">🔔</div>
+            <div class="section-title">
+              <h3>Notifications</h3>
+              <p>Control when Tanaka notifies you</p>
+            </div>
+          </div>
+
+          <div class="toggle-group">
+            <div class="toggle-label">
+              <span>Sync Notifications</span>
+              <small>Show when tabs are synced successfully</small>
+            </div>
+            <div class="toggle-switch active"></div>
+          </div>
+
+          <div class="toggle-group">
+            <div class="toggle-label">
+              <span>Error Notifications</span>
+              <small>Alert when sync errors occur</small>
+            </div>
+            <div class="toggle-switch active"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sync Tab -->
+      <div class="tab-content" id="sync-tab">
+        <div class="settings-section">
+          <div class="section-header">
+            <div class="section-icon">🌐</div>
+            <div class="section-title">
+              <h3>Server Configuration</h3>
+              <p>Connect to your Tanaka sync server</p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Server URL</label>
+            <input
+              type="url"
+              class="form-input"
+              placeholder="https://your-server.com:8443"
+              value="https://localhost:8443"
+            />
+            <p class="form-hint">The URL of your Tanaka server</p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Auth Token</label>
+            <input
+              type="password"
+              class="form-input"
+              placeholder="Enter your authentication token"
+              value="••••••••••••••••"
+            />
+            <p class="form-hint">Found in your server's tanaka.toml config file</p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Device Name</label>
+            <input type="text" class="form-input" placeholder="My Firefox" value="Work Laptop" />
+            <p class="form-hint">A friendly name to identify this device</p>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="section-header">
+            <div class="section-icon">⚡</div>
+            <div class="section-title">
+              <h3>Sync Behavior</h3>
+              <p>Fine-tune synchronization settings</p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Sync Interval</label>
+            <select class="form-select">
+              <option>Adaptive (1-10s)</option>
+              <option>Fast (1s)</option>
+              <option>Normal (5s)</option>
+              <option>Slow (10s)</option>
+              <option>Manual Only</option>
+            </select>
+            <p class="form-hint">How often to sync with the server</p>
+          </div>
+
+          <div class="toggle-group">
+            <div class="toggle-label">
+              <span>Auto-sync on Startup</span>
+              <small>Sync tabs when Firefox starts</small>
+            </div>
+            <div class="toggle-switch active"></div>
+          </div>
+
+          <div class="toggle-group">
+            <div class="toggle-label">
+              <span>Sync Closed Tabs</span>
+              <small>Keep history of recently closed tabs</small>
+            </div>
+            <div class="toggle-switch"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Devices Tab -->
+      <div class="tab-content" id="devices-tab">
+        <div class="settings-section">
+          <div class="section-header">
+            <div class="section-icon">📱</div>
+            <div class="section-title">
+              <h3>Connected Devices</h3>
+              <p>Manage devices syncing with this server</p>
+            </div>
+          </div>
+
+          <div class="device-list">
+            <div class="device-item">
+              <div class="device-info">
+                <div class="device-icon">💻</div>
+                <div class="device-details">
+                  <h4>Work Laptop (This Device)</h4>
+                  <small>Last sync: Just now</small>
+                </div>
+              </div>
+              <div class="device-status">
+                <span class="status-dot"></span>
+                <span>Active</span>
+              </div>
+            </div>
+
+            <div class="device-item">
+              <div class="device-info">
+                <div class="device-icon">🖥️</div>
+                <div class="device-details">
+                  <h4>Home Desktop</h4>
+                  <small>Last sync: 5 minutes ago</small>
+                </div>
+              </div>
+              <div class="device-status">
+                <span class="status-dot"></span>
+                <span>Active</span>
+              </div>
+            </div>
+
+            <div class="device-item inactive">
+              <div class="device-info">
+                <div class="device-icon">💻</div>
+                <div class="device-details">
+                  <h4>Old Laptop</h4>
+                  <small>Last sync: 3 days ago</small>
+                </div>
+              </div>
+              <div class="device-status inactive">
+                <span class="status-dot inactive"></span>
+                <span>Inactive</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Advanced Tab -->
+      <div class="tab-content" id="advanced-tab">
+        <div class="settings-section">
+          <div class="section-header">
+            <div class="section-icon">🚀</div>
+            <div class="section-title">
+              <h3>Performance</h3>
+              <p>Optimize Tanaka for your system</p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Max Tabs to Sync</label>
+            <input type="number" class="form-input" value="500" />
+            <p class="form-hint">Limit the number of tabs synced per window</p>
+          </div>
+
+          <div class="toggle-group">
+            <div class="toggle-label">
+              <span>Use Web Workers</span>
+              <small>Offload processing to background threads</small>
+            </div>
+            <div class="toggle-switch active"></div>
+          </div>
+
+          <div class="toggle-group">
+            <div class="toggle-label">
+              <span>Debug Mode</span>
+              <small>Enable verbose logging in console</small>
+            </div>
+            <div class="toggle-switch"></div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="section-header">
+            <div class="section-icon">💾</div>
+            <div class="section-title">
+              <h3>Data Management</h3>
+              <p>Control your local and synced data</p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <button class="danger-button inline">Clear Local Cache</button>
+            <p class="form-hint">Remove locally stored tab data</p>
+          </div>
+
+          <div class="form-group">
+            <button class="danger-button inline">Export Data</button>
+            <p class="form-hint">Download all your tab data as JSON</p>
+          </div>
+        </div>
+
+        <div class="settings-section danger-zone">
+          <div class="section-header">
+            <div class="section-icon">⚠️</div>
+            <div class="section-title">
+              <h3>Danger Zone</h3>
+              <p>Irreversible actions - proceed with caution</p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <button class="danger-button inline">Reset All Settings</button>
+            <p class="form-hint">Restore all settings to defaults</p>
+          </div>
+
+          <div class="form-group">
+            <button class="danger-button inline">Delete All Data</button>
+            <p class="form-hint">Remove all local and synced data permanently</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- About Tab -->
+      <div class="tab-content" id="about-tab">
+        <div class="settings-section">
+          <div class="about-info">
+            <div class="app-logo">T</div>
+            <div class="app-name">Tanaka</div>
+            <div class="app-version">Version 0.5.0</div>
+
+            <div class="about-links">
+              <a href="#" class="about-link">📖 Documentation</a>
+              <a href="#" class="about-link">🐛 Report Bug</a>
+              <a href="#" class="about-link">💬 Discussions</a>
+              <a href="#" class="about-link">⭐ Star on GitHub</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="section-header">
+            <div class="section-icon">📊</div>
+            <div class="section-title">
+              <h3>Statistics</h3>
+              <p>Your Tanaka usage summary</p>
+            </div>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-value">247</div>
+              <div class="stat-label">Total Tabs Synced</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">3</div>
+              <div class="stat-label">Active Devices</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">12</div>
+              <div class="stat-label">Windows Tracked</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">99.9%</div>
+              <div class="stat-label">Sync Success Rate</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success Toast -->
+    <div class="toast" id="successToast">
+      <div class="toast-icon">✓</div>
+      <span>Settings saved successfully!</span>
+    </div>
+
+    <script>
+      // Tab Navigation
+      const tabs = document.querySelectorAll('.nav-tab');
+      const tabContents = document.querySelectorAll('.tab-content');
+
+      tabs.forEach((tab) => {
+        tab.addEventListener('click', () => {
+          // Remove active class from all tabs and contents
+          tabs.forEach((t) => t.classList.remove('active'));
+          tabContents.forEach((content) => content.classList.remove('active'));
+
+          // Add active class to clicked tab and corresponding content
+          tab.classList.add('active');
+          const tabName = tab.getAttribute('data-tab');
+          document.getElementById(`${tabName}-tab`).classList.add('active');
+        });
+      });
+
+      // Toggle Switches
+      document.querySelectorAll('.toggle-switch').forEach((toggle) => {
+        toggle.addEventListener('click', () => {
+          toggle.classList.toggle('active');
+        });
+      });
+
+      // Save Button
+      const saveBtn = document.getElementById('saveBtn');
+      const toast = document.getElementById('successToast');
+
+      saveBtn.addEventListener('click', () => {
+        // Simulate saving
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving...';
+
+        setTimeout(() => {
+          saveBtn.disabled = false;
+          saveBtn.textContent = 'Save Changes';
+
+          // Show success toast
+          toast.classList.add('show');
+          setTimeout(() => {
+            toast.classList.remove('show');
+          }, 3000);
+        }, 1000);
+      });
+
+      // Danger Zone Buttons
+      document.querySelectorAll('.danger-button').forEach((button) => {
+        button.addEventListener('click', (e) => {
+          const action = button.textContent;
+          if (
+            confirm(
+              `Are you sure you want to ${action.toLowerCase()}? This action cannot be undone.`,
+            )
+          ) {
+            // Perform action
+            console.log(`Performing: ${action}`);
+          }
+        });
+      });
+
+      // Form Input Interactions
+      document.querySelectorAll('.form-input').forEach((input) => {
+        input.addEventListener('input', () => {
+          // Enable save button when changes are made
+          saveBtn.textContent = 'Save Changes';
+          saveBtn.disabled = false;
+        });
+      });
+
+      // Password Toggle (for auth token)
+      const authTokenInput = document.querySelector('input[type="password"]');
+      if (authTokenInput) {
+        authTokenInput.addEventListener('focus', () => {
+          authTokenInput.type = 'text';
+        });
+        authTokenInput.addEventListener('blur', () => {
+          authTokenInput.type = 'password';
+        });
+      }
+    </script>
+  </body>
+</html>

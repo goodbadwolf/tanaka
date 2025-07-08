@@ -1,5 +1,5 @@
 {
-  "id": "tanaka_consolidation_test",
+  "id": "tanaka_v3_refactoring",
   "viewports": [
     { "label": "phone", "width": 320, "height": 480 },
     { "label": "tablet", "width": 1024, "height": 768 },
@@ -7,75 +7,112 @@
   ],
   "scenarios": [
     {
-      "label": "Popup_Comparison",
-      "url": "file:///Users/manish/projects/tanaka/prototype/v2/popup.html",
-      "referenceUrl": "file:///Users/manish/projects/tanaka/prototype/v1/popup.html",
+      "label": "V3_Index",
+      "url": "file:///Users/manish/projects/tanaka/prototype/v3/index.html",
+      "referenceUrl": "file:///Users/manish/projects/tanaka/prototype/v3/backup/index.html",
       "selectors": ["document"],
       "delay": 500,
-      "misMatchThreshold": 0.5,
+      "misMatchThreshold": 0.1,
       "requireSameDimensions": true
     },
     {
-      "label": "Settings_Comparison",
-      "url": "file:///Users/manish/projects/tanaka/prototype/v2/settings.html",
-      "referenceUrl": "file:///Users/manish/projects/tanaka/prototype/v1/settings.html",
+      "label": "V3_Popup",
+      "url": "file:///Users/manish/projects/tanaka/prototype/v3/popup.html",
+      "referenceUrl": "file:///Users/manish/projects/tanaka/prototype/v3/backup/popup.html",
       "selectors": ["document"],
       "delay": 500,
-      "misMatchThreshold": 0.5,
+      "misMatchThreshold": 0.1,
       "requireSameDimensions": true
     },
     {
-      "label": "Onboarding_Comparison",
-      "url": "file:///Users/manish/projects/tanaka/prototype/v2/onboarding.html",
-      "referenceUrl": "file:///Users/manish/projects/tanaka/prototype/v1/onboarding.html",
+      "label": "V3_Settings_General",
+      "url": "file:///Users/manish/projects/tanaka/prototype/v3/settings.html",
+      "referenceUrl": "file:///Users/manish/projects/tanaka/prototype/v3/backup/settings.html",
       "selectors": ["document"],
       "delay": 500,
-      "misMatchThreshold": 7.0,
-      "requireSameDimensions": false
-    },
-    {
-      "label": "ErrorStates_Comparison",
-      "url": "file:///Users/manish/projects/tanaka/prototype/v2/error-states.html",
-      "referenceUrl": "file:///Users/manish/projects/tanaka/prototype/v1/error-states.html",
-      "selectors": ["document"],
-      "delay": 500,
-      "misMatchThreshold": 0.5,
+      "misMatchThreshold": 0.1,
       "requireSameDimensions": true
     },
     {
-      "label": "Notifications_Comparison",
-      "url": "file:///Users/manish/projects/tanaka/prototype/v2/notifications.html",
-      "referenceUrl": "file:///Users/manish/projects/tanaka/prototype/v1/notifications.html",
+      "label": "V3_Settings_Sync",
+      "url": "file:///Users/manish/projects/tanaka/prototype/v3/settings.html",
+      "referenceUrl": "file:///Users/manish/projects/tanaka/prototype/v3/backup/settings.html",
+      "onReadyScript": "puppet/clickTab.js",
+      "clickTab": "sync",
       "selectors": ["document"],
-      "delay": 500,
-      "misMatchThreshold": 15.0,
-      "requireSameDimensions": false
-    },
-    {
-      "label": "SyncHistory_Comparison",
-      "url": "file:///Users/manish/projects/tanaka/prototype/v2/sync-history.html",
-      "referenceUrl": "file:///Users/manish/projects/tanaka/prototype/v1/sync-history.html",
-      "selectors": ["document"],
-      "delay": 500,
-      "misMatchThreshold": 0.5,
+      "delay": 1000,
+      "misMatchThreshold": 0.1,
       "requireSameDimensions": true
     },
     {
-      "label": "EmptyStates_Comparison",
-      "url": "file:///Users/manish/projects/tanaka/prototype/v2/empty-states.html",
-      "referenceUrl": "file:///Users/manish/projects/tanaka/prototype/v1/empty-states.html",
+      "label": "V3_Settings_Devices",
+      "url": "file:///Users/manish/projects/tanaka/prototype/v3/settings.html",
+      "referenceUrl": "file:///Users/manish/projects/tanaka/prototype/v3/backup/settings.html",
+      "onReadyScript": "puppet/clickTab.js",
+      "clickTab": "devices",
       "selectors": ["document"],
-      "delay": 500,
-      "misMatchThreshold": 0.5,
+      "delay": 1000,
+      "misMatchThreshold": 0.1,
       "requireSameDimensions": true
     },
     {
-      "label": "Index_Comparison",
-      "url": "file:///Users/manish/projects/tanaka/prototype/v2/index.html",
-      "referenceUrl": "file:///Users/manish/projects/tanaka/prototype/v1/index.html",
+      "label": "V3_Settings_Advanced",
+      "url": "file:///Users/manish/projects/tanaka/prototype/v3/settings.html",
+      "referenceUrl": "file:///Users/manish/projects/tanaka/prototype/v3/backup/settings.html",
+      "onReadyScript": "puppet/clickTab.js",
+      "clickTab": "advanced",
+      "selectors": ["document"],
+      "delay": 1000,
+      "misMatchThreshold": 0.1,
+      "requireSameDimensions": true
+    },
+    {
+      "label": "V3_Settings_About",
+      "url": "file:///Users/manish/projects/tanaka/prototype/v3/settings.html",
+      "referenceUrl": "file:///Users/manish/projects/tanaka/prototype/v3/backup/settings.html",
+      "onReadyScript": "puppet/clickTab.js",
+      "clickTab": "about",
+      "selectors": ["document"],
+      "delay": 1000,
+      "misMatchThreshold": 0.1,
+      "requireSameDimensions": true
+    },
+    {
+      "label": "V3_Onboarding",
+      "url": "file:///Users/manish/projects/tanaka/prototype/v3/onboarding.html",
+      "referenceUrl": "file:///Users/manish/projects/tanaka/prototype/v3/backup/onboarding.html",
       "selectors": ["document"],
       "delay": 500,
-      "misMatchThreshold": 0.5,
+      "misMatchThreshold": 0.1,
+      "requireSameDimensions": true
+    },
+    {
+      "label": "V3_SyncHistory",
+      "url": "file:///Users/manish/projects/tanaka/prototype/v3/sync-history.html",
+      "referenceUrl": "file:///Users/manish/projects/tanaka/prototype/v3/backup/sync-history.html",
+      "selectors": ["document"],
+      "delay": 500,
+      "misMatchThreshold": 0.1,
+      "requireSameDimensions": true
+    },
+    {
+      "label": "V3_DesignSystem_EmptyStates",
+      "url": "file:///Users/manish/projects/tanaka/prototype/v3/design-system.html",
+      "referenceUrl": "file:///Users/manish/projects/tanaka/prototype/v3/backup/design-system.html",
+      "selectors": ["document"],
+      "delay": 500,
+      "misMatchThreshold": 0.1,
+      "requireSameDimensions": true
+    },
+    {
+      "label": "V3_DesignSystem_Notifications",
+      "url": "file:///Users/manish/projects/tanaka/prototype/v3/design-system.html",
+      "referenceUrl": "file:///Users/manish/projects/tanaka/prototype/v3/backup/design-system.html",
+      "onReadyScript": "puppet/clickTab.js",
+      "clickTab": "notifications",
+      "selectors": ["document"],
+      "delay": 1000,
+      "misMatchThreshold": 0.1,
       "requireSameDimensions": true
     }
   ],
