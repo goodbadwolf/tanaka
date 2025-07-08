@@ -1,0 +1,127 @@
+{
+  "id": "tanaka_consolidation_test",
+  "viewports": [
+    { "label": "phone", "width": 320, "height": 480 },
+    { "label": "tablet", "width": 1024, "height": 768 },
+    { "label": "desktop", "width": 1920, "height": 1080 }
+  ],
+  "scenarios": [
+    {
+      "label": "Popup_Comparison",
+      "url": "file:///Users/manish/projects/tanaka/prototype/v2/popup.html",
+      "referenceUrl": "file:///Users/manish/projects/tanaka/prototype/v1/popup.html",
+      "selectors": ["document"],
+      "delay": 500,
+      "misMatchThreshold": 0.5,
+      "requireSameDimensions": true
+    },
+    {
+      "label": "Settings_Comparison",
+      "url": "file:///Users/manish/projects/tanaka/prototype/v2/settings.html",
+      "referenceUrl": "file:///Users/manish/projects/tanaka/prototype/v1/settings.html",
+      "selectors": ["document"],
+      "delay": 500,
+      "misMatchThreshold": 0.5,
+      "requireSameDimensions": true
+    },
+    {
+      "label": "Onboarding_Comparison",
+      "url": "file:///Users/manish/projects/tanaka/prototype/v2/onboarding.html",
+      "referenceUrl": "file:///Users/manish/projects/tanaka/prototype/v1/onboarding.html",
+      "selectors": ["document"],
+      "delay": 500,
+      "misMatchThreshold": 7.0,
+      "requireSameDimensions": false
+    },
+    {
+      "label": "ErrorStates_Comparison",
+      "url": "file:///Users/manish/projects/tanaka/prototype/v2/error-states.html",
+      "referenceUrl": "file:///Users/manish/projects/tanaka/prototype/v1/error-states.html",
+      "selectors": ["document"],
+      "delay": 500,
+      "misMatchThreshold": 0.5,
+      "requireSameDimensions": true
+    },
+    {
+      "label": "Notifications_Comparison",
+      "url": "file:///Users/manish/projects/tanaka/prototype/v2/notifications.html",
+      "referenceUrl": "file:///Users/manish/projects/tanaka/prototype/v1/notifications.html",
+      "selectors": ["document"],
+      "delay": 500,
+      "misMatchThreshold": 15.0,
+      "requireSameDimensions": false
+    },
+    {
+      "label": "ContextMenu_Comparison",
+      "url": "file:///Users/manish/projects/tanaka/prototype/v2/context-menu.html",
+      "referenceUrl": "file:///Users/manish/projects/tanaka/prototype/v1/context-menu.html",
+      "selectors": ["document"],
+      "delay": 500,
+      "misMatchThreshold": 0.5,
+      "requireSameDimensions": true
+    },
+    {
+      "label": "TabSearch_Comparison",
+      "url": "file:///Users/manish/projects/tanaka/prototype/v2/tab-search.html",
+      "referenceUrl": "file:///Users/manish/projects/tanaka/prototype/v1/tab-search.html",
+      "selectors": ["document"],
+      "delay": 500,
+      "misMatchThreshold": 0.5,
+      "requireSameDimensions": true
+    },
+    {
+      "label": "WindowDetails_Comparison",
+      "url": "file:///Users/manish/projects/tanaka/prototype/v2/window-details.html",
+      "referenceUrl": "file:///Users/manish/projects/tanaka/prototype/v1/window-details.html",
+      "selectors": ["document"],
+      "delay": 500,
+      "misMatchThreshold": 0.5,
+      "requireSameDimensions": true
+    },
+    {
+      "label": "SyncHistory_Comparison",
+      "url": "file:///Users/manish/projects/tanaka/prototype/v2/sync-history.html",
+      "referenceUrl": "file:///Users/manish/projects/tanaka/prototype/v1/sync-history.html",
+      "selectors": ["document"],
+      "delay": 500,
+      "misMatchThreshold": 0.5,
+      "requireSameDimensions": true
+    },
+    {
+      "label": "EmptyStates_Comparison",
+      "url": "file:///Users/manish/projects/tanaka/prototype/v2/empty-states.html",
+      "referenceUrl": "file:///Users/manish/projects/tanaka/prototype/v1/empty-states.html",
+      "selectors": ["document"],
+      "delay": 500,
+      "misMatchThreshold": 0.5,
+      "requireSameDimensions": true
+    },
+    {
+      "label": "Index_Comparison",
+      "url": "file:///Users/manish/projects/tanaka/prototype/v2/index.html",
+      "referenceUrl": "file:///Users/manish/projects/tanaka/prototype/v1/index.html",
+      "selectors": ["document"],
+      "delay": 500,
+      "misMatchThreshold": 0.5,
+      "requireSameDimensions": true
+    }
+  ],
+  "paths": {
+    "bitmaps_reference": "backstop_data/bitmaps_reference",
+    "bitmaps_test": "backstop_data/bitmaps_test",
+    "engine_scripts": "backstop_data/engine_scripts",
+    "html_report": "backstop_data/html_report",
+    "ci_report": "backstop_data/ci_report"
+  },
+  "engine": "puppeteer",
+  "engineOptions": {
+    "args": ["--no-sandbox"],
+    "executablePath": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+  },
+  "report": ["CI"],
+  "openBrowser": false,
+  "asyncCaptureLimit": 5,
+  "asyncCompareLimit": 50,
+  "debug": false,
+  "debugWindow": false
+}
