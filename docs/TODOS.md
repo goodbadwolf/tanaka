@@ -71,12 +71,16 @@ This file tracks all pending work for the Tanaka project.
 - Squash commits for clean history when merging
 - Delete feature branches after merge
 
-
 ## Pending Tasks
 
 All work to be completed.
 
-#### Branch: `docs/operational-basics`
+**Note: v3 Design Elements to Preserve**
+
+- Colors: #6366f1 (primary), #8b5cf6 (secondary), #0a0a0b (dark bg), #0f0f10 (surface)
+- UI: Purple gradient buttons, glowing effects, card-based layout, smooth animations
+
+### Branch: `docs/operational-basics`
 
 **Basic Documentation**
 
@@ -84,7 +88,7 @@ All work to be completed.
 - [ ] Document backup/restore process
 - [ ] List common issues and fixes
 
-#### Branch: `chore/update-cargo-test-references`
+### Branch: `chore/update-cargo-test-references`
 
 **Update cargo test to cargo nextest**
 
@@ -93,7 +97,7 @@ All work to be completed.
 - [ ] Update any scripts that use cargo test
 - [ ] Verify pre-commit hooks use nextest
 
-#### Branch: `docs/git-best-practices`
+### Branch: `docs/git-best-practices`
 
 **Git Best Practices Documentation**
 
@@ -103,29 +107,21 @@ All work to be completed.
 - [ ] Update CLAUDE.md with this guideline
 - [ ] Add to contributor documentation
 
-#### Branch: `fix/memory-leaks`
+### Branch: `fix/memory-leaks`
 
-**Fix Memory Leaks**
+**Fix Memory Leaks & Performance**
 
 - [ ] Extension: Fix event handler cleanup in TabEventHandler
-- [ ] Extension: Fix window tracking memory issues  
-- [ ] Server: Improve concurrency handling
-- [ ] Tests: Verify no memory growth over extended usage
-
-#### Branch: `feat/performance`
-
-**Basic Performance Improvements**
-
-- [ ] Extension: Implement simple operation batching (50-100 operations, 1 second max wait)
-- [ ] Extension: Deduplicate operations for same tab
+- [ ] Extension: Fix window tracking memory issues
+- [ ] Extension: Implement operation batching (50-100 ops, 1s max wait)
 - [ ] Extension: Add operation priorities (high/medium/low)
+- [ ] Server: Improve concurrency handling
 - [ ] Server: Add database indices on (device_id, clock) and operation_type
-- [ ] Server: Consider partial index for active tabs only
-- [ ] Server: Increase cache size for better performance
-- [ ] Server: VACUUM periodically
+- [ ] Server: Increase cache size and VACUUM periodically
+- [ ] Tests: Verify no memory growth over extended usage
 - [ ] Tests: Verify handles 200+ tabs smoothly
 
-#### Branch: `feat/error-recovery`
+### Branch: `feat/error-recovery`
 
 **Error Recovery**
 
@@ -142,7 +138,7 @@ All work to be completed.
 - [ ] Server: Return partial results if possible
 - [ ] Tests: Verify recovery from network outages
 
-#### Branch: `feat/mantine-setup`
+### Branch: `feat/mantine-setup`
 
 **Setup Mantine** (UI Redesign - build components iteratively as needed)
 
@@ -152,7 +148,7 @@ All work to be completed.
 - [ ] Get popup page working end-to-end
 - [ ] Add theme switching support (light/dark)
 
-#### Branch: `feat/popup-redesign`
+### Branch: `feat/popup-redesign`
 
 **Popup Redesign**
 
@@ -162,7 +158,7 @@ All work to be completed.
 - [ ] Theme toggle in header
 - [ ] Build components inline as needed
 
-#### Branch: `feat/settings-redesign`
+### Branch: `feat/settings-redesign`
 
 **Settings Redesign**
 
@@ -172,7 +168,7 @@ All work to be completed.
 - [ ] Device management list
 - [ ] Extract shared components if patterns emerge
 
-#### Branch: `feat/remaining-pages`
+### Branch: `feat/remaining-pages`
 
 **Additional Pages**
 
@@ -181,55 +177,20 @@ All work to be completed.
 - [ ] Empty states for no windows/tabs
 - [ ] Continue building components as required
 
-#### Branch: `feat/ui-polish`  
+### Branch: `feat/ui-polish`
 
 **Polish & Refactor**
 
 - [ ] Extract truly reusable components
 - [ ] Optimize bundle size (target < 150KB)
-- [ ] Performance improvements (TTI < 200ms)
+- [ ] Performance improvements (TTI < 200ms, smooth 60fps)
 - [ ] Visual consistency pass
 - [ ] Firefox compatibility testing
-
-**Design Elements to Preserve from v3:**
-- Primary: #6366f1 (indigo gradient)
-- Secondary: #8b5cf6 (purple accent)
-- Dark Background: #0a0a0b
-- Surface: #0f0f10
-- Purple gradient buttons
-- Glowing effects on interactive elements
-- Card-based layout
-- Smooth animations
-
-#### Branch: `feat/css-architecture-improvements`
-
-**CSS Architecture Refinements** (Lower Priority)
-
-- [ ] Create core/ directory for variables, reset, base
-- [ ] Create utilities/ directory for layout, spacing, typography, states
-- [ ] Create components/ directory for buttons, cards, forms, badges, modals
-- [ ] Create pages/ directory for page-specific styles
-- [ ] Create main.css to import all files in correct order
-- [ ] Convert .button variants to .button--primary, .button--danger
-- [ ] Convert .card variants to .card--hover, .card--selected
-- [ ] Update HTML to use new modifier classes
-- [ ] Reduce overly specific selectors
-- [ ] Group similar properties
-- [ ] Create transition utility groups
-- [ ] Identify above-fold styles
-- [ ] Create critical.css for inline loading
-- [ ] Load non-critical styles asynchronously
-
-#### Branch: `feat/ui-polish`
-
-**UI Improvements** (after redesign)
-
 - [ ] Improve error messages with better copy
 - [ ] Add tooltips for complex features
-- [ ] Optimize performance for smooth 60fps
 - [ ] Add keyboard navigation support
 
-#### Branch: `feat/code-cleanup`
+### Branch: `feat/code-cleanup`
 
 **Code Quality**
 
@@ -238,7 +199,7 @@ All work to be completed.
 - [ ] Remove dead code
 - [ ] Update dependencies
 
-#### Branch: `feat/v1-release`
+### Branch: `feat/v1-release`
 
 **Release**
 
