@@ -142,16 +142,17 @@ All work to be completed.
 
 **Setup Mantine** (UI Redesign - build components iteratively as needed)
 
-- [ ] Install Mantine and dependencies
-- [ ] Basic theme configuration (colors from v3 prototype)
-- [ ] Set up MantineProvider in extension entry points
-- [ ] Get popup page working end-to-end
-- [ ] Add theme switching support (light/dark)
+- [x] Install Mantine and dependencies
+- [x] Basic theme configuration (colors from v3 prototype)
+- [x] Add theme switching support (light/dark)
+- [x] Create UI component playground for development
 
 ### Branch: `feat/popup-redesign`
 
 **Popup Redesign**
 
+- [ ] Set up MantineProvider in popup entry point
+- [ ] Get popup page working end-to-end with Mantine
 - [ ] Window list with tracking toggles
 - [ ] Sync status indicator with live animation
 - [ ] Quick action buttons (Track Window, Sync Now)
@@ -162,6 +163,7 @@ All work to be completed.
 
 **Settings Redesign**
 
+- [ ] Set up MantineProvider in settings entry point
 - [ ] Tabbed interface (General, Sync, Devices, Advanced, About)
 - [ ] Theme toggle in header
 - [ ] Server configuration form

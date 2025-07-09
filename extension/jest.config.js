@@ -38,6 +38,8 @@ export default {
     '!src/popup/popup.tsx',
     '!src/settings/settings.tsx',
     '!src/webapp/**',
+    // UI Playground files
+    '!src/playground/**',
     '!src/di/webapp-container.ts',
     // Mock and polyfill files
     '!src/browser/mock.ts',
@@ -48,6 +50,9 @@ export default {
     '!src/components/test-setup.ts',
     // Hooks (difficult to test in isolation)
     '!src/hooks/**',
+    // Theme files (Mantine integration, tested via UI)
+    // TODO: Add tests for these later. See Mantine's Jest guide: https://mantine.dev/guides/jest/
+    '!src/themes/**',
     // Development-only utilities
     '!src/utils/performance.ts',
   ],
