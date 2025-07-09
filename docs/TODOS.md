@@ -154,10 +154,16 @@ All work to be completed.
   - Use plain CSS for base styles (visible in DevTools)
   - Use styles prop for dynamic/interactive behavior
   - Example: `className="playground-button"` + `styles={{ root: { '&:hover': {...} } }}`
-- [ ] Implement gradient buttons and glowing card effects
-- [ ] Add DevTools-friendly data attributes for component identification
+- [x] Implement dual-theme system with v3 and cyberpunk themes:
+  - Reorganized existing theme as 'v3' in dedicated folders
+  - Created cyberpunk theme with neon colors and futuristic design
+  - Added theme switching via SegmentedControl
+  - Implemented theme-specific CSS scoping
+  - Updated ThemeProvider for dynamic theme selection
+- [x] Implement gradient buttons and glowing card effects (in both themes)
+- [x] Add DevTools-friendly data attributes for component identification
 - [ ] Create styling utility functions for reusable patterns
-- [ ] Add full-page gradient background to playground:
+- [x] Add full-page gradient background to playground:
   - CSS class: `.playground-container` with `min-height: 100vh`
   - Background: `linear-gradient(135deg, #667eea 0%, #764ba2 100%)`
   - Apply to Container with `size="lg"` and `padding: 2rem`

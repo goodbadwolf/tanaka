@@ -1,5 +1,5 @@
 /* Button Components */
-.custom-button {
+.theme-v3 .custom-button {
   background: linear-gradient(45deg, #fc466b 0%, #3f5efb 100%);
   border: none;
   transition: all 0.3s ease;
@@ -8,7 +8,7 @@
   overflow: hidden;
 }
 
-.custom-button::before {
+.theme-v3 .custom-button::before {
   content: '';
   position: absolute;
   top: 0;
@@ -19,17 +19,17 @@
   transition: left 0.5s;
 }
 
-.custom-button:hover {
+.theme-v3 .custom-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
-.custom-button:hover::before {
+.theme-v3 .custom-button:hover::before {
   left: 100%;
 }
 
 /* Card Components */
-.glowing-card {
+.theme-v3 .glowing-card {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -38,7 +38,7 @@
   transition: all 0.3s ease;
 }
 
-.glowing-card:hover {
+.theme-v3 .glowing-card:hover {
   box-shadow:
     0 8px 32px 0 rgba(31, 38, 135, 0.37),
     0 0 30px rgba(255, 255, 255, 0.5);
@@ -46,7 +46,7 @@
 }
 
 /* Gradient Text */
-.gradient-text {
+.theme-v3 .gradient-text {
   background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;

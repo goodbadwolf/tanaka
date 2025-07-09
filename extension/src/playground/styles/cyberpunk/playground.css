@@ -1,0 +1,65 @@
+/* Import other cyberpunk style modules */
+@import './components.css';
+@import './utilities.css';
+
+/* Cyberpunk Container Styles */
+.theme-cyberpunk .playground-container {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 20% 50%, rgba(255, 15, 135, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(15, 160, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 80%, rgba(15, 255, 15, 0.05) 0%, transparent 50%),
+    linear-gradient(180deg, #0a0a0f 0%, #1a0a1f 100%);
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Animated grid background */
+.theme-cyberpunk .playground-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image:
+    linear-gradient(rgba(255, 15, 135, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 15, 135, 0.1) 1px, transparent 1px);
+  background-size: 50px 50px;
+  animation: grid-move 20s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes grid-move {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(50px, 50px);
+  }
+}
+
+/* Responsive padding adjustment */
+@media (max-width: 768px) {
+  .theme-cyberpunk .playground-container {
+    padding: 1rem;
+  }
+}
+
+/* Debug mode styles */
+body.debug [data-component]::before {
+  content: attr(data-component);
+  position: absolute;
+  top: -20px;
+  left: 0;
+  font-size: 10px;
+  color: var(--mantine-color-neonGreen-5);
+  font-family: 'Monaco', 'Consolas', monospace;
+  background: rgba(10, 10, 15, 0.9);
+  padding: 2px 6px;
+  border: 1px solid var(--mantine-color-neonGreen-5);
+  border-radius: 2px;
+  z-index: 1000;
+  text-shadow: 0 0 5px currentColor;
+}

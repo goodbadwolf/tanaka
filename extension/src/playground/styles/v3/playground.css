@@ -2,8 +2,8 @@
 @import './components.css';
 @import './utilities.css';
 
-/* Container Styles */
-.playground-container {
+/* V3 Theme Container Styles */
+.theme-v3 .playground-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 2rem;
@@ -11,7 +11,7 @@
 
 /* Responsive padding adjustment */
 @media (max-width: 768px) {
-  .playground-container {
+  .theme-v3 .playground-container {
     padding: 1rem;
   }
 }

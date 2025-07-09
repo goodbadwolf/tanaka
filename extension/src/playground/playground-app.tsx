@@ -1,10 +1,26 @@
-import { Button, Container, Title, Text, Stack, Divider } from '@mantine/core';
+import { Button, Container, Title, Text, Stack, Divider, SegmentedControl, Group } from '@mantine/core';
 import { ThemeProvider, useTheme } from '../themes';
 import { StyledExample } from './styled-example';
-import './styles/playground.css';
+import { useState, useEffect } from 'react';
+import { ThemeStyle } from '../themes/theme-config';
 
-function PlaygroundContainer() {
+// Import both theme styles
+import './styles/v3/playground.css';
+import './styles/cyberpunk/playground.css';
+
+interface PlaygroundContainerProps {
+  themeStyle: ThemeStyle;
+  setThemeStyle: (style: ThemeStyle) => void;
+}
+
+function PlaygroundContainer({ themeStyle, setThemeStyle }: PlaygroundContainerProps) {
   const { theme, toggleTheme } = useTheme();
+
+  // Apply theme class to body
+  useEffect(() => {
+    document.body.className = `theme-${themeStyle}`;
+  }, [themeStyle]);
+
   return (
     <Container size="lg" className="playground-container" data-component="playground-container">
       <Stack gap="xl">
@@ -13,16 +29,35 @@ function PlaygroundContainer() {
             order={1}
             style={{
               color: 'white',
-              textShadow: '2px 2px 4px rgba(0, 0, 0, 0.3)',
+              textShadow: themeStyle === ThemeStyle.CYBERPUNK
+                ? '0 0 20px var(--mantine-color-neonPink-5)'
+                : '2px 2px 4px rgba(0, 0, 0, 0.3)',
               marginBottom: '1rem'
             }}
           >
             Tanaka UI Playground
           </Title>
           <Text size="lg" c="white">
-            Mantine v8 with Multiple Styling Approaches
+            Mantine v8 - {themeStyle === ThemeStyle.V3 ? 'V3 Theme' : 'Cyberpunk Theme'}
           </Text>
         </div>
+
+        <Group justify="center">
+          <SegmentedControl
+            value={themeStyle}
+            onChange={(value) => setThemeStyle(value as ThemeStyle)}
+            data={[
+              { label: 'V3 Theme', value: ThemeStyle.V3 },
+              { label: 'Cyberpunk', value: ThemeStyle.CYBERPUNK },
+            ]}
+            styles={{
+              root: {
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+              },
+            }}
+          />
+        </Group>
 
         <Button
           onClick={toggleTheme}
@@ -70,9 +105,14 @@ function PlaygroundContainer() {
 }
 
 export function PlaygroundApp() {
+  const [themeStyle, setThemeStyle] = useState<ThemeStyle>(ThemeStyle.V3);
+
   return (
-    <ThemeProvider>
-      <PlaygroundContainer />
+    <ThemeProvider themeStyle={themeStyle}>
+      <PlaygroundContainer themeStyle={themeStyle} setThemeStyle={setThemeStyle} />
     </ThemeProvider>
   );
 }
+
+// Easy theme switching for testing
+// Change the default theme in useState above to ThemeStyle.CYBERPUNK to test the cyberpunk theme
