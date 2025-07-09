@@ -521,12 +521,11 @@ $cyberpunk-colors: (
 }
 ```
 
-## Migration Strategy
+## Migration Strategy - Incremental Approach
 
-### Phase 1: Foundation
+### Phase 1: Foundation ✅
 
 1. ✅ Set up build pipeline (COMPLETED)
-
    - ✅ Install dependencies: `sass`, `sass-loader`, `postcss`, `autoprefixer`
    - ✅ Configure Rspack for SCSS
    - ✅ Set up source maps for debugging
@@ -534,55 +533,94 @@ $cyberpunk-colors: (
    - ✅ Install and configure Stylelint for SCSS linting
    - ✅ Test SCSS compilation successfully
 
-2. Create base architecture
+### Phase 2: Incremental Component Migration
 
-   - Create folder structure
-   - Write global variables and mixins
-   - Set up CSS custom properties system
-   - Create reset and typography base
+We'll migrate the playground app component by component, starting simple and building complexity.
 
-3. Utility migration
-   - Convert spacing utilities to SCSS loops
-   - Create text and color utilities
-   - Set up responsive utilities with mixins
+**Benefits of Incremental Approach:**
+- Each step is small and testable
+- Can verify SCSS is working at each stage
+- Easier to identify and fix issues
+- Learn patterns that can be reused
+- Maintain a working application throughout migration
 
-### Phase 2: Component Migration
+#### Step 1: Minimal Playground Setup
+- [ ] Comment out all complex components in playground-app.tsx
+- [ ] Start with just a simple container and title
+- [ ] Create basic SCSS structure:
+  - `playground.scss` entry point
+  - `_variables.scss` for colors and spacing
+  - `_base.scss` for reset and typography
+- [ ] Get it rendering with SCSS instead of CSS
+- [ ] Verify hot reload works
 
-1. Button components
+#### Step 2: Add Theme Switching
+- [ ] Uncomment theme switcher (SegmentedControl)
+- [ ] Implement theme variables in SCSS
+- [ ] Create theme switching mechanism with CSS custom properties
+- [ ] Migrate theme-specific styles from inline to SCSS
 
-   - Extract button base mixin
-   - Create theme-specific variants
-   - Ensure all states work (hover, active, disabled)
+#### Step 3: Add Toggle Button
+- [ ] Uncomment the toggle button
+- [ ] Migrate button styles from inline to SCSS
+- [ ] Extract reusable button mixins
+- [ ] Add hover and active states
 
-2. Card components
+#### Step 4: Add Dividers
+- [ ] Uncomment divider components
+- [ ] Create divider styles in SCSS
+- [ ] Handle theme-specific divider colors
 
-   - Migrate glass morphism effects
-   - Create BEM structure
-   - Add theme-specific glow effects
+#### Step 5: Add StyledExample Component
+- [ ] Uncomment StyledExample
+- [ ] Analyze its CSS requirements
+- [ ] Migrate its styles to SCSS
+- [ ] Extract any reusable patterns
 
-3. Remaining components
-   - Forms and inputs
-   - Gradient text components
-   - Any custom components
+#### Step 6: Add StylingUtilsExample Component
+- [ ] Uncomment StylingUtilsExample
+- [ ] Migrate its styles
+- [ ] Create utility classes in SCSS
+- [ ] Ensure theme compatibility
 
-### Phase 3: Theme Integration
+#### Step 7: Add DebugStylesExample Component
+- [ ] Uncomment DebugStylesExample
+- [ ] Migrate debug-specific styles
+- [ ] Complete the playground migration
 
-1. Theme compilation
+### Phase 3: Extract and Organize
 
-   - Create separate theme bundles
-   - Optimize CSS output
-   - Set up theme switching mechanism
+After all components work:
 
-2. Testing & optimization
+1. **Refactor and DRY**
+   - Extract common patterns into mixins
+   - Consolidate duplicate styles
+   - Create proper file organization
 
-   - Visual regression testing
-   - Performance benchmarking
-   - Bundle size analysis
+2. **Create Component Library Structure**
+   - Move component styles to dedicated files
+   - Create index files for easy imports
+   - Document component APIs
 
-3. Documentation & cleanup
-   - Update component documentation
-   - Remove old CSS files
-   - Create theme addition guide
+3. **Optimize**
+   - Remove unused styles
+   - Minimize bundle size
+   - Performance testing
+
+### Phase 4: Apply to Extension
+
+1. **Popup Migration**
+   - Apply learned patterns to popup
+   - Use established mixins and utilities
+
+2. **Settings Migration**
+   - Migrate settings page styles
+   - Ensure consistency with popup
+
+3. **Cleanup**
+   - Remove all old CSS files
+   - Update imports throughout codebase
+   - Final testing
 
 ## Technical Considerations
 
