@@ -10,24 +10,24 @@
     <link rel="stylesheet" href="css/components.css" />
     <link rel="stylesheet" href="css/sync-history.css" />
   </head>
-  <body>
+  <body class="sync-history-page">
     <!-- Header -->
     <div class="header">
-      <div class="header-content">
-        <div class="header-left">
-          <a href="#" class="back-button">←</a>
+      <div class="header__content">
+        <div class="header__left">
+          <a href="#" class="button button--secondary">←</a>
           <h1 class="page-title">Sync Activity</h1>
           <div class="sync-status">
-            <span class="status-dot"></span>
-            <span>Live Updates</span>
+            <span class="sync-status__dot"></span>
+            <span class="sync-status__text">Live Updates</span>
           </div>
         </div>
-        <div class="header-actions">
-          <button class="action-button" onclick="clearHistory()">
+        <div class="header__actions">
+          <button class="button button--secondary" onclick="clearHistory()">
             <span>🗑️</span>
             <span>Clear History</span>
           </button>
-          <button class="action-button" onclick="exportHistory()">
+          <button class="button button--secondary" onclick="exportHistory()">
             <span>📥</span>
             <span>Export</span>
           </button>
@@ -36,17 +36,17 @@
     </div>
 
     <!-- Live Update Indicator -->
-    <div class="live-indicator" id="liveIndicator" style="display: none">
-      <span class="live-dot"></span>
+    <div class="indicator indicator--live" id="liveIndicator" style="display: none">
+      <span class="indicator__dot"></span>
       <span>New activity</span>
     </div>
 
     <!-- Main Container -->
-    <div class="main-container">
+    <div class="container container--main">
       <!-- Sidebar -->
-      <aside class="sidebar">
+      <aside class="container__sidebar">
         <!-- Stats -->
-        <div class="stats-card">
+        <div class="card card--stats">
           <h3 class="stats-title">Activity Summary</h3>
           <div class="stat-item">
             <div class="stat-label">Total Syncs Today</div>
@@ -67,195 +67,195 @@
         </div>
 
         <!-- Device Filter -->
-        <div class="device-filter">
-          <h3 class="filter-title">Filter by Device</h3>
-          <div class="device-option active">
-            <div class="device-checkbox"></div>
-            <span class="device-name">All Devices</span>
+        <div class="device">
+          <h3 class="device__title">Filter by Device</h3>
+          <div class="device__option device__option--active">
+            <div class="device__checkbox"></div>
+            <span class="device__name">All Devices</span>
           </div>
-          <div class="device-option">
-            <div class="device-checkbox"></div>
-            <span class="device-name">This Device</span>
-            <span class="device-status"></span>
+          <div class="device__option">
+            <div class="device__checkbox"></div>
+            <span class="device__name">This Device</span>
+            <span class="device__indicator"></span>
           </div>
-          <div class="device-option">
-            <div class="device-checkbox"></div>
-            <span class="device-name">Work Laptop</span>
-            <span class="device-status"></span>
+          <div class="device__option">
+            <div class="device__checkbox"></div>
+            <span class="device__name">Work Laptop</span>
+            <span class="device__indicator"></span>
           </div>
-          <div class="device-option inactive">
-            <div class="device-checkbox"></div>
-            <span class="device-name">Home Desktop</span>
-            <span class="device-status"></span>
+          <div class="device__option device__option--inactive">
+            <div class="device__checkbox"></div>
+            <span class="device__name">Home Desktop</span>
+            <span class="device__indicator"></span>
           </div>
         </div>
       </aside>
 
       <!-- Timeline -->
-      <main class="timeline-container">
-        <div class="timeline-header">
-          <h2 style="font-size: 18px; font-weight: 600">Recent Activity</h2>
-          <div class="time-range-selector">
-            <button class="time-button active">Today</button>
-            <button class="time-button">Yesterday</button>
-            <button class="time-button">Last 7 Days</button>
-            <button class="time-button">Last 30 Days</button>
-            <button class="time-button">All Time</button>
+      <main class="container container--timeline">
+        <div class="timeline__header">
+          <h2 class="timeline__title" style="font-size: 18px; font-weight: 600">Recent Activity</h2>
+          <div class="timeline__range-selector">
+            <button class="button button--time button--active">Today</button>
+            <button class="button button--time">Yesterday</button>
+            <button class="button button--time">Last 7 Days</button>
+            <button class="button button--time">Last 30 Days</button>
+            <button class="button button--time">All Time</button>
           </div>
         </div>
 
         <div class="timeline">
           <!-- Today's Activity -->
-          <div class="timeline-group">
-            <div class="timeline-date">Today, March 15</div>
+          <div class="timeline__group">
+            <div class="timeline__date">Today, March 15</div>
 
-            <div class="timeline-item sync">
-              <div class="item-header">
-                <div class="item-info">
-                  <div class="item-icon">🔄</div>
+            <div class="timeline__item timeline__item--sync">
+              <div class="timeline__header">
+                <div class="timeline__info">
+                  <div class="icon icon--item">🔄</div>
                   <div>
-                    <div class="item-title">Bulk Sync Completed</div>
-                    <div class="item-time">2 minutes ago</div>
+                    <div class="timeline__title">Bulk Sync Completed</div>
+                    <div class="timeline__time">2 minutes ago</div>
                   </div>
                 </div>
-                <button class="expand-button" onclick="toggleExpand(this)">Details</button>
+                <button class="button button--expand" onclick="toggleExpand(this)">Details</button>
               </div>
-              <div class="item-details">Successfully synced 15 operations from Work Laptop</div>
-              <div class="item-meta">
-                <span class="meta-item">💻 Work Laptop</span>
-                <span class="meta-item">🔢 15 operations</span>
-                <span class="meta-item">⚡ 0.3s</span>
+              <div class="timeline__details">Successfully synced 15 operations from Work Laptop</div>
+              <div class="timeline__meta">
+                <span class="timeline__meta-item">💻 Work Laptop</span>
+                <span class="timeline__meta-item">🔢 15 operations</span>
+                <span class="timeline__meta-item">⚡ 0.3s</span>
               </div>
-              <div class="expanded-content">
-                <div class="tab-list">
-                  <div class="tab-entry">
-                    <span class="tab-action added">+</span>
+              <div class="timeline__content timeline__content--expanded">
+                <div class="tab__list">
+                  <div class="tab__entry">
+                    <span class="tab__action tab__action--added">+</span>
                     <span>GitHub - Pull Request #234</span>
                   </div>
-                  <div class="tab-entry">
-                    <span class="tab-action added">+</span>
+                  <div class="tab__entry">
+                    <span class="tab__action tab__action--added">+</span>
                     <span>Figma - Design System Updates</span>
                   </div>
-                  <div class="tab-entry">
-                    <span class="tab-action removed">−</span>
+                  <div class="tab__entry">
+                    <span class="tab__action tab__action--removed">−</span>
                     <span>Stack Overflow - Answered Question</span>
                   </div>
-                  <div class="tab-entry">
-                    <span class="tab-action moved">→</span>
+                  <div class="tab__entry">
+                    <span class="tab__action tab__action--moved">→</span>
                     <span>Slack moved to Work Window</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div class="timeline-item add">
-              <div class="item-header">
-                <div class="item-info">
-                  <div class="item-icon">➕</div>
+            <div class="timeline__item timeline__item--add">
+              <div class="timeline__header">
+                <div class="timeline__info">
+                  <div class="icon icon--item">➕</div>
                   <div>
-                    <div class="item-title">New Window Tracked</div>
-                    <div class="item-time">15 minutes ago</div>
+                    <div class="timeline__title">New Window Tracked</div>
+                    <div class="timeline__time">15 minutes ago</div>
                   </div>
                 </div>
               </div>
-              <div class="item-details">Started tracking "Research" window with 23 tabs</div>
-              <div class="item-meta">
-                <span class="meta-item">📱 This Device</span>
-                <span class="meta-item">🪟 Research Window</span>
-                <span class="meta-item">📑 23 tabs</span>
+              <div class="timeline__details">Started tracking "Research" window with 23 tabs</div>
+              <div class="timeline__meta">
+                <span class="timeline__meta-item">📱 This Device</span>
+                <span class="timeline__meta-item">🪟 Research Window</span>
+                <span class="timeline__meta-item">📑 23 tabs</span>
               </div>
             </div>
 
-            <div class="timeline-item conflict">
-              <div class="item-header">
-                <div class="item-info">
-                  <div class="item-icon">⚠️</div>
+            <div class="timeline__item timeline__item--conflict">
+              <div class="timeline__header">
+                <div class="timeline__info">
+                  <div class="icon icon--item">⚠️</div>
                   <div>
-                    <div class="item-title">Conflict Resolved</div>
-                    <div class="item-time">1 hour ago</div>
+                    <div class="timeline__title">Conflict Resolved</div>
+                    <div class="timeline__time">1 hour ago</div>
                   </div>
                 </div>
-                <button class="expand-button" onclick="toggleExpand(this)">Details</button>
+                <button class="button button--expand" onclick="toggleExpand(this)">Details</button>
               </div>
-              <div class="item-details">Tab URL changed on multiple devices simultaneously</div>
-              <div class="item-meta">
-                <span class="meta-item">💻 2 devices</span>
-                <span class="meta-item">🔀 Auto-merged</span>
+              <div class="timeline__details">Tab URL changed on multiple devices simultaneously</div>
+              <div class="timeline__meta">
+                <span class="timeline__meta-item">💻 2 devices</span>
+                <span class="timeline__meta-item">🔀 Auto-merged</span>
               </div>
-              <div class="expanded-content">
+              <div class="timeline__content timeline__content--expanded">
                 <p style="font-size: 13px; color: #a1a1aa; margin-bottom: 12px">
                   The tab "Project Dashboard" was updated on both devices. The most recent change
                   was kept.
                 </p>
-                <div class="tab-list">
-                  <div class="tab-entry">
-                    <span class="tab-action removed">−</span>
+                <div class="tab__list">
+                  <div class="tab__entry">
+                    <span class="tab__action tab__action--removed">−</span>
                     <span>dashboard.com/old-view (Work Laptop)</span>
                   </div>
-                  <div class="tab-entry">
-                    <span class="tab-action added">+</span>
+                  <div class="tab__entry">
+                    <span class="tab__action tab__action--added">+</span>
                     <span>dashboard.com/new-view (Home Desktop)</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div class="timeline-item remove">
-              <div class="item-header">
-                <div class="item-info">
-                  <div class="item-icon">🗑️</div>
+            <div class="timeline__item timeline__item--remove">
+              <div class="timeline__header">
+                <div class="timeline__info">
+                  <div class="icon icon--item">🗑️</div>
                   <div>
-                    <div class="item-title">Bulk Close</div>
-                    <div class="item-time">2 hours ago</div>
+                    <div class="timeline__title">Bulk Close</div>
+                    <div class="timeline__time">2 hours ago</div>
                   </div>
                 </div>
               </div>
-              <div class="item-details">Closed 12 tabs from Shopping window</div>
-              <div class="item-meta">
-                <span class="meta-item">🏠 Home Desktop</span>
-                <span class="meta-item">🛒 Shopping Window</span>
-                <span class="meta-item">📑 12 tabs</span>
+              <div class="timeline__details">Closed 12 tabs from Shopping window</div>
+              <div class="timeline__meta">
+                <span class="timeline__meta-item">🏠 Home Desktop</span>
+                <span class="timeline__meta-item">🛒 Shopping Window</span>
+                <span class="timeline__meta-item">📑 12 tabs</span>
               </div>
             </div>
           </div>
 
           <!-- Yesterday's Activity -->
-          <div class="timeline-group">
-            <div class="timeline-date">Yesterday, March 14</div>
+          <div class="timeline__group">
+            <div class="timeline__date">Yesterday, March 14</div>
 
-            <div class="timeline-item sync">
-              <div class="item-header">
-                <div class="item-info">
-                  <div class="item-icon">🔄</div>
+            <div class="timeline__item timeline__item--sync">
+              <div class="timeline__header">
+                <div class="timeline__info">
+                  <div class="icon icon--item">🔄</div>
                   <div>
-                    <div class="item-title">Large Sync Operation</div>
-                    <div class="item-time">11:45 PM</div>
+                    <div class="timeline__title">Large Sync Operation</div>
+                    <div class="timeline__time">11:45 PM</div>
                   </div>
                 </div>
-                <button class="expand-button" onclick="toggleExpand(this)">Details</button>
+                <button class="button button--expand" onclick="toggleExpand(this)">Details</button>
               </div>
-              <div class="item-details">Synced 47 operations across 3 windows</div>
-              <div class="item-meta">
-                <span class="meta-item">💻 Work Laptop</span>
-                <span class="meta-item">🔢 47 operations</span>
-                <span class="meta-item">⚡ 1.2s</span>
+              <div class="timeline__details">Synced 47 operations across 3 windows</div>
+              <div class="timeline__meta">
+                <span class="timeline__meta-item">💻 Work Laptop</span>
+                <span class="timeline__meta-item">🔢 47 operations</span>
+                <span class="timeline__meta-item">⚡ 1.2s</span>
               </div>
             </div>
 
-            <div class="timeline-item add">
-              <div class="item-header">
-                <div class="item-info">
-                  <div class="item-icon">🌐</div>
+            <div class="timeline__item timeline__item--add">
+              <div class="timeline__header">
+                <div class="timeline__info">
+                  <div class="icon icon--item">🌐</div>
                   <div>
-                    <div class="item-title">New Device Connected</div>
-                    <div class="item-time">9:30 PM</div>
+                    <div class="timeline__title">New Device Connected</div>
+                    <div class="timeline__time">9:30 PM</div>
                   </div>
                 </div>
               </div>
-              <div class="item-details">Home Desktop joined sync network</div>
-              <div class="item-meta">
-                <span class="meta-item">🏠 Home Desktop</span>
-                <span class="meta-item">🎉 First sync</span>
+              <div class="timeline__details">Home Desktop joined sync network</div>
+              <div class="timeline__meta">
+                <span class="timeline__meta-item">🏠 Home Desktop</span>
+                <span class="timeline__meta-item">🎉 First sync</span>
               </div>
             </div>
           </div>
@@ -263,7 +263,7 @@
 
         <!-- Load More -->
         <div class="load-more">
-          <button class="load-more-button" onclick="loadMore()">Load More Activity</button>
+          <button class="button button--load-more" onclick="loadMore()">Load More Activity</button>
         </div>
       </main>
     </div>
@@ -271,15 +271,15 @@
     <script>
       // Expand/Collapse details
       function toggleExpand(button) {
-        const item = button.closest('.timeline-item');
-        item.classList.toggle('expanded');
+        const item = button.closest('.timeline__item');
+        item.classList.toggle('timeline__item--expanded');
         button.textContent = item.classList.contains('expanded') ? 'Hide' : 'Details';
       }
 
       // Time range selection
-      document.querySelectorAll('.time-button').forEach((button) => {
+      document.querySelectorAll('.button--time').forEach((button) => {
         button.addEventListener('click', () => {
-          document.querySelectorAll('.time-button').forEach((btn) => {
+          document.querySelectorAll('.button--time').forEach((btn) => {
             btn.classList.remove('active');
           });
           button.classList.add('active');
@@ -288,9 +288,9 @@
       });
 
       // Device filter
-      document.querySelectorAll('.device-option').forEach((option) => {
+      document.querySelectorAll('.device__option').forEach((option) => {
         option.addEventListener('click', () => {
-          option.classList.toggle('active');
+          option.classList.toggle('device__option--active');
           applyDeviceFilter();
         });
       });
@@ -348,8 +348,8 @@
 
           // Add new item to timeline
           const newItem = createNewTimelineItem();
-          const todayGroup = document.querySelector('.timeline-group');
-          const firstItem = todayGroup.querySelector('.timeline-item');
+          const todayGroup = document.querySelector('.timeline__group');
+          const firstItem = todayGroup.querySelector('.timeline__item');
           todayGroup.insertBefore(newItem, firstItem.nextSibling);
 
           // Update stats
@@ -359,22 +359,22 @@
 
       function createNewTimelineItem() {
         const div = document.createElement('div');
-        div.className = 'timeline-item sync';
+        div.className = 'timeline__item timeline__item--sync';
         div.style.animation = 'fadeIn 0.5s ease-out';
         div.innerHTML = `
-                <div class="item-header">
-                    <div class="item-info">
-                        <div class="item-icon">🔄</div>
+                <div class="timeline__header">
+                    <div class="timeline__info">
+                        <div class="icon icon--item">🔄</div>
                         <div>
-                            <div class="item-title">New Sync Activity</div>
-                            <div class="item-time">Just now</div>
+                            <div class="timeline__title">New Sync Activity</div>
+                            <div class="timeline__time">Just now</div>
                         </div>
                     </div>
                 </div>
-                <div class="item-details">Live update #${updateCount} - Tab changes synced</div>
-                <div class="item-meta">
-                    <span class="meta-item">📱 This Device</span>
-                    <span class="meta-item">🔢 3 operations</span>
+                <div class="timeline__details">Live update #${updateCount} - Tab changes synced</div>
+                <div class="timeline__meta">
+                    <span class="timeline__meta-item">📱 This Device</span>
+                    <span class="timeline__meta-item">🔢 3 operations</span>
                 </div>
             `;
         return div;

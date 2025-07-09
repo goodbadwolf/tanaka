@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -12,26 +12,26 @@
   <body class="popup-body">
     <!-- Header -->
     <div class="header">
-      <div class="header-content">
+      <div class="header__content">
         <div class="app-title">
           <div class="logo">T</div>
           <h1>Tanaka</h1>
         </div>
         <div class="sync-status">
-          <div class="status-indicator"></div>
-          <span>Synced • 2 devices</span>
+          <div class="sync-status__indicator"></div>
+          <span class="sync-status__text">Synced • 2 devices</span>
         </div>
       </div>
-      <button class="settings-button" aria-label="Settings">⚙️</button>
+      <button class="button button--secondary button--settings" aria-label="Settings">⚙️</button>
     </div>
 
     <!-- Quick Actions -->
     <div class="quick-actions">
-      <button class="button primary" id="trackWindowBtn">
+      <button class="button button--primary" id="trackWindowBtn">
         <span>🪟</span>
         <span>Track Current Window</span>
       </button>
-      <button class="button">
+      <button class="button button--secondary">
         <span>🔄</span>
         <span>Sync Now</span>
       </button>
@@ -39,97 +39,97 @@
 
     <!-- Windows Section -->
     <div class="windows-section">
-      <div class="section-header">
-        <h2 class="section-title">Your Windows</h2>
+      <div class="windows-section__header">
+        <h2 class="windows-section__title">Your Windows</h2>
         <span class="badge">2 windows • 35 tabs</span>
       </div>
 
       <!-- Window Card 1 -->
       <div class="card">
-        <div class="window-header">
-          <div class="window-info">
-            <div class="icon icon-large">💻</div>
-            <div class="window-details">
-              <h3>Work - MacBook Pro</h3>
-              <div class="text-meta">12 tabs • Updated 2m ago</div>
+        <div class="window__header">
+          <div class="window__info">
+            <div class="window__icon icon icon--large">💻</div>
+            <div class="window__details">
+              <h3 class="window__name">Work - MacBook Pro</h3>
+              <div class="window__meta u-text--meta">12 tabs • Updated 2m ago</div>
             </div>
           </div>
-          <div class="toggle-switch active"></div>
+          <div class="toggle toggle--active"></div>
         </div>
-        <div class="tab-preview">
-          <div class="tab-icon">📧</div>
-          <div class="tab-icon">📊</div>
-          <div class="tab-icon">💬</div>
-          <div class="tab-icon">📝</div>
-          <div class="tab-count">+8</div>
+        <div class="tab__preview">
+          <div class="icon icon--tab">📧</div>
+          <div class="icon icon--tab">📊</div>
+          <div class="icon icon--tab">💬</div>
+          <div class="icon icon--tab">📝</div>
+          <div class="tab__count">+8</div>
         </div>
       </div>
 
       <!-- Window Card 2 -->
       <div class="card">
-        <div class="window-header">
-          <div class="window-info">
-            <div class="icon icon-large">🏠</div>
-            <div class="window-details">
-              <h3>Personal - Desktop</h3>
-              <div class="text-meta">23 tabs • Updated 5m ago</div>
+        <div class="window__header">
+          <div class="window__info">
+            <div class="window__icon icon icon--large">🏠</div>
+            <div class="window__details">
+              <h3 class="window__name">Personal - Desktop</h3>
+              <div class="window__meta u-text--meta">23 tabs • Updated 5m ago</div>
             </div>
           </div>
-          <div class="toggle-switch active"></div>
+          <div class="toggle toggle--active"></div>
         </div>
-        <div class="tab-preview">
-          <div class="tab-icon">🎵</div>
-          <div class="tab-icon">📺</div>
-          <div class="tab-icon">🛒</div>
-          <div class="tab-icon">📰</div>
-          <div class="tab-count">+19</div>
+        <div class="tab__preview">
+          <div class="icon icon--tab">🎵</div>
+          <div class="icon icon--tab">📺</div>
+          <div class="icon icon--tab">🛒</div>
+          <div class="icon icon--tab">📰</div>
+          <div class="tab__count">+19</div>
         </div>
       </div>
     </div>
 
     <!-- Track Window Animation Overlay -->
-    <div class="track-overlay" id="trackOverlay">
-      <div class="scanner-container" id="scannerContainer">
-        <div class="scanner-window">
-          <div class="scanner-line"></div>
+    <div class="overlay overlay--track" id="trackOverlay">
+      <div class="overlay__scanner" id="scannerContainer">
+        <div class="overlay__window">
+          <div class="overlay__scan-line"></div>
         </div>
       </div>
-      <svg class="success-checkmark is-hidden" viewBox="0 0 52 52">
+      <svg class="success-checkmark u-hidden" viewBox="0 0 52 52">
         <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none" />
         <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
       </svg>
-      <div class="scanner-status">
+      <div class="overlay__status">
         <h3 id="statusTitle">Scanning Window...</h3>
         <p id="statusText">Discovering open tabs</p>
-        <div class="tab-counter is-hidden" id="tabCounter">0</div>
+        <div class="tab__counter u-hidden" id="tabCounter">0</div>
       </div>
     </div>
 
     <script>
       // Toggle tracking switches
-      document.querySelectorAll('.toggle-switch').forEach((toggle) => {
-        toggle.addEventListener('click', (e) => {
+      document.querySelectorAll(".toggle").forEach((toggle) => {
+        toggle.addEventListener("click", (e) => {
           e.stopPropagation();
-          toggle.classList.toggle('active');
+          toggle.classList.toggle("toggle--active");
         });
       });
 
       // Window name editing
-      document.querySelectorAll('.window-details h3').forEach((heading) => {
-        heading.addEventListener('click', (e) => {
+      document.querySelectorAll(".window__name").forEach((heading) => {
+        heading.addEventListener("click", (e) => {
           e.stopPropagation();
 
           // Don't allow editing if already editing
-          if (heading.classList.contains('editing')) return;
+          if (heading.classList.contains("editing")) return;
 
           const originalText = heading.textContent;
-          const input = document.createElement('input');
-          input.type = 'text';
-          input.className = 'window-name-input';
+          const input = document.createElement("input");
+          input.type = "text";
+          input.className = "window__name-input";
           input.value = originalText;
 
-          heading.classList.add('editing');
-          heading.classList.add('is-editing-hidden');
+          heading.classList.add("editing");
+          heading.classList.add("is-editing-hidden");
           heading.parentNode.insertBefore(input, heading);
           input.focus();
           input.select();
@@ -137,17 +137,17 @@
           const saveEdit = () => {
             const newText = input.value.trim() || originalText;
             heading.textContent = newText;
-            heading.classList.remove('is-editing-hidden');
-            heading.classList.remove('editing');
+            heading.classList.remove("is-editing-hidden");
+            heading.classList.remove("editing");
             input.remove();
           };
 
-          input.addEventListener('blur', saveEdit);
-          input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
+          input.addEventListener("blur", saveEdit);
+          input.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
               e.preventDefault();
               saveEdit();
-            } else if (e.key === 'Escape') {
+            } else if (e.key === "Escape") {
               input.value = originalText;
               saveEdit();
             }
@@ -156,29 +156,29 @@
       });
 
       // Track Window Animation
-      const trackBtn = document.getElementById('trackWindowBtn');
-      const overlay = document.getElementById('trackOverlay');
-      const scannerContainer = document.getElementById('scannerContainer');
-      const statusTitle = document.getElementById('statusTitle');
-      const statusText = document.getElementById('statusText');
-      const tabCounter = document.getElementById('tabCounter');
-      const successCheckmark = document.querySelector('.success-checkmark');
+      const trackBtn = document.getElementById("trackWindowBtn");
+      const overlay = document.getElementById("trackOverlay");
+      const scannerContainer = document.getElementById("scannerContainer");
+      const statusTitle = document.getElementById("statusTitle");
+      const statusText = document.getElementById("statusText");
+      const tabCounter = document.getElementById("tabCounter");
+      const successCheckmark = document.querySelector(".success-checkmark");
 
-      trackBtn.addEventListener('click', () => {
-        overlay.classList.add('active');
-        scannerContainer.classList.remove('is-hidden');
-        successCheckmark.classList.add('is-hidden');
-        statusTitle.textContent = 'Scanning Window...';
-        statusText.textContent = 'Discovering open tabs';
-        tabCounter.classList.add('is-hidden');
+      trackBtn.addEventListener("click", () => {
+        overlay.classList.add("overlay--active");
+        scannerContainer.classList.remove("is-hidden");
+        successCheckmark.classList.add("is-hidden");
+        statusTitle.textContent = "Scanning Window...";
+        statusText.textContent = "Discovering open tabs";
+        tabCounter.classList.add("is-hidden");
 
         // Simulate tab discovery
         let tabCount = 0;
-        const tabIcons = ['📄', '🔍', '💼', '🎨', '📊', '🛒', '💬', '📧', '🎵', '📺', '🌐', '💡'];
+        const tabIcons = ["📄", "🔍", "💼", "🎨", "📊", "🛒", "💬", "📧", "🎵", "📺", "🌐", "💡"];
 
         setTimeout(() => {
-          tabCounter.classList.remove('is-hidden');
-          statusText.textContent = 'Found tabs:';
+          tabCounter.classList.remove("is-hidden");
+          statusText.textContent = "Found tabs:";
 
           // Animate tab counter
           const targetCount = 15;
@@ -194,98 +194,95 @@
 
           // Create floating tabs
           for (let i = 0; i < 8; i++) {
-            setTimeout(
-              () => {
-                const tab = document.createElement('div');
-                tab.className = 'floating-tab';
-                tab.textContent = tabIcons[i % tabIcons.length];
+            setTimeout(() => {
+              const tab = document.createElement("div");
+              tab.className = "floating-tab";
+              tab.textContent = tabIcons[i % tabIcons.length];
 
-                // Random starting position
-                const angle = (Math.PI * 2 * i) / 8;
-                const radius = 150;
-                const startX = Math.cos(angle) * radius;
-                const startY = Math.sin(angle) * radius;
+              // Random starting position
+              const angle = (Math.PI * 2 * i) / 8;
+              const radius = 150;
+              const startX = Math.cos(angle) * radius;
+              const startY = Math.sin(angle) * radius;
 
-                tab.style.setProperty('--start-x', `${startX}px`);
-                tab.style.setProperty('--start-y', `${startY}px`);
-                tab.style.animationDelay = `${i * 0.1}s`;
+              tab.style.setProperty("--start-x", `${startX}px`);
+              tab.style.setProperty("--start-y", `${startY}px`);
+              tab.style.animationDelay = `${i * 0.1}s`;
 
-                scannerContainer.appendChild(tab);
-              },
-              500 + i * 100,
-            );
+              scannerContainer.appendChild(tab);
+            }, 500 + i * 100);
           }
         }, 1000);
 
         // Show success state
         setTimeout(() => {
-          scannerContainer.classList.add('is-hidden');
-          successCheckmark.classList.remove('is-hidden');
-          successCheckmark.classList.add('show');
-          statusTitle.textContent = 'Window Tracked!';
-          statusText.textContent = '15 tabs synced to cloud';
-          tabCounter.classList.add('is-hidden');
+          scannerContainer.classList.add("is-hidden");
+          successCheckmark.classList.remove("is-hidden");
+          successCheckmark.classList.add("show");
+          statusTitle.textContent = "Window Tracked!";
+          statusText.textContent = "15 tabs synced to cloud";
+          tabCounter.classList.add("is-hidden");
 
           // Update UI and close overlay
           setTimeout(() => {
-            overlay.classList.remove('active');
+            overlay.classList.remove("overlay--active");
 
             // Add new window card
-            const windowsSection = document.querySelector('.windows-section');
-            const newCard = document.createElement('div');
-            newCard.className = 'card';
-            newCard.style.opacity = '0';
+            const windowsSection = document.querySelector(".windows-section");
+            const newCard = document.createElement("div");
+            newCard.className = "card";
+            newCard.style.opacity = "0";
             newCard.innerHTML = `
-                        <div class="window-header">
-                            <div class="window-info">
-                                <div class="icon icon-large">🌟</div>
-                                <div class="window-details">
-                                    <h3>Current Window - This Device</h3>
-                                    <div class="text-meta">15 tabs • Just now</div>
+                        <div class="window__header">
+                            <div class="window__info">
+                                <div class="window__icon icon icon--large">🌟</div>
+                                <div class="window__details">
+                                    <h3 class="window__name">Current Window - This Device</h3>
+                                    <div class="window__meta u-text--meta">15 tabs • Just now</div>
                                 </div>
                             </div>
-                            <div class="toggle-switch active"></div>
+                            <div class="toggle toggle--active"></div>
                         </div>
-                        <div class="tab-preview">
-                            <div class="tab-icon">📄</div>
-                            <div class="tab-icon">🔍</div>
-                            <div class="tab-icon">💼</div>
-                            <div class="tab-icon">🎨</div>
-                            <div class="tab-count">+11</div>
+                        <div class="tab__preview">
+                            <div class="icon icon--tab">📄</div>
+                            <div class="icon icon--tab">🔍</div>
+                            <div class="icon icon--tab">💼</div>
+                            <div class="icon icon--tab">🎨</div>
+                            <div class="tab__count">+11</div>
                         </div>
                     `;
 
             // Insert at the top after the section header
-            const sectionHeader = windowsSection.querySelector('.section-header');
+            const sectionHeader = windowsSection.querySelector(".windows-section__header");
             sectionHeader.after(newCard);
 
             // Animate in
             requestAnimationFrame(() => {
-              newCard.style.transition = 'all 0.5s ease';
-              newCard.style.opacity = '1';
+              newCard.style.transition = "all 0.5s ease";
+              newCard.style.opacity = "1";
             });
 
             // Add event listeners to new elements
-            const newToggle = newCard.querySelector('.toggle-switch');
-            newToggle.addEventListener('click', (e) => {
+            const newToggle = newCard.querySelector(".toggle");
+            newToggle.addEventListener("click", (e) => {
               e.stopPropagation();
-              newToggle.classList.toggle('active');
+              newToggle.classList.toggle("toggle--active");
             });
 
-            const newHeading = newCard.querySelector('.window-details h3');
-            newHeading.addEventListener('click', (e) => {
+            const newHeading = newCard.querySelector(".window__name");
+            newHeading.addEventListener("click", (e) => {
               e.stopPropagation();
 
-              if (newHeading.classList.contains('editing')) return;
+              if (newHeading.classList.contains("editing")) return;
 
               const originalText = newHeading.textContent;
-              const input = document.createElement('input');
-              input.type = 'text';
-              input.className = 'window-name-input';
+              const input = document.createElement("input");
+              input.type = "text";
+              input.className = "window__name-input";
               input.value = originalText;
 
-              newHeading.classList.add('editing');
-              newHeading.style.display = 'none';
+              newHeading.classList.add("editing");
+              newHeading.style.display = "none";
               newHeading.parentNode.insertBefore(input, newHeading);
               input.focus();
               input.select();
@@ -293,17 +290,17 @@
               const saveEdit = () => {
                 const newText = input.value.trim() || originalText;
                 newHeading.textContent = newText;
-                newHeading.style.display = 'inline-block';
-                newHeading.classList.remove('editing');
+                newHeading.style.display = "inline-block";
+                newHeading.classList.remove("editing");
                 input.remove();
               };
 
-              input.addEventListener('blur', saveEdit);
-              input.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
+              input.addEventListener("blur", saveEdit);
+              input.addEventListener("keydown", (e) => {
+                if (e.key === "Enter") {
                   e.preventDefault();
                   saveEdit();
-                } else if (e.key === 'Escape') {
+                } else if (e.key === "Escape") {
                   input.value = originalText;
                   saveEdit();
                 }
@@ -311,23 +308,23 @@
             });
 
             // Update count
-            document.querySelector('.badge').textContent = '3 windows • 50 tabs';
+            document.querySelector(".badge").textContent = "3 windows • 50 tabs";
 
             // Clean up scanner elements
-            const floatingTabs = scannerContainer.querySelectorAll('.floating-tab');
+            const floatingTabs = scannerContainer.querySelectorAll(".floating-tab");
             floatingTabs.forEach((tab) => tab.remove());
-            successCheckmark.classList.remove('show');
+            successCheckmark.classList.remove("show");
           }, 1500);
         }, 3500);
       });
 
       // Window card interactions
-      document.querySelectorAll('.card').forEach((card) => {
-        card.addEventListener('click', (e) => {
-          if (!e.target.closest('.toggle-switch') && !e.target.closest('.window-details h3')) {
-            card.style.transform = 'scale(0.98)';
+      document.querySelectorAll(".card").forEach((card) => {
+        card.addEventListener("click", (e) => {
+          if (!e.target.closest(".toggle") && !e.target.closest(".window__name")) {
+            card.style.transform = "scale(0.98)";
             setTimeout(() => {
-              card.style.transform = '';
+              card.style.transform = "";
             }, 100);
           }
         });

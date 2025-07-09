@@ -8,7 +8,7 @@
  */
 
 /* ===== Section Components ===== */
-.settings-section {
+.settings__section {
   background: var(--color-surface-1);
   border: 1px solid var(--color-border-subtle);
   border-radius: 12px;
@@ -16,13 +16,14 @@
   margin-bottom: 20px;
 }
 
-.section-header {
+.settings__header {
   display: flex;
   align-items: center;
   margin-bottom: 20px;
 }
 
-.section-icon {
+.section-icon,
+.icon.icon--section {
   width: 40px;
   height: 40px;
   background: rgba(99, 102, 241, 0.1);
@@ -34,27 +35,30 @@
   margin-right: 16px;
 }
 
-.section-title h3 {
+.settings__title h3 {
   font-size: 16px;
   font-weight: 600;
   margin-bottom: 2px;
 }
 
-.section-title p {
+.settings__title p {
   font-size: 13px;
   color: var(--color-text-muted);
 }
 
 /* ===== Form Components ===== */
-.form-group {
+.form-group,
+.form__group {
   margin-bottom: 20px;
 }
 
-.form-group:last-child {
+.form-group:last-child,
+.form__group:last-child {
   margin-bottom: 0;
 }
 
-.form-label {
+.form-label,
+.form__label {
   display: block;
   font-size: 13px;
   font-weight: 500;
@@ -62,7 +66,8 @@
   margin-bottom: var(--space-sm);
 }
 
-.form-input {
+.form-input,
+.form__input {
   width: 100%;
   padding: var(--space-md) var(--space-lg);
   background: var(--color-surface-2);
@@ -73,18 +78,21 @@
   transition: all var(--transition-fast);
 }
 
-.form-input:focus {
+.form-input:focus,
+.form__input:focus {
   outline: none;
   background: rgba(255, 255, 255, 0.08);
   border-color: var(--color-primary);
 }
 
-.form-input:disabled {
+.form-input:disabled,
+.form__input:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.form-hint {
+.form-hint,
+.form__hint {
   font-size: 12px;
   color: var(--color-text-muted);
   margin-top: 6px;
@@ -115,7 +123,8 @@
 }
 
 /* Select Dropdown */
-.form-select {
+.form-select,
+.form__select {
   width: 100%;
   padding: var(--space-md) var(--space-lg);
   background: var(--color-surface-2);
@@ -127,7 +136,8 @@
   transition: all var(--transition-fast);
 }
 
-.form-select:focus {
+.form-select:focus,
+.form__select:focus {
   outline: none;
   background: rgba(255, 255, 255, 0.08);
   border-color: var(--color-primary);
@@ -246,35 +256,13 @@
   font-size: inherit;
 }
 
-/* ===== Status Indicators ===== */
-.status-indicator {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  display: inline-block;
-  animation: statusPulse 2s ease-in-out infinite;
-}
-
-.status-indicator.status-active {
-  background: var(--color-success);
-  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
-}
-
-.status-indicator.status-warning {
-  background: var(--color-warning);
-  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
-}
-
-.status-indicator.status-error {
-  background: var(--color-error);
-  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
-}
-
-.status-indicator.status-inactive {
-  background: var(--color-text-muted);
-  box-shadow: none;
-  animation: none;
-}
+/* ===== Status Indicators - Now using BEM in specific components ===== */
+/* Status indicators are now component-specific:
+   - .sync-status__indicator, .sync-status__dot
+   - .device__status-dot
+   - .connection-test__icon (for larger status displays)
+   See styles.css for the base status indicator styles
+*/
 
 /* ===== Toast Notifications ===== */
 .toast {
@@ -294,12 +282,26 @@
   z-index: 1000;
 }
 
+/* Toast type-specific borders */
+.toast--error {
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.toast--warning {
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.toast--info {
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
 .toast.show {
   transform: translateY(0);
   opacity: 1;
 }
 
-.toast-icon {
+.toast-icon,
+.icon.icon--toast {
   width: 20px;
   height: 20px;
   background: var(--color-success);
@@ -309,4 +311,24 @@
   justify-content: center;
   color: white;
   font-size: 12px;
+}
+
+.toast--success .icon.icon--toast {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+}
+
+.toast--error .icon.icon--toast {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+.toast--warning .icon.icon--toast {
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+}
+
+.toast--info .icon.icon--toast {
+  background: rgba(99, 102, 241, 0.2);
+  color: #6366f1;
 }

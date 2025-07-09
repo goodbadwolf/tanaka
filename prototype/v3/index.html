@@ -10,16 +10,16 @@
     <link rel="stylesheet" href="css/components.css" />
     <link rel="stylesheet" href="css/index.css" />
   </head>
-  <body>
+  <body class="index-page">
     <!-- Background Animation -->
     <div class="background-canvas">
-      <div class="floating-orb orb1"></div>
-      <div class="floating-orb orb2"></div>
-      <div class="floating-orb orb3"></div>
+      <div class="animation__orb animation__orb--1"></div>
+      <div class="animation__orb animation__orb--2"></div>
+      <div class="animation__orb animation__orb--3"></div>
     </div>
 
     <!-- Main Container -->
-    <div class="main-container">
+    <div class="container container--main">
       <!-- Header -->
       <div class="header">
         <div class="app-logo-large">T</div>
@@ -29,38 +29,38 @@
 
       <!-- Prototype Grid -->
       <div class="prototype-grid">
-        <a href="popup.html" class="prototype-card">
-          <span class="card-badge">Core</span>
-          <div class="card-icon">🪟</div>
-          <h3 class="card-title">Popup</h3>
-          <p class="card-description">Main extension popup with window tracking animations and sync status</p>
+        <a href="popup.html" class="card card--prototype">
+          <span class="card__badge">Core</span>
+          <div class="card__icon">🪟</div>
+          <h3 class="card__title">Popup</h3>
+          <p class="card__description">Main extension popup with window tracking animations and sync status</p>
         </a>
 
-        <a href="settings.html" class="prototype-card">
-          <span class="card-badge">Core</span>
-          <div class="card-icon">⚙️</div>
-          <h3 class="card-title">Settings</h3>
-          <p class="card-description">Comprehensive settings with tabbed navigation and device management</p>
+        <a href="settings.html" class="card card--prototype">
+          <span class="card__badge">Core</span>
+          <div class="card__icon">⚙️</div>
+          <h3 class="card__title">Settings</h3>
+          <p class="card__description">Comprehensive settings with tabbed navigation and device management</p>
         </a>
 
-        <a href="onboarding.html" class="prototype-card">
-          <span class="card-badge">Core</span>
-          <div class="card-icon">🚀</div>
-          <h3 class="card-title">Onboarding</h3>
-          <p class="card-description">Step-by-step setup flow for first-time users</p>
+        <a href="onboarding.html" class="card card--prototype">
+          <span class="card__badge">Core</span>
+          <div class="card__icon">🚀</div>
+          <h3 class="card__title">Onboarding</h3>
+          <p class="card__description">Step-by-step setup flow for first-time users</p>
         </a>
 
-        <a href="sync-history.html" class="prototype-card">
-          <span class="card-badge new">New</span>
-          <div class="card-icon">📅</div>
-          <h3 class="card-title">Sync History</h3>
-          <p class="card-description">Timeline view of sync activity with device filtering</p>
+        <a href="sync-history.html" class="card card--prototype">
+          <span class="card__badge card__badge--new">New</span>
+          <div class="card__icon">📅</div>
+          <h3 class="card__title">Sync History</h3>
+          <p class="card__description">Timeline view of sync activity with device filtering</p>
         </a>
 
-        <a href="design-system.html" class="prototype-card">
-          <div class="card-icon">🎨</div>
-          <h3 class="card-title">Design System</h3>
-          <p class="card-description">UI patterns including empty states, errors, and notifications</p>
+        <a href="design-system.html" class="card card--prototype">
+          <div class="card__icon">🎨</div>
+          <h3 class="card__title">Design System</h3>
+          <p class="card__description">UI patterns including empty states, errors, and notifications</p>
         </a>
       </div>
 
@@ -98,15 +98,15 @@
 
     <script>
       // Add some interactive hover effects
-      document.querySelectorAll(".prototype-card").forEach((card) => {
+      document.querySelectorAll(".card--prototype").forEach((card) => {
         card.addEventListener("mouseenter", (e) => {
-          const icon = card.querySelector(".card-icon");
+          const icon = card.querySelector(".card__icon");
           icon.style.transform = "scale(1.1) rotate(5deg)";
           icon.style.transition = "transform 0.3s ease";
         });
 
         card.addEventListener("mouseleave", (e) => {
-          const icon = card.querySelector(".card-icon");
+          const icon = card.querySelector(".card__icon");
           icon.style.transform = "scale(1) rotate(0deg)";
         });
       });
