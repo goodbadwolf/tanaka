@@ -1,0 +1,44 @@
+/* Utility Classes */
+
+/* Spacing */
+.theme-v3 .mt-xl { margin-top: 2rem; }
+.theme-v3 .mb-xl { margin-bottom: 2rem; }
+.theme-v3 .p-xl { padding: 2rem; }
+
+/* Text utilities */
+.theme-v3 .text-center { text-align: center; }
+.theme-v3 .fw-bold { font-weight: bold; }
+.theme-v3 .text-white { color: white; }
+
+/* Layout */
+.theme-v3 .flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Animations */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+  }
+}
+
+.theme-v3 .pulse-effect {
+  animation: pulse 2s infinite;
+}
+
+/* Theme-specific utilities */
+.theme-v3 .theme-gradient-light {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.theme-v3 .theme-gradient-dark {
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+}

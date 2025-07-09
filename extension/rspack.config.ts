@@ -10,7 +10,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const isDev = process.env.NODE_ENV === 'development';
 const buildEnv = process.env.BUILD_ENV || 'development';
 const isAnalyze = process.env.RSPACK_BUNDLE_ANALYZE === 'true';
-const isWebapp = process.env.WEBAPP_MODE === 'true';
+
+type AppMode = 'extension' | 'webapp' | 'playground';
+
+const appMode: AppMode = (process.env.APP_MODE || 'extension') as AppMode;
 
 export default defineConfig({
   context: __dirname,
@@ -22,6 +25,7 @@ export default defineConfig({
     'settings/settings': './src/settings/settings.tsx',
     webapp: './src/webapp/index.tsx',
     'workers/crdt-worker': './src/workers/crdt-worker.ts',
+    playground: './src/playground/index.tsx',
   },
 
   output: {
@@ -34,16 +38,18 @@ export default defineConfig({
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
     extensionAlias: {
       '.js': ['.ts', '.js'],
-      '.jsx': ['.tsx', '.jsx']
+      '.jsx': ['.tsx', '.jsx'],
     },
     alias: {
       '@': resolve(__dirname, 'src'),
       '@env': resolve(__dirname, `src/config/environments/${buildEnv}.ts`),
-      'react': 'preact/compat',
+      react: 'preact/compat',
       'react-dom': 'preact/compat',
-      ...(isWebapp ? {
-        'webextension-polyfill': resolve(__dirname, 'src/browser/mock-polyfill.ts'),
-      } : {}),
+      ...(appMode !== 'extension'
+        ? {
+            'webextension-polyfill': resolve(__dirname, 'src/browser/mock-polyfill.ts'),
+          }
+        : {}),
     },
   },
 
@@ -119,6 +125,13 @@ export default defineConfig({
       inject: true,
     }),
 
+    new HtmlRspackPlugin({
+      template: './src/playground/index.html',
+      filename: 'playground/index.html',
+      chunks: ['playground'],
+      inject: true,
+    }),
+
     new rspack.CopyRspackPlugin({
       patterns: [
         { from: 'manifest.json', to: 'manifest.json' },
@@ -132,49 +145,53 @@ export default defineConfig({
       __APP_VERSION__: JSON.stringify(process.env.npm_package_version),
     }),
 
-    isAnalyze && new BundleAnalyzerPlugin({
-      analyzerMode: 'static',
-      reportFilename: 'bundle-report.html',
-      openAnalyzer: true,
-      generateStatsFile: true,
-      statsFilename: 'bundle-stats.json',
-    }),
+    isAnalyze &&
+      new BundleAnalyzerPlugin({
+        analyzerMode: 'static',
+        reportFilename: 'bundle-report.html',
+        openAnalyzer: true,
+        generateStatsFile: true,
+        statsFilename: 'bundle-stats.json',
+      }),
   ].filter(Boolean),
 
   optimization: {
     minimize: !isDev,
-    minimizer: !isDev ? [
-      new rspack.SwcJsMinimizerRspackPlugin({
-        minimizerOptions: {
-          format: {
-            comments: false,
-            ascii_only: true,
-          },
-          compress: {
-            passes: 2,
-            drop_console: buildEnv === 'production',
-            drop_debugger: true,
-            pure_funcs: buildEnv === 'production' ? ['console.log', 'console.info', 'console.debug'] : [],
-            collapse_vars: true,
-            reduce_vars: true,
-            sequences: true,
-            dead_code: true,
-            conditionals: true,
-            evaluate: true,
-            if_return: true,
-            join_vars: true,
-            loops: true,
-            unused: true,
-          },
-          mangle: {
-            toplevel: true,
-            keep_classnames: false,
-            keep_fnames: false,
-            safari10: true,
-          },
-        },
-      }),
-    ] : [],
+    minimizer: !isDev
+      ? [
+          new rspack.SwcJsMinimizerRspackPlugin({
+            minimizerOptions: {
+              format: {
+                comments: false,
+                ascii_only: true,
+              },
+              compress: {
+                passes: 2,
+                drop_console: buildEnv === 'production',
+                drop_debugger: true,
+                pure_funcs:
+                  buildEnv === 'production' ? ['console.log', 'console.info', 'console.debug'] : [],
+                collapse_vars: true,
+                reduce_vars: true,
+                sequences: true,
+                dead_code: true,
+                conditionals: true,
+                evaluate: true,
+                if_return: true,
+                join_vars: true,
+                loops: true,
+                unused: true,
+              },
+              mangle: {
+                toplevel: true,
+                keep_classnames: false,
+                keep_fnames: false,
+                safari10: true,
+              },
+            },
+          }),
+        ]
+      : [],
     sideEffects: false, // Enable tree shaking
     usedExports: true, // Mark used exports
     innerGraph: true, // Enable inner graph optimizations
@@ -185,13 +202,20 @@ export default defineConfig({
   devServer: {
     hot: true,
     port: 3000,
+    client: {
+      overlay: {
+        errors: true,
+        warnings: false,
+        runtimeErrors: true,
+      },
+    },
     devMiddleware: {
       writeToDisk: true,
     },
     historyApiFallback: {
-      index: '/index.html',
+      index: appMode === 'playground' ? '/playground/index.html' : '/index.html',
     },
-    open: true,
+    open: appMode === 'playground' ? '/playground/index.html' : true,
   },
 
   devtool: isDev ? 'source-map' : false,

@@ -141,17 +141,61 @@ All work to be completed.
 ### Branch: `feat/mantine-setup`
 
 **Setup Mantine** (UI Redesign - build components iteratively as needed)
+**NOTE**: Pick one item at a time when working, and commit it when finished after confirmation from the user. Only then move on to the next one
 
-- [ ] Install Mantine and dependencies
-- [ ] Basic theme configuration (colors from v3 prototype)
-- [ ] Set up MantineProvider in extension entry points
-- [ ] Get popup page working end-to-end
-- [ ] Add theme switching support (light/dark)
+- [x] Install Mantine and dependencies
+- [x] Basic theme configuration (colors from v3 prototype)
+- [x] Add theme switching support (light/dark)
+- [x] Create UI component playground for development
+- [x] Enhance theme config with v3 colors (#6366f1, #8b5cf6)
+- [x] Add multiple styling approaches (CSS classes, CSS-in-JS, CSS modules)
+- [x] Implement recommended hybrid styling pattern:
+  - Create `extension/src/playground/styles/` folder for CSS files
+  - Use plain CSS for base styles (visible in DevTools)
+  - Use styles prop for dynamic/interactive behavior
+  - Example: `className="playground-button"` + `styles={{ root: { '&:hover': {...} } }}`
+- [x] Implement dual-theme system with v3 and cyberpunk themes:
+  - Reorganized existing theme as 'v3' in dedicated folders
+  - Created cyberpunk theme with neon colors and futuristic design
+  - Added theme switching via SegmentedControl
+  - Implemented theme-specific CSS scoping
+  - Updated ThemeProvider for dynamic theme selection
+- [x] Implement gradient buttons and glowing card effects (in both themes)
+- [x] Add DevTools-friendly data attributes for component identification
+- [x] Create styling utility functions for reusable patterns
+- [x] Add full-page gradient background to playground:
+  - CSS class: `.playground-container` with `min-height: 100vh`
+  - Background: `linear-gradient(135deg, #667eea 0%, #764ba2 100%)`
+  - Apply to Container with `size="lg"` and `padding: 2rem`
+- ~~[ ] Implement animated gradients with keyframes:~~
+  - ~~4-color gradient: `#ee7752, #e73c7e, #23a6d5, #23d5ab`~~
+  - ~~Animation: `gradient 15s ease infinite` with `backgroundSize: 400% 400%`~~
+  - ~~Keyframes: 0% → 50% → 100% background position transitions~~
+- [x] Create debugStyles utilities:
+  - `getClassName: (component, variant) => \`tanaka-${component}${variant ? \`--${variant}\` : ''}\``
+  - `createStyledComponent` that adds `data-styled-component` attribute and `displayName`
+  - Example: `GradientButton` with pink gradient (#FE6B8B → #FF8E53), 48px height
+- [x] Add dynamic theme-aware styling examples:
+  - Dark mode: `linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)`
+  - Light mode: `linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)`
+  - Using `isDark = colorScheme === 'dark'` pattern
+- [x] Show combined styling approaches (CSS + styles prop):
+  - `.glowing-card` with glass morphism: `backdrop-filter: blur(10px)`, `rgba(255, 255, 255, 0.1)` bg
+  - `.custom-button` with gradient: `linear-gradient(45deg, #fc466b 0%, #3f5efb 100%)`
+  - Hover effects: `translateY(-2px)`, `box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2)`
+  - Pink outline button with dynamic hover state switching
+- [x] Add CSS effects and utilities:
+  - Text gradient: `linear-gradient(45deg, #f093fb 0%, #f5576c 100%)` with `-webkit-background-clip`
+  - White theme toggle button with `rgba(255, 255, 255, 0.9)` background
+  - Title with `textShadow: '2px 2px 4px rgba(0, 0, 0, 0.3)'`
+  - Data attributes pattern: `data-component="example-card"` with hover tooltip in debug mode
 
 ### Branch: `feat/popup-redesign`
 
 **Popup Redesign**
 
+- [ ] Set up MantineProvider in popup entry point
+- [ ] Get popup page working end-to-end with Mantine
 - [ ] Window list with tracking toggles
 - [ ] Sync status indicator with live animation
 - [ ] Quick action buttons (Track Window, Sync Now)
@@ -162,6 +206,7 @@ All work to be completed.
 
 **Settings Redesign**
 
+- [ ] Set up MantineProvider in settings entry point
 - [ ] Tabbed interface (General, Sync, Devices, Advanced, About)
 - [ ] Theme toggle in header
 - [ ] Server configuration form
@@ -189,6 +234,15 @@ All work to be completed.
 - [ ] Improve error messages with better copy
 - [ ] Add tooltips for complex features
 - [ ] Add keyboard navigation support
+
+### Branch: `chore/postcss-setup`
+
+**PostCSS Configuration**
+
+- [ ] Add PostCSS configuration for advanced CSS features
+- [ ] Install postcss, postcss-loader, and autoprefixer
+- [ ] Configure PostCSS for Mantine UI optimizations
+- [ ] Test CSS modules and vendor prefixing
 
 ### Branch: `feat/code-cleanup`
 
