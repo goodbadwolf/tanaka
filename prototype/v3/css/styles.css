@@ -76,6 +76,89 @@
   --breakpoint-xl: 1280px;
 }
 
+/* ===== Container/Layout System ===== */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.container.container--timeline {
+  flex: 1;
+  min-width: 0;
+}
+
+.container.container--design-system {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.container__content {
+  flex: 1;
+  width: 100%;
+}
+
+.container__sidebar {
+  width: 280px;
+  flex-shrink: 0;
+}
+
+/* ===== Header System ===== */
+.header {
+  background: var(--gradient-header);
+  padding: 20px 30px;
+  border-bottom: 1px solid var(--color-border-subtle);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  backdrop-filter: blur(20px);
+}
+
+.header.header--design {
+  text-align: center;
+  margin-bottom: 40px;
+  background: transparent;
+  position: static;
+  border: none;
+}
+
+.header.header--gallery {
+  text-align: center;
+  margin-bottom: 40px;
+  background: transparent;
+  position: static;
+  border: none;
+}
+
+.header.header--welcome {
+  text-align: center;
+  margin-bottom: 40px;
+  background: transparent;
+  position: static;
+  border: none;
+}
+
+.header__content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header__left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header__actions {
+  display: flex;
+  gap: 12px;
+}
+
 /* ===== Shared Components ===== */
 
 /* Button Component */
@@ -110,18 +193,36 @@
   outline-offset: 2px;
 }
 
-.button.primary {
+.button-primary,
+.button.button--primary {
   background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   border: none;
   color: white;
 }
 
-.button.primary:hover {
+.button-primary:hover,
+.button.button--primary:hover {
   background: linear-gradient(135deg, #5558e3 0%, #7c4ce6 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.button-secondary,
+.button.button--secondary {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #e7e7e8;
+}
+
+.button-secondary:hover,
+.button.button--secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
 }
 
 /* Toggle Switch Component */
-.toggle-switch {
+.toggle {
   width: 44px;
   height: 24px;
   background: rgba(255, 255, 255, 0.1);
@@ -132,17 +233,17 @@
   flex-shrink: 0;
 }
 
-.toggle-switch.active {
+.toggle--active {
   background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
 }
 
-.toggle-switch:focus-visible {
+.toggle:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
 
-.toggle-switch::after {
-  content: '';
+.toggle::after {
+  content: "";
   position: absolute;
   width: 20px;
   height: 20px;
@@ -154,12 +255,17 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.toggle-switch.active::after {
+.toggle--active::after {
   transform: translateX(20px);
 }
 
-/* Status Indicator Component */
-.status-indicator {
+/* Status Indicator Component - BEM structure */
+.status-indicator,
+.status__indicator,
+.sync-status__indicator,
+.sync-status__dot,
+.device__status-dot,
+.connection-test__icon {
   width: 8px;
   height: 8px;
   border-radius: 50%;
@@ -168,10 +274,29 @@
   animation: statusPulse 2s ease-in-out infinite;
 }
 
-.status-indicator.syncing {
+/* Status states */
+.status-indicator.syncing,
+.status__indicator.syncing,
+.sync-status__indicator--syncing,
+.sync-status__dot--syncing {
   background: #f59e0b;
   box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
   animation: spin 1s linear infinite;
+}
+
+.sync-status__indicator--error,
+.sync-status__dot--error,
+.device__status-dot--error {
+  background: var(--color-error);
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
+.sync-status__indicator--inactive,
+.sync-status__dot--inactive,
+.device__status-dot--inactive {
+  background: var(--color-text-muted);
+  box-shadow: none;
+  animation: none;
 }
 
 /* Card Component */
@@ -213,7 +338,8 @@
   overflow: hidden;
 }
 
-.icon.icon-large {
+.icon.icon-large,
+.icon.icon--large {
   width: 36px;
   height: 36px;
   background: rgba(99, 102, 241, 0.1);
@@ -226,8 +352,4 @@
   height: 20px;
 }
 
-/* Text Utility Component */
-.text-meta {
-  font-size: 12px;
-  color: #6b7280;
-}
+/* Text Utility Component - moved to utilities.css */

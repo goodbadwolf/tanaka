@@ -44,10 +44,8 @@
 }
 
 /* ===== Popup Layout ===== */
-body.popup-body {
-  font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
-    sans-serif;
+.popup-body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   width: 380px;
   min-height: 500px;
   background: var(--color-background);
@@ -58,17 +56,15 @@ body.popup-body {
 
 /* ===== Shared Components ===== */
 
-/* Header */
-.header {
-  background: var(--gradient-header);
+/* Header - Popup specific overrides */
+.popup-body .header {
   padding: 20px;
-  border-bottom: 1px solid var(--color-border-subtle);
   position: relative;
   overflow: hidden;
 }
 
-.header::before {
-  content: '';
+.popup-body .header::before {
+  content: "";
   position: absolute;
   top: -50%;
   right: -50%;
@@ -78,9 +74,11 @@ body.popup-body {
   animation: pulse 4s ease-in-out infinite;
 }
 
-.header-content {
+.popup-body .header__content {
   position: relative;
   z-index: 1;
+  justify-content: space-between;
+  display: block;
 }
 
 .app-title {
@@ -118,6 +116,19 @@ h1 {
   color: var(--color-text-secondary);
 }
 
+.sync-status__indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+  animation: statusPulse 2s ease-in-out infinite;
+}
+
+.sync-status__text {
+  color: var(--color-text-secondary);
+}
+
 /* Quick Actions */
 .quick-actions {
   padding: 16px 20px;
@@ -134,14 +145,14 @@ h1 {
   position: relative;
 }
 
-.section-header {
+.windows-section__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 16px;
 }
 
-.section-title {
+.windows-section__title {
   font-size: 14px;
   font-weight: 600;
   color: var(--color-text-secondary);
@@ -149,26 +160,30 @@ h1 {
   letter-spacing: 0.05em;
 }
 
-/* ===== Window Management ===== */
-.window-header {
+/* ===== Window Management - BEM Structure ===== */
+.window__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 12px;
 }
 
-.window-info {
+.window__info {
   display: flex;
   align-items: center;
   gap: 10px;
   flex: 1;
 }
 
-.window-details {
+.window__icon {
+  /* Icon inherits from icon--large */
+}
+
+.window__details {
   flex: 1;
 }
 
-.window-details h3 {
+.window__name {
   font-size: 14px;
   font-weight: 600;
   margin-bottom: 2px;
@@ -180,12 +195,12 @@ h1 {
   position: relative;
 }
 
-.window-details h3:hover {
+.window__name:hover {
   background: var(--color-surface-2);
 }
 
-.window-details h3:hover::after {
-  content: '✏️';
+.window__name:hover::after {
+  content: "✏️";
   position: absolute;
   right: -20px;
   top: 50%;
@@ -194,13 +209,13 @@ h1 {
   opacity: 0.5;
 }
 
-.window-details h3.editing {
+.window__name.editing {
   background: var(--color-surface-3);
   outline: 2px solid var(--color-primary);
   outline-offset: -2px;
 }
 
-.window-name-input {
+.window__name-input {
   font-size: 14px;
   font-weight: 600;
   background: var(--color-surface-3);
@@ -214,13 +229,17 @@ h1 {
   margin-bottom: 2px;
 }
 
-.tab-preview {
+.window__meta {
+  /* Meta text inherits from u-text--meta */
+}
+
+.tab__preview {
   display: flex;
   gap: 4px;
   margin-top: 8px;
 }
 
-.tab-icon {
+.icon.icon--tab {
   width: 20px;
   height: 20px;
   background: var(--color-surface-2);
@@ -229,7 +248,7 @@ h1 {
   overflow: hidden;
 }
 
-.tab-count {
+.tab__count {
   width: 20px;
   height: 20px;
   background: var(--color-surface-3);
@@ -242,8 +261,7 @@ h1 {
   color: var(--color-text-secondary);
 }
 
-/* Settings Icon */
-.settings-button {
+.button--settings {
   position: absolute;
   top: 20px;
   right: 20px;
@@ -260,13 +278,15 @@ h1 {
   z-index: 2;
 }
 
-.settings-button:hover {
+.settings-button:hover,
+.button.button--settings:hover {
   background: var(--color-surface-3);
   border-color: rgba(255, 255, 255, 0.2);
   transform: rotate(45deg);
 }
 
-.settings-button:focus-visible {
+.settings-button:focus-visible,
+.button.button--settings:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
@@ -286,7 +306,7 @@ h1 {
 }
 
 /* ===== Track Overlay System ===== */
-.track-overlay {
+.overlay {
   position: absolute;
   top: 0;
   left: 0;
@@ -301,19 +321,23 @@ h1 {
   flex-direction: column;
 }
 
-.track-overlay.active {
+.overlay--track {
+  /* Inherits from .overlay */
+}
+
+.overlay--active {
   display: flex;
 }
 
 /* Scanner Animation */
-.scanner-container {
+.overlay__scanner {
   position: relative;
   width: 200px;
   height: 200px;
   margin-bottom: 30px;
 }
 
-.scanner-window {
+.overlay__window {
   width: 100%;
   height: 100%;
   background: rgba(99, 102, 241, 0.1);
@@ -324,7 +348,7 @@ h1 {
   animation: scannerGlow 2s ease-in-out infinite;
 }
 
-.scanner-line {
+.overlay__scan-line {
   position: absolute;
   width: 100%;
   height: 3px;
@@ -348,7 +372,7 @@ h1 {
   opacity: 0;
 }
 
-.scanner-status {
+.overlay__status {
   text-align: center;
   animation: fadeIn 0.5s ease-out;
 }
@@ -364,7 +388,8 @@ h1 {
   color: var(--color-text-secondary);
 }
 
-.tab-counter {
+.tab-counter,
+.tab__counter {
   font-size: 24px;
   font-weight: 700;
   color: var(--color-primary);

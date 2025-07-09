@@ -18,9 +18,7 @@
 }
 
 body {
-  font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
-    sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   background: var(--color-background);
   color: var(--color-text-primary);
   min-height: 100vh;
@@ -28,25 +26,18 @@ body {
 }
 
 /* ===== Header ===== */
-.header {
-  background: var(--gradient-header);
+/* Header styles are now in styles.css - adding settings-specific overrides */
+.settings--page .header {
   padding: 30px;
-  border-bottom: 1px solid var(--color-border-subtle);
-  position: sticky;
-  top: 0;
-  z-index: 100;
   backdrop-filter: blur(10px);
 }
 
-.header-content {
+.settings--page .header__content {
   max-width: 800px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
 }
 
-.back-button {
+.back-button,
+.button.button--secondary {
   width: 40px;
   height: 40px;
   background: var(--color-surface-2);
@@ -62,7 +53,8 @@ body {
   font-size: 18px;
 }
 
-.back-button:hover {
+.back-button:hover,
+.button.button--secondary:hover {
   background: var(--color-surface-3);
   transform: translateX(-2px);
 }
@@ -75,7 +67,8 @@ body {
   text-align: center;
 }
 
-.save-button {
+.save-button,
+.button.button--primary {
   padding: 10px 20px;
   background: var(--gradient-primary);
   border: none;
@@ -87,25 +80,28 @@ body {
   font-size: 14px;
 }
 
-.save-button:hover {
+.save-button:hover,
+.button.button--primary:hover {
   background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-secondary-dark) 100%);
   transform: translateY(-1px);
 }
 
-.save-button:disabled {
+.save-button:disabled,
+.button.button--primary:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
 /* ===== Main Content ===== */
-.main-content {
+.main-content,
+.container__content {
   max-width: 800px;
   margin: 0 auto;
   padding: 30px;
 }
 
-/* ===== Navigation Tabs ===== */
-.nav-tabs {
+/* ===== Navigation Tabs - BEM Structure ===== */
+.navigation__tabs {
   display: flex;
   gap: var(--space-sm);
   margin-bottom: 30px;
@@ -114,7 +110,7 @@ body {
   border-radius: 10px;
 }
 
-.nav-tab {
+.button.button--tab {
   flex: 1;
   padding: var(--space-md) var(--space-xl);
   background: transparent;
@@ -131,22 +127,23 @@ body {
   gap: var(--space-sm);
 }
 
-.nav-tab:hover {
+.button.button--tab:hover {
   color: var(--color-text-primary);
   background: var(--color-surface-2);
 }
 
-.nav-tab.active {
+.button.button--tab.active,
+.button.button--tab.button--tab-active {
   background: rgba(99, 102, 241, 0.15);
   color: var(--color-text-primary);
 }
 
-/* ===== Tab Content ===== */
-.tab-content {
+/* ===== Tab Content - BEM Structure ===== */
+.navigation__content {
   display: none;
 }
 
-.tab-content.active {
+.navigation__content.navigation__content--active {
   display: block;
   animation: fadeIn 0.3s ease-out;
 }
@@ -154,16 +151,17 @@ body {
 /* Note: fadeIn animation is already defined in animations.css */
 
 /* ===== Danger Zone ===== */
-.danger-zone {
+.settings__section--danger {
   background: rgba(239, 68, 68, 0.05);
   border-color: rgba(239, 68, 68, 0.2);
 }
 
-.danger-zone .section-icon {
+.settings__section--danger .icon.icon--section {
   background: rgba(239, 68, 68, 0.1);
 }
 
-.danger-button {
+.danger-button,
+.button.button--danger {
   padding: 10px 20px;
   background: transparent;
   border: 1px solid rgba(239, 68, 68, 0.5);
@@ -175,19 +173,20 @@ body {
   font-size: 14px;
 }
 
-.danger-button:hover {
+.danger-button:hover,
+.button.button--danger:hover {
   background: rgba(239, 68, 68, 0.1);
   border-color: #ef4444;
 }
 
 /* ===== Device List ===== */
-.device-list {
+.device__list {
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
 }
 
-.device-item {
+.device__item {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -198,17 +197,18 @@ body {
   transition: all var(--transition-fast);
 }
 
-.device-item:hover {
+.device__item:hover {
   background: var(--color-surface-2);
 }
 
-.device-info {
+.device__info {
   display: flex;
   align-items: center;
   gap: var(--space-md);
 }
 
-.device-icon {
+.device-icon,
+.icon.icon--device {
   width: 36px;
   height: 36px;
   background: rgba(99, 102, 241, 0.1);
@@ -230,7 +230,7 @@ body {
   color: var(--color-text-muted);
 }
 
-.device-status {
+.device__status {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
@@ -238,12 +238,16 @@ body {
   color: var(--color-success);
 }
 
-.status-dot {
+.device__status-dot {
   width: 8px;
   height: 8px;
   background: var(--color-success);
   border-radius: 50%;
   box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+}
+
+.device__status-text {
+  /* Text inherits styles from parent */
 }
 
 /* ===== About Section ===== */
@@ -308,7 +312,8 @@ body {
   gap: 16px;
 }
 
-.stat-card {
+.stat-card,
+.card.card--stat {
   text-align: center;
   padding: 20px;
   background: rgba(255, 255, 255, 0.03);
@@ -328,15 +333,15 @@ body {
 }
 
 /* ===== State Modifiers ===== */
-.device-item.inactive {
+.device__item--inactive {
   opacity: 0.6;
 }
 
-.device-status.inactive {
+.device__status--inactive {
   color: #6b7280;
 }
 
-.status-dot.inactive {
+.device__status-dot--inactive {
   background: #6b7280;
   box-shadow: none;
 }

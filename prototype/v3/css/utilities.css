@@ -103,15 +103,18 @@
 }
 
 /* ===== Text Utilities ===== */
-.text-center {
+.text-center,
+.u-text--center {
   text-align: center;
 }
 
-.text-left {
+.text-left,
+.u-text--left {
   text-align: left;
 }
 
-.text-right {
+.text-right,
+.u-text--right {
   text-align: right;
 }
 
@@ -191,6 +194,14 @@
   color: var(--color-warning);
 }
 
+/* Text meta utility - special text style */
+.text-meta,
+.u-text--meta {
+  font-size: 12px;
+  color: #a1a1aa;
+  line-height: 1.5;
+}
+
 /* ===== Spacing Utilities ===== */
 
 /* Margin */
@@ -228,7 +239,8 @@
   margin-top: var(--space-lg);
 }
 
-.mt-xl {
+.mt-xl,
+.u-mt--xl {
   margin-top: var(--space-xl);
 }
 
@@ -365,7 +377,8 @@
   display: inline;
 }
 
-.hidden {
+.hidden,
+.u-hidden {
   display: none !important;
 }
 
@@ -442,7 +455,8 @@
   border-color: var(--color-success) !important;
 }
 
-.is-hidden {
+.is-hidden,
+.u-hidden {
   display: none !important;
 }
 

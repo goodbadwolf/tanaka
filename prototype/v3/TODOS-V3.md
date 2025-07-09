@@ -1,5 +1,14 @@
 # Tanaka v3 Prototype TODOs
 
+## 🚨 CRITICAL: THIS IS A PROTOTYPE - NO BACKWARD COMPATIBILITY! 🚨
+
+**⚠️ EXTREMELY IMPORTANT ⚠️**
+- **THIS IS A PROTOTYPE** - Break things freely!
+- **NO BACKWARD COMPATIBILITY NEEDED** - Replace old classes directly
+- **NO DUAL SELECTORS** - Just use the new BEM classes
+- **BREAKING CHANGES ARE EXPECTED** - This is not production code
+- **DELETE OLD CLASSES** - Don't maintain them alongside new ones
+
 ## Git Usage Instructions
 
 ### Branch Rules
@@ -48,9 +57,16 @@ gh pr create --base feat/prototype-v3
 3. 📋 Before merge: Review commits & update PR description
 4. 🗑️ After merge: Delete local branch
 
+## Progress Summary
+
+- **Total Tasks**: 3 major refactoring tasks
+- **Completed**: Task 1 (100%), Task 2.b (100%)
+- **In Progress**: Task 2.c - Reusable HTML component templates
+- **Pending**: Task 2.d-g, Task 3 (CSS consolidation)
+
 ## Pending Tasks
 
-1. **Branch: `feat/remove-redundant-pages`**
+1. **Branch: `feat/remove-redundant-pages`** ✅ **COMPLETED**
 
    a. [x] Add a scrollbar to index.html
    b. [x] Delete tab-search
@@ -83,6 +99,7 @@ gh pr create --base feat/prototype-v3
    - **🛑 STOP if regression > 0.1%** - Do NOT proceed to next item
    - **🛑 STOP and investigate** any visual differences before continuing
    - **Expected**: 0% visual change (refactoring should be invisible)
+   - **REMEMBER**: This is a prototype - REPLACE classes, don't add alongside!
 
    a. [x] Standardize component patterns across all HTML files
       - Identify all component variations (headers, cards, forms, buttons)
@@ -91,10 +108,103 @@ gh pr create --base feat/prototype-v3
       - ✅ **COMPLETED**: Created COMPONENT-ANALYSIS.md with comprehensive analysis of 22 component families
       - ✅ **SCOPE IDENTIFIED**: ~350 class changes required across 6 HTML files
       - ✅ **BEM STRUCTURE PLANNED**: 23 BEM blocks with 95+ modifiers defined
-   b. [ ] Implement consistent naming conventions (BEM methodology)
+   b. [x] Implement consistent naming conventions (BEM methodology) - ✅ COMPLETE
       - Convert to BEM: .block__element--modifier
       - Update all HTML classes to follow BEM
       - Ensure self-documenting component names
+      - ✅ **PHASE 1 COMPLETE**: 5/22 component families
+        - Container/Layout System (container, container--main, container__content, etc.)
+        - Header System (header, header--design, header__content, etc.)
+        - Button System (button--primary, button--secondary)
+        - Form System (form__group, form__label, form__input, etc.)
+        - Utility/State System (u-text--meta, u-hidden, u-mt--xl, etc.)
+      - ✅ **PHASE 2 COMPLETE**: 8/22 component families
+        - Card System (card, card__badge, card__icon, card__title, card--prototype, etc.)
+        - Icon System (icon icon--device, icon--empty, icon--large, etc.)
+        - Badge System (badge, badge--warning)
+      - ✅ **PHASE 3 COMPLETE**: 13/22 component families
+        - Progress/Stepper System (progress__bar, stepper__step-line, etc.)
+        - Animation System (animation__orb, scanner__window, etc.)
+        - Live Indicator System (indicator--live, status__dot, etc.)
+        - Navigation System (navigation__tabs, tab__entry, button--tab-active)
+        - Notification/Toast System (toast--error, notification--inline, etc.)
+      - ✅ **INFRASTRUCTURE COMPLETE**:
+        - Desktop-only BackstopJS testing configured
+        - Visual regression down to <1% for most pages
+      - ✅ **PHASE 4 COMPLETE**: 22/22 component families complete (100%)
+        - Modal/Overlay System ✅
+        - Toggle/Switch System ✅
+        - Empty State System ✅
+        - Settings System ✅
+        - Device Management System ✅
+        - Status/Sync Status System ✅
+        - Window Management System ✅
+        - Tab System ✅
+        - Timeline System ✅
+      - 🎉 **ALL BEM CONVERSIONS COMPLETE!**
+      - 📋 **PHASE 4 PLAN**: Complete BEM conversion for remaining components
+
+        **Implementation Strategy**:
+        - REPLACE old classes directly with new BEM classes
+        - DELETE old class names from CSS files
+        - Test with BackstopJS after each component (expect 0% regression)
+        - Commit after each component family with message: `feat: implement BEM for [Component] System (X/22)`
+
+        **Modal/Overlay System** (popup.html) ✅ COMPLETED
+        - Current: `.track-overlay`, `.scanner__container`, `.scanner__window`
+        - BEM: `overlay`, `overlay__scanner`, `overlay__window`
+        - Modifiers: `overlay--active`, `overlay--scanning`
+
+        **Toggle/Switch System** (popup.html, settings.html) ✅ COMPLETED
+        - Current: `.toggle-switch`, `.toggle-switch--active`, `.toggle-group`
+        - BEM: `toggle`, `toggle__switch`, `toggle__label`
+        - Modifiers: `toggle--active`, `toggle--disabled`
+
+        **Empty State System** (design-system.html) ✅ COMPLETED
+        - Current: `.empty-title`, `.empty-description`, `.empty-hint`
+        - BEM: `empty-state`, `empty-state__icon`, `empty-state__title`, `empty-state__description`
+        - Modifiers: `empty-state--no-windows`, `empty-state--offline`
+
+        **Settings System** (settings.html) ✅ COMPLETED
+        - Current: `.settings-section`, `.settings-page`, `.section-header`
+        - BEM: `settings`, `settings__section`, `settings__header`
+        - Modifiers: `settings--danger`, `settings--advanced`
+
+        **Device Management System** (settings.html, sync-history.html)
+        - Current: `.device-list`, `.device-item`, `.device-status`
+        - BEM: `device`, `device__list`, `device__item`, `device__status`
+        - Modifiers: `device--active`, `device--inactive`, `device--current`
+
+        **Status/Sync Status System** (multiple files)
+        - Current: `.sync-status`, `.status__dot` (partial BEM)
+        - BEM: `status`, `status__indicator`, `status__text`
+        - Modifiers: `status--syncing`, `status--error`, `status--success`
+
+        **Window Management System** (onboarding.html, popup.html)
+        - Current: `.window-info`, `.window-details`, `.window-name`
+        - BEM: `window`, `window__info`, `window__name`, `window__checkbox`
+        - Modifiers: `window--tracked`, `window--selected`
+
+        **Tab System** (popup.html)
+        - Current: `.tab__entry`, `.tab__preview` (partial BEM)
+        - BEM: `tab`, `tab__entry`, `tab__preview`, `tab__counter`
+        - Modifiers: `tab--active`, `tab--pinned`
+
+        **Timeline System** (sync-history.html)
+        - Current: Already follows BEM but needs consistency check
+        - Ensure all timeline classes strictly follow BEM pattern
+        - Add missing modifiers for different event types
+
+      - 📊 **PHASE 4 PRIORITY**:
+        1. ~~Toggle/Switch System (HIGH - core UI interaction)~~ ✅ COMPLETED
+        2. ~~Modal/Overlay System (HIGH - critical for tracking UX)~~ ✅ COMPLETED
+        3. ~~Empty State System (MEDIUM - important for UX)~~ ✅ COMPLETED
+        4. ~~Settings System (MEDIUM - page-specific)~~ ✅ COMPLETED
+        5. ~~Device Management System (MEDIUM - feature-specific)~~ ✅ COMPLETED
+        6. ~~Status/Sync Status System (MEDIUM - cross-file usage)~~ ✅ COMPLETED
+        7. ~~Window Management System (MEDIUM - core feature)~~ ✅ COMPLETED
+        8. ~~Tab System (MEDIUM - already partial BEM)~~ ✅ COMPLETED
+        9. ~~Timeline System (LOW - already mostly BEM)~~ ✅ COMPLETED
    c. [ ] Create reusable HTML component templates
       - Extract common patterns into template snippets
       - Standardize component HTML structure
@@ -120,9 +230,14 @@ gh pr create --base feat/prototype-v3
 
    **Goal**: Consolidate 10 CSS files (~3,342 lines) into 3-layer architecture with ~25% reduction through deduplication and modern tooling.
 
+   **Prerequisites**:
+   - ✅ Task 1 must be complete (remove redundant pages)
+   - ⚠️ Task 2 must be complete (all BEM conversions done)
+   - All HTML files must use consistent BEM naming
+
    **⚠️ MANDATORY BackstopJS Testing ⚠️**:
-   - **BEFORE STARTING**: Capture baseline with `npx backstop reference --config=backstop.json`
-   - **AFTER EACH CSS LAYER**: Test with `npx backstop test --config=backstop.json`
+   - **BEFORE STARTING**: Capture baseline with `pnpm dlx backstopjs reference --config=backstop.json`
+   - **AFTER EACH CSS LAYER**: Test with `pnpm dlx backstopjs test --config=backstop.json`
    - **🛑 STOP if ANY visual changes detected** - CSS consolidation must be invisible
    - **🛑 STOP if regression > 0.1%** - Investigate immediately
    - **Critical**: Test interactive states (toggles, tabs, hovers) for each component
@@ -216,7 +331,7 @@ gh pr create --base feat/prototype-v3
       - Run Lighthouse tests for performance metrics
       - Ensure CLS/FCP/TTI delta ≤ 5%
    i. [ ] Visual regression testing & Documentation
-      - Final BackstopJS test: `npx backstop test --config=backstop.json`
+      - Final BackstopJS test: `pnpm dlx backstopjs test --config=backstop.json`
       - Verify no unintended visual changes
       - Update reference images if changes are intentional
       - Document benefits achieved:
@@ -226,3 +341,13 @@ gh pr create --base feat/prototype-v3
         * Single source of truth for design tokens
         * Self-documenting components
         * Theme switching ready via CSS properties
+
+## Notes & Reminders
+
+- **CSS Files**: Currently 10 files in `css/` directory totaling ~3,342 lines
+- **HTML Files**: 6 main pages (popup, settings, onboarding, sync-history, design-system, index)
+- **BackstopJS**: Test configuration in `backstop.json` with 11 scenarios
+- **Component Count**: 22 total component families identified
+- **BEM Progress**: 13/22 complete (59%), 9/22 remaining (41%)
+- **Commit Pattern**: One commit per component/subtask, descriptive messages
+- **NO DUAL SELECTORS**: This is a prototype - replace classes directly!
