@@ -1,0 +1,29 @@
+/* Hover slide effect */
+.hover-slide-card {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  min-height: 100px;
+}
+
+.hover-slide-card .slide-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  transform: translateY(100%);
+  transition: transform 0.5s ease;
+}
+
+.hover-slide-card:hover .slide-content {
+  transform: translateY(0);
+}
+
+/* Theme-specific hover slide */
+.theme-v3 .hover-slide-card .slide-content {
+  background: linear-gradient(45deg, #6366f1, #8b5cf6);
+}
+
+.theme-cyberpunk .hover-slide-card .slide-content {
+  background: linear-gradient(45deg, #ff0f87, #0096ff);
+}

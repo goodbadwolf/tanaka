@@ -205,18 +205,9 @@ export function StylingUtilsExample({ themeStyle }: StylingUtilsExampleProps) {
         </Paper>
         <Paper
           p="xl"
-          className="hover-slide"
+          className="hover-slide-card"
           style={{
             background: 'rgba(255, 255, 255, 0.05)',
-            position: 'relative',
-            overflow: 'hidden',
-          }}
-          styles={{
-            root: {
-              '&:hover .slide-content': {
-                transform: 'translateY(0)',
-              },
-            },
           }}
         >
           <Text size="lg" fw={600} c="white">
@@ -224,16 +215,7 @@ export function StylingUtilsExample({ themeStyle }: StylingUtilsExampleProps) {
           </Text>
           <Box
             className="slide-content"
-            style={{
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              background: themedGradients.primary,
-              padding: '1rem',
-              transform: 'translateY(100%)',
-              transition: animations.transition(['transform'], '0.5s'),
-            }}
+            p="md"
           >
             <Text c="white">Hidden content revealed!</Text>
           </Box>

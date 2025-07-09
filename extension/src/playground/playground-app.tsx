@@ -8,6 +8,7 @@ import { ThemeStyle } from '../themes/theme-config';
 // Import both theme styles
 import './styles/v3/playground.css';
 import './styles/cyberpunk/playground.css';
+import './styles/hover-effects.css';
 
 interface PlaygroundContainerProps {
   themeStyle: ThemeStyle;
