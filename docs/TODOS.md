@@ -175,16 +175,16 @@ All work to be completed.
   - `getClassName: (component, variant) => \`tanaka-${component}${variant ? \`--${variant}\` : ''}\``
   - `createStyledComponent` that adds `data-styled-component` attribute and `displayName`
   - Example: `GradientButton` with pink gradient (#FE6B8B → #FF8E53), 48px height
-- [ ] Add dynamic theme-aware styling examples:
+- [x] Add dynamic theme-aware styling examples:
   - Dark mode: `linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)`
   - Light mode: `linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)`
   - Using `isDark = colorScheme === 'dark'` pattern
-- [ ] Show combined styling approaches (CSS + styles prop):
+- [x] Show combined styling approaches (CSS + styles prop):
   - `.glowing-card` with glass morphism: `backdrop-filter: blur(10px)`, `rgba(255, 255, 255, 0.1)` bg
   - `.custom-button` with gradient: `linear-gradient(45deg, #fc466b 0%, #3f5efb 100%)`
   - Hover effects: `translateY(-2px)`, `box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2)`
   - Pink outline button with dynamic hover state switching
-- [ ] Add CSS effects and utilities:
+- [x] Add CSS effects and utilities:
   - Text gradient: `linear-gradient(45deg, #f093fb 0%, #f5576c 100%)` with `-webkit-background-clip`
   - White theme toggle button with `rgba(255, 255, 255, 0.9)` background
   - Title with `textShadow: '2px 2px 4px rgba(0, 0, 0, 0.3)'`
