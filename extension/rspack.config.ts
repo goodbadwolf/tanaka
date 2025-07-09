@@ -202,6 +202,13 @@ export default defineConfig({
   devServer: {
     hot: true,
     port: 3000,
+    client: {
+      overlay: {
+        errors: true,
+        warnings: false,
+        runtimeErrors: true,
+      },
+    },
     devMiddleware: {
       writeToDisk: true,
     },
