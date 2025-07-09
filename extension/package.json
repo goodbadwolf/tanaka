@@ -90,6 +90,9 @@
     "webpack-bundle-analyzer": "^4.10.2"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@mantine/core": "^8.1.3",
+    "@mantine/hooks": "^8.1.3",
     "@preact/signals": "^2.2.0",
     "preact": "^10.26.9",
     "preact-router": "^4.1.2",
