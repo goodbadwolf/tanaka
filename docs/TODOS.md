@@ -71,33 +71,6 @@ This file tracks all pending work for the Tanaka project.
 - Squash commits for clean history when merging
 - Delete feature branches after merge
 
----
-
-## ✅ MAJOR MILESTONE ACHIEVED
-
-**🎉 CSS Prototype Consolidation COMPLETE!**
-
-**What was accomplished in `feat/consolidate-prototypes`:**
-- ✅ **2,850+ lines of inline CSS** → **0 lines** (100% extraction across ALL 11 prototype files)
-- ✅ **Complete CSS architecture** established:
-  - `styles.css` - Core design system with variables and tokens
-  - `animations.css` - All keyframes and animations
-  - `utilities.css` - 300+ utility classes for layout and spacing
-  - `components.css` - Reusable UI components
-  - Page-specific CSS files for each prototype
-- ✅ **File organization** restructured:
-  - Original files moved from `extension/prototype/` to `prototype/v1/`
-  - Extracted files with external CSS in `prototype/v2/`
-  - Removed `tanaka-` prefix and `-updated` suffix from filenames
-- ✅ **Production-ready design system** with full tokenization
-- ✅ **Perfect visual fidelity** maintained (0.00% regression via BackstopJS)
-- ✅ **Accessibility compliance** (WCAG 2.1 AA + reduced motion support)
-- ✅ **JavaScript modernization** (classList vs style.display patterns)
-- ✅ **Comprehensive methodology** documented in INSTRUCTIONS.md
-
-**Impact:** All prototype files now use a modular, maintainable CSS architecture ready for production implementation.
-
----
 
 ## Pending Tasks
 
@@ -324,96 +297,68 @@ All 7 remaining prototype files were successfully extracted:
 - [x] Extracted any remaining demo-specific styles
 - [x] Tested visual regression throughout extraction (0.00%)
 
-#### Branch: `feat/create-design-system`
+### UI Redesign with Mantine
 
-**Convert to React Component Library**
+**Note**: Complete UI redesign using Mantine UI library with iterative approach - build components as needed, not upfront.
 
-- [ ] Set up component library structure
-  - [ ] Create components directory
-  - [ ] Set up Storybook for component development
-  - [ ] Configure CSS modules or styled-components
-- [ ] Build core design system components
-  - [ ] Button (primary, secondary, danger)
-  - [ ] Card (default, elevated, interactive)
-  - [ ] Input/TextArea with validation
-  - [ ] Toggle switch
-  - [ ] Badge/Status indicators
-  - [ ] Toast notifications
-  - [ ] Modal/Overlay
-  - [ ] Dropdown/Select
-  - [ ] Tooltip
-  - [ ] LoadingSpinner/Skeleton
+#### Branch: `feat/mantine-setup`
 
-#### Branch: `feat/ui-redesign`
+**Phase 1: Setup Mantine**
 
-**Implement Redesigned Pages**
+- [ ] Install Mantine and dependencies
+- [ ] Basic theme configuration (colors from v3 prototype)
+- [ ] Set up MantineProvider in extension entry points
+- [ ] Get popup page working end-to-end
+- [ ] Add theme switching support (light/dark)
 
-- [ ] Popup page redesign
-  - [ ] WindowCard with tracking toggle
-  - [ ] SyncStatus indicator
-  - [ ] QuickActions bar
-  - [ ] TrackingAnimation overlay
-- [ ] Settings page redesign
-  - [ ] TabNavigation component
-  - [ ] SettingsSection cards
-  - [ ] Form components integration
-  - [ ] Device management
-- [ ] Onboarding flow
-  - [ ] ProgressBar stepper
-  - [ ] Connection test
-  - [ ] Window selection
-  - [ ] Success animation
-- [ ] Error/troubleshooting page
-  - [ ] DiagnosticPanel
-  - [ ] Common issues accordion
-  - [ ] Debug info display
-- [ ] Additional pages
-  - [ ] Context menu implementation
-  - [ ] Empty states for all views
-  - [ ] Notification system
-  - [ ] Sync history timeline
-  - [ ] Tab search interface
-  - [ ] Window details panel
-- [ ] Implement state management integration
-  - [ ] Window tracking state
-  - [ ] Sync status and progress
-  - [ ] Settings persistence
-  - [ ] Error/warning states
-  - [ ] Onboarding progress
-- [ ] Add missing UI states
-  - [ ] Loading states (skeleton screens, progress indicators)
-  - [ ] Offline mode indicators
-  - [ ] Sync conflict resolution UI
-  - [ ] Bulk actions (select multiple windows)
-- [ ] Accessibility improvements
-  - [ ] ARIA labels and roles
-  - [ ] Keyboard navigation (Tab, Enter, Escape)
-  - [ ] Focus management and trapping
-  - [ ] Screen reader announcements
-  - [ ] High contrast mode support
-- [ ] Animation refinements
-  - [ ] Page transitions (slide, fade)
-  - [ ] Stagger animations for lists
-  - [ ] Smooth height transitions
-  - [ ] Loading progress animations
-  - [ ] Success/error state transitions
-- [ ] Theme system implementation
-  - [ ] CSS custom properties for all tokens
-  - [ ] Theme provider component
-  - [ ] Light theme variant
-  - [ ] System preference detection
-  - [ ] Smooth theme transitions
-- [ ] Responsive improvements
-  - [ ] Popup: Fixed 380px with internal responsiveness
-  - [ ] Settings: Adapt to window width
-  - [ ] Onboarding: Center and scale appropriately
-  - [ ] Touch-friendly tap targets (min 44px)
-- [ ] Performance optimizations
-  - [ ] Virtualized window lists for 200+ items
-  - [ ] Debounced search/filter inputs
-  - [ ] Lazy load heavy components
-  - [ ] Optimize animation performance
-  - [ ] Reduce re-renders with memo
+#### Branch: `feat/popup-redesign`
+
+**Phase 2: Popup Redesign**
+
+- [ ] Window list with tracking toggles
+- [ ] Sync status indicator with live animation
+- [ ] Quick action buttons (Track Window, Sync Now)
+- [ ] Theme toggle in header
+- [ ] Build components inline as needed
+
+#### Branch: `feat/settings-redesign`
+
+**Phase 3: Settings Redesign**
+
+- [ ] Tabbed interface (General, Sync, Devices, Advanced, About)
+- [ ] Theme toggle in header
+- [ ] Server configuration form
+- [ ] Device management list
+- [ ] Extract shared components if patterns emerge
+
+#### Branch: `feat/remaining-pages`
+
+**Phase 4: Additional Pages**
+
+- [ ] Onboarding flow (if needed)
+- [ ] Error states with troubleshooting
+- [ ] Empty states for no windows/tabs
+- [ ] Continue building components as required
+
+#### Branch: `feat/ui-polish`
+
+**Phase 5: Polish & Refactor**
+
+- [ ] Extract truly reusable components
+- [ ] Optimize bundle size (target < 150KB)
+- [ ] Performance improvements (TTI < 200ms)
+- [ ] Visual consistency pass
+- [ ] Firefox compatibility testing
+
+**Design Elements to Preserve from v3:**
+- Primary: #6366f1 (indigo gradient)
+- Secondary: #8b5cf6 (purple accent)
+- Dark Background: #0a0a0b
+- Surface: #0f0f10
+- Purple gradient buttons
+- Glowing effects on interactive elements
+- Card-based layout
+- Smooth animations
 
 #### Branch: `feat/css-architecture-improvements`
 
