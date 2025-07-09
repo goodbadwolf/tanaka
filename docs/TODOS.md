@@ -138,7 +138,7 @@ All work to be completed.
 - [ ] Server: Return partial results if possible
 - [ ] Tests: Verify recovery from network outages
 
-### Branch: `feat/mantine-setup`
+### ~~Branch: `feat/mantine-setup`~~ (COMPLETED - Merged to main)
 
 **Setup Mantine** (UI Redesign - build components iteratively as needed)
 **NOTE**: Pick one item at a time when working, and commit it when finished after confirmation from the user. Only then move on to the next one
@@ -167,7 +167,7 @@ All work to be completed.
   - CSS class: `.playground-container` with `min-height: 100vh`
   - Background: `linear-gradient(135deg, #667eea 0%, #764ba2 100%)`
   - Apply to Container with `size="lg"` and `padding: 2rem`
-- ~~[ ] Implement animated gradients with keyframes:~~
+- ~~[ ] Implement animated gradients with keyframes:~~ (Skipped - not needed)
   - ~~4-color gradient: `#ee7752, #e73c7e, #23a6d5, #23d5ab`~~
   - ~~Animation: `gradient 15s ease infinite` with `backgroundSize: 400% 400%`~~
   - ~~Keyframes: 0% → 50% → 100% background position transitions~~
