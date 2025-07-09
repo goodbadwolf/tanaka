@@ -76,8 +76,6 @@ This file tracks all pending work for the Tanaka project.
 
 All work to be completed.
 
-### Documentation
-
 #### Branch: `docs/operational-basics`
 
 **Basic Documentation**
@@ -104,8 +102,6 @@ All work to be completed.
 - [ ] Show alternatives: `git add <specific-files>` or `git add -p`
 - [ ] Update CLAUDE.md with this guideline
 - [ ] Add to contributor documentation
-
-### Core Stability
 
 #### Branch: `fix/memory-leaks`
 
@@ -146,13 +142,9 @@ All work to be completed.
 - [ ] Server: Return partial results if possible
 - [ ] Tests: Verify recovery from network outages
 
-### UI Redesign with Mantine
-
-**Note**: Complete UI redesign using Mantine UI library with iterative approach - build components as needed, not upfront.
-
 #### Branch: `feat/mantine-setup`
 
-**Phase 1: Setup Mantine**
+**Setup Mantine** (UI Redesign - build components iteratively as needed)
 
 - [ ] Install Mantine and dependencies
 - [ ] Basic theme configuration (colors from v3 prototype)
@@ -162,7 +154,7 @@ All work to be completed.
 
 #### Branch: `feat/popup-redesign`
 
-**Phase 2: Popup Redesign**
+**Popup Redesign**
 
 - [ ] Window list with tracking toggles
 - [ ] Sync status indicator with live animation
@@ -172,7 +164,7 @@ All work to be completed.
 
 #### Branch: `feat/settings-redesign`
 
-**Phase 3: Settings Redesign**
+**Settings Redesign**
 
 - [ ] Tabbed interface (General, Sync, Devices, Advanced, About)
 - [ ] Theme toggle in header
@@ -182,16 +174,16 @@ All work to be completed.
 
 #### Branch: `feat/remaining-pages`
 
-**Phase 4: Additional Pages**
+**Additional Pages**
 
 - [ ] Onboarding flow (if needed)
 - [ ] Error states with troubleshooting
 - [ ] Empty states for no windows/tabs
 - [ ] Continue building components as required
 
-#### Branch: `feat/ui-polish`
+#### Branch: `feat/ui-polish`  
 
-**Phase 5: Polish & Refactor**
+**Polish & Refactor**
 
 - [ ] Extract truly reusable components
 - [ ] Optimize bundle size (target < 150KB)
@@ -245,8 +237,6 @@ All work to be completed.
 - [ ] Increase test coverage to 80%
 - [ ] Remove dead code
 - [ ] Update dependencies
-
-### Release Preparation
 
 #### Branch: `feat/v1-release`
 
