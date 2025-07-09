@@ -162,7 +162,7 @@ All work to be completed.
   - Updated ThemeProvider for dynamic theme selection
 - [x] Implement gradient buttons and glowing card effects (in both themes)
 - [x] Add DevTools-friendly data attributes for component identification
-- [ ] Create styling utility functions for reusable patterns
+- [x] Create styling utility functions for reusable patterns
 - [x] Add full-page gradient background to playground:
   - CSS class: `.playground-container` with `min-height: 100vh`
   - Background: `linear-gradient(135deg, #667eea 0%, #764ba2 100%)`
