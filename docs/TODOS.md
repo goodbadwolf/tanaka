@@ -167,10 +167,10 @@ All work to be completed.
   - CSS class: `.playground-container` with `min-height: 100vh`
   - Background: `linear-gradient(135deg, #667eea 0%, #764ba2 100%)`
   - Apply to Container with `size="lg"` and `padding: 2rem`
-- [ ] Implement animated gradients with keyframes:
-  - 4-color gradient: `#ee7752, #e73c7e, #23a6d5, #23d5ab`
-  - Animation: `gradient 15s ease infinite` with `backgroundSize: 400% 400%`
-  - Keyframes: 0% → 50% → 100% background position transitions
+- ~~[ ] Implement animated gradients with keyframes:~~
+  - ~~4-color gradient: `#ee7752, #e73c7e, #23a6d5, #23d5ab`~~
+  - ~~Animation: `gradient 15s ease infinite` with `backgroundSize: 400% 400%`~~
+  - ~~Keyframes: 0% → 50% → 100% background position transitions~~
 - [ ] Create debugStyles utilities:
   - `getClassName: (component, variant) => \`tanaka-${component}${variant ? \`--${variant}\` : ''}\``
   - `createStyledComponent` that adds `data-styled-component` attribute and `displayName`
