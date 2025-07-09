@@ -2,6 +2,7 @@ import { Button, Container, Title, Text, Stack, Divider, SegmentedControl, Group
 import { ThemeProvider, useTheme } from '../themes';
 import { StyledExample } from './styled-example';
 import { StylingUtilsExample } from './styling-utils-example';
+import { DebugStylesExample } from './debug-styles-example';
 import { useState, useEffect } from 'react';
 import { ThemeStyle } from '../themes/theme-config';
 
@@ -116,6 +117,21 @@ function PlaygroundContainer({ themeStyle, setThemeStyle }: PlaygroundContainerP
         />
 
         <StylingUtilsExample themeStyle={themeStyle} />
+
+        <Divider
+          my="xl"
+          label="Debug Styles Utilities"
+          labelPosition="center"
+          color="rgba(255, 255, 255, 0.3)"
+          styles={{
+            label: {
+              color: 'white',
+              backgroundColor: 'transparent'
+            }
+          }}
+        />
+
+        <DebugStylesExample />
       </Stack>
     </Container>
   );
