@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome to Tanaka</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/animations.css" />
+    <link rel="stylesheet" href="css/utilities.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/onboarding.css" />
+  </head>
+  <body>
+    <!-- Background Animation -->
+    <div class="background-canvas">
+      <div class="animation__orb animation__orb--1"></div>
+      <div class="animation__orb animation__orb--2"></div>
+      <div class="animation__orb animation__orb--3"></div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container container--onboarding">
+      <!-- Progress Bar -->
+      <div class="progress__bar">
+        <div class="progress__step">
+          <div class="stepper__circle stepper__circle--active" id="step1">1</div>
+        </div>
+        <div class="stepper__step-line" id="line1"></div>
+        <div class="progress__step">
+          <div class="stepper__circle" id="step2">2</div>
+        </div>
+        <div class="stepper__step-line" id="line2"></div>
+        <div class="progress__step">
+          <div class="stepper__circle" id="step3">3</div>
+        </div>
+        <div class="stepper__step-line" id="line3"></div>
+        <div class="progress__step">
+          <div class="stepper__circle" id="step4">4</div>
+        </div>
+      </div>
+
+      <!-- Content Area -->
+      <div class="container__content">
+        <button class="button button--secondary button--skip" onclick="skipOnboarding()">Skip Setup</button>
+
+        <!-- Step 1: Welcome -->
+        <div class="stepper__content stepper__content--active" id="content1">
+          <div class="header header--welcome">
+            <div class="app-logo-large">T</div>
+            <h1 class="welcome-title">Welcome to Tanaka</h1>
+            <p class="welcome-subtitle">Sync your Firefox tabs across all your devices</p>
+          </div>
+
+          <div class="feature-grid">
+            <div class="card card--feature">
+              <div class="icon icon--feature">🔄</div>
+              <div class="feature-name">Real-time Sync</div>
+              <div class="feature-desc">Changes sync in 1-10 seconds</div>
+            </div>
+            <div class="card card--feature">
+              <div class="icon icon--feature">🔒</div>
+              <div class="feature-name">Private & Secure</div>
+              <div class="feature-desc">Your own server, your data</div>
+            </div>
+            <div class="card card--feature">
+              <div class="icon icon--feature">⚡</div>
+              <div class="feature-name">Fast & Light</div>
+              <div class="feature-desc">Handles 200+ tabs easily</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Server Configuration -->
+        <div class="stepper__step-content" id="content2">
+          <div class="header header--welcome">
+            <h2 class="welcome-title">Connect to Your Server</h2>
+            <p class="welcome-subtitle">Enter your Tanaka server details</p>
+          </div>
+
+          <form id="serverForm" class="form form--onboarding">
+            <div class="form__group">
+              <label class="form__label">Server URL</label>
+              <input
+                type="url"
+                class="form__input"
+                id="serverUrl"
+                placeholder="https://your-server.com:8443"
+                value=""
+              />
+              <p class="form__hint">The URL where your Tanaka server is running</p>
+              <p class="form__error" id="urlError">Please enter a valid URL</p>
+            </div>
+
+            <div class="form__group">
+              <label class="form__label">Authentication Token</label>
+              <input type="password" class="form__input" id="authToken" placeholder="Enter your shared token" />
+              <p class="form__hint">Found in your server's tanaka.toml config file</p>
+              <p class="form__error" id="tokenError">Token is required</p>
+            </div>
+          </form>
+        </div>
+
+        <!-- Step 3: Connection Test -->
+        <div class="stepper__step-content" id="content3">
+          <div class="header header--welcome">
+            <h2 class="welcome-title">Testing Connection</h2>
+            <p class="welcome-subtitle">Verifying your server configuration</p>
+          </div>
+
+          <div class="connection-test">
+            <div class="connection-test__icon" id="testIcon">
+              <!-- Loading spinner -->
+              <svg class="spinner" viewBox="0 0 50 50">
+                <circle
+                  cx="25"
+                  cy="25"
+                  r="20"
+                  fill="none"
+                  stroke="#6366f1"
+                  stroke-width="4"
+                  stroke-dasharray="80, 200"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </div>
+            <div class="connection-test__status" id="testStatus">Connecting to server...</div>
+            <div class="connection-test__message" id="testMessage">This may take a few seconds</div>
+          </div>
+        </div>
+
+        <!-- Step 4: Window Selection -->
+        <div class="stepper__step-content" id="content4">
+          <div class="header header--welcome">
+            <h2 class="welcome-title">Select Windows to Track</h2>
+            <p class="welcome-subtitle">Choose which browser windows to sync</p>
+          </div>
+
+          <div class="window-selection" id="windowSelection">
+            <div class="window-selection__option" data-window-id="1">
+              <div class="window-selection__checkbox"></div>
+              <div class="window-selection__details">
+                <div class="window-selection__name">Current Window</div>
+                <div class="window-selection__info">12 tabs • Active now</div>
+              </div>
+            </div>
+            <div class="window-selection__option" data-window-id="2">
+              <div class="window-selection__checkbox"></div>
+              <div class="window-selection__details">
+                <div class="window-selection__name">Work Window</div>
+                <div class="window-selection__info">8 tabs • Last active 5m ago</div>
+              </div>
+            </div>
+            <div class="window-selection__option" data-window-id="3">
+              <div class="window-selection__checkbox"></div>
+              <div class="window-selection__details">
+                <div class="window-selection__name">Research Window</div>
+                <div class="window-selection__info">23 tabs • Last active 1h ago</div>
+              </div>
+            </div>
+          </div>
+
+          <p class="form__hint u-text--center u-mt--xl">You can always change this later in the extension popup</p>
+        </div>
+
+        <!-- Success Screen -->
+        <div class="stepper__content u-hidden" id="contentSuccess">
+          <div class="animation animation--success">
+            <div class="checkmark-circle">
+              <svg viewBox="0 0 120 120">
+                <circle class="circle-path" cx="60" cy="60" r="50" fill="none" stroke="#22c55e" stroke-width="6" />
+                <path
+                  class="check-path"
+                  fill="none"
+                  stroke="#22c55e"
+                  stroke-width="6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M40 60 L55 75 L80 45"
+                />
+              </svg>
+            </div>
+            <h2 class="welcome-title">All Set!</h2>
+            <p class="welcome-subtitle">Tanaka is ready to sync your tabs</p>
+          </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="navigation__buttons">
+          <button class="button button--secondary u-hidden" id="backBtn" onclick="previousStep()">
+            <span>←</span>
+            <span>Back</span>
+          </button>
+          <button class="button button--primary" id="nextBtn" onclick="nextStep()">
+            <span>Get Started</span>
+            <span>→</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let currentStep = 1;
+      const totalSteps = 4;
+      let selectedWindows = new Set();
+
+      // Navigation functions
+      function updateProgress() {
+        // Update step circles
+        for (let i = 1; i <= totalSteps; i++) {
+          const circle = document.getElementById(`step${i}`);
+          if (i < currentStep) {
+            circle.classList.add("stepper__circle--completed");
+            circle.classList.remove("stepper__circle--active");
+            circle.innerHTML = "✓";
+          } else if (i === currentStep) {
+            circle.classList.add("stepper__circle--active");
+            circle.classList.remove("stepper__circle--completed");
+            circle.innerHTML = i;
+          } else {
+            circle.classList.remove("stepper__circle--active", "stepper__circle--completed");
+            circle.innerHTML = i;
+          }
+        }
+
+        // Update step lines
+        for (let i = 1; i < totalSteps; i++) {
+          const line = document.getElementById(`line${i}`);
+          if (i < currentStep) {
+            line.classList.add("stepper__step-line--active");
+          } else {
+            line.classList.remove("stepper__step-line--active");
+          }
+        }
+
+        // Update content
+        document.querySelectorAll(".stepper__step-content").forEach((content) => {
+          content.classList.remove("stepper__content--active");
+        });
+        document.getElementById(`content${currentStep}`).classList.add("stepper__content--active");
+
+        // Update buttons
+        updateButtons();
+      }
+
+      function updateButtons() {
+        const backBtn = document.getElementById("backBtn");
+        const nextBtn = document.getElementById("nextBtn");
+
+        // Back button
+        if (currentStep === 1) {
+          backBtn.classList.add("u-hidden");
+        } else {
+          backBtn.classList.remove("u-hidden");
+        }
+
+        // Next button
+        if (currentStep === 1) {
+          nextBtn.innerHTML = "<span>Get Started</span><span>→</span>";
+        } else if (currentStep === 2) {
+          nextBtn.innerHTML = "<span>Test Connection</span><span>→</span>";
+        } else if (currentStep === 3) {
+          nextBtn.innerHTML = "<span>Continue</span><span>→</span>";
+          nextBtn.classList.add("u-hidden"); // Hide during test
+        } else if (currentStep === 4) {
+          nextBtn.innerHTML = "<span>Finish Setup</span><span>→</span>";
+          nextBtn.disabled = selectedWindows.size === 0;
+        }
+      }
+
+      function nextStep() {
+        if (currentStep === 2) {
+          // Validate server form
+          if (!validateServerForm()) return;
+
+          currentStep++;
+          updateProgress();
+
+          // Start connection test
+          testConnection();
+        } else if (currentStep === 4) {
+          // Show success screen
+          document.getElementById("content4").classList.add("u-hidden");
+          document.getElementById("contentSuccess").classList.remove("u-hidden");
+          document.querySelector(".navigation__buttons").classList.add("u-hidden");
+          document.querySelector(".skip-button").classList.add("u-hidden");
+
+          // Redirect after animation
+          setTimeout(() => {
+            console.log("Setup complete! Redirecting to extension...");
+            // In real implementation, close tab or redirect to extension
+          }, 3000);
+        } else if (currentStep < totalSteps) {
+          currentStep++;
+          updateProgress();
+        }
+      }
+
+      function previousStep() {
+        if (currentStep > 1) {
+          currentStep--;
+          updateProgress();
+        }
+      }
+
+      function skipOnboarding() {
+        if (confirm("Are you sure you want to skip setup? You can configure settings later.")) {
+          console.log("Skipping onboarding...");
+          // In real implementation, close tab or redirect
+        }
+      }
+
+      // Form validation
+      function validateServerForm() {
+        const urlInput = document.getElementById("serverUrl");
+        const tokenInput = document.getElementById("authToken");
+        const urlError = document.getElementById("urlError");
+        const tokenError = document.getElementById("tokenError");
+        let valid = true;
+
+        // Reset errors
+        urlInput.classList.remove("error");
+        tokenInput.classList.remove("error");
+        urlError.classList.add("u-hidden");
+        tokenError.classList.add("u-hidden");
+
+        // Validate URL
+        if (!urlInput.value || !isValidUrl(urlInput.value)) {
+          urlInput.classList.add("error");
+          urlError.classList.remove("u-hidden");
+          valid = false;
+        }
+
+        // Validate token
+        if (!tokenInput.value) {
+          tokenInput.classList.add("error");
+          tokenError.classList.remove("u-hidden");
+          valid = false;
+        }
+
+        return valid;
+      }
+
+      function isValidUrl(string) {
+        try {
+          new URL(string);
+          return true;
+        } catch (_) {
+          return false;
+        }
+      }
+
+      // Connection test simulation
+      function testConnection() {
+        const testIcon = document.getElementById("testIcon");
+        const testStatus = document.getElementById("testStatus");
+        const testMessage = document.getElementById("testMessage");
+        const nextBtn = document.getElementById("nextBtn");
+
+        // Simulate connection test
+        setTimeout(() => {
+          // Success state
+          testIcon.innerHTML = `
+                    <svg viewBox="0 0 80 80" class="svg-success">
+                        <circle class="bg-circle" cx="40" cy="40" r="35"/>
+                        <circle class="border-circle" cx="40" cy="40" r="30"/>
+                        <path class="check-path" d="M25 40 L35 50 L55 30"/>
+                    </svg>
+                `;
+          testStatus.textContent = "Connection Successful!";
+          testStatus.classList.add("text-success");
+          testMessage.textContent = "Your server is configured correctly";
+
+          // Show next button
+          nextBtn.classList.remove("u-hidden");
+        }, 2000);
+      }
+
+      // Window selection
+      document.querySelectorAll(".window-selection__option").forEach((option) => {
+        option.addEventListener("click", () => {
+          const windowId = option.dataset.windowId;
+
+          if (selectedWindows.has(windowId)) {
+            selectedWindows.delete(windowId);
+            option.classList.remove("selected");
+          } else {
+            selectedWindows.add(windowId);
+            option.classList.add("selected");
+          }
+
+          // Update next button state
+          const nextBtn = document.getElementById("nextBtn");
+          nextBtn.disabled = selectedWindows.size === 0;
+        });
+      });
+
+      // Password field focus behavior
+      const authTokenInput = document.getElementById("authToken");
+      if (authTokenInput) {
+        authTokenInput.addEventListener("focus", () => {
+          authTokenInput.type = "text";
+        });
+        authTokenInput.addEventListener("blur", () => {
+          authTokenInput.type = "password";
+        });
+      }
+
+      // Initialize
+      updateProgress();
+    </script>
+  </body>
+</html>

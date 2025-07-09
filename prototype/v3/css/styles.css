@@ -1,0 +1,355 @@
+/* Tanaka Extension - Shared Component System */
+
+/* ===== CSS Variables ===== */
+:root {
+  /* Colors */
+  --color-background: #0a0a0b;
+  --color-background-secondary: #0f0f10;
+  --color-text-primary: #e7e7e8;
+  --color-text-secondary: #a1a1aa;
+  --color-text-muted: #6b7280;
+  --color-primary: #6366f1;
+  --color-primary-dark: #5558e3;
+  --color-secondary: #8b5cf6;
+  --color-secondary-dark: #7c4ce6;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+
+  /* Surface colors for consistency */
+  --color-surface-1: rgba(255, 255, 255, 0.03);
+  --color-surface-2: rgba(255, 255, 255, 0.05);
+  --color-surface-3: rgba(255, 255, 255, 0.1);
+  --color-border-subtle: rgba(255, 255, 255, 0.05);
+  --color-border-hover: rgba(99, 102, 241, 0.3);
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  --gradient-header: linear-gradient(135deg, #1a1a1c 0%, #0f0f10 100%);
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 20px;
+  --space-2xl: 24px;
+  --space-3xl: 32px;
+  --space-4xl: 40px;
+
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 20px;
+  --radius-full: 50%;
+
+  /* Z-Index System */
+  --z-base: 1;
+  --z-dropdown: 10;
+  --z-sticky: 50;
+  --z-overlay: 100;
+  --z-modal: 200;
+  --z-popover: 300;
+  --z-tooltip: 400;
+  --z-notification: 500;
+  --z-max: 9999;
+
+  /* Shadow System */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);
+  --shadow-xl: 0 12px 48px rgba(0, 0, 0, 0.25);
+  --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.5);
+  --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+
+  /* Transitions */
+  --transition-fast: 0.2s ease;
+  --transition-base: 0.3s ease;
+  --transition-slow: 0.5s ease;
+
+  /* Breakpoints (for reference) */
+  --breakpoint-xs: 320px;
+  --breakpoint-sm: 480px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+}
+
+/* ===== Container/Layout System ===== */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.container.container--timeline {
+  flex: 1;
+  min-width: 0;
+}
+
+.container.container--design-system {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.container__content {
+  flex: 1;
+  width: 100%;
+}
+
+.container__sidebar {
+  width: 280px;
+  flex-shrink: 0;
+}
+
+/* ===== Header System ===== */
+.header {
+  background: var(--gradient-header);
+  padding: 20px 30px;
+  border-bottom: 1px solid var(--color-border-subtle);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  backdrop-filter: blur(20px);
+}
+
+.header.header--design {
+  text-align: center;
+  margin-bottom: 40px;
+  background: transparent;
+  position: static;
+  border: none;
+}
+
+.header.header--gallery {
+  text-align: center;
+  margin-bottom: 40px;
+  background: transparent;
+  position: static;
+  border: none;
+}
+
+.header.header--welcome {
+  text-align: center;
+  margin-bottom: 40px;
+  background: transparent;
+  position: static;
+  border: none;
+}
+
+.header__content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header__left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header__actions {
+  display: flex;
+  gap: 12px;
+}
+
+/* ===== Shared Components ===== */
+
+/* Button Component */
+.button {
+  flex: 1;
+  padding: 12px;
+  background: rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 8px;
+  color: #e7e7e8;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.button:hover {
+  background: rgba(99, 102, 241, 0.2);
+  border-color: rgba(99, 102, 241, 0.4);
+  transform: translateY(-1px);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.button-primary,
+.button.button--primary {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  border: none;
+  color: white;
+}
+
+.button-primary:hover,
+.button.button--primary:hover {
+  background: linear-gradient(135deg, #5558e3 0%, #7c4ce6 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.button-secondary,
+.button.button--secondary {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #e7e7e8;
+}
+
+.button-secondary:hover,
+.button.button--secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+/* Toggle Switch Component */
+.toggle {
+  width: 44px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  flex-shrink: 0;
+}
+
+.toggle--active {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+}
+
+.toggle:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.toggle::after {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle--active::after {
+  transform: translateX(20px);
+}
+
+/* Status Indicator Component - BEM structure */
+.status-indicator,
+.status__indicator,
+.sync-status__indicator,
+.sync-status__dot,
+.device__status-dot,
+.connection-test__icon {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+  animation: statusPulse 2s ease-in-out infinite;
+}
+
+/* Status states */
+.status-indicator.syncing,
+.status__indicator.syncing,
+.sync-status__indicator--syncing,
+.sync-status__dot--syncing {
+  background: #f59e0b;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+  animation: spin 1s linear infinite;
+}
+
+.sync-status__indicator--error,
+.sync-status__dot--error,
+.device__status-dot--error {
+  background: var(--color-error);
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
+.sync-status__indicator--inactive,
+.sync-status__dot--inactive,
+.device__status-dot--inactive {
+  background: var(--color-text-muted);
+  box-shadow: none;
+  animation: none;
+}
+
+/* Card Component */
+.card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(99, 102, 241, 0.3);
+  transform: translateX(2px);
+}
+
+/* Badge Component */
+.badge {
+  font-size: 12px;
+  color: #6b7280;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px 8px;
+  border-radius: 12px;
+}
+
+/* Icon Component */
+.icon {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.icon.icon-large,
+.icon.icon--large {
+  width: 36px;
+  height: 36px;
+  background: rgba(99, 102, 241, 0.1);
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.icon.icon-small {
+  width: 20px;
+  height: 20px;
+}
+
+/* Text Utility Component - moved to utilities.css */

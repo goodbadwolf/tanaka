@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tanaka - Design System</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/animations.css" />
+    <link rel="stylesheet" href="css/utilities.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/design-system.css" />
+  </head>
+  <body>
+    <div class="container container--design-system">
+      <!-- Header -->
+      <div class="header header--design">
+        <h1 class="design-title">Tanaka Design System</h1>
+        <p class="design-subtitle">UI patterns and components for consistent user experience</p>
+      </div>
+
+      <!-- Tab Navigation -->
+      <div class="navigation navigation--tabs">
+        <button class="button button--tab button--tab-active" data-tab="empty-states">Empty States</button>
+        <button class="button button--tab" data-tab="notifications">Notifications</button>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="navigation__content">
+        <!-- Empty States Tab -->
+        <div id="empty-states-tab" class="navigation__pane navigation__pane--active">
+          <div class="header header--gallery">
+            <h2 class="gallery-title">Empty States</h2>
+            <p class="gallery-subtitle">Guiding users when there's no data to display</p>
+          </div>
+
+          <div class="states-grid">
+            <!-- No Windows Tracked -->
+            <div class="card card--state">
+              <div class="state-header">
+                <h3 class="state-title">No Windows Tracked</h3>
+              </div>
+              <div class="empty-state empty-state--no-windows">
+                <div
+                  class="animation__window animation__window--floating"
+                  style="top: 20%; left: 10%; animation-delay: 0s"
+                ></div>
+                <div
+                  class="animation__window animation__window--floating"
+                  style="top: 40%; right: 15%; animation-delay: 1s"
+                ></div>
+                <div
+                  class="animation__window animation__window--floating"
+                  style="bottom: 30%; left: 20%; animation-delay: 2s"
+                ></div>
+                <div class="icon icon--empty empty-state__icon">🪟</div>
+                <h3 class="empty-state__title">No Windows Tracked</h3>
+                <p class="empty-state__description">
+                  Start tracking windows to sync your tabs across devices
+                </p>
+                <button class="button button--primary">Track This Window</button>
+              </div>
+            </div>
+
+            <!-- No Tabs -->
+            <div class="card card--state">
+              <div class="state-header">
+                <h3 class="state-title">No Tabs in Window</h3>
+              </div>
+              <div class="empty-state empty-state--no-tabs">
+                <div class="icon icon--empty empty-state__icon">📑</div>
+                <h3 class="empty-state__title">Window is Empty</h3>
+                <p class="empty-state__description">This window doesn't have any tabs to sync</p>
+                <div class="empty-state__hint">Open some tabs to start syncing</div>
+              </div>
+            </div>
+
+            <!-- Offline State -->
+            <div class="card card--state">
+              <div class="state-header">
+                <h3 class="state-title">Offline</h3>
+              </div>
+              <div class="empty-state empty-state--offline">
+                <div class="animation animation--offline">
+                  <div class="icon icon--wifi">
+                    <div class="animation__wifi-dot"></div>
+                    <div class="animation__wifi-ring animation__wifi-ring--1"></div>
+                    <div class="animation__wifi-ring animation__wifi-ring--2"></div>
+                    <div class="animation__wifi-ring animation__wifi-ring--3"></div>
+                  </div>
+                </div>
+                <h3 class="empty-state__title">You're Offline</h3>
+                <p class="empty-state__description">
+                  Tanaka will sync your tabs when connection is restored
+                </p>
+                <div class="badge badge--warning">Last synced 5 min ago</div>
+              </div>
+            </div>
+
+            <!-- No History -->
+            <div class="card card--state">
+              <div class="state-header">
+                <h3 class="state-title">No Sync History</h3>
+              </div>
+              <div class="empty-state empty-state--no-history">
+                <div class="icon icon--empty empty-state__icon">📅</div>
+                <h3 class="empty-state__title">No Activity Yet</h3>
+                <p class="empty-state__description">
+                  Your sync history will appear here once you start tracking windows
+                </p>
+              </div>
+            </div>
+
+            <!-- Welcome State -->
+            <div class="card card--state">
+              <div class="state-header">
+                <h3 class="state-title">Welcome</h3>
+              </div>
+              <div class="empty-state empty-state--welcome">
+                <div class="animation animation--welcome">
+                  <div class="icon icon--welcome">🎉</div>
+                  <div class="animation__confetti animation__confetti--1"></div>
+                  <div class="animation__confetti animation__confetti--2"></div>
+                  <div class="animation__confetti animation__confetti--3"></div>
+                </div>
+                <h3 class="empty-state__title">Welcome to Tanaka!</h3>
+                <p class="empty-state__description">
+                  Let's get you set up to sync tabs across your devices
+                </p>
+                <button class="button button--primary">Get Started</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notifications Tab -->
+        <div id="notifications-tab" class="navigation__pane">
+          <div class="header header--gallery">
+            <h2 class="gallery-title">Notification System</h2>
+            <p class="gallery-subtitle">Consistent feedback across all interfaces</p>
+          </div>
+
+          <!-- Trigger Buttons -->
+          <div class="trigger-grid">
+            <button class="button button--trigger" onclick="showNotification('success')">
+              ✅ Success Notification
+            </button>
+            <button class="button button--trigger" onclick="showNotification('error')">
+              ❌ Error Notification
+            </button>
+            <button class="button button--trigger" onclick="showNotification('warning')">
+              ⚠️ Warning Notification
+            </button>
+            <button class="button button--trigger" onclick="showNotification('info')">
+              ℹ️ Info Notification
+            </button>
+            <button class="button button--trigger" onclick="showProgress()">
+              📊 Progress Notification
+            </button>
+            <button class="button button--trigger" onclick="showInline()">
+              📌 Inline Notification
+            </button>
+          </div>
+
+          <!-- Notification Types -->
+          <div class="notification__types">
+            <h3 class="section-title">Toast Notifications</h3>
+            <div class="type-grid">
+              <div class="type-example">
+                <div class="toast toast--success" style="position: static; transform: translateX(0); opacity: 1;">
+                  <div class="icon icon--toast">✓</div>
+                  <div class="toast__content">
+                    <h4 class="toast__title">Success!</h4>
+                    <p class="toast__message">Your tabs have been synced</p>
+                  </div>
+                  <button class="button button--close">✕</button>
+                </div>
+              </div>
+
+              <div class="type-example">
+                <div class="toast toast--error" style="position: static; transform: translateX(0); opacity: 1;">
+                  <div class="icon icon--toast">✕</div>
+                  <div class="toast__content">
+                    <h4 class="toast__title">Error</h4>
+                    <p class="toast__message">Failed to connect to server</p>
+                  </div>
+                  <button class="button button--close">✕</button>
+                </div>
+              </div>
+
+              <div class="type-example">
+                <div class="toast toast--warning" style="position: static; transform: translateX(0); opacity: 1;">
+                  <div class="icon icon--toast">!</div>
+                  <div class="toast__content">
+                    <h4 class="toast__title">Warning</h4>
+                    <p class="toast__message">Some tabs couldn't be synced</p>
+                  </div>
+                  <button class="button button--close">✕</button>
+                </div>
+              </div>
+            </div>
+
+            <h3 class="section-title">Progress Notifications</h3>
+            <div class="progress progress--example">
+              <div class="notification notification--progress" style="position: static; transform: translateX(0); opacity: 1;">
+                <div class="progress__header">
+                  <h4 class="progress__title">Syncing tabs...</h4>
+                  <span class="progress__percentage">75%</span>
+                </div>
+                <div class="progress__bar-container">
+                  <div class="progress__bar-fill" style="width: 75%"></div>
+                </div>
+                <p class="progress__status">Syncing 18 of 24 tabs</p>
+              </div>
+            </div>
+
+            <h3 class="section-title">Inline Notifications</h3>
+            <div class="inline-examples">
+              <div class="notification notification--inline notification--info">
+                <div class="icon icon--inline">ℹ️</div>
+                <p class="notification__message notification__message--inline">
+                  Tip: Use keyboard shortcut Ctrl+Shift+T to quickly search tabs
+                </p>
+              </div>
+
+              <div class="notification notification--inline notification--success">
+                <div class="icon icon--inline">✓</div>
+                <p class="notification__message notification__message--inline">
+                  Settings saved successfully
+                </p>
+              </div>
+
+              <div class="notification notification--inline notification--warning">
+                <div class="icon icon--inline">⚠️</div>
+                <p class="notification__message notification__message--inline">
+                  You have unsaved changes. Save before leaving?
+                </p>
+                <div class="inline-actions">
+                  <button class="button button--small button--primary">Save</button>
+                  <button class="button button--small button--secondary">Discard</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast__container"></div>
+
+    <script>
+      // Tab Navigation
+      document.querySelectorAll('.button--tab').forEach(button => {
+        button.addEventListener('click', () => {
+          // Remove active class from all
+          document.querySelectorAll('.button--tab').forEach(btn => btn.classList.remove('button--tab-active'));
+          document.querySelectorAll('.navigation__pane').forEach(pane => pane.classList.remove('navigation__pane--active'));
+
+          // Add active to clicked
+          button.classList.add('button--tab-active');
+          const tabName = button.getAttribute('data-tab');
+          document.getElementById(`${tabName}-tab`).classList.add('navigation__pane--active');
+        });
+      });
+
+      // Notification Functions
+      function showNotification(type) {
+        const messages = {
+          success: { title: 'Success!', message: 'Operation completed successfully' },
+          error: { title: 'Error', message: 'Something went wrong' },
+          warning: { title: 'Warning', message: 'Please check your settings' },
+          info: { title: 'Info', message: 'New update available' }
+        };
+
+        const toast = document.createElement('div');
+        toast.className = `toast toast--${type}`;
+        toast.innerHTML = `
+          <div class="icon icon--toast">${type === 'success' ? '✓' : type === 'error' ? '✕' : type === 'warning' ? '!' : 'i'}</div>
+          <div class="toast__content">
+            <h4 class="toast__title">${messages[type].title}</h4>
+            <p class="toast__message">${messages[type].message}</p>
+          </div>
+          <button class="button button--close" onclick="this.parentElement.remove()">✕</button>
+        `;
+
+        const container = document.getElementById('toastContainer');
+        container.appendChild(toast);
+
+        setTimeout(() => toast.classList.add('show'), 10);
+        setTimeout(() => {
+          toast.classList.remove('show');
+          setTimeout(() => toast.remove(), 300);
+        }, 3000);
+      }
+
+      function showProgress() {
+        const toast = document.createElement('div');
+        toast.className = 'notification notification--progress';
+        let progress = 0;
+
+        toast.innerHTML = `
+          <div class="progress__header">
+            <h4 class="progress__title">Syncing tabs...</h4>
+            <span class="progress__percentage">0%</span>
+          </div>
+          <div class="progress__bar-container">
+            <div class="progress__bar-fill" style="width: 0%"></div>
+          </div>
+          <p class="progress__status">Starting sync...</p>
+        `;
+
+        const container = document.getElementById('toastContainer');
+        container.appendChild(toast);
+        setTimeout(() => toast.classList.add('show'), 10);
+
+        const interval = setInterval(() => {
+          progress += 10;
+          if (progress > 100) {
+            clearInterval(interval);
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+            showNotification('success');
+            return;
+          }
+
+          toast.querySelector('.progress__percentage').textContent = `${progress}%`;
+          toast.querySelector('.progress__bar-fill').style.width = `${progress}%`;
+          toast.querySelector('.progress__status').textContent = `Syncing ${Math.round(progress/4)} of 25 tabs`;
+        }, 200);
+      }
+
+      function showInline() {
+        const inline = document.createElement('div');
+        inline.className = 'notification notification--inline notification--info';
+        inline.innerHTML = `
+          <div class="icon icon--inline">ℹ️</div>
+          <p class="notification__message notification__message--inline">This is a temporary inline notification</p>
+          <button class="button button--close" onclick="this.parentElement.remove()">✕</button>
+        `;
+
+        document.querySelector('.trigger-grid').appendChild(inline);
+        setTimeout(() => inline.classList.add('show'), 10);
+        setTimeout(() => {
+          inline.classList.remove('show');
+          setTimeout(() => inline.remove(), 300);
+        }, 5000);
+      }
+    </script>
+  </body>
+</html>
