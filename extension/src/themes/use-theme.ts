@@ -1,15 +1,17 @@
 import { useComputedColorScheme, useMantineColorScheme } from '@mantine/core';
+import { getToggledTheme, ThemeName } from './theme-config';
 
 export function useTheme() {
+  const defaultTheme = ThemeName.LIGHT;
   const { setColorScheme, clearColorScheme } = useMantineColorScheme();
-  const computedColorScheme = useComputedColorScheme('dark');
+  const computedColorScheme = useComputedColorScheme(defaultTheme);
 
   const toggleTheme = () => {
-    setColorScheme(computedColorScheme === 'light' ? 'dark' : 'light');
+    setColorScheme(getToggledTheme(computedColorScheme as ThemeName));
   };
 
-  const setTheme = (theme: 'light' | 'dark' | 'auto') => {
-    if (theme === 'auto') {
+  const setTheme = (theme: ThemeName) => {
+    if (theme === ThemeName.AUTO) {
       clearColorScheme();
     } else {
       setColorScheme(theme);
