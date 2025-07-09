@@ -106,18 +106,6 @@ All work to be completed.
   - Update CLAUDE.md with this guideline
   - Add to contributor documentation
 
-### Baseline Measurements
-
-#### Branch: `docs/baseline-metrics`
-
-**Establish Baselines**
-
-- [ ] Test with 200+ tabs and note performance
-- [ ] Check memory usage patterns
-- [ ] Document sync frequency
-- [ ] Document why Yjs was chosen for CRDT
-- [ ] Document current architecture decisions
-
 ### Core Stability
 
 #### Branch: `fix/memory-leaks`
