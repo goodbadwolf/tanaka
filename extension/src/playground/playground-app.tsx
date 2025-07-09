@@ -1,6 +1,7 @@
 import { Button, Container, Title, Text, Stack, Divider, SegmentedControl, Group } from '@mantine/core';
 import { ThemeProvider, useTheme } from '../themes';
 import { StyledExample } from './styled-example';
+import { StylingUtilsExample } from './styling-utils-example';
 import { useState, useEffect } from 'react';
 import { ThemeStyle } from '../themes/theme-config';
 
@@ -99,6 +100,21 @@ function PlaygroundContainer({ themeStyle, setThemeStyle }: PlaygroundContainerP
         />
 
         <StyledExample />
+
+        <Divider
+          my="xl"
+          label="Styling Utilities"
+          labelPosition="center"
+          color="rgba(255, 255, 255, 0.3)"
+          styles={{
+            label: {
+              color: 'white',
+              backgroundColor: 'transparent'
+            }
+          }}
+        />
+
+        <StylingUtilsExample themeStyle={themeStyle} />
       </Stack>
     </Container>
   );
