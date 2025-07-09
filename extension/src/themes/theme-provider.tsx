@@ -1,7 +1,7 @@
 import { MantineProvider } from '@mantine/core';
 import '@mantine/core/styles.css';
 import { ComponentChildren } from 'preact';
-import { theme } from './theme';
+import { theme } from './theme-config';
 
 interface ThemeProviderProps {
   children: ComponentChildren;

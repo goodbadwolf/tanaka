@@ -1,5 +1,5 @@
 import { render } from 'preact';
-import { PlaygroundApp } from './PlaygroundApp';
+import { PlaygroundApp } from './playground-app';
 
 const root = document.getElementById('root');
 if (root) {

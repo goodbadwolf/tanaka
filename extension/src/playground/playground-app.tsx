@@ -12,7 +12,7 @@ function PlaygroundContainer() {
           Toggle Theme
         </Button>
         <Text c="dimmed" size="sm">
-          Add your component demos here
+          This is a playground for developing UI components. They can be added below.
         </Text>
       </Stack>
     </Container>
