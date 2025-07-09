@@ -90,21 +90,20 @@ All work to be completed.
 
 **Update cargo test to cargo nextest**
 
-- [ ] Replace all `cargo test` references with `cargo nextest run`
-  - Update .github/workflows/ci.yml
-  - Check all documentation files
-  - Update any scripts that use cargo test
-  - Verify pre-commit hooks use nextest
+- [ ] Update .github/workflows/ci.yml to use cargo nextest run
+- [ ] Check all documentation files for cargo test references
+- [ ] Update any scripts that use cargo test
+- [ ] Verify pre-commit hooks use nextest
 
 #### Branch: `docs/git-best-practices`
 
 **Git Best Practices Documentation**
 
 - [ ] Document that `git add -A` should never be used
-  - Explain why (stages unintended files)
-  - Show alternatives: `git add <specific-files>` or `git add -p`
-  - Update CLAUDE.md with this guideline
-  - Add to contributor documentation
+- [ ] Explain why it stages unintended files
+- [ ] Show alternatives: `git add <specific-files>` or `git add -p`
+- [ ] Update CLAUDE.md with this guideline
+- [ ] Add to contributor documentation
 
 ### Core Stability
 
@@ -113,177 +112,39 @@ All work to be completed.
 **Fix Memory Leaks**
 
 - [ ] Extension: Fix event handler cleanup in TabEventHandler
-  - Add cleanup methods for all browser event listeners
-  - Clear timers and intervals on dispose
-  - Remove listeners for onActivated, windowRemoved events
-- [ ] Extension: Fix window tracking memory issues
-  - Replace weak references with proper Set<number>
-  - Clean up tracked windows on untrack
+- [ ] Extension: Fix window tracking memory issues  
 - [ ] Server: Improve concurrency handling
-  - Consider RwLock instead of Mutex for better read performance
 - [ ] Tests: Verify no memory growth over extended usage
 
 #### Branch: `feat/performance`
 
 **Basic Performance Improvements**
 
-- [ ] Extension: Implement simple operation batching
-  - Batch size: 50-100 operations
-  - Max wait time: 1 second
-  - Deduplicate operations for same tab
-- [ ] Extension: Add operation priorities
-  - High: close_tab, track/untrack (send immediately)
-  - Medium: tab updates (batch with 200ms delay)
-  - Low: URL changes (batch with 1s delay)
-- [ ] Server: Add database indices
-  - Index on (device_id, clock) for sync queries
-  - Index on operation_type for filtering
-  - Consider partial index for active tabs only
-- [ ] Server: Basic SQLite tuning
-  - Increase cache size for better performance
-  - Use WAL mode (already enabled)
-  - VACUUM periodically
+- [ ] Extension: Implement simple operation batching (50-100 operations, 1 second max wait)
+- [ ] Extension: Deduplicate operations for same tab
+- [ ] Extension: Add operation priorities (high/medium/low)
+- [ ] Server: Add database indices on (device_id, clock) and operation_type
+- [ ] Server: Consider partial index for active tabs only
+- [ ] Server: Increase cache size for better performance
+- [ ] Server: VACUUM periodically
 - [ ] Tests: Verify handles 200+ tabs smoothly
 
 #### Branch: `feat/error-recovery`
 
 **Error Recovery**
 
-- [ ] Extension: Add exponential backoff
-  - Start: 1s, max: 60s, multiplier: 2
-  - Add small random jitter to prevent thundering herd
-  - Reset on successful sync
-- [ ] Extension: Implement offline queue
-  - Store failed operations in browser.storage.local
-  - Limit queue to 1000 operations
-  - Retry when connection restored
-- [ ] Extension: Handle common failures gracefully
-  - Network timeouts
-  - Server errors (500s)
-  - Auth failures (401s)
-- [ ] Server: Add request timeouts
-  - Set reasonable timeout (30s) for sync endpoint
-  - Return partial results if possible
+- [ ] Extension: Add exponential backoff (1s start, 60s max, 2x multiplier)
+- [ ] Extension: Add small random jitter to prevent thundering herd
+- [ ] Extension: Reset backoff on successful sync
+- [ ] Extension: Implement offline queue in browser.storage.local
+- [ ] Extension: Limit queue to 1000 operations
+- [ ] Extension: Retry when connection restored
+- [ ] Extension: Handle network timeouts gracefully
+- [ ] Extension: Handle server errors (500s) gracefully
+- [ ] Extension: Handle auth failures (401s) gracefully
+- [ ] Server: Add request timeouts (30s for sync endpoint)
+- [ ] Server: Return partial results if possible
 - [ ] Tests: Verify recovery from network outages
-
-### User Experience
-
-#### Branch: `feat/add-ui-prototypes`
-
-**Add UI Prototypes**
-
-- [x] Commit all prototype files as-is
-  - [x] Popup redesign with window tracking animation
-  - [x] Settings page with tabbed navigation
-  - [x] Onboarding flow with step-by-step setup
-  - [x] Error states and troubleshooting page
-  - [x] Context menu with quick actions
-  - [x] Empty states for all scenarios
-  - [x] Notification system (toasts, progress, inline)
-  - [x] Sync history timeline view
-  - [x] Advanced tab search interface
-  - [x] Window details management panel
-  - [x] Extension icon with gradient design
-
-#### Branch: `feat/consolidate-prototypes` ✅ **MAJOR MILESTONE COMPLETE**
-
-**Consolidate Prototype Styles**
-
-- [x] **PHASE 1 COMPLETE: 4 PAGES FULLY EXTRACTED** - 1,797 lines of inline CSS → 0 lines
-  - [x] Popup prototype: 520 lines extracted (0.00% regression)
-  - [x] Settings page: 400 lines extracted (0.32% regression)
-  - [x] Onboarding flow: 350 lines extracted (0.27% regression)
-  - [x] Error states: 527 lines extracted (0.01% regression)
-
-- [x] **CSS ARCHITECTURE ESTABLISHED**
-  - [x] styles.css - Core design system with expanded variables
-  - [x] animations.css - Centralized @keyframes (fixed duplicates)
-  - [x] utilities.css - 300+ utility classes created
-  - [x] components.css - Enhanced with icon/badge systems
-  - [x] Page-specific CSS for all 4 completed pages
-
-- [x] **CSS OPTIMIZATION COMPLETED** (January 6, 2025)
-  - [x] Extracted all remaining inline styles
-  - [x] Created comprehensive utilities.css
-  - [x] Enhanced components.css with icon/badge systems
-  - [x] Added missing CSS variables (error color, z-index, shadows)
-  - [x] Fixed animation organization (moved to animations.css)
-  - [x] Updated all HTML files with utilities.css link
-  - [x] All visual regression tests passing (12/12)
-
-- [x] Extract common CSS into shared stylesheet
-  - [x] Color variables and gradients
-  - [x] Typography scale and fonts
-  - [x] Spacing and sizing system (extended to 3xl/4xl)
-  - [x] Animation keyframes and transitions
-  - [x] Common component styles (buttons, cards, inputs)
-- [x] Extract design system tokens
-  - [x] Colors: Primary (#6366f1, #8b5cf6), Background (#0a0a0b, #0f0f10), Text (#e7e7e8, #a1a1aa, #6b7280), Error (#ef4444)
-  - [x] Spacing: 4px base unit (xs through 4xl scale)
-  - [x] Border radius: Small (4px), Medium (8px), Large (12px), XL (20px)
-  - [x] Shadows: Complete system (sm/md/lg/xl/glow/inner)
-  - [x] Z-index: Systematic scale (base through max)
-  - [x] Animation: Standard easings and durations
-- [x] Consolidate JavaScript behaviors
-  - [x] Toggle interactions
-  - [x] Form validations
-  - [x] Animation triggers
-  - [x] State management patterns
-
-**ALL 11 prototype files completed with 100% CSS extraction** ✅
-
-#### ~~Branch: `feat/extract-remaining-prototypes`~~ ✅ COMPLETED
-
-**Extract Remaining Prototype CSS** ✅ **COMPLETED in `feat/consolidate-prototypes`**
-
-All 7 remaining prototype files were successfully extracted:
-
-**Notifications** (`notifications.html` ~180 lines) ✅
-- [x] Setup BackstopJS configuration for notifications page
-- [x] Created prototype/v2/css/notifications.css for page-specific styles
-- [x] Created prototype/v2/notifications.html
-- [x] Extracted toast system and notification styles
-- [x] Tested visual regression throughout extraction (0.00%)
-
-**Context Menu** (`context-menu.html` ~150 lines) ✅
-- [x] Setup BackstopJS configuration for context menu
-- [x] Created prototype/v2/css/context-menu.css for page-specific styles
-- [x] Created prototype/v2/context-menu.html
-- [x] Extracted dropdown and menu item styles
-- [x] Tested visual regression throughout extraction (0.00%)
-
-**Tab Search** (`tab-search.html` ~300 lines) ✅
-- [x] Setup BackstopJS configuration for tab search
-- [x] Created prototype/v2/css/tab-search.css for page-specific styles
-- [x] Created prototype/v2/tab-search.html
-- [x] Extracted search interface and result styles
-- [x] Tested visual regression throughout extraction (0.00%)
-
-**Window Details** (`window-details.html` ~250 lines) ✅
-- [x] Setup BackstopJS configuration for window details
-- [x] Created prototype/v2/css/window-details.css for page-specific styles
-- [x] Created prototype/v2/window-details.html
-- [x] Extracted detail panel and management styles
-- [x] Tested visual regression throughout extraction (0.00%)
-
-**Sync History** (`sync-history.html` ~280 lines) ✅
-- [x] Setup BackstopJS configuration for sync history
-- [x] Created prototype/v2/css/sync-history.css for page-specific styles
-- [x] Created prototype/v2/sync-history.html
-- [x] Extracted timeline and history item styles
-- [x] Tested visual regression throughout extraction (0.00%)
-
-**Empty States** (`empty-states.html` ~120 lines) ✅
-- [x] Setup BackstopJS configuration for empty states
-- [x] Created prototype/v2/css/empty-states.css for page-specific styles
-- [x] Created prototype/v2/empty-states.html
-- [x] Extracted empty state illustrations and messages
-- [x] Tested visual regression throughout extraction (0.00%)
-
-**Index/Demo** (`index.html` ~100 lines) ✅
-- [x] Completed prototype/v2/index.html with new CSS architecture
-- [x] Extracted any remaining demo-specific styles
-- [x] Tested visual regression throughout extraction (0.00%)
 
 ### UI Redesign with Mantine
 
@@ -352,24 +213,20 @@ All 7 remaining prototype files were successfully extracted:
 
 **CSS Architecture Refinements** (Lower Priority)
 
-- [ ] Reorganize CSS into core/utilities/components/pages structure
-  - [ ] Create core/ directory for variables, reset, base
-  - [ ] Create utilities/ directory for layout, spacing, typography, states
-  - [ ] Create components/ directory for buttons, cards, forms, badges, modals
-  - [ ] Create pages/ directory for page-specific styles
-  - [ ] Create main.css to import all files in correct order
-- [ ] Implement BEM-like modifier patterns
-  - [ ] Convert .button variants to .button--primary, .button--danger
-  - [ ] Convert .card variants to .card--hover, .card--selected
-  - [ ] Update HTML to use new modifier classes
-- [ ] Optimize selector specificity
-  - [ ] Reduce overly specific selectors
-  - [ ] Group similar properties
-  - [ ] Create transition utility groups
-- [ ] Implement critical CSS splitting
-  - [ ] Identify above-fold styles
-  - [ ] Create critical.css for inline loading
-  - [ ] Load non-critical styles asynchronously
+- [ ] Create core/ directory for variables, reset, base
+- [ ] Create utilities/ directory for layout, spacing, typography, states
+- [ ] Create components/ directory for buttons, cards, forms, badges, modals
+- [ ] Create pages/ directory for page-specific styles
+- [ ] Create main.css to import all files in correct order
+- [ ] Convert .button variants to .button--primary, .button--danger
+- [ ] Convert .card variants to .card--hover, .card--selected
+- [ ] Update HTML to use new modifier classes
+- [ ] Reduce overly specific selectors
+- [ ] Group similar properties
+- [ ] Create transition utility groups
+- [ ] Identify above-fold styles
+- [ ] Create critical.css for inline loading
+- [ ] Load non-critical styles asynchronously
 
 #### Branch: `feat/ui-polish`
 
