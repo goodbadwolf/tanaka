@@ -1,0 +1,44 @@
+/* Utility Classes */
+
+/* Spacing */
+.mt-xl { margin-top: 2rem; }
+.mb-xl { margin-bottom: 2rem; }
+.p-xl { padding: 2rem; }
+
+/* Text utilities */
+.text-center { text-align: center; }
+.fw-bold { font-weight: bold; }
+.text-white { color: white; }
+
+/* Layout */
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Animations */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+  }
+}
+
+.pulse-effect {
+  animation: pulse 2s infinite;
+}
+
+/* Theme-specific utilities */
+.theme-gradient-light {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.theme-gradient-dark {
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+}
