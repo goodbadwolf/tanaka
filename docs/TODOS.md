@@ -171,7 +171,7 @@ All work to be completed.
   - ~~4-color gradient: `#ee7752, #e73c7e, #23a6d5, #23d5ab`~~
   - ~~Animation: `gradient 15s ease infinite` with `backgroundSize: 400% 400%`~~
   - ~~Keyframes: 0% → 50% → 100% background position transitions~~
-- [ ] Create debugStyles utilities:
+- [x] Create debugStyles utilities:
   - `getClassName: (component, variant) => \`tanaka-${component}${variant ? \`--${variant}\` : ''}\``
   - `createStyledComponent` that adds `data-styled-component` attribute and `displayName`
   - Example: `GradientButton` with pink gradient (#FE6B8B → #FF8E53), 48px height
