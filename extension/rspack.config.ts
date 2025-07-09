@@ -3,6 +3,9 @@ import { rspack } from '@rspack/core';
 import RefreshPlugin from '@rspack/plugin-react-refresh';
 import HtmlRspackPlugin from 'html-rspack-plugin';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
+// import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+// import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
+import * as sass from 'sass';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -92,6 +95,47 @@ export default defineConfig({
         type: 'css',
       },
       {
+        test: /\.scss$/,
+        use: [
+          'style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              modules: {
+                auto: true,
+                localIdentName: isDev
+                  ? '[name]__[local]--[hash:base64:5]'
+                  : '[hash:base64:8]',
+              },
+              sourceMap: isDev,
+            },
+          },
+          {
+            loader: 'postcss-loader',
+            options: {
+              postcssOptions: {
+                plugins: [
+                  'autoprefixer',
+                  'postcss-preset-env',
+                  !isDev && ['cssnano', { preset: 'default' }],
+                ].filter(Boolean),
+              },
+              sourceMap: isDev,
+            },
+          },
+          {
+            loader: 'sass-loader',
+            options: {
+              implementation: sass,
+              sourceMap: isDev,
+              sassOptions: {
+                includePaths: ['src/playground/styles'],
+              },
+            },
+          },
+        ],
+      },
+      {
         test: /\.(png|svg|jpg|jpeg|gif)$/i,
         type: 'asset/resource',
         generator: {
@@ -145,6 +189,11 @@ export default defineConfig({
       __APP_VERSION__: JSON.stringify(process.env.npm_package_version),
     }),
 
+    // !isDev && new MiniCssExtractPlugin({
+    //   filename: '[name].[contenthash].css',
+    //   chunkFilename: '[id].[contenthash].css',
+    // }),
+
     isAnalyze &&
       new BundleAnalyzerPlugin({
         analyzerMode: 'static',
@@ -190,6 +239,7 @@ export default defineConfig({
               },
             },
           }),
+          // new CssMinimizerPlugin(),
         ]
       : [],
     sideEffects: false, // Enable tree shaking
@@ -201,6 +251,8 @@ export default defineConfig({
 
   devServer: {
     hot: true,
+    liveReload: true,
+    watchFiles: ['src/**/*.scss'],
     port: 3000,
     client: {
       overlay: {
