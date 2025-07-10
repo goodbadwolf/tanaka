@@ -385,7 +385,7 @@ $twilight-colors: (
 - ✅ Add Toggle Button
 - ✅ Extract and organize common patterns
 
-### Phase 2.5: Styling Architecture Cleanup (CRITICAL - NEXT PRIORITY)
+### Phase 2.5: Styling Architecture Cleanup (IN PROGRESS - Steps 4-8 NEXT)
 
 The current codebase has a jumbled mix of styling approaches:
 - SCSS files with imports and mixins
@@ -534,70 +534,7 @@ This ensures:
 - All CSS variables are properly cascaded
 - Easy to add new themes later
 
-#### Step 3.5: Build Mantine Component Library
-
-**Component Creation Tasks:**
-
-- [ ] Create `components/ui/` directory for new Mantine-based components
-- [ ] Build Button component with SCSS (replaces deprecated Button)
-- [ ] Build Card component with SCSS (replaces deprecated Card)
-- [ ] Build ErrorMessage component with SCSS (replaces deprecated ErrorMessage)
-- [ ] Build LoadingSpinner component with SCSS (replaces deprecated LoadingSpinner)
-- [ ] Build Input wrapper components with SCSS (replaces deprecated Input)
-- [ ] Create EmptyState component for no-data scenarios
-- [ ] Create StatusIndicator component for sync status
-- [ ] Add all components to playground for testing
-
-**Component Guidelines:**
-- Each component gets its own folder in `components/[component-name]/` (kebab-case)
-- Component folder contains `[component-name].tsx` and `[component-name].scss`
-- **CRITICAL**: Use `.tanaka-` prefix for ALL component classes (global CSS, no modules)
-- Use BEM naming: `.tanaka-button`, `.tanaka-button__icon`, `.tanaka-button--primary`
-- Reference only CSS variables, no hardcoded colors
-- No inline styles or CSS-in-JS
-- Export from component file directly (no index.ts barrel exports)
-
-**Example Component Structure:**
-```tsx
-// button/button.tsx
-import './button.scss';
-
-export function Button({ variant = 'default', children }) {
-  return (
-    <button className={`tanaka-button tanaka-button--${variant}`}>
-      {children}
-    </button>
-  );
-}
-```
-
-```scss
-// button/button.scss
-.tanaka-button {
-  // Base styles using CSS variables
-  padding: var(--mantine-spacing-sm) var(--mantine-spacing-md);
-
-  &--primary {
-    background: var(--twilight-gradient-primary);
-  }
-}
-```
-
-Example structure:
-```scss
-// _twilight-theme.scss
-[data-theme-style="twilight"] {
-  // Override Mantine's CSS variables
-  --mantine-color-primary-0: #f5f3ff;
-  --mantine-color-primary-6: #7c3aed;
-
-  // Custom theme variables
-  --twilight-gradient-primary: linear-gradient(135deg, #6366f1, #8b5cf6);
-  --twilight-shadow-glow: 0 0 20px rgba(139, 92, 246, 0.3);
-}
-```
-
-#### Step 4: Migrate Components to New System
+#### Step 4: Migrate Playground Components to New System
 
 **For each component:**
 
@@ -682,10 +619,58 @@ This cleanup is critical before proceeding with Phase 3, as it will establish th
 - [ ] Minimize bundle size
 - [ ] Performance testing
 
-### Phase 4: Production Rollout (PENDING)
+### Phase 4: Production Pages (PENDING)
 
-- [ ] Apply patterns to popup
-- [ ] Migrate settings page styles
+#### Popup Page
+- [ ] Create new popup structure
+- [ ] Build components as needed following guidelines
+- [ ] Apply twilight theme
+- [ ] Implement window tracking UI
+- [ ] Test with real extension data
+
+#### Settings Page  
+- [ ] Create new settings structure
+- [ ] Build components as needed following guidelines
+- [ ] Apply twilight theme
+- [ ] Implement server configuration UI
+- [ ] Test all settings functionality
+
+#### Component Guidelines (When Building)
+- Each component gets its own folder in `components/[component-name]/` (kebab-case)
+- Component folder contains `[component-name].tsx` and `[component-name].scss`
+- **CRITICAL**: Use `.tanaka-` prefix for ALL component classes (global CSS, no modules)
+- Use BEM naming: `.tanaka-button`, `.tanaka-button__icon`, `.tanaka-button--primary`
+- Reference only CSS variables, no hardcoded colors
+- No inline styles or CSS-in-JS
+- Export from component file directly (no index.ts barrel exports)
+
+**Example Component Structure:**
+```tsx
+// button/button.tsx
+import './button.scss';
+
+export function Button({ variant = 'default', children }) {
+  return (
+    <button className={`tanaka-button tanaka-button--${variant}`}>
+      {children}
+    </button>
+  );
+}
+```
+
+```scss
+// button/button.scss
+.tanaka-button {
+  // Base styles using CSS variables
+  padding: var(--mantine-spacing-sm) var(--mantine-spacing-md);
+
+  &--primary {
+    background: var(--twilight-gradient-primary);
+  }
+}
+```
+
+#### Final Cleanup
 - [ ] Remove all old CSS files
 - [ ] Update imports throughout codebase
 - [ ] Final testing
