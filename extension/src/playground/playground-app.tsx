@@ -66,7 +66,8 @@ import {
   IconX,
 } from '@tabler/icons-preact';
 import { useState } from 'react';
-import { PageHeader, Toggle } from '../components';
+import { PageHeader } from '../components/page-header';
+import { Toggle } from '../components/toggle';
 import { withThemeProvider } from '../themes/theme-provider';
 import './playground.scss';
 
@@ -412,22 +413,14 @@ function PlaygroundContainer() {
                       checked={toggleValue}
                       onChange={setToggleValue}
                     />
-                    <Toggle
-                      label="Small toggle"
-                      size="small"
-                      defaultChecked
-                    />
+                    <Toggle label="Small toggle" size="small" defaultChecked />
                     <Toggle
                       label="Large toggle"
                       size="large"
                       checked={toggleValue2}
                       onChange={setToggleValue2}
                     />
-                    <Toggle
-                      label="Disabled toggle"
-                      disabled
-                      checked
-                    />
+                    <Toggle label="Disabled toggle" disabled checked />
                     <Toggle
                       label="Toggle without label"
                       aria-label="Toggle without visible label"
