@@ -1,0 +1,33 @@
+// Base styles - Reset and typography
+
+@use 'variables' as *;
+
+// Reset
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: $font-family-base;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: $color-background;
+  color: $color-text;
+
+  // Support for light mode
+  &.theme-light {
+    background-color: $color-background-light;
+    color: $color-text-dark;
+  }
+}
+
+// Typography
+h1, h2, h3, h4, h5, h6 {
+  margin: 0 0 $spacing-md;
+  font-weight: 600;
+  line-height: 1.2;
+}

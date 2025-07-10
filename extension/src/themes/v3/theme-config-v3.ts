@@ -42,17 +42,3 @@ export const v3Theme: MantineThemeOverride = {
     xl: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
   },
 };
-
-export enum ThemeName {
-  LIGHT = 'light',
-  DARK = 'dark',
-  AUTO = 'auto',
-}
-
-export function getToggledTheme(theme: ThemeName | undefined): ThemeName {
-  if (!theme) {
-    return ThemeName.LIGHT;
-  }
-
-  return theme === ThemeName.LIGHT ? ThemeName.DARK : ThemeName.LIGHT;
-}

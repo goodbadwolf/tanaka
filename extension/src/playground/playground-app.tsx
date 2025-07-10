@@ -1,151 +1,190 @@
-import { Button, Container, Title, Text, Stack, Divider, SegmentedControl, Group } from '@mantine/core';
-import { ThemeProvider, useTheme } from '../themes';
+import { Container, Title, SegmentedControl, Group, Select, MantineColorScheme, Button, Text, Stack, Divider, Paper, Box, useComputedColorScheme, useMantineTheme } from '@mantine/core';
+import { withAppTheme, useAppTheme, ThemeStyle } from '../themes';
+import { debugStyles, GradientButton, getThemeAwareGradient, getDebugClassName, createDebugComponent, withDebug } from './utils/debug-utils';
 import { StyledExample } from './styled-example';
 import { StylingUtilsExample } from './styling-utils-example';
-import { DebugStylesExample } from './debug-styles-example';
-import { useState, useEffect } from 'react';
-import { ThemeStyle } from '../themes/theme-config';
 
-// Import both theme styles
-import './styles/v3/playground.css';
-import './styles/cyberpunk/playground.css';
-import './styles/hover-effects.css';
+// Import our new SCSS
+import './styles/playground.scss';
 
-interface PlaygroundContainerProps {
-  themeStyle: ThemeStyle;
-  setThemeStyle: (style: ThemeStyle) => void;
-}
-
-function PlaygroundContainer({ themeStyle, setThemeStyle }: PlaygroundContainerProps) {
-  const { theme, toggleTheme } = useTheme();
-
-  // Apply theme class to body
-  useEffect(() => {
-    document.body.className = `theme-${themeStyle}`;
-  }, [themeStyle]);
+function PlaygroundContainer() {
+  // Use the theme hook - no props needed!
+  const { currentThemeSettings: themeSettings, setThemeSettings } = useAppTheme();
 
   return (
-    <Container size="lg" className="playground-container" data-component="playground-container">
-      <Stack gap="xl">
-        <div className="text-center">
-          <Title
-            order={1}
-            style={{
-              color: 'white',
-              textShadow: themeStyle === ThemeStyle.CYBERPUNK
-                ? '0 0 20px var(--mantine-color-neonPink-5)'
-                : '2px 2px 4px rgba(0, 0, 0, 0.3)',
-              marginBottom: '1rem'
-            }}
-          >
-            Tanaka UI Playground
-          </Title>
-          <Text size="lg" c="white">
-            Mantine v8 - {themeStyle === ThemeStyle.V3 ? 'V3 Theme' : 'Cyberpunk Theme'}
-          </Text>
-        </div>
+    <Container size="lg" className="playground-container">
+      <Title order={1} className="playground-title">
+        Tanaka UI Playground
+      </Title>
 
-        <Group justify="center">
-          <SegmentedControl
-            value={themeStyle}
-            onChange={(value) => setThemeStyle(value as ThemeStyle)}
-            data={[
-              { label: 'V3 Theme', value: ThemeStyle.V3 },
-              { label: 'Cyberpunk', value: ThemeStyle.CYBERPUNK },
-            ]}
-            styles={{
-              root: {
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-              },
-            }}
-          />
-        </Group>
-
-        <Button
-          onClick={toggleTheme}
-          variant="white"
-          size="lg"
-          className="pulse-effect"
-          data-component="theme-toggle"
-          styles={{
-            root: {
-              backgroundColor: 'rgba(255, 255, 255, 0.9)',
-              color: '#764ba2',
-              fontWeight: 600,
-              backdropFilter: 'blur(10px)',
-              border: '2px solid rgba(255, 255, 255, 0.3)',
-              transition: 'all 0.3s ease',
-
-              '&:hover': {
-                backgroundColor: 'white',
-                transform: 'translateY(-2px)',
-                boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15)'
-              }
-            }
-          }}
-        >
-          Toggle {theme === 'light' ? 'Dark' : 'Light'} Mode
-        </Button>
-
-        <Divider
-          my="xl"
-          label="Styling Examples"
-          labelPosition="center"
-          color="rgba(255, 255, 255, 0.3)"
-          styles={{
-            label: {
-              color: 'white',
-              backgroundColor: 'transparent'
-            }
-          }}
+      {/* Step 2: Theme switcher using a dropdown*/}
+      <Group justify="center" className="theme-switcher-group">
+        <Select
+          value={themeSettings.style}
+          onChange={(value) => setThemeSettings({ ...themeSettings, style: value as ThemeStyle })}
+          data={[
+            { label: 'V3 Theme', value: ThemeStyle.V3 },
+            { label: 'Cyberpunk', value: ThemeStyle.CYBERPUNK },
+          ]}
         />
-
-        <StyledExample />
-
-        <Divider
-          my="xl"
-          label="Styling Utilities"
-          labelPosition="center"
-          color="rgba(255, 255, 255, 0.3)"
-          styles={{
-            label: {
-              color: 'white',
-              backgroundColor: 'transparent'
-            }
-          }}
+        <SegmentedControl
+          value={themeSettings.colorScheme}
+          onChange={(value) => setThemeSettings({ ...themeSettings, colorScheme: value as MantineColorScheme })}
+          data={[
+            { label: 'Light', value: 'light' },
+            { label: 'Dark', value: 'dark' },
+          ]}
+          className="theme-switcher"
         />
+      </Group>
 
-        <StylingUtilsExample themeStyle={themeStyle} />
+      <Divider my="xl" label="Styling Examples" />
+      <StyledExample />
 
-        <Divider
-          my="xl"
-          label="Debug Styles Utilities"
-          labelPosition="center"
-          color="rgba(255, 255, 255, 0.3)"
-          styles={{
-            label: {
-              color: 'white',
-              backgroundColor: 'transparent'
-            }
-          }}
-        />
+      <Divider my="xl" label="Styling Utilities" />
+      <StylingUtilsExample themeStyle={themeSettings.style || ThemeStyle.V3} />
 
-        <DebugStylesExample />
-      </Stack>
+      <Divider my="xl" label="Debug Utilities" />
+      <DebugExamples />
     </Container>
   );
 }
 
-export function PlaygroundApp() {
-  const [themeStyle, setThemeStyle] = useState<ThemeStyle>(ThemeStyle.V3);
+// Debug Examples Component
+function DebugExamples() {
+  const colorScheme = useComputedColorScheme();
+  const theme = useMantineTheme();
+
+  // Create a custom debug button
+  const CustomNeonButton = createDebugComponent(
+    Button,
+    'CustomNeonButton',
+    {
+      root: {
+        background: 'linear-gradient(90deg, #00ff00 0%, #00ffff 100%)',
+        color: '#000',
+        fontWeight: 700,
+        textTransform: 'uppercase',
+        letterSpacing: '1px',
+        border: '2px solid #00ff00',
+        boxShadow: '0 0 20px rgba(0, 255, 0, 0.5)',
+        '&:hover': {
+          boxShadow: '0 0 30px rgba(0, 255, 0, 0.8)',
+          transform: 'scale(1.05)',
+        },
+      },
+    }
+  );
+
+  // Create a debug-wrapped component
+  const DebugCard = withDebug(Paper);
 
   return (
-    <ThemeProvider themeStyle={themeStyle}>
-      <PlaygroundContainer themeStyle={themeStyle} setThemeStyle={setThemeStyle} />
-    </ThemeProvider>
+    <Stack gap="xl">
+      {/* Debug Class Names */}
+      <Paper
+        className={getDebugClassName('example-card', 'primary')}
+        p="xl"
+        style={{
+          background: 'rgba(255, 255, 255, 0.05)',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+        }}
+      >
+        <Text size="lg" fw={600} mb="md">
+          Debug Class Names
+        </Text>
+        <Text>
+          This card has class: <code>{getDebugClassName('example-card', 'primary')}</code>
+        </Text>
+        <Text mt="sm">
+          Without variant: <code>{getDebugClassName('example-card')}</code>
+        </Text>
+      </Paper>
+
+      {/* Gradient Buttons */}
+      <Paper p="xl" style={{ background: 'rgba(255, 255, 255, 0.05)' }}>
+        <Text size="lg" fw={600} mb="md">
+          Gradient Buttons
+        </Text>
+        <Group>
+          <GradientButton onClick={() => console.log('Gradient clicked!')}>
+            Pink Gradient
+          </GradientButton>
+          <GradientButton size="lg">Large Gradient</GradientButton>
+          <CustomNeonButton onClick={() => console.log('Neon clicked!')}>
+            Neon Green
+          </CustomNeonButton>
+        </Group>
+        <Text mt="md" size="sm" opacity={0.7}>
+          Inspect these buttons to see data-styled-component attributes
+        </Text>
+      </Paper>
+
+      {/* Theme-aware Gradient */}
+      <Paper
+        p="xl"
+        style={{
+          background: getThemeAwareGradient(theme, colorScheme),
+          transition: 'background 0.3s ease',
+        }}
+      >
+        <Text size="lg" fw={600} mb="md">
+          Theme-Aware Gradient
+        </Text>
+        <Text>
+          This background changes based on {colorScheme} mode
+        </Text>
+      </Paper>
+
+      {/* Debug Styles */}
+      <Paper p="xl" style={{ background: 'rgba(255, 255, 255, 0.05)' }}>
+        <Text size="lg" fw={600} mb="md">
+          Debug Style Utilities
+        </Text>
+        <Group grow>
+          <Box p="md" style={debugStyles.outline()}>Outline</Box>
+          <Box p="md" style={debugStyles.outline('#00ff00')}>Green Outline</Box>
+          <Box p="md" style={debugStyles.background()}>Debug Background</Box>
+          <Box p="md" style={debugStyles.grid()}>Grid Overlay</Box>
+        </Group>
+        <Box mt="lg" style={debugStyles.spacing(20, 10)}>
+          <Text>Spacing visualization (20px padding, 10px margin)</Text>
+        </Box>
+      </Paper>
+
+      {/* Debug Wrapper */}
+      <Paper p="xl" style={{ background: 'rgba(255, 255, 255, 0.05)' }}>
+        <Text size="lg" fw={600} mb="md">
+          Debug Wrapper HOC
+        </Text>
+        <Stack gap="md">
+          <DebugCard p="md" debug={false}>
+            <Text>Normal card (debug=false)</Text>
+          </DebugCard>
+          <DebugCard p="md" debug={true}>
+            <Text>Wrapped with debug boundaries (debug=true)</Text>
+          </DebugCard>
+        </Stack>
+      </Paper>
+
+      {/* DevTools Tip */}
+      <Paper
+        p="xl"
+        style={{
+          background: 'rgba(255, 255, 255, 0.05)',
+          border: '1px dashed rgba(255, 255, 255, 0.3)',
+        }}
+      >
+        <Text size="lg" fw={600} mb="md">💡 DevTools Tips</Text>
+        <Box component="ul">
+          <li>Inspect elements to see generated class names</li>
+          <li>Look for data-styled-component attributes</li>
+          <li>Check data-debug-wrapper on wrapped components</li>
+          <li>View displayName in React DevTools</li>
+        </Box>
+      </Paper>
+    </Stack>
   );
 }
 
-// Easy theme switching for testing
-// Change the default theme in useState above to ThemeStyle.CYBERPUNK to test the cyberpunk theme
+export const PlaygroundApp = withAppTheme(PlaygroundContainer);
