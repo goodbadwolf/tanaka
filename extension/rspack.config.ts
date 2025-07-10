@@ -14,7 +14,7 @@ const isDev = process.env.NODE_ENV === 'development';
 const buildEnv = process.env.BUILD_ENV || 'development';
 const isAnalyze = process.env.RSPACK_BUNDLE_ANALYZE === 'true';
 
-type AppMode = 'extension' | 'webapp' | 'playground';
+type AppMode = 'extension' | 'playground';
 
 const appMode: AppMode = (process.env.APP_MODE || 'extension') as AppMode;
 
@@ -24,9 +24,6 @@ export default defineConfig({
 
   entry: {
     background: './src/background.ts',
-    'popup/popup': './src/popup/popup.tsx',
-    'settings/settings': './src/settings/settings.tsx',
-    webapp: './src/webapp/index.tsx',
     'workers/crdt-worker': './src/workers/crdt-worker.ts',
     playground: './src/playground/index.tsx',
   },
@@ -148,26 +145,7 @@ export default defineConfig({
   plugins: [
     isDev && new RefreshPlugin(),
 
-    new HtmlRspackPlugin({
-      template: './src/popup/popup-template.html',
-      filename: 'popup/popup.html',
-      chunks: ['popup/popup'],
-      inject: false,
-    }),
 
-    new HtmlRspackPlugin({
-      template: './src/settings/settings-template.html',
-      filename: 'settings/settings.html',
-      chunks: ['settings/settings'],
-      inject: false,
-    }),
-
-    new HtmlRspackPlugin({
-      template: './src/webapp/index.html',
-      filename: 'index.html',
-      chunks: ['webapp'],
-      inject: true,
-    }),
 
     new HtmlRspackPlugin({
       template: './src/playground/index.html',

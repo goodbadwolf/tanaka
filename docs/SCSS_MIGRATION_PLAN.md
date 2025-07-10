@@ -420,6 +420,19 @@ The current codebase has a jumbled mix of styling approaches:
 
 This phase will establish a clean, consistent styling architecture using **SCSS + Mantine CSS Variables**.
 
+#### Step 0: Clean Slate - Remove Old Implementations
+
+Since we are redesigning a huge chunk of the UI, start by removing old code:
+
+- [ ] Delete webapp implementation (old routing system)
+- [ ] Delete settings page implementation
+- [ ] Delete popup page implementation  
+- [ ] Delete all deprecated components folder
+- [ ] Remove all imports of deprecated components
+- [ ] Clean up orphaned CSS/SCSS files
+
+This gives us a clean slate to rebuild with consistent patterns.
+
 #### Step 1: Audit and Document Current State
 
 - [ ] Create comprehensive list of all styling approaches currently in use

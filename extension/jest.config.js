@@ -32,9 +32,6 @@ export default {
     '/node_modules/',
     // Current in a refactor mode so we don't need to test these
     '/src/components/',
-    '/src/popup/components/',
-    '/src/settings/components/',
-    '/src/webapp/components/',
     '/src/playground/components/',
   ],
   collectCoverageFrom: [
@@ -43,13 +40,9 @@ export default {
     '!src/**/index.ts',
     '!src/test/**',
     '!src/test-utils/**',
-    // Entry points and webapp-specific files
-    '!src/popup/popup.tsx',
-    '!src/settings/settings.tsx',
-    '!src/webapp/**',
+    // Entry points
     // UI Playground files
     '!src/playground/**',
-    '!src/di/webapp-container.ts',
     // Mock and polyfill files
     '!src/browser/mock.ts',
     '!src/browser/mock-polyfill.ts',
