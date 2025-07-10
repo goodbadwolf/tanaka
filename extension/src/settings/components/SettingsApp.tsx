@@ -1,17 +1,21 @@
-import { useEffect, useCallback } from 'preact/hooks';
+import { useCallback, useEffect } from 'preact/hooks';
+import type { IBrowser } from '../../browser/core';
+import { Button } from '../../components/deprecated/Button';
+import { Card } from '../../components/deprecated/Card';
+import { ErrorMessage } from '../../components/deprecated/ErrorMessage';
+import { Input } from '../../components/deprecated/Input';
+import { LoadingSpinner } from '../../components/deprecated/LoadingSpinner';
 import { getConfig } from '../../config/index';
 import { useService } from '../../di/provider';
-import type { IBrowser } from '../../browser/core';
 import {
-  settings,
+  enablePersistence,
   isLoading,
   isSaving,
-  saveStatus,
   loadSettings,
   saveSettings as saveSettingsToStore,
-  enablePersistence,
+  saveStatus,
+  settings,
 } from '../../store/settings';
-import { Button, Input, Card, ErrorMessage, LoadingSpinner } from '../../components';
 
 export function SettingsApp() {
   const browser = useService<IBrowser>('IBrowser');
@@ -50,7 +54,7 @@ export function SettingsApp() {
         // Error is already handled by the store
       }
     },
-    [browser]
+    [browser],
   );
 
   if (isLoading.value) {

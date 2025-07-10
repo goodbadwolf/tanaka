@@ -1,9 +1,9 @@
+import { ErrorInfo, render } from 'preact';
 import 'reflect-metadata';
-import { render, ErrorInfo } from 'preact';
-import { PopupApp } from './components/PopupApp';
+import { ErrorBoundary } from '../components/deprecated/ErrorBoundary';
 import { DIProvider } from '../di/provider';
-import { ErrorBoundary } from '../components';
 import { ExtensionError } from '../error/types';
+import { PopupApp } from './components/PopupApp';
 import './popup.css';
 
 // Load Preact DevTools in development
@@ -26,10 +26,7 @@ const root = document.getElementById('root');
 if (root) {
   render(
     <DIProvider>
-      <ErrorBoundary
-        onError={handlePopupError}
-        reportErrors={true}
-      >
+      <ErrorBoundary onError={handlePopupError} reportErrors={true}>
         <PopupApp />
       </ErrorBoundary>
     </DIProvider>,

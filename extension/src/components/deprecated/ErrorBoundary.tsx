@@ -1,7 +1,7 @@
 import { Component, ComponentChildren, ErrorInfo } from 'preact';
-import { ExtensionError, ErrorFactories, isExtensionError } from '../error/types';
-import { ErrorMessage } from './ErrorMessage';
+import { ErrorFactories, ExtensionError, isExtensionError } from '../../error/types';
 import { Button } from './Button';
+import { ErrorMessage } from './ErrorMessage';
 
 export interface ErrorBoundaryProps {
   children: ComponentChildren;
@@ -134,10 +134,18 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
           <details>
             <summary>Error Details</summary>
             <div className="error-info">
-              <p><strong>Error ID:</strong> {error.id}</p>
-              <p><strong>Error Code:</strong> {error.code}</p>
-              <p><strong>Severity:</strong> {error.severity}</p>
-              <p><strong>Time:</strong> {new Date(error.timestamp).toLocaleString()}</p>
+              <p>
+                <strong>Error ID:</strong> {error.id}
+              </p>
+              <p>
+                <strong>Error Code:</strong> {error.code}
+              </p>
+              <p>
+                <strong>Severity:</strong> {error.severity}
+              </p>
+              <p>
+                <strong>Time:</strong> {new Date(error.timestamp).toLocaleString()}
+              </p>
               {error.context && (
                 <div>
                   <strong>Context:</strong>
@@ -161,28 +169,16 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
         <div className="error-actions">
           {canRetry && (
-            <Button
-              variant="primary"
-              onClick={this.handleRetry}
-              size="small"
-            >
+            <Button variant="primary" onClick={this.handleRetry} size="small">
               {`Try Again (${this.maxRetries - this.retryCount} attempts left)`}
             </Button>
           )}
 
-          <Button
-            variant="secondary"
-            onClick={this.handleReset}
-            size="small"
-          >
+          <Button variant="secondary" onClick={this.handleReset} size="small">
             Reset Component
           </Button>
 
-          <Button
-            variant="secondary"
-            onClick={() => window.location.reload()}
-            size="small"
-          >
+          <Button variant="secondary" onClick={() => window.location.reload()} size="small">
             Reload Page
           </Button>
         </div>
@@ -209,7 +205,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
  */
 export function withErrorBoundary<P extends object>(
   Component: (props: P) => ComponentChildren,
-  errorBoundaryProps?: Omit<ErrorBoundaryProps, 'children'>
+  errorBoundaryProps?: Omit<ErrorBoundaryProps, 'children'>,
 ) {
   return function WrappedComponent(props: P) {
     return (
