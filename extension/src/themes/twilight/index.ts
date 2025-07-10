@@ -1,6 +1,6 @@
 import { MantineThemeOverride } from '@mantine/core';
 
-export const v3Theme: MantineThemeOverride = {
+export const twilightTheme: MantineThemeOverride = {
   colors: {
     indigo: [
       '#eef2ff',

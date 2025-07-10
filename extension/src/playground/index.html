@@ -11,6 +11,74 @@
       href="https://fonts.googleapis.com/css2?family=Audiowide&family=Orbitron:wght@400;600;700;900&family=Space+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
+    <style>
+      /* Initial state - hidden to prevent flash */
+      body {
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+      }
+
+      /* After React mounts, body will get this class */
+      body.app-mounted {
+        opacity: 1;
+      }
+
+      /* Theme-specific backgrounds with smooth transitions */
+      html {
+        transition: background-color 0.3s ease-in-out;
+      }
+
+      html[data-mantine-color-scheme='dark'] {
+        background-color: #1a1b1e;
+      }
+
+      html[data-mantine-color-scheme='light'] {
+        background-color: #fff;
+      }
+
+      /* Prevent layout shift during load */
+      #root {
+        min-height: 100vh;
+      }
+    </style>
+    <!-- Theme initialization script to prevent FOUC (Flash of Unstyled Content). Must be inline to execute synchronously before first paint. -->
+    <script>
+      (() => {
+        try {
+          if (typeof Storage === 'undefined') {
+            console.warn('localStorage not available');
+            return;
+          }
+          const DATA_ATTR_KEY = 'data-mantine-color-scheme';
+          const mantineColorScheme = localStorage.getItem('mantine-color-scheme-value');
+
+          const validSchemes = ['light', 'dark', 'auto'];
+          if (mantineColorScheme && validSchemes.includes(mantineColorScheme)) {
+            document.documentElement.setAttribute(DATA_ATTR_KEY, mantineColorScheme);
+          } else {
+            document.documentElement.setAttribute(DATA_ATTR_KEY, 'auto');
+          }
+
+          if (mantineColorScheme === 'auto' || !mantineColorScheme) {
+            if (window.matchMedia) {
+              try {
+                const prefersDarkQuery = window.matchMedia('(prefers-color-scheme: dark)');
+                const prefersDark = prefersDarkQuery.matches;
+                const systemScheme = prefersDark ? 'dark' : 'light';
+                document.documentElement.setAttribute(DATA_ATTR_KEY, systemScheme);
+              } catch (e) {
+                document.documentElement.setAttribute(DATA_ATTR_KEY, 'light');
+              }
+            } else {
+              document.documentElement.setAttribute(DATA_ATTR_KEY, 'light');
+            }
+          }
+        } catch (error) {
+          console.error('Error setting initial theme:', error);
+          document.documentElement.setAttribute(DATA_ATTR_KEY, 'light');
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

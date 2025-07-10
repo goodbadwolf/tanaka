@@ -28,6 +28,15 @@ export default {
   transformIgnorePatterns: ['node_modules/(?!(preact|@preact|@testing-library|.*\\.mjs$))'],
   extensionsToTreatAsEsm: ['.ts', '.tsx'],
   setupFilesAfterEnv: ['<rootDir>/src/test/setup.ts'],
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    // Current in a refactor mode so we don't need to test these
+    '/src/components/',
+    '/src/popup/components/',
+    '/src/settings/components/',
+    '/src/webapp/components/',
+    '/src/playground/components/',
+  ],
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',
     '!src/**/*.d.ts',

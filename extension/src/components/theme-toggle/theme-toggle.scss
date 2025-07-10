@@ -1,0 +1,35 @@
+.theme-toggle {
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+  &:hover {
+    transform: scale(1.1);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  // Add a subtle rotation animation on theme change
+  &[data-transitioning="true"] {
+    animation: theme-toggle-rotate 0.3s ease-in-out;
+  }
+}
+
+@keyframes theme-toggle-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.1);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+[data-mantine-color-scheme='dark'] {
+  .theme-toggle {
+    box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
+  }
+}

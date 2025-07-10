@@ -1,0 +1,19 @@
+:root {
+  // Header gradients
+  --gradient-header-bg-light: linear-gradient(135deg, var(--mantine-color-white) 0%, var(--mantine-color-gray-0) 100%);
+  --gradient-header-bg-dark: linear-gradient(135deg, var(--mantine-color-dark-7) 0%, var(--mantine-color-dark-6) 100%);
+  --gradient-header-title: linear-gradient(45deg, var(--mantine-color-indigo-6) 0%, var(--mantine-color-violet-6) 100%);
+
+  // Button gradients
+  --gradient-button-primary: linear-gradient(45deg, var(--mantine-color-blue-6) 0%, var(--mantine-color-cyan-6) 100%);
+  --gradient-button-danger: linear-gradient(45deg, var(--mantine-color-red-6) 0%, var(--mantine-color-pink-6) 100%);
+  --gradient-button-success: linear-gradient(45deg, var(--mantine-color-teal-6) 0%, var(--mantine-color-green-6) 100%);
+
+  // Background gradients
+  --gradient-bg-subtle: linear-gradient(180deg, var(--mantine-color-gray-0) 0%, var(--mantine-color-white) 100%);
+  --gradient-bg-vibrant: linear-gradient(135deg, var(--mantine-color-blue-0) 0%, var(--mantine-color-violet-0) 100%);
+
+  // Accent gradients
+  --gradient-accent-primary: linear-gradient(90deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+  --gradient-accent-secondary: linear-gradient(90deg, #06b6d4 0%, #3b82f6 50%, #8b5cf6 100%);
+}
