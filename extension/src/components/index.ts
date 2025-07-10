@@ -7,3 +7,4 @@ export { Card } from './Card';
 export { ErrorBoundary, withErrorBoundary, useErrorHandler } from './ErrorBoundary';
 export { PageHeader } from './page-header';
 export { ThemeToggle } from './theme-toggle';
+export { Toggle } from './toggle';

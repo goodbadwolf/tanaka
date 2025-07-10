@@ -66,7 +66,7 @@ import {
   IconX,
 } from '@tabler/icons-preact';
 import { useState } from 'react';
-import { PageHeader } from '../components';
+import { PageHeader, Toggle } from '../components';
 import { withThemeProvider } from '../themes/theme-provider';
 import './playground.scss';
 
@@ -85,6 +85,8 @@ function PlaygroundContainer() {
   const [ratingValue, setRatingValue] = useState(3);
   const [chipValue, setChipValue] = useState<string[]>(['react']);
   const [tabValue, setTabValue] = useState<string | null>('gallery');
+  const [toggleValue, setToggleValue] = useState(false);
+  const [toggleValue2, setToggleValue2] = useState(true);
 
   return (
     <Box style={{ minHeight: '100vh', backgroundColor: dark ? '#1a1b1e' : '#f8f9fa' }}>
@@ -397,6 +399,39 @@ function PlaygroundContainer() {
                     />
                     <Switch label="Disabled switch" disabled />
                     <Switch label="Large switch" size="lg" defaultChecked />
+                  </Stack>
+                </div>
+
+                <div>
+                  <Text size="sm" fw={500} mb="xs">
+                    Custom Toggle (SCSS Component)
+                  </Text>
+                  <Stack gap="xs">
+                    <Toggle
+                      label="Default toggle"
+                      checked={toggleValue}
+                      onChange={setToggleValue}
+                    />
+                    <Toggle
+                      label="Small toggle"
+                      size="small"
+                      defaultChecked
+                    />
+                    <Toggle
+                      label="Large toggle"
+                      size="large"
+                      checked={toggleValue2}
+                      onChange={setToggleValue2}
+                    />
+                    <Toggle
+                      label="Disabled toggle"
+                      disabled
+                      checked
+                    />
+                    <Toggle
+                      label="Toggle without label"
+                      aria-label="Toggle without visible label"
+                    />
                   </Stack>
                 </div>
 
