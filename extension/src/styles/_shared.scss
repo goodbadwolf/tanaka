@@ -1,4 +1,8 @@
-// Global CSS reset
+@use "sass:map";
+@use "variables" as *;
+
+// ===== Base Styles =====
+// Reset
 *,
 *::before,
 *::after {
@@ -11,4 +15,30 @@ body,
   height: 100%;
   margin: 0;
   padding: 0;
+}
+
+body {
+  font-family: $font-family-base;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// Typography
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0 0 map.get($spacing-scale, "md");
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+// Root CSS variables
+:root {
+  --spacing-unit: #{$base-spacing};
+  --border-radius: #{$border-radius-base};
+  --transition: #{$transition-base};
 }

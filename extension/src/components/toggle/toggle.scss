@@ -1,0 +1,113 @@
+@use "../../styles/variables" as *;
+@use "../../styles/animations" as *;
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+
+  &__switch {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    transition: all $transition-base;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 18px;
+      height: 18px;
+      background: white;
+      border-radius: 50%;
+      transition: all $transition-base;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+  }
+
+  &__label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  &__input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+
+    &:checked + .toggle__switch {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+
+      &::after {
+        transform: translateX(20px);
+      }
+    }
+
+    &:focus-visible + .toggle__switch {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 2px;
+    }
+
+    &:disabled + .toggle__switch {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  &:hover &__switch {
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  &__input:checked:hover + &__switch {
+    background: var(--color-primary-light);
+  }
+
+  // Size variants
+  &--small {
+    .toggle__switch {
+      width: 36px;
+      height: 20px;
+
+      &::after {
+        width: 14px;
+        height: 14px;
+      }
+    }
+
+    .toggle__input:checked + .toggle__switch::after {
+      transform: translateX(16px);
+    }
+
+    .toggle__label {
+      font-size: 13px;
+    }
+  }
+
+  &--large {
+    .toggle__switch {
+      width: 52px;
+      height: 28px;
+
+      &::after {
+        width: 22px;
+        height: 22px;
+      }
+    }
+
+    .toggle__input:checked + .toggle__switch::after {
+      transform: translateX(24px);
+    }
+
+    .toggle__label {
+      font-size: 16px;
+    }
+  }
+}

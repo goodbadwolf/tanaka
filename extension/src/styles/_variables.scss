@@ -1,0 +1,32 @@
+// ===== Variables =====
+// Global design tokens
+$base-spacing: 8px;
+$border-radius-base: 4px;
+$transition-base: 0.3s ease;
+$font-family-base: system-ui, -apple-system, sans-serif;
+
+// Spacing scale
+$spacing-scale: (
+  "xs": $base-spacing * 0.5,  // 4px
+  "sm": $base-spacing,         // 8px
+  "md": $base-spacing * 2,     // 16px
+  "lg": $base-spacing * 3,     // 24px
+  "xl": $base-spacing * 4,     // 32px
+  "xxl": $base-spacing * 6     // 48px
+);
+
+// Z-index scale
+$z-index: (
+  "dropdown": 1000,
+  "modal": 1050,
+  "popover": 1060,
+  "tooltip": 1070,
+);
+
+// Breakpoints
+$breakpoints: (
+  "sm": 640px,
+  "md": 768px,
+  "lg": 1024px,
+  "xl": 1280px,
+);
