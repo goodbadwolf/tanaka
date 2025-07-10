@@ -1,29 +1,25 @@
 import { MantineColorScheme, MantineThemeOverride } from '@mantine/core';
-import { v3Theme } from './v3/theme-config-v3';
-import { cyberpunkTheme } from './cyberpunk/theme-config-cyberpunk';
+import { twilightTheme } from './twilight';
 
 export enum ThemeStyle {
-  V3 = 'v3',
-  CYBERPUNK = 'cyberpunk',
+  TWILIGHT = 'twilight',
 }
 
-export const defaultThemeStyle = ThemeStyle.V3;
-export const defaultThemeColorScheme: MantineColorScheme = 'light';
+export type ThemeColorScheme = MantineColorScheme;
+
+export const defaultThemeStyle = ThemeStyle.TWILIGHT;
+export const defaultThemeColorScheme: ThemeColorScheme = 'light';
 
 export interface ThemeSettings {
   style?: ThemeStyle;
-  colorScheme?: MantineColorScheme;
+  colorScheme?: ThemeColorScheme;
 }
 
 export function getThemeConfig(style?: ThemeStyle): MantineThemeOverride {
-  style = style ?? defaultThemeStyle;
-  switch (style) {
-    case ThemeStyle.CYBERPUNK:
-      return cyberpunkTheme;
-    case ThemeStyle.V3:
-    default:
-      return v3Theme;
+  if (style === ThemeStyle.TWILIGHT) {
+    return twilightTheme;
   }
+  throw new Error(`Unknown theme style: ${style}`);
 }
 
 /**

@@ -26,6 +26,9 @@ importers:
       '@preact/signals':
         specifier: ^2.2.0
         version: 2.2.0(preact@10.26.9)
+      '@tabler/icons-preact':
+        specifier: ^3.34.0
+        version: 3.34.0(preact@10.26.9)
       preact:
         specifier: ^10.26.9
         version: 10.26.9
@@ -1436,6 +1439,14 @@ packages:
 
   '@sinonjs/fake-timers@13.0.5':
     resolution: {integrity: sha512-36/hTbH2uaWuGVERyC6da9YwGWnzUZXuPro/F2LfsdOsLnCojz/iSH8MxUt/FD2S5XBSVPhmArFUXcpCQ2Hkiw==}
+
+  '@tabler/icons-preact@3.34.0':
+    resolution: {integrity: sha512-zUbS+i1ozHKC4Z1xI81ii4h8bs2a1FlYla/+/inTL3TTOw8otQRnQeHEGEEj/2pJCYBwM/dxWF0SB6O2Zo0RMQ==}
+    peerDependencies:
+      preact: ^10.5.13
+
+  '@tabler/icons@3.34.0':
+    resolution: {integrity: sha512-jtVqv0JC1WU2TTEBN32D9+R6mc1iEBuPwLnBsWaR02SIEciu9aq5806AWkCHuObhQ4ERhhXErLEK7Fs+tEZxiA==}
 
   '@testing-library/dom@8.20.1':
     resolution: {integrity: sha512-/DiOQ5xBxgdYRC8LNk7U+RWat0S3qRLeIw3ZIkMQ9kkVlRmwD/Eg8k8CqIpD6GW7u20JIUOfMKbxtiLutpjQ4g==}
@@ -7605,6 +7616,13 @@ snapshots:
   '@sinonjs/fake-timers@13.0.5':
     dependencies:
       '@sinonjs/commons': 3.0.1
+
+  '@tabler/icons-preact@3.34.0(preact@10.26.9)':
+    dependencies:
+      '@tabler/icons': 3.34.0
+      preact: 10.26.9
+
+  '@tabler/icons@3.34.0': {}
 
   '@testing-library/dom@8.20.1':
     dependencies:

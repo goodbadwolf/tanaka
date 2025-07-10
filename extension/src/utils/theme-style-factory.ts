@@ -27,26 +27,7 @@ interface ThemeStyleConfig {
 }
 
 const themeConfigs: Record<ThemeStyle, ThemeStyleConfig> = {
-  [ThemeStyle.CYBERPUNK]: {
-    gradients: {
-      primary: ['#ff0f87', '#0096ff'],
-      secondary: ['#0fa0ff', '#0fff0f'],
-      accent: ['#00ff00', '#3000ff'],
-    },
-    shadows: {
-      glow: {
-        color: 'rgba(255, 15, 135, 0.5)',
-        opacity: 0.5,
-      },
-      card: {
-        layers: [
-          { x: 0, y: 8, blur: 32, spread: 0, color: 'rgba(31, 38, 135, 0.37)' },
-          { x: 0, y: 0, blur: 32, spread: 0, color: 'rgba(255, 15, 135, 0.1)', inset: true },
-        ],
-      },
-    },
-  },
-  [ThemeStyle.V3]: {
+  [ThemeStyle.TWILIGHT]: {
     gradients: {
       primary: ['#6366f1', '#8b5cf6'],
       secondary: ['#818cf8', '#7c3aed'],

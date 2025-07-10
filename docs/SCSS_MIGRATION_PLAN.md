@@ -6,10 +6,10 @@ This document outlines a comprehensive plan to migrate the Tanaka extension's st
 
 ## Architecture Overview
 
-### Folder Structure
+### SCSS Folder Structure
 
 ```
-extension/src/playground/styles/
+extension/src/styles/
 ├── _shared.scss                 # Variables, base styles, animations
 ├── _mixins.scss                 # All mixins and functions
 │
@@ -119,7 +119,7 @@ $spacing-scale: (
   // 24px
   "xl": $base-spacing * 4,
   // 32px
-  "xxl": $base-spacing * 6 // 48px,
+  "xxl": $base-spacing * 6 // 48px,,,,,
 );
 
 // Z-index scale
@@ -357,7 +357,7 @@ $v3-colors: (
   "text-muted": rgba(255, 255, 255, 0.7),
 );
 
-.theme-v3 {
+.theme-style-v3 {
   @include base.apply-theme($v3-colors);
 
   // V3-specific component overrides
@@ -384,7 +384,7 @@ $cyberpunk-colors: (
   "neon-blue": #00d4ff,
 );
 
-.theme-cyberpunk {
+.theme-style-cyberpunk {
   @include base.apply-theme($cyberpunk-colors);
 
   // Cyberpunk-specific component overrides
@@ -471,7 +471,7 @@ $cyberpunk-colors: (
 - [ ] Create migration strategy for theme schema changes
 - [ ] Add memoization for theme-related calculations
 - [ ] Prevent unnecessary reflows during theme changes
-- [ ] Override CSS variables under `.theme-v3` and `.theme-cyberpunk` scopes
+- [ ] Override CSS variables under `.theme-style-v3` and `.theme-style-cyberpunk` scopes
 - [ ] Implement theme inheritance and composition patterns
 - [ ] Use CSS custom properties for theming instead of class-based approach
 - [ ] Create centralized theme configuration with TypeScript validation
