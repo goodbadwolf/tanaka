@@ -11,84 +11,65 @@ This document outlines a comprehensive plan to migrate the Tanaka extension's st
 ### SCSS Folder Structure
 
 ```
-extension/src/styles/
-├── _shared.scss                 # Variables, base styles, animations
-├── _mixins.scss                 # All mixins and functions
+extension/src/
+├── styles/
+│   ├── _variables.scss          # Design tokens (spacing, breakpoints, z-index)
+│   ├── _mixins.scss             # Reusable mixins and functions
+│   ├── _animations.scss         # Keyframe animations
+│   ├── _shared.scss             # Base styles and resets
+│   └── themes/
+│       ├── _base.scss           # Theme structure and mixins
+│       └── _twilight.scss       # Twilight theme CSS variables
 │
-├── components/
-│   ├── _buttons.scss           # Button component & variants
-│   ├── _cards.scss             # Card component & modifiers
-│   ├── _forms.scss             # Input, select, etc.
-│   ├── _gradients.scss         # Gradient text & backgrounds
-│   ├── _layout.scss            # Container + grid + sections
-│   └── _index.scss             # Component barrel export
+├── components/                  # Shared components (kebab-case)
+│   ├── button/
+│   │   ├── button.tsx
+│   │   └── button.scss          # BEM: .tanaka-button
+│   ├── card/
+│   │   ├── card.tsx
+│   │   └── card.scss            # BEM: .tanaka-card
+│   ├── page-header/             # Existing component
+│   ├── theme-toggle/            # Existing component
+│   └── toggle/                  # Existing component
 │
-├── themes/
-│   ├── _base.scss              # Shared theme structure
-│   └── _twilight.scss          # Twilight theme variables + overrides
-│
-├── webapp/
-│   ├── _navigation.scss         # Route navigation UI
-│   └── _mock-ui.scss            # Mock API indicators
-│
-├── extension/
-│   └── _compact.scss            # Extension-specific optimizations
-│
-├── _utilities.scss              # All utilities (spacing, text, colors, display)
-├── playground.scss              # Dev/testing bundle
-├── webapp.scss                  # Webapp bundle (full features)
-└── extension.scss               # Production extension bundle
+└── [app]/                       # App-specific structure
+    ├── components/              # App-specific components
+    │   └── [component]/
+    │       ├── component.tsx
+    │       └── component.scss
+    └── [app].scss               # App entry point styles
 ```
 
-### Bundle Entry Points
+Examples:
+- `playground/playground.scss` imports what it needs
+- `popup/popup.scss` will be lightweight
+- `settings/settings.scss` will be full-featured
 
-The project has three distinct bundle entry points for different use cases:
+### Entry Point Strategy
 
-#### 1. **playground.scss** - Component Development & Testing
+Each app imports only what it needs, no central bundles:
 
+#### Playground (Development Environment)
 ```scss
-// For testing all components and themes
-@use "shared";
-@use "mixins" as m;
-
-@use "utilities";
-@use "components"; // via components/_index.scss (includes layout)
-
-@use "themes/base";
-@use "themes/twilight";
+// playground/playground.scss
+@use "../styles/themes/twilight";
+@use "../styles/animations";
+// Import specific components as needed
 ```
 
-#### 2. **webapp.scss** - Full Extension as Web Application
-
+#### Popup (Lightweight)
 ```scss
-// Full extension experience with mocked browser APIs
-@use "shared";
-@use "mixins" as m;
-
-@use "utilities";
-@use "components";
-
-@use "themes/base";
-@use "themes/twilight";
-
-@use "webapp/navigation"; // Route navigation between pages
-@use "webapp/mock-ui"; // Visual indicators for mocked APIs
+// popup/popup.scss (future)
+@use "../styles/themes/twilight";
+// Minimal imports for performance
 ```
 
-#### 3. **extension.scss** - Production Firefox Extension
-
+#### Settings (Full Featured)
 ```scss
-// Optimized for extension popup and settings
-@use "shared";
-@use "mixins" as m;
-
-@use "utilities";
-@use "components";
-
-@use "themes/base";
-@use "themes/twilight";
-
-@use "extension/compact"; // Space-efficient layouts
+// settings/settings.scss (future)
+@use "../styles/themes/twilight";
+@use "../styles/animations";
+// More components and features
 ```
 
 ### SCSS Architecture Patterns
@@ -420,16 +401,16 @@ The current codebase has a jumbled mix of styling approaches:
 
 This phase will establish a clean, consistent styling architecture using **SCSS + Mantine CSS Variables**.
 
-#### Step 0: Clean Slate - Remove Old Implementations
+#### Step 0: Clean Slate - Remove Old Implementations ✅ COMPLETED
 
 Since we are redesigning a huge chunk of the UI, start by removing old code:
 
-- [ ] Delete webapp implementation (old routing system)
-- [ ] Delete settings page implementation
-- [ ] Delete popup page implementation  
-- [ ] Delete all deprecated components folder
-- [ ] Remove all imports of deprecated components
-- [ ] Clean up orphaned CSS/SCSS files
+- [x] Delete webapp implementation (old routing system)
+- [x] Delete settings page implementation
+- [x] Delete popup page implementation  
+- [x] Delete all deprecated components folder
+- [x] Remove all imports of deprecated components
+- [x] Clean up orphaned CSS/SCSS files
 
 This gives us a clean slate to rebuild with consistent patterns.
 
@@ -452,22 +433,72 @@ This gives us a clean slate to rebuild with consistent patterns.
 
 **File Structure:**
 ```
-styles/
-├── _mantine-overrides.scss  # Override Mantine component styles
-├── _twilight-theme.scss     # Theme-specific CSS variables
-├── components/              # Component-specific SCSS
-│   ├── _index.scss         # Barrel export
-│   └── [component].scss    # One file per component
-└── main.scss               # Main entry point
+src/
+├── styles/
+│   ├── _variables.scss      # Design tokens
+│   ├── _mixins.scss         # Reusable mixins
+│   ├── _animations.scss     # Keyframes
+│   └── themes/
+│       ├── _base.scss       # Theme structure
+│       └── _twilight.scss   # Twilight theme
+│
+└── components/              # Flat structure, kebab-case
+    ├── button/
+    │   ├── button.tsx
+    │   └── button.scss
+    └── [component]/
+        ├── [component].tsx
+        └── [component].scss
 ```
 
 #### Step 3: Create Twilight Theme with CSS Variables
 
-- [ ] Create `_twilight-theme.scss` with theme-specific CSS variable overrides
-- [ ] Define custom CSS variables for theme-specific values (gradients, shadows)
+**3.1 Implementation Tasks:**
+
+- [ ] Create `styles/_twilight-theme.scss` with CSS variable definitions
+- [ ] Define Mantine color scale overrides (primary, secondary, gray scales)
+- [ ] Create custom theme variables for gradients, shadows, and effects
 - [ ] Set up data attribute selector: `[data-theme-style="twilight"]`
-- [ ] Map all Mantine color scales to twilight palette
-- [ ] Create theme-specific component overrides using CSS variables
+- [ ] Update playground index.html to include theme attribute
+- [ ] Create theme initialization script to apply data attribute
+
+**3.2 Theme Structure:**
+```scss
+// _twilight-theme.scss
+[data-theme-style="twilight"] {
+  // Mantine color overrides
+  --mantine-color-primary-0 through 9
+  --mantine-color-gray-0 through 9
+
+  // Custom theme variables
+  --twilight-gradient-primary
+  --twilight-gradient-secondary
+  --twilight-shadow-sm/md/lg
+  --twilight-glow-effect
+}
+```
+
+#### Step 3.5: Build Mantine Component Library
+
+**Component Creation Tasks:**
+
+- [ ] Create `components/ui/` directory for new Mantine-based components
+- [ ] Build Button component with SCSS (replaces deprecated Button)
+- [ ] Build Card component with SCSS (replaces deprecated Card)
+- [ ] Build ErrorMessage component with SCSS (replaces deprecated ErrorMessage)
+- [ ] Build LoadingSpinner component with SCSS (replaces deprecated LoadingSpinner)
+- [ ] Build Input wrapper components with SCSS (replaces deprecated Input)
+- [ ] Create EmptyState component for no-data scenarios
+- [ ] Create StatusIndicator component for sync status
+- [ ] Add all components to playground for testing
+
+**Component Guidelines:**
+- Each component gets its own folder in `components/[component-name]/` (kebab-case)
+- Component folder contains `[component-name].tsx` and `[component-name].scss`
+- Use BEM naming in SCSS: `.tanaka-button`, `.tanaka-card`, etc.
+- Reference only CSS variables, no hardcoded colors
+- No inline styles or CSS-in-JS
+- Export from component file directly (no index.ts barrel exports)
 
 Example structure:
 ```scss
