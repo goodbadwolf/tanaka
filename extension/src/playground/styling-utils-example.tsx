@@ -1,7 +1,7 @@
 import { Box, Button, Paper, Text, Stack, Group, Title } from '@mantine/core';
 import { useMantineTheme } from '@mantine/core';
 import { useState } from 'react';
-import { ThemeStyle } from '../themes/theme-config';
+import { ThemeStyle } from './themes/theme-config';
 import { stylingUtils } from './utils/styling-utils';
 
 const { cn, gradients, shadows, animations, responsive, colors, compose, debug } = stylingUtils;

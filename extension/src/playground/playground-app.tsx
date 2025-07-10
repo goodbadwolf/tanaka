@@ -1,5 +1,5 @@
 import { Container, Title, SegmentedControl, Group, Select, MantineColorScheme, Button, Text, Stack, Divider, Paper, Box, useComputedColorScheme, useMantineTheme } from '@mantine/core';
-import { withAppTheme, useAppTheme, ThemeStyle } from '../themes';
+import { withAppTheme, useAppTheme, ThemeStyle } from './themes';
 import { debugStyles, GradientButton, getThemeAwareGradient, getDebugClassName, createDebugComponent, withDebug } from './utils/debug-utils';
 import { StyledExample } from './styled-example';
 import { StylingUtilsExample } from './styling-utils-example';
