@@ -1,9 +1,10 @@
-import { useEffect, useCallback } from 'preact/hooks';
-import { WindowTracker } from './WindowTracker';
-import { useService } from '../../di/provider';
+import { useCallback, useEffect } from 'preact/hooks';
 import type { IBrowser } from '../../browser/core';
-import { isLoading, error, initializePopup } from '../../store/popup';
-import { LoadingSpinner, ErrorMessage } from '../../components';
+import { ErrorMessage } from '../../components/deprecated/ErrorMessage';
+import { LoadingSpinner } from '../../components/deprecated/LoadingSpinner';
+import { useService } from '../../di/provider';
+import { error, initializePopup, isLoading } from '../../store/popup';
+import { WindowTracker } from './WindowTracker';
 
 export function PopupApp() {
   const browser = useService<IBrowser>('IBrowser');
@@ -12,11 +13,14 @@ export function PopupApp() {
     initializePopup(browser);
   }, [browser]);
 
-  const handleSettingsClick = useCallback((e: Event) => {
-    e.preventDefault();
-    browser.runtime.openOptionsPage();
-    window.close();
-  }, [browser]);
+  const handleSettingsClick = useCallback(
+    (e: Event) => {
+      e.preventDefault();
+      browser.runtime.openOptionsPage();
+      window.close();
+    },
+    [browser],
+  );
 
   const loading = isLoading.value;
   const errorMessage = error.value;
@@ -58,10 +62,7 @@ export function PopupApp() {
       <WindowTracker />
 
       <div className="footer">
-        <a
-          href="#"
-          onClick={handleSettingsClick}
-        >
+        <a href="#" onClick={handleSettingsClick}>
           Settings
         </a>
       </div>

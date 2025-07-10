@@ -1,6 +1,6 @@
-import { render, screen, fireEvent } from '@testing-library/preact';
-import { ExtensionError } from '../error/types';
-import { ErrorBoundary, withErrorBoundary, useErrorHandler } from './ErrorBoundary';
+import { fireEvent, render, screen } from '@testing-library/preact';
+import { ExtensionError } from '../../error/types';
+import { ErrorBoundary, useErrorHandler, withErrorBoundary } from './ErrorBoundary';
 
 // Mock component that throws an error
 const ThrowError = ({ error }: { error?: Error }) => {
@@ -46,7 +46,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary>
         <div>Test content</div>
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(screen.getByText('Test content')).toBeInTheDocument();
@@ -62,7 +62,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary>
         <ThrowError error={testError} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(screen.getByText('Something went wrong')).toBeInTheDocument();
@@ -76,7 +76,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary>
         <ThrowError error={testError} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(screen.getByText('Something went wrong')).toBeInTheDocument();
@@ -92,7 +92,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary>
         <ThrowError error={testError} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(screen.getByText('Suggested Actions:')).toBeInTheDocument();
@@ -109,7 +109,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary>
         <ThrowError error={testError} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     // Click to expand error details
@@ -134,7 +134,7 @@ describe('ErrorBoundary', () => {
     const { rerender } = render(
       <ErrorBoundary>
         <TestComponent />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(screen.getByText('Network error')).toBeInTheDocument();
@@ -149,7 +149,7 @@ describe('ErrorBoundary', () => {
     rerender(
       <ErrorBoundary>
         <TestComponent />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(screen.getByText('Success after retry')).toBeInTheDocument();
@@ -163,7 +163,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary>
         <ThrowError error={testError} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     // Initial state should show 3 attempts left
@@ -189,7 +189,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary onError={onError}>
         <ThrowError error={testError} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(onError).toHaveBeenCalledWith(
@@ -197,7 +197,7 @@ describe('ErrorBoundary', () => {
         code: 'SERVER_ERROR',
         message: 'Server error',
       }),
-      expect.any(Object) // Preact may not provide componentStack in the same way as React
+      expect.any(Object), // Preact may not provide componentStack in the same way as React
     );
 
     consoleSpy.mockRestore();
@@ -216,7 +216,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary fallback={customFallback}>
         <ThrowError error={testError} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(screen.getByText('Custom error: Sync conflict')).toBeInTheDocument();
@@ -234,7 +234,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary reportErrors={true}>
         <ThrowError error={testError} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(consoleInfoSpy).toHaveBeenCalledWith(
@@ -242,7 +242,7 @@ describe('ErrorBoundary', () => {
       expect.objectContaining({
         code: 'DATABASE_ERROR',
         message: 'DB error',
-      })
+      }),
     );
 
     consoleInfoSpy.mockRestore();
@@ -256,11 +256,11 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary reportErrors={false}>
         <ThrowError error={testError} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(console.info).not.toHaveBeenCalledWith(
-      expect.stringContaining('Reporting error to telemetry')
+      expect.stringContaining('Reporting error to telemetry'),
     );
   });
 });
@@ -290,7 +290,7 @@ describe('useErrorHandler hook', () => {
     render(
       <ErrorBoundary>
         <ComponentWithErrorHandler shouldThrow={true} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(screen.getByText('Something went wrong')).toBeInTheDocument();
@@ -300,7 +300,7 @@ describe('useErrorHandler hook', () => {
     render(
       <ErrorBoundary>
         <ComponentWithErrorHandler shouldThrow={false} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(screen.getByText('Component with error handler')).toBeInTheDocument();

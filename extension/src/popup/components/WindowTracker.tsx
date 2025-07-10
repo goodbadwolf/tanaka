@@ -1,13 +1,13 @@
-import { useEffect, useState, useCallback } from 'preact/hooks';
-import { useService } from '../../di/provider';
+import { useCallback, useEffect, useState } from 'preact/hooks';
 import type { IBrowser } from '../../browser/core';
+import { LoadingSpinner } from '../../components/deprecated/LoadingSpinner';
+import { useService } from '../../di/provider';
 import {
-  trackedWindows,
-  toggleWindowTracking,
   isWindowTracked,
+  toggleWindowTracking,
+  trackedWindows,
   trackWindow,
 } from '../../store/extension';
-import { LoadingSpinner } from '../../components';
 
 export function WindowTracker() {
   const browser = useService<IBrowser>('IBrowser');
