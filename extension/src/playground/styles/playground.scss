@@ -5,6 +5,10 @@
 @use 'base' as *;
 @use 'variables' as *;
 
+// Import theme-specific styles
+@use 'themes/v3';
+@use 'themes/cyberpunk';
+
 // Playground container styles
 .playground-container {
   min-height: 100vh;
@@ -18,4 +22,34 @@
   text-align: center;
   margin-bottom: 2rem;
   text-shadow: $text-shadow-default;
+}
+
+// Theme switcher group
+.theme-switcher-group {
+  margin-bottom: 2rem;
+}
+
+// Theme switcher styles
+.theme-switcher {
+  .mantine-SegmentedControl-root {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+  }
+
+  .mantine-SegmentedControl-label {
+    color: white;
+    font-weight: 500;
+
+    &[data-active] {
+      color: $color-primary-dark;
+      background-color: rgba(255, 255, 255, 0.9);
+      font-weight: 600;
+    }
+  }
+
+  .mantine-SegmentedControl-indicator {
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
 }

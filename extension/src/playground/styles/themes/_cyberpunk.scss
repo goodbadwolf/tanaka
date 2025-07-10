@@ -1,0 +1,37 @@
+// Cyberpunk Theme Variables
+
+// Colors
+$cyber-color-primary: #ff006e;
+$cyber-color-neon-pink: #ff10f0;
+$cyber-color-neon-blue: #00fff0;
+$cyber-background-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+
+// Apply Cyberpunk theme styles
+.theme-cyberpunk {
+  .playground-container {
+    background: $cyber-background-gradient;
+  }
+
+  .playground-title {
+    text-shadow: 0 0 20px rgba(255, 16, 240, 0.5),
+                 0 0 40px rgba(255, 16, 240, 0.3),
+                 0 0 60px rgba(255, 16, 240, 0.1);
+  }
+
+  .theme-switcher {
+    .mantine-SegmentedControl-root {
+      border-color: $cyber-color-neon-pink;
+      box-shadow: 0 0 10px rgba(255, 16, 240, 0.3);
+    }
+
+    .mantine-SegmentedControl-label[data-active] {
+      background-color: $cyber-color-neon-pink;
+      color: white;
+    }
+
+    .mantine-SegmentedControl-indicator {
+      background-color: $cyber-color-neon-pink;
+      box-shadow: 0 0 15px rgba(255, 16, 240, 0.5);
+    }
+  }
+}

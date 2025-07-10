@@ -1,11 +1,11 @@
-import { Container, Title } from '@mantine/core';
+import { Container, Title, SegmentedControl, Group } from '@mantine/core';
 import { ThemeProvider } from '../themes';
-// import { Button, Text, Stack, Divider, SegmentedControl, Group } from '@mantine/core';
+// import { Button, Text, Stack, Divider } from '@mantine/core';
 // import { useTheme } from '../themes';
 // import { StyledExample } from './styled-example';
 // import { StylingUtilsExample } from './styling-utils-example';
 // import { DebugStylesExample } from './debug-styles-example';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ThemeStyle } from '../themes/theme-config';
 
 // Import our new SCSS
@@ -16,16 +16,21 @@ interface PlaygroundContainerProps {
   setThemeStyle: (style: ThemeStyle) => void;
 }
 
-function PlaygroundContainer({ }: PlaygroundContainerProps) {
-  // Minimal setup - just container and title
+function PlaygroundContainer({ themeStyle, setThemeStyle }: PlaygroundContainerProps) {
+  // Apply theme class to body
+  useEffect(() => {
+    document.body.className = `theme-${themeStyle}`;
+  }, [themeStyle]);
+
+  // Now with theme switcher
   return (
     <Container size="lg" className="playground-container">
       <Title order={1} className="playground-title">
         Tanaka UI Playground
       </Title>
 
-      {/* Step 2: Theme switcher will go here */}
-      {/* <Group justify="center">
+      {/* Step 2: Theme switcher */}
+      <Group justify="center" className="theme-switcher-group">
         <SegmentedControl
           value={themeStyle}
           onChange={(value) => setThemeStyle(value as ThemeStyle)}
@@ -33,8 +38,9 @@ function PlaygroundContainer({ }: PlaygroundContainerProps) {
             { label: 'V3 Theme', value: ThemeStyle.V3 },
             { label: 'Cyberpunk', value: ThemeStyle.CYBERPUNK },
           ]}
+          className="theme-switcher"
         />
-      </Group> */}
+      </Group>
 
       {/* Step 3: Toggle button will go here */}
       {/* <Button onClick={toggleTheme}>
