@@ -4,32 +4,7 @@
 
 This document outlines a comprehensive plan to migrate the Tanaka extension's styling from duplicated CSS files to a modular SCSS architecture. The migration will reduce code duplication by 70-90%, improve maintainability, and enable proper BEM methodology while maintaining compatibility with Mantine's component system.
 
-## Current State Analysis
-
-### Duplication Metrics
-
-- **Lines of CSS**: ~500 per theme (v3 and cyberpunk)
-- **Duplicate selectors**: 100% between themes
-- **Shared patterns**: Utilities, animations, component structures
-- **Unique elements**: Only color values and some theme-specific effects
-
-### Pain Points
-
-1. Every utility class is duplicated with different theme prefixes
-2. Component changes must be made in multiple files
-3. No variable sharing for consistent spacing/sizing
-4. Manual BEM implementation without nesting support
-5. Difficult to add new themes without massive duplication
-
-## Goals
-
-1. **Reduce code duplication by >70%**
-2. **Maintain visual parity** with current themes
-3. **Enable easy theme addition** (future themes in <100 lines)
-4. **Improve build performance** and bundle size
-5. **Maintain Mantine compatibility** for component styling
-
-## Technical Architecture
+## Architecture Overview
 
 ### Folder Structure
 
@@ -118,94 +93,6 @@ The project has three distinct bundle entry points for different use cases:
 @use "extension/compact"; // Space-efficient layouts
 ```
 
-### Build Configuration
-
-#### Rspack/Webpack Configuration
-
-```javascript
-// rspack.config.js additions
-import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
-
-const isDev = process.env.NODE_ENV === 'development';
-
-{
-  module: {
-    rules: [
-      {
-        test: /\.scss$/,
-        use: [
-          isDev ? "style-loader" : MiniCssExtractPlugin.loader,
-          {
-            loader: "css-loader",
-            options: {
-              modules: {
-                auto: true,
-                localIdentName: isDev
-                  ? "[name]__[local]--[hash:base64:5]"
-                  : "[hash:base64:8]",
-              },
-              sourceMap: isDev,
-            },
-          },
-          {
-            loader: "postcss-loader",
-            options: {
-              postcssOptions: {
-                plugins: [
-                  "autoprefixer",
-                  "postcss-preset-env",
-                  !isDev && ["cssnano", { preset: "default" }],
-                ].filter(Boolean),
-              },
-              sourceMap: isDev,
-            },
-          },
-          {
-            loader: "sass-loader",
-            options: {
-              implementation: require("sass"),
-              sourceMap: isDev,
-              sassOptions: {
-                includePaths: ["src/playground/styles"],
-              },
-            },
-          },
-        ],
-      },
-    ],
-  },
-  plugins: [
-    !isDev && new MiniCssExtractPlugin({
-      filename: "[name].[contenthash].css",
-      chunkFilename: "[id].[contenthash].css",
-    }),
-  ].filter(Boolean),
-  optimization: {
-    minimizer: [
-      `...`, // Extend existing minimizers
-      new CssMinimizerPlugin(),
-    ],
-    splitChunks: {
-      cacheGroups: {
-        styles: {
-          name: "styles",
-          type: "css/mini-extract",
-          chunks: "all",
-          enforce: true,
-        },
-      },
-    },
-  },
-  devServer: {
-    hot: true,
-    liveReload: true,
-    watchFiles: ["src/**/*.scss"],
-  },
-  devtool: isDev ? "source-map" : false,
-}
-```
-
 ### SCSS Architecture Patterns
 
 #### Shared Foundation Files
@@ -222,17 +109,12 @@ $font-family-base: system-ui, -apple-system, sans-serif;
 
 // Spacing scale
 $spacing-scale: (
-  "xs": $base-spacing * 0.5,
-  // 4px
-  "sm": $base-spacing,
-  // 8px
-  "md": $base-spacing * 2,
-  // 16px
-  "lg": $base-spacing * 3,
-  // 24px
-  "xl": $base-spacing * 4,
-  // 32px
-  "xxl": $base-spacing * 6 // 48px,,,,,,,,,,,,,,
+  "xs": $base-spacing * 0.5,  // 4px
+  "sm": $base-spacing,        // 8px
+  "md": $base-spacing * 2,    // 16px
+  "lg": $base-spacing * 3,    // 24px
+  "xl": $base-spacing * 4,    // 32px
+  "xxl": $base-spacing * 6    // 48px
 );
 
 // Z-index scale
@@ -521,174 +403,242 @@ $cyberpunk-colors: (
 }
 ```
 
-## Migration Strategy - Incremental Approach
+## Migration Strategy
 
-### Phase 1: Foundation ✅
+### Phase 1: Foundation ✅ (COMPLETED)
 
-1. ✅ Set up build pipeline (COMPLETED)
-   - ✅ Install dependencies: `sass`, `sass-loader`, `postcss`, `autoprefixer`
-   - ✅ Configure Rspack for SCSS
-   - ✅ Set up source maps for debugging
-   - ✅ Configure PostCSS with modern CSS features
-   - ✅ Install and configure Stylelint for SCSS linting
-   - ✅ Test SCSS compilation successfully
+- ✅ Install dependencies: `sass`, `sass-loader`, `postcss`, `autoprefixer`
+- ✅ Configure Rspack for SCSS
+- ✅ Set up source maps for debugging
+- ✅ Configure PostCSS with modern CSS features
+- ✅ Install and configure Stylelint for SCSS linting
+- ✅ Test SCSS compilation successfully
 
-### Phase 2: Incremental Component Migration
+### Phase 2: Component Migration (IN PROGRESS)
 
-We'll migrate the playground app component by component, starting simple and building complexity.
+#### Completed Steps ✅
+- ✅ Minimal Playground Setup
+- ✅ Theme Switching (partial - see Outstanding Tasks)
+- ✅ StyledExample Component
+- ✅ StylingUtilsExample Component
+- ✅ DebugStylesExample Component
 
-**Benefits of Incremental Approach:**
-- Each step is small and testable
-- Can verify SCSS is working at each stage
-- Easier to identify and fix issues
-- Learn patterns that can be reused
-- Maintain a working application throughout migration
+#### Remaining Steps
+- [ ] Add Toggle Button
+- [ ] Add Dividers
+- [ ] Extract and organize common patterns
+- [ ] Apply to extension popup and settings
 
-#### Step 1: Minimal Playground Setup ✅
-- [x] Comment out all complex components in playground-app.tsx (We actually integrated them all)
-- [x] Start with just a simple container and title
-- [x] Create basic SCSS structure:
-  - `playground.scss` entry point
-  - `_variables.scss` for colors and spacing
-  - `_base.scss` for reset and typography
-- [x] Get it rendering with SCSS instead of CSS
-- [x] Verify hot reload works
+### Phase 3: Consolidation & Optimization (PENDING)
 
-#### Step 2: Add Theme Switching ✅
-- [x] Uncomment theme switcher (SegmentedControl)
-- [x] Implement theme variables in SCSS
-- [x] Create theme switching mechanism with CSS custom properties
-- [x] Migrate theme-specific styles from inline to SCSS
+- [ ] Extract common patterns into mixins
+- [ ] Consolidate duplicate styles
+- [ ] Create proper file organization
+- [ ] Remove unused styles
+- [ ] Minimize bundle size
+- [ ] Performance testing
 
-#### Step 3: Add Toggle Button
-- [ ] Uncomment the toggle button
-- [ ] Migrate button styles from inline to SCSS
-- [ ] Extract reusable button mixins
-- [ ] Add hover and active states
+### Phase 4: Production Rollout (PENDING)
 
-#### Step 4: Add Dividers
-- [ ] Uncomment divider components
-- [ ] Create divider styles in SCSS
-- [ ] Handle theme-specific divider colors
+- [ ] Apply patterns to popup
+- [ ] Migrate settings page styles
+- [ ] Remove all old CSS files
+- [ ] Update imports throughout codebase
+- [ ] Final testing
 
-#### Step 5: Add StyledExample Component ✅
-- [x] Uncomment StyledExample
-- [x] Analyze its CSS requirements
-- [x] Migrate its styles to SCSS (already existed in CSS)
-- [x] Extract any reusable patterns
+## Outstanding Tasks
 
-#### Step 6: Add StylingUtilsExample Component ✅
-- [x] Uncomment StylingUtilsExample
-- [x] Migrate its styles
-- [x] Create utility classes in SCSS (already existed)
-- [x] Ensure theme compatibility
+### Design System Foundation
+- [ ] Create `_tokens.scss` with maps for colors, spacing, radii, shadows
+- [ ] Implement `token($map, $key)` helper function for accessing design tokens
+- [ ] Set up CSS variables generation at build time for design tokens
+- [ ] Move spacing utilities into `_spacing.scss`
+- [ ] Extract shared keyframes to `_animations.scss`
 
-#### Step 7: Add DebugStylesExample Component ✅
-- [x] Uncomment DebugStylesExample (integrated into playground-app.tsx)
-- [x] Migrate debug-specific styles
-- [x] Complete the playground migration
+### Theme System
+- [ ] Replace DOM classList manipulation with CSS variables approach
+- [ ] Add validation for theme settings loaded from localStorage
+- [ ] Implement error handling for corrupted theme data
+- [ ] Create migration strategy for theme schema changes
+- [ ] Add memoization for theme-related calculations
+- [ ] Prevent unnecessary reflows during theme changes
+- [ ] Override CSS variables under `.theme-v3` and `.theme-cyberpunk` scopes
+- [ ] Implement theme inheritance and composition patterns
+- [ ] Use CSS custom properties for theming instead of class-based approach
+- [ ] Create centralized theme configuration with TypeScript validation
 
-### Phase 3: Extract and Organize
+### CSS Architecture
+- [ ] Adopt consistent CSS methodology (BEM or SMACSS)
+- [ ] Establish consistent naming convention across all styles
+- [ ] Eliminate theme-specific selectors that create tight coupling
+- [ ] Remove styles that depend on specific DOM structure
+- [ ] Extract common theme utilities into shared modules
+- [ ] Extract shared base styles from theme-specific styles
+- [ ] Implement proper style inheritance between themes
+- [ ] Remove duplicate selectors and properties across themes
 
-After all components work:
+### Component Patterns
+- [ ] Create gradient-bg mixin: `@mixin gradient-bg($start, $end)`
+- [ ] Convert custom-button and glowing-card to parameterized mixins
+- [ ] Refactor custom button styles to use parameterized mixin
+- [ ] Replace duplicated .custom-button rules with color-parameterized mixin
+- [ ] Ensure theme-agnostic component styles stay out of `themes/` directory
+- [ ] Build shared component library with documentation
+- [ ] Create proper folder structure with clear module boundaries
 
-1. **Refactor and DRY**
-   - Extract common patterns into mixins
-   - Consolidate duplicate styles
-   - Create proper file organization
+### Performance & Optimization
+- [ ] Add React.memo to components that receive theme props
+- [ ] Use useMemo for expensive theme calculations
+- [ ] Implement useCallback for theme-related event handlers
+- [ ] Add lazy loading for theme-specific assets
+- [ ] Memoize themedGradients and themedShadows calculations
+- [ ] Enable PurgeCSS on playground & webapp targets
+- [ ] Add code splitting and performance optimizations
 
-2. **Create Component Library Structure**
-   - Move component styles to dedicated files
-   - Create index files for easy imports
-   - Document component APIs
+### Build Pipeline
+- [ ] Enable CSS Modules only for component-scoped files
+- [ ] Keep global utilities in non-module path
+- [ ] Implement CSS modules or scoping strategy for playground styles
+- [ ] Replace global CSS imports with scoped alternatives
+- [ ] Add stylelint-order plugin for consistent property ordering
+- [ ] Add stylelint-scss plugin for SCSS-specific linting rules
 
-3. **Optimize**
-   - Remove unused styles
-   - Minimize bundle size
-   - Performance testing
+### Browser Compatibility
+- [ ] Replace color-mix CSS with proper color manipulation library
+- [ ] Add fallbacks for older browser support
+- [ ] Ensure Firefox compatibility for all color utilities
 
-### Phase 4: Apply to Extension
+### TypeScript Integration
+- [ ] Generate SCSS token JSON for importing into TypeScript
+- [ ] Create typed ThemeToken enum for autocomplete support
+- [ ] Replace Record<string, unknown> with proper typed interfaces
+- [ ] Add runtime validation for theme configurations
+- [ ] Implement type guards for theme-related types
+- [ ] Add type assertions where necessary
+- [ ] Define strict types for styles parameter in createDebugComponent
 
-1. **Popup Migration**
-   - Apply learned patterns to popup
-   - Use established mixins and utilities
+### Module Organization
+- [ ] Remove dynamic imports from styling-utils.ts themed function
+- [ ] Restructure modules to eliminate circular dependencies
+- [ ] Use proper ES6 imports instead of require() for tree-shaking
+- [ ] Consolidate utility helper files into single module
+- [ ] Split stylingUtils into separate modules by responsibility
+- [ ] Apply single responsibility principle to each utility module
+- [ ] Merge debug helpers into single debug module
+- [ ] Separate debug utilities from production code
+- [ ] Create clear dev/production utility separation
 
-2. **Settings Migration**
-   - Migrate settings page styles
-   - Ensure consistency with popup
+### Code Cleanup
+- [ ] Delete deprecated gradient/shadow helpers in styling-utils.ts
+- [ ] Delete deprecated gradients.* and shadows.* helpers
+- [ ] Delete deprecated helpers (already marked @deprecated)
+- [ ] Create single source of truth for gradients/shadows
+- [ ] Convert components.css and utilities.css to SCSS files
 
-3. **Cleanup**
-   - Remove all old CSS files
-   - Update imports throughout codebase
-   - Final testing
+### Isolation & Production
+- [ ] Prevent style leakage between playground and main extension
+- [ ] Ensure playground styles are isolated from production code
+- [ ] Separate playground/example code from production utilities
+- [ ] Migrate existing styles to new structure incrementally
+- [ ] Create migration checklist for each duplicated utility
 
-## Technical Considerations
+## Technical Details
 
-### Performance Optimizations
+### Build Configuration
 
-1. **CSS Modules** for component isolation
-2. **PurgeCSS** for removing unused utilities
-3. **CSS containment** for render performance
-4. **Critical CSS** extraction for initial load
+#### Rspack/Webpack Configuration
 
-### Browser Support
+```javascript
+// rspack.config.js additions
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 
-- Use `postcss-preset-env` for modern CSS features
-- Autoprefixer for vendor prefixes
-- CSS custom properties with fallbacks
+const isDev = process.env.NODE_ENV === 'development';
 
-### Development Experience
-
-#### VS Code Extensions (Recommended)
-
-1. **Stylelint** - Real-time SCSS linting
-
-   - Install: `dbaeumer.vscode-stylelint`
-   - Catches errors and enforces conventions
-
-2. **SCSS IntelliSense** - Autocomplete for variables/mixins
-
-   - Install: `mrmlnc.vscode-scss`
-   - Shows variable values on hover
-
-3. **SCSS Formatter** - Consistent code formatting
-
-   - Install: `sibiraj-s.vscode-scss-formatter`
-   - Formats on save
-
-4. **CSS Peek** - Navigate to style definitions
-   - Install: `pranaygp.vscode-css-peek`
-   - Ctrl+click to jump to CSS
-
-#### Stylelint Configuration
-
-```json
-// .stylelintrc.json
 {
-  "extends": ["stylelint-config-standard-scss"],
-  "rules": {
-    "scss/dollar-variable-pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
-    "scss/at-mixin-pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
-    "selector-class-pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*(__[a-z0-9]+(-[a-z0-9]+)*)?(--[a-z0-9]+(-[a-z0-9]+)*)?$",
-    "max-nesting-depth": 3
-  }
+  module: {
+    rules: [
+      {
+        test: /\.scss$/,
+        use: [
+          isDev ? "style-loader" : MiniCssExtractPlugin.loader,
+          {
+            loader: "css-loader",
+            options: {
+              modules: {
+                auto: true,
+                localIdentName: isDev
+                  ? "[name]__[local]--[hash:base64:5]"
+                  : "[hash:base64:8]",
+              },
+              sourceMap: isDev,
+            },
+          },
+          {
+            loader: "postcss-loader",
+            options: {
+              postcssOptions: {
+                plugins: [
+                  "autoprefixer",
+                  "postcss-preset-env",
+                  !isDev && ["cssnano", { preset: "default" }],
+                ].filter(Boolean),
+              },
+              sourceMap: isDev,
+            },
+          },
+          {
+            loader: "sass-loader",
+            options: {
+              implementation: require("sass"),
+              sourceMap: isDev,
+              sassOptions: {
+                includePaths: ["src/playground/styles"],
+              },
+            },
+          },
+        ],
+      },
+    ],
+  },
+  plugins: [
+    !isDev && new MiniCssExtractPlugin({
+      filename: "[name].[contenthash].css",
+      chunkFilename: "[id].[contenthash].css",
+    }),
+  ].filter(Boolean),
+  optimization: {
+    minimizer: [
+      `...`, // Extend existing minimizers
+      new CssMinimizerPlugin(),
+    ],
+    splitChunks: {
+      cacheGroups: {
+        styles: {
+          name: "styles",
+          type: "css/mini-extract",
+          chunks: "all",
+          enforce: true,
+        },
+      },
+    },
+  },
+  devServer: {
+    hot: true,
+    liveReload: true,
+    watchFiles: ["src/**/*.scss"],
+  },
+  devtool: isDev ? "source-map" : false,
 }
 ```
 
-#### Hot Reload & Source Maps
+### TypeScript Integration
 
-- **HMR**: Configured in devServer, style-loader handles automatically
-- **Source Maps**: Enabled in development for easy debugging
-- **Browser DevTools**: Shows original SCSS file locations
-
-## TypeScript Integration & Migration Strategy
-
-### Current TypeScript Utilities
+#### Current TypeScript Utilities
 
 The codebase includes extensive TypeScript styling utilities that need to remain functional:
 
 1. **styling-utils.ts** provides:
-
    - BEM class name generators (`cn.bem`, `cn.component`)
    - Gradient generators (linear, radial, themed)
    - Shadow generators (box, glow, layered)
@@ -701,11 +651,30 @@ The codebase includes extensive TypeScript styling utilities that need to remain
    - Theme-aware gradient functions
    - Styled component factory
 
-### Migration Approach for Existing Patterns
+#### SCSS-TypeScript Bridge
 
-#### Inline Styles in Components
+For utilities that need to work in both SCSS and TypeScript:
 
-Current code has many inline styles that need migration:
+```scss
+// _export-variables.scss
+:export {
+  primary-v3: #6366f1;
+  primary-cyberpunk: #ff006e;
+  spacing-unit: 8px;
+}
+```
+
+```typescript
+// Import in TypeScript
+import scssVars from "./styles/_export-variables.scss";
+
+// Use in styling utilities
+const primaryColor = scssVars["primary-v3"];
+```
+
+### Migration Patterns
+
+#### Inline Styles Migration
 
 ```tsx
 // Current pattern
@@ -734,12 +703,6 @@ Current code has many inline styles that need migration:
 
 #### Styled Components Migration
 
-For components using `createStyledComponent`:
-
-1. **Keep as-is** for highly dynamic styles that change based on props
-2. **Convert to SCSS classes** for static theme-based styles
-3. **Use CSS Modules** for component-specific isolated styles
-
 ```tsx
 // Keep this pattern for dynamic styling
 const DynamicButton = styled(Button)<{ intensity: number }>`
@@ -757,266 +720,36 @@ export const GradientButton = debugStyles.createStyledComponent(Button, 'Gradien
 }
 ```
 
-### SCSS-TypeScript Bridge
+## Supporting Documentation
 
-For utilities that need to work in both SCSS and TypeScript:
+### VS Code Extensions (Recommended)
 
-```scss
-// _export-variables.scss
-:export {
-  primary-v3: #6366f1;
-  primary-cyberpunk: #ff006e;
-  spacing-unit: 8px;
-}
-```
+1. **Stylelint** - Real-time SCSS linting
+   - Install: `dbaeumer.vscode-stylelint`
 
-```typescript
-// Import in TypeScript
-import scssVars from "./styles/_export-variables.scss";
+2. **SCSS IntelliSense** - Autocomplete for variables/mixins
+   - Install: `mrmlnc.vscode-scss`
 
-// Use in styling utilities
-const primaryColor = scssVars["primary-v3"];
-```
+3. **SCSS Formatter** - Consistent code formatting
+   - Install: `sibiraj-s.vscode-scss-formatter`
 
-### Migration of Current CSS Structure
+4. **CSS Peek** - Navigate to style definitions
+   - Install: `pranaygp.vscode-css-peek`
 
-#### Current Files to Migrate
-
-1. **Theme-specific files** (found in analysis):
-
-   - `v3/playground.css` → `themes/_v3.scss` (theme-specific parts)
-   - `v3/components.css` → `components/_buttons.scss`, `_cards.scss`
-   - `v3/utilities.css` → `_utilities.scss`
-   - `cyberpunk/*` → Similar structure
-
-2. **Shared files**:
-   - `hover-effects.css` → `_mixins.scss` (as mixins)
-
-#### Specific Patterns to Extract
-
-1. **Debug Mode Styles** (duplicated in both themes):
-
-   - Will be added to `_mixins.scss` as a mixin
-
-2. **Pulse Animation** (color differences only):
-
-   - Animation keyframe in `_shared.scss`
-   - Mixin in `_mixins.scss` with color parameter
-
-3. **Glass Morphism** (repeated pattern):
-   - Already included in `_mixins.scss` as a mixin
-
-### Import Strategy
-
-#### Current Import Pattern
-
-```typescript
-// playground-app.tsx currently imports:
-import "./styles/v3/playground.css";
-import "./styles/cyberpunk/playground.css";
-import "./styles/hover-effects.css";
-```
-
-#### New Import Pattern
-
-```typescript
-// For development/testing:
-import "./styles/playground.scss";
-
-// For webapp mode:
-import "./styles/webapp.scss";
-
-// For extension:
-import "./styles/extension.scss";
-```
-
-### Build Pipeline Updates
-
-#### Package Dependencies
+### Stylelint Configuration
 
 ```json
+// .stylelintrc.json
 {
-  "devDependencies": {
-    "sass": "^1.70.0",
-    "sass-loader": "^14.0.0",
-    "css-loader": "^6.9.0",
-    "style-loader": "^3.3.0",
-    "postcss": "^8.4.0",
-    "postcss-loader": "^8.0.0",
-    "postcss-preset-env": "^9.3.0",
-    "autoprefixer": "^10.4.0",
-    "stylelint": "^16.0.0",
-    "stylelint-config-standard-scss": "^13.0.0",
-    "typed-css-modules": "^0.7.0"
+  "extends": ["stylelint-config-standard-scss"],
+  "rules": {
+    "scss/dollar-variable-pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+    "scss/at-mixin-pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+    "selector-class-pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*(__[a-z0-9]+(-[a-z0-9]+)*)?(--[a-z0-9]+(-[a-z0-9]+)*)?$",
+    "max-nesting-depth": 3
   }
 }
 ```
-
-#### Type Generation for CSS Modules
-
-```bash
-# Generate TypeScript definitions for CSS modules
-pnpm run tcm src/playground/styles -p '**/*.module.scss'
-```
-
-## Testing Strategy
-
-### Visual Testing
-
-```javascript
-// tests/visual/themes.test.js
-describe("Theme Visual Tests", () => {
-  themes.forEach((theme) => {
-    it(`renders ${theme} theme correctly`, async () => {
-      await page.setTheme(theme);
-      await page.screenshot({ path: `./screenshots/${theme}.png` });
-      expect(await page.compareSnapshot()).toBeLessThan(0.01);
-    });
-  });
-});
-```
-
-### Unit Testing
-
-- Test mixin outputs
-- Verify CSS variable generation
-- Check utility class generation
-
-### Integration Testing
-
-- Theme switching functionality
-- Mantine component compatibility
-- Build process validation
-
-## Adding a New Theme
-
-Creating a new theme requires only defining colors and specific overrides:
-
-```scss
-// themes/_neon.scss
-@use "base" as base;
-@use "../mixins" as m;
-
-$neon-colors: (
-  "primary": #00ff88,
-  "primary-light": #33ffaa,
-  "primary-dark": #00cc66,
-  "secondary": #ff00ff,
-  "secondary-light": #ff33ff,
-  "secondary-dark": #cc00cc,
-  "background": #0a0a0a,
-  "surface": #1a1a1a,
-  "text": #ffffff,
-  "text-muted": rgba(255, 255, 255, 0.7),
-  "accent-green": #00ff00,
-  "accent-blue": #00ffff,
-);
-
-.theme-neon {
-  @include base.apply-theme($neon-colors);
-
-  // Theme-specific overrides
-  .custom-button {
-    @include m.glow-effect(var(--color-primary), 12px);
-    text-transform: uppercase;
-    letter-spacing: 2px;
-
-    &:hover {
-      @include m.glow-effect(var(--color-secondary), 16px);
-    }
-  }
-
-  .glowing-card {
-    @include m.glass-morphism(0.05, 20px);
-    border-color: var(--accent-green);
-  }
-}
-
-// Add to bundle entry points
-@use "themes/neon";
-```
-
-That's it! The new theme inherits all shared components and utilities automatically.
-
-## Theme-Specific Features to Preserve
-
-### V3 Theme Unique Elements
-
-1. **Purple gradient background**: `linear-gradient(135deg, #667eea 0%, #764ba2 100%)`
-2. **Glass morphism cards**: `backdrop-filter: blur(10px)` with white/opacity
-3. **Subtle shadows**: Soft shadows for depth
-4. **Gradient text effects**: `-webkit-background-clip: text`
-
-### Cyberpunk Theme Unique Elements
-
-1. **Animated grid background**: CSS grid pattern with keyframe animation
-2. **Neon glow effects**: Multiple box-shadows for neon appearance
-3. **Glitch animations**: Text distortion effects
-4. **Matrix-style gradients**: Dark backgrounds with bright neon accents
-5. **Animated pseudo-elements**: `::before` and `::after` for dynamic effects
-
-### Shared Features Needing Abstraction
-
-1. **Responsive padding**: Same breakpoints, different values
-2. **Debug mode overlays**: Identical functionality, different styling
-3. **Utility classes**: Same names, theme-scoped application
-4. **Hover transitions**: Same timing, different visual effects
-
-## Critical Migration Checkpoints
-
-### Pre-Migration Checklist
-
-- [ ] Backup all current CSS files
-- [ ] Document current class usage in components
-- [ ] Screenshot all current UI states
-- [ ] List all dynamic style dependencies
-- [ ] Verify TypeScript utility usage
-
-### Post-Migration Verification
-
-- [ ] All components render identically
-- [ ] Theme switching works without flicker
-- [ ] No console errors or warnings
-- [ ] Bundle size is reduced
-- [ ] Hot reload works for SCSS changes
-- [ ] TypeScript utilities still function
-- [ ] Dynamic styles work correctly
-
-## Rollback Plan
-
-If issues arise:
-
-1. **Keep old CSS files** during migration
-
-## Mantine Integration
-
-Mantine components will continue to work alongside SCSS styles:
-
-```scss
-// Mantine CSS variables are accessible in SCSS
-.custom-component {
-  color: var(--mantine-color-primary-6);
-
-  @include theme-variant("cyberpunk") {
-    color: var(--mantine-color-neonPink-6);
-  }
-}
-
-// Override Mantine components with SCSS
-.mantine-Button-root {
-  &.pulse-effect {
-    @include m.pulse-effect(var(--color-primary));
-  }
-}
-```
-
-## Next Steps
-
-1. Review and approve this plan
-2. Set up development branch
-3. Install dependencies
-4. Begin Phase 1 implementation
-5. Daily progress updates
 
 ---
 
