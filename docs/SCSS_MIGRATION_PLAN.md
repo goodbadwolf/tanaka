@@ -553,8 +553,12 @@ This ensures:
 6. **Colors Section** - `colors.scss`
 7. **PlaygroundApp** - `playground-app.scss`
 
+**Additional Components Migrated (Styles Props Removed):**
+8. **PlaygroundNav** - `playground-nav.scss` ✅
+9. **PlaygroundSearch** - `playground-search.scss` ✅
+10. **ThemeStyleSwitcher** - `theme-style-switcher.scss` ✅
+
 **Still TODO:**
-- [ ] Remove CSS-in-JS (styles/sx props) from PlaygroundNav, PlaygroundSearch, ThemeStyleSwitcher
 - [ ] Test in both light/dark modes thoroughly
 
 **Migration Pattern Used:**
