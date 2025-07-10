@@ -1,138 +1,57 @@
-import { Button, Container, Title, Text, Stack, Divider, SegmentedControl, Group } from '@mantine/core';
-import { ThemeProvider, useTheme } from '../themes';
-import { StyledExample } from './styled-example';
-import { StylingUtilsExample } from './styling-utils-example';
-import { DebugStylesExample } from './debug-styles-example';
-import { useState, useEffect } from 'react';
+import { Container, Title } from '@mantine/core';
+import { ThemeProvider } from '../themes';
+// import { Button, Text, Stack, Divider, SegmentedControl, Group } from '@mantine/core';
+// import { useTheme } from '../themes';
+// import { StyledExample } from './styled-example';
+// import { StylingUtilsExample } from './styling-utils-example';
+// import { DebugStylesExample } from './debug-styles-example';
+import { useState } from 'react';
 import { ThemeStyle } from '../themes/theme-config';
 
-// Import both theme styles
-import './styles/v3/playground.css';
-import './styles/cyberpunk/playground.css';
-import './styles/hover-effects.css';
+// Import our new SCSS
+import './styles/playground.scss';
 
 interface PlaygroundContainerProps {
   themeStyle: ThemeStyle;
   setThemeStyle: (style: ThemeStyle) => void;
 }
 
-function PlaygroundContainer({ themeStyle, setThemeStyle }: PlaygroundContainerProps) {
-  const { theme, toggleTheme } = useTheme();
-
-  // Apply theme class to body
-  useEffect(() => {
-    document.body.className = `theme-${themeStyle}`;
-  }, [themeStyle]);
-
+function PlaygroundContainer({ }: PlaygroundContainerProps) {
+  // Minimal setup - just container and title
   return (
-    <Container size="lg" className="playground-container" data-component="playground-container">
-      <Stack gap="xl">
-        <div className="text-center">
-          <Title
-            order={1}
-            style={{
-              color: 'white',
-              textShadow: themeStyle === ThemeStyle.CYBERPUNK
-                ? '0 0 20px var(--mantine-color-neonPink-5)'
-                : '2px 2px 4px rgba(0, 0, 0, 0.3)',
-              marginBottom: '1rem'
-            }}
-          >
-            Tanaka UI Playground
-          </Title>
-          <Text size="lg" c="white">
-            Mantine v8 - {themeStyle === ThemeStyle.V3 ? 'V3 Theme' : 'Cyberpunk Theme'}
-          </Text>
-        </div>
+    <Container size="lg" className="playground-container">
+      <Title order={1} className="playground-title">
+        Tanaka UI Playground
+      </Title>
 
-        <Group justify="center">
-          <SegmentedControl
-            value={themeStyle}
-            onChange={(value) => setThemeStyle(value as ThemeStyle)}
-            data={[
-              { label: 'V3 Theme', value: ThemeStyle.V3 },
-              { label: 'Cyberpunk', value: ThemeStyle.CYBERPUNK },
-            ]}
-            styles={{
-              root: {
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-              },
-            }}
-          />
-        </Group>
-
-        <Button
-          onClick={toggleTheme}
-          variant="white"
-          size="lg"
-          className="pulse-effect"
-          data-component="theme-toggle"
-          styles={{
-            root: {
-              backgroundColor: 'rgba(255, 255, 255, 0.9)',
-              color: '#764ba2',
-              fontWeight: 600,
-              backdropFilter: 'blur(10px)',
-              border: '2px solid rgba(255, 255, 255, 0.3)',
-              transition: 'all 0.3s ease',
-
-              '&:hover': {
-                backgroundColor: 'white',
-                transform: 'translateY(-2px)',
-                boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15)'
-              }
-            }
-          }}
-        >
-          Toggle {theme === 'light' ? 'Dark' : 'Light'} Mode
-        </Button>
-
-        <Divider
-          my="xl"
-          label="Styling Examples"
-          labelPosition="center"
-          color="rgba(255, 255, 255, 0.3)"
-          styles={{
-            label: {
-              color: 'white',
-              backgroundColor: 'transparent'
-            }
-          }}
+      {/* Step 2: Theme switcher will go here */}
+      {/* <Group justify="center">
+        <SegmentedControl
+          value={themeStyle}
+          onChange={(value) => setThemeStyle(value as ThemeStyle)}
+          data={[
+            { label: 'V3 Theme', value: ThemeStyle.V3 },
+            { label: 'Cyberpunk', value: ThemeStyle.CYBERPUNK },
+          ]}
         />
+      </Group> */}
 
-        <StyledExample />
+      {/* Step 3: Toggle button will go here */}
+      {/* <Button onClick={toggleTheme}>
+        Toggle {theme === 'light' ? 'Dark' : 'Light'} Mode
+      </Button> */}
 
-        <Divider
-          my="xl"
-          label="Styling Utilities"
-          labelPosition="center"
-          color="rgba(255, 255, 255, 0.3)"
-          styles={{
-            label: {
-              color: 'white',
-              backgroundColor: 'transparent'
-            }
-          }}
-        />
+      {/* Step 4: Dividers will go here */}
+      {/* <Divider my="xl" label="Styling Examples" /> */}
 
-        <StylingUtilsExample themeStyle={themeStyle} />
+      {/* Step 5: StyledExample will go here */}
+      {/* <StyledExample /> */}
 
-        <Divider
-          my="xl"
-          label="Debug Styles Utilities"
-          labelPosition="center"
-          color="rgba(255, 255, 255, 0.3)"
-          styles={{
-            label: {
-              color: 'white',
-              backgroundColor: 'transparent'
-            }
-          }}
-        />
+      {/* Step 6: StylingUtilsExample will go here */}
+      {/* <StylingUtilsExample themeStyle={themeStyle} /> */}
 
-        <DebugStylesExample />
-      </Stack>
+      {/* Step 7: DebugStylesExample will go here */}
+      {/* <DebugStylesExample /> */}
     </Container>
   );
 }

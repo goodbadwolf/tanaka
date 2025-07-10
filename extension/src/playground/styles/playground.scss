@@ -1,0 +1,21 @@
+// Playground SCSS entry point
+// This replaces the old CSS imports
+
+// Import base styles
+@use 'base' as *;
+@use 'variables' as *;
+
+// Playground container styles
+.playground-container {
+  min-height: 100vh;
+  padding: 2rem;
+  background: $background-gradient;
+}
+
+// Playground title
+.playground-title {
+  color: white;
+  text-align: center;
+  margin-bottom: 2rem;
+  text-shadow: $text-shadow-default;
+}
