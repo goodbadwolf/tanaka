@@ -19,7 +19,8 @@ extension/src/
 │   ├── _shared.scss             # Base styles and resets
 │   └── themes/
 │       ├── _base.scss           # Theme structure and mixins
-│       └── _twilight.scss       # Twilight theme CSS variables
+│       ├── _twilight.scss       # Twilight theme CSS variables
+│       └── _all.scss            # Theme orchestrator - applies themes based on attributes
 │
 ├── components/                  # Shared components (kebab-case)
 │   ├── button/
@@ -52,7 +53,7 @@ Each app imports only what it needs, no central bundles:
 #### Playground (Development Environment)
 ```scss
 // playground/playground.scss
-@use "../styles/themes/twilight";
+@use "../styles/themes/all";  // Imports all themes and applies based on data attribute
 @use "../styles/animations";
 // Import specific components as needed
 ```
@@ -60,14 +61,14 @@ Each app imports only what it needs, no central bundles:
 #### Popup (Lightweight)
 ```scss
 // popup/popup.scss (future)
-@use "../styles/themes/twilight";
+@use "../styles/themes/all";  // Even lightweight apps need theme
 // Minimal imports for performance
 ```
 
 #### Settings (Full Featured)
 ```scss
 // settings/settings.scss (future)
-@use "../styles/themes/twilight";
+@use "../styles/themes/all";
 @use "../styles/animations";
 // More components and features
 ```
@@ -455,28 +456,62 @@ src/
 
 **3.1 Implementation Tasks:**
 
-- [ ] Create `styles/_twilight-theme.scss` with CSS variable definitions
+- [ ] Create `styles/themes/_base.scss` with theme application mixin
+- [ ] Create `styles/themes/_twilight.scss` with theme variable definitions
+- [ ] Create `styles/themes/_all.scss` to orchestrate theme application
 - [ ] Define Mantine color scale overrides (primary, secondary, gray scales)
 - [ ] Create custom theme variables for gradients, shadows, and effects
-- [ ] Set up data attribute selector: `[data-theme-style="twilight"]`
+- [ ] Update playground/playground.scss to import themes/all
 - [ ] Update playground index.html to include theme attribute
-- [ ] Create theme initialization script to apply data attribute
+- [ ] Test theme application and CSS variable cascade
 
 **3.2 Theme Structure:**
+
 ```scss
-// _twilight-theme.scss
-[data-theme-style="twilight"] {
+// themes/_base.scss
+@mixin apply-theme($theme-map) {
+  @each $key, $value in $theme-map {
+    --#{$key}: #{$value};
+  }
+}
+
+// themes/_twilight.scss
+$twilight-theme: (
   // Mantine color overrides
-  --mantine-color-primary-0 through 9
-  --mantine-color-gray-0 through 9
+  "mantine-color-primary-0": #f5f3ff,
+  "mantine-color-primary-6": #7c3aed,
+  // ... all color scales
 
   // Custom theme variables
-  --twilight-gradient-primary
-  --twilight-gradient-secondary
-  --twilight-shadow-sm/md/lg
-  --twilight-glow-effect
+  "twilight-gradient-primary": linear-gradient(135deg, #6366f1, #8b5cf6),
+  "twilight-shadow-glow": 0 0 20px rgba(139, 92, 246, 0.3),
+);
+
+// themes/_all.scss - The orchestrator
+@use "base";
+@use "twilight";
+
+// Set default theme on root
+:root {
+  @include base.apply-theme(twilight.$twilight-theme);
 }
+
+// Apply theme based on data attribute
+[data-theme-style="twilight"] {
+  @include base.apply-theme(twilight.$twilight-theme);
+}
+
+// Future themes will be added here
+// [data-theme-style="midnight"] {
+//   @include base.apply-theme(midnight.$midnight-theme);
+// }
 ```
+
+This ensures:
+- Default theme is always applied to `:root`
+- Theme can be explicitly set via data attribute
+- All CSS variables are properly cascaded
+- Easy to add new themes later
 
 #### Step 3.5: Build Mantine Component Library
 
