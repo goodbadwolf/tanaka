@@ -4,6 +4,8 @@
 
 This document outlines a comprehensive plan to migrate the Tanaka extension's styling from duplicated CSS files to a modular SCSS architecture. The migration will reduce code duplication by 70-90%, improve maintainability, and enable proper BEM methodology while maintaining compatibility with Mantine's component system.
 
+**Theme Strategy**: The initial migration will implement a single theme called "twilight" (working name). Additional themes will be added in later stages once the core architecture is established.
+
 ## Architecture Overview
 
 ### SCSS Folder Structure
@@ -23,8 +25,7 @@ extension/src/styles/
 │
 ├── themes/
 │   ├── _base.scss              # Shared theme structure
-│   ├── _v3.scss                # V3 variables + component overrides
-│   └── _cyberpunk.scss         # Cyberpunk variables + overrides
+│   └── _twilight.scss          # Twilight theme variables + overrides
 │
 ├── webapp/
 │   ├── _navigation.scss         # Route navigation UI
@@ -54,8 +55,7 @@ The project has three distinct bundle entry points for different use cases:
 @use "components"; // via components/_index.scss (includes layout)
 
 @use "themes/base";
-@use "themes/v3";
-@use "themes/cyberpunk";
+@use "themes/twilight";
 ```
 
 #### 2. **webapp.scss** - Full Extension as Web Application
@@ -69,8 +69,7 @@ The project has three distinct bundle entry points for different use cases:
 @use "components";
 
 @use "themes/base";
-@use "themes/v3";
-@use "themes/cyberpunk";
+@use "themes/twilight";
 
 @use "webapp/navigation"; // Route navigation between pages
 @use "webapp/mock-ui"; // Visual indicators for mocked APIs
@@ -87,8 +86,7 @@ The project has three distinct bundle entry points for different use cases:
 @use "components";
 
 @use "themes/base";
-@use "themes/v3";
-@use "themes/cyberpunk";
+@use "themes/twilight";
 
 @use "extension/compact"; // Space-efficient layouts
 ```
@@ -263,7 +261,7 @@ h6 {
   background-clip: text;
 }
 
-// Theme variant helper
+// Theme variant helper (for future theme additions)
 @mixin theme-variant($theme-name) {
   .theme-#{$theme-name} & {
     @content;
@@ -341,10 +339,10 @@ h6 {
 #### Theme Implementation
 
 ```scss
-// themes/_v3.scss
+// themes/_twilight.scss
 @use "base" as base;
 
-$v3-colors: (
+$twilight-colors: (
   "primary": #6366f1,
   "primary-light": #818cf8,
   "primary-dark": #4f46e5,
@@ -355,42 +353,16 @@ $v3-colors: (
   "surface": #0f0f10,
   "text": #ffffff,
   "text-muted": rgba(255, 255, 255, 0.7),
+  "accent": #a78bfa,
+  "accent-dark": #7c3aed,
 );
 
-.theme-style-v3 {
-  @include base.apply-theme($v3-colors);
+.theme-style-twilight {
+  @include base.apply-theme($twilight-colors);
 
-  // V3-specific component overrides
+  // Twilight-specific component overrides
   .custom-button {
-    background: linear-gradient(45deg, #fc466b 0%, #3f5efb 100%);
-  }
-}
-
-// themes/_cyberpunk.scss
-@use "base" as base;
-
-$cyberpunk-colors: (
-  "primary": #ff006e,
-  "primary-light": #ff4494,
-  "primary-dark": #d6005a,
-  "secondary": #8338ec,
-  "secondary-light": #a364ff,
-  "secondary-dark": #6b1fd8,
-  "background": #0a0a0f,
-  "surface": #1a1a2e,
-  "text": #ffffff,
-  "text-muted": rgba(255, 255, 255, 0.7),
-  "neon-green": #39ff14,
-  "neon-blue": #00d4ff,
-);
-
-.theme-style-cyberpunk {
-  @include base.apply-theme($cyberpunk-colors);
-
-  // Cyberpunk-specific component overrides
-  .custom-button {
-    background: linear-gradient(45deg, var(--neon-pink), var(--neon-blue));
-    text-transform: uppercase;
+    background: linear-gradient(45deg, var(--color-primary), var(--color-secondary));
   }
 }
 
@@ -471,7 +443,7 @@ $cyberpunk-colors: (
 - [ ] Create migration strategy for theme schema changes
 - [ ] Add memoization for theme-related calculations
 - [ ] Prevent unnecessary reflows during theme changes
-- [ ] Override CSS variables under `.theme-style-v3` and `.theme-style-cyberpunk` scopes
+- [ ] Override CSS variables under `.theme-style-twilight` scope
 - [ ] Implement theme inheritance and composition patterns
 - [ ] Use CSS custom properties for theming instead of class-based approach
 - [ ] Create centralized theme configuration with TypeScript validation
@@ -677,8 +649,8 @@ For utilities that need to work in both SCSS and TypeScript:
 ```scss
 // _export-variables.scss
 :export {
-  primary-v3: #6366f1;
-  primary-cyberpunk: #ff006e;
+  primary-twilight: #6366f1;
+  secondary-twilight: #8b5cf6;
   spacing-unit: 8px;
 }
 ```
@@ -688,7 +660,7 @@ For utilities that need to work in both SCSS and TypeScript:
 import scssVars from "./styles/_export-variables.scss";
 
 // Use in styling utilities
-const primaryColor = scssVars["primary-v3"];
+const primaryColor = scssVars["primary-twilight"];
 ```
 
 ### Migration Patterns
@@ -699,23 +671,20 @@ const primaryColor = scssVars["primary-v3"];
 // Current pattern
 <Title
   style={{
-    textShadow: themeStyle === ThemeStyle.CYBERPUNK
-      ? '0 0 20px var(--mantine-color-neonPink-5)'
-      : '2px 2px 4px rgba(0, 0, 0, 0.3)',
+    textShadow: '2px 2px 4px rgba(0, 0, 0, 0.3)',
   }}
 >
 
 // Migration approach: Use CSS classes
-<Title className={cn.component('title', themeStyle)}>
+<Title className={cn.component('title')}>
 
 // In SCSS
 .tanaka-title {
-  @include theme-variant("v3") {
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-  }
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 
-  @include theme-variant("cyberpunk") {
-    text-shadow: 0 0 20px var(--mantine-color-neonPink-5);
+  // Future theme variant example
+  @include theme-variant("twilight") {
+    text-shadow: 0 0 10px var(--color-primary-light);
   }
 }
 ```

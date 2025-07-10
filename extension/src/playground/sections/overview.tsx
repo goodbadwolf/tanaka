@@ -103,13 +103,11 @@ import { PageHeader } from '../components/page-header';`}</Code>
               Apply theme classes:
             </Text>
             <Code block>{`// Theme-specific styles
-.theme-style-v3 & {
+.theme-style-twilight & {
   background: linear-gradient(135deg, #6366f1, #8b5cf6);
 }
 
-.theme-style-cyberpunk & {
-  background: linear-gradient(135deg, #ff006e, #8338ec);
-}`}</Code>
+// Additional themes will be added in future releases`}</Code>
           </div>
         </Stack>
       </div>
