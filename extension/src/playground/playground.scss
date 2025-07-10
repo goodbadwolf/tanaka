@@ -3,6 +3,9 @@
 @use "../styles/variables" as *;
 @use "../styles/animations" as *;
 
+// Import themes to include their CSS rules
+@import "../styles/themes/all";
+
 .playground {
   // Smooth transitions for theme switching
   &-container {

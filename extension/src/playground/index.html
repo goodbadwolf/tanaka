@@ -3,8 +3,38 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tanaka UI Playground</title>
+    <title>Tanaka Playground</title>
+    <!-- Theme based styles to prevent FOUC (Flash of Unstyled Content).
+     Must be inline to execute synchronously before first paint. -->
     <style>
+      /* Initial theme variables to prevent FOUC */
+      :root {
+        /* Default to twilight light mode if no theme or color scheme is set */
+        --color-background: #f8f9fa;
+        --color-surface: #ffffff;
+        --color-text: #1f2937;
+      }
+
+      :root[data-mantine-color-scheme='dark'] {
+        /* Override to twilight dark mode if color scheme is set to dark */
+        --color-background: #1a1b1e;
+        --color-surface: #0f0f10;
+        --color-text: #ffffff;
+      }
+
+      /* Neon theme overrides */
+      [data-theme-style='neon'],
+      [data-theme-style='neon'][data-mantine-color-scheme='dark'] {
+        --color-background: #ffff00;
+        --color-surface: #ff9900;
+        --color-text: #000000;
+      }
+
+      html {
+        transition: background-color 0.3s ease-in-out;
+        background-color: var(--color-background, #1a1b1e);
+      }
+
       /* Initial state - hidden to prevent flash */
       body {
         opacity: 0;
@@ -16,25 +46,11 @@
         opacity: 1;
       }
 
-      /* Theme-specific backgrounds with smooth transitions */
-      html {
-        transition: background-color 0.3s ease-in-out;
-      }
-
-      html[data-mantine-color-scheme='dark'] {
-        background-color: #1a1b1e;
-      }
-
-      html[data-mantine-color-scheme='light'] {
-        background-color: #fff;
-      }
-
       /* Prevent layout shift during load */
       #root {
         min-height: 100vh;
       }
     </style>
-    <!-- Theme initialization script to prevent FOUC (Flash of Unstyled Content). Must be inline to execute synchronously before first paint. -->
     <script>
       (() => {
         try {
@@ -43,7 +59,12 @@
             return;
           }
           const DATA_ATTR_KEY = 'data-mantine-color-scheme';
+          const THEME_STYLE_KEY = 'data-theme-style';
           const mantineColorScheme = localStorage.getItem('mantine-color-scheme-value');
+
+          // Set theme style from localStorage or default to twilight
+          const savedThemeStyle = localStorage.getItem('tanaka-theme-style') || 'twilight';
+          document.documentElement.setAttribute(THEME_STYLE_KEY, savedThemeStyle);
 
           const validSchemes = ['light', 'dark', 'auto'];
           if (mantineColorScheme && validSchemes.includes(mantineColorScheme)) {

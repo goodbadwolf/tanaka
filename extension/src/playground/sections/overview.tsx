@@ -1,5 +1,6 @@
 import { Alert, Card, Code, Grid, List, Stack, Text, Title } from '@mantine/core';
 import { IconBrandGithub, IconInfoCircle, IconRocket } from '@tabler/icons-preact';
+import { ThemeTest } from '../components/ThemeTest';
 
 export function OverviewSection() {
   return (
@@ -111,6 +112,8 @@ import { PageHeader } from '../components/page-header';`}</Code>
           </div>
         </Stack>
       </div>
+
+      <ThemeTest />
     </Stack>
   );
 }

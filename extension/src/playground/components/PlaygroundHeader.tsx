@@ -1,6 +1,7 @@
 import { Box, Group, Text, Title, useMantineColorScheme } from '@mantine/core';
 import { IconPalette } from '@tabler/icons-preact';
 import { ThemeToggle } from '../../components/theme-toggle';
+import { ThemeStyleSwitcher } from './ThemeStyleSwitcher';
 
 export function PlaygroundHeader() {
   const { colorScheme } = useMantineColorScheme();
@@ -32,7 +33,10 @@ export function PlaygroundHeader() {
             </Text>
           </div>
         </Group>
-        <ThemeToggle />
+        <Group gap="md">
+          <ThemeStyleSwitcher />
+          <ThemeToggle />
+        </Group>
       </Group>
     </Box>
   );

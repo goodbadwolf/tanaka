@@ -1,0 +1,39 @@
+// Base theme application mixin
+// This mixin takes a theme map and applies all values as CSS custom properties
+
+@use "sass:map";
+
+@mixin apply-theme($theme-map) {
+  // Apply each key-value pair as a CSS custom property
+  @each $key, $value in $theme-map {
+    --#{$key}: #{$value};
+  }
+}
+
+// Helper mixin to generate Mantine color scales
+@mixin generate-color-scale($name, $colors) {
+  @for $i from 0 through 9 {
+    @if map.has-key($colors, $i) {
+      --mantine-color-#{$name}-#{$i}: #{map.get($colors, $i)};
+    }
+  }
+}
+
+// Helper mixin for component-specific theme variables
+@mixin apply-component-themes($theme-map) {
+  // Extract theme colors for component use
+  @if map.has-key($theme-map, "color-primary") {
+    --button-bg: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+    --button-hover-bg: linear-gradient(135deg, var(--color-primary-dark), var(--color-secondary-dark));
+  }
+
+  @if map.has-key($theme-map, "color-surface") {
+    --card-bg: var(--color-surface);
+    --card-border: rgba(255, 255, 255, 0.1);
+  }
+
+  @if map.has-key($theme-map, "color-primary-light") {
+    --glow-color: var(--color-primary-light);
+    --focus-ring: 0 0 0 2px var(--color-primary-light);
+  }
+}
