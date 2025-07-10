@@ -1,7 +1,7 @@
 import { Box, Group, Text, Title } from '@mantine/core';
 import { IconPalette } from '@tabler/icons-preact';
-import { ThemeToggle } from '../../components/theme-toggle';
-import { ThemeStyleSwitcher } from './ThemeStyleSwitcher';
+import { ThemeToggle } from '../../../components/theme-toggle';
+import { ThemeStyleSwitcher } from '../theme-style-switcher';
 import './playground-header.scss';
 
 export function PlaygroundHeader() {

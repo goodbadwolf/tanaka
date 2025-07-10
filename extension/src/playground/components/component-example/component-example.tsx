@@ -1,7 +1,8 @@
 import { ActionIcon, Code, Collapse, Group, Paper, Stack, Text, Tooltip } from '@mantine/core';
 import { IconCode, IconCopy } from '@tabler/icons-preact';
 import { useState } from 'react';
-import type { ComponentExample as ComponentExampleType } from '../types';
+import type { ComponentExample as ComponentExampleType } from '../../types';
+import './component-example.scss';
 
 interface ComponentExampleProps {
   example: ComponentExampleType;

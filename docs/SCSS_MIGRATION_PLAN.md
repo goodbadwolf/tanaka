@@ -561,6 +561,14 @@ This ensures:
 **Still TODO:**
 - [ ] Test in both light/dark modes thoroughly
 
+**Component Structure Fix (Additional work completed):**
+- [x] Reorganized all playground components from flat structure to folder structure ✅
+- [x] Created kebab-case folders for each component ✅
+- [x] Moved component files into their respective folders ✅
+- [x] Created missing SCSS files for ComponentExample and PlaygroundSection ✅
+- [x] Added index.ts barrel exports per user preference (deviation from original plan) ✅
+- [x] Updated all import statements to use new paths ✅
+
 **Migration Pattern Used:**
 ```scss
 // Before (inline styles)
@@ -661,7 +669,7 @@ This cleanup is critical before proceeding with Phase 3, as it will establish th
 - Use BEM naming: `.tanaka-button`, `.tanaka-button__icon`, `.tanaka-button--primary`
 - Reference only CSS variables, no hardcoded colors
 - No inline styles or CSS-in-JS
-- Export from component file directly (no index.ts barrel exports)
+- Export from component file directly (no index.ts barrel exports) *[Updated per user preference: index.ts files added for easier imports]*
 
 **Example Component Structure:**
 ```tsx

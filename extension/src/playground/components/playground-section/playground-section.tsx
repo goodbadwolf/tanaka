@@ -1,6 +1,7 @@
 import { Stack, Text, Title } from '@mantine/core';
-import { ComponentExample } from './ComponentExample';
-import type { PlaygroundSection as PlaygroundSectionType } from '../types';
+import { ComponentExample } from '../component-example';
+import type { PlaygroundSection as PlaygroundSectionType } from '../../types';
+import './playground-section.scss';
 
 interface PlaygroundSectionProps {
   section: PlaygroundSectionType;

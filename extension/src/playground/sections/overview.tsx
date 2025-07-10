@@ -1,6 +1,6 @@
 import { Alert, Card, Code, Grid, List, Stack, Text, Title } from '@mantine/core';
 import { IconBrandGithub, IconInfoCircle, IconRocket } from '@tabler/icons-preact';
-import { ThemeTest } from '../components/ThemeTest';
+import { ThemeTest } from '../components/theme-test';
 import './overview.scss';
 
 export function OverviewSection() {
