@@ -1,0 +1,30 @@
+// Colors Section styles
+.tanaka-colors {
+  &__swatch {
+    height: 80px;
+    margin-bottom: var(--mantine-spacing-md);
+    border-radius: var(--mantine-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    // Background color is dynamic
+  }
+
+  &__gradient-demo {
+    width: 100px;
+    height: 50px;
+    border-radius: var(--mantine-radius-sm);
+
+    &--primary {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    }
+
+    &--vibrant {
+      background: linear-gradient(135deg, #ff006e, #8338ec);
+    }
+
+    &--purple {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+  }
+}

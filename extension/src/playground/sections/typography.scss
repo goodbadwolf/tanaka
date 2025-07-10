@@ -1,0 +1,32 @@
+// Typography Section styles
+.tanaka-typography {
+  &__system-font {
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: var(--mantine-font-size-lg);
+  }
+
+  &__heading-demo {
+    margin: 0;
+    // Font size, line height, and weight will be set inline as they're dynamic
+  }
+
+  &__flex-box {
+    flex: 1;
+  }
+
+  &__meta-stack {
+    min-width: 200px;
+  }
+
+  &__text-meta-stack {
+    min-width: 280px;
+  }
+
+  &__gradient-text {
+    background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+  }
+}

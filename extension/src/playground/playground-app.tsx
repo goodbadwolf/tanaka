@@ -1,4 +1,4 @@
-import { AppShell, Box, Burger, ScrollArea, useMantineColorScheme } from '@mantine/core';
+import { AppShell, Box, Burger, ScrollArea } from '@mantine/core';
 import '@mantine/core/styles.css';
 import { useDisclosure } from '@mantine/hooks';
 import { useState } from 'react';
@@ -9,6 +9,7 @@ import { PlaygroundNav } from './components/PlaygroundNav';
 import { PlaygroundSearch } from './components/PlaygroundSearch';
 import { PlaygroundSection } from './components/PlaygroundSection';
 import './playground.scss';
+import './playground-app.scss';
 import { buttonsSection, inputsSection, selectionSection } from './sections';
 import { ColorsSection } from './sections/colors';
 import { OverviewSection } from './sections/overview';
@@ -16,8 +17,6 @@ import { SpacingSection } from './sections/spacing';
 import { TypographySection } from './sections/typography';
 
 function PlaygroundContainer() {
-  const { colorScheme } = useMantineColorScheme();
-  const dark = colorScheme === 'dark';
   const [opened, { toggle }] = useDisclosure();
   const [activeSection, setActiveSection] = useState('overview');
   const [searchQuery, setSearchQuery] = useState('');
@@ -48,13 +47,13 @@ function PlaygroundContainer() {
           return (
             <Box>
               {filtered.length === 0 ? (
-                <Box ta="center" py="xl" c="dimmed">
+                <Box className="tanaka-playground-app__empty-state">
                   No components found matching "{searchQuery}"
                 </Box>
               ) : (
                 <Box>
                   {filtered.map((example) => (
-                    <Box key={example.id} mb="xl">
+                    <Box key={example.id} className="tanaka-playground-app__component-wrapper">
                       <ComponentExample example={example} />
                     </Box>
                   ))}
@@ -67,7 +66,7 @@ function PlaygroundContainer() {
         return (
           <Box>
             {[buttonsSection, inputsSection, selectionSection].map((section) => (
-              <Box key={section.id} mb="xxl">
+              <Box key={section.id} className="tanaka-playground-app__section-wrapper">
                 <PlaygroundSection section={section} />
               </Box>
             ))}
@@ -97,9 +96,9 @@ function PlaygroundContainer() {
       padding={0}
     >
       <AppShell.Header>
-        <Box h="100%" style={{ display: 'flex', alignItems: 'center' }}>
+        <Box className="tanaka-playground-app__header-wrapper">
           <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" ml="md" />
-          <Box style={{ flex: 1 }}>
+          <Box className="tanaka-playground-app__header-content">
             <PlaygroundHeader />
           </Box>
         </Box>
@@ -107,10 +106,7 @@ function PlaygroundContainer() {
 
       <AppShell.Navbar
         p="md"
-        style={{
-          backgroundColor: dark ? '#1a1b1e' : '#f8f9fa',
-          borderRight: `1px solid ${dark ? '#373A40' : '#dee2e6'}`,
-        }}
+        className="tanaka-playground-app__navbar"
       >
         <AppShell.Section>
           {activeSection === 'components' && (

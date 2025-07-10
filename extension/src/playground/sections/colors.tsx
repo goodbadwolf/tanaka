@@ -1,5 +1,6 @@
 import { Box, Card, Code, Grid, Group, Stack, Text, Title } from '@mantine/core';
 import { useMantineTheme } from '@mantine/core';
+import './colors.scss';
 
 interface ColorCardProps {
   name: string;
@@ -13,14 +14,9 @@ function ColorCard({ name, color, description }: ColorCardProps) {
   return (
     <Card shadow="sm" radius="md" withBorder>
       <Box
+        className="tanaka-colors__swatch"
         style={{
           backgroundColor: color,
-          height: 80,
-          marginBottom: 12,
-          borderRadius: 'var(--mantine-radius-sm)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
         }}
       >
         <Text size="xs" c={textColor} fw={500}>
@@ -196,30 +192,9 @@ export function ColorsSection() {
               Gradients
             </Text>
             <Group>
-              <Box
-                style={{
-                  width: 100,
-                  height: 50,
-                  borderRadius: 'var(--mantine-radius-sm)',
-                  background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-                }}
-              />
-              <Box
-                style={{
-                  width: 100,
-                  height: 50,
-                  borderRadius: 'var(--mantine-radius-sm)',
-                  background: 'linear-gradient(135deg, #ff006e, #8338ec)',
-                }}
-              />
-              <Box
-                style={{
-                  width: 100,
-                  height: 50,
-                  borderRadius: 'var(--mantine-radius-sm)',
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                }}
-              />
+              <Box className="tanaka-colors__gradient-demo tanaka-colors__gradient-demo--primary" />
+              <Box className="tanaka-colors__gradient-demo tanaka-colors__gradient-demo--vibrant" />
+              <Box className="tanaka-colors__gradient-demo tanaka-colors__gradient-demo--purple" />
             </Group>
           </Card>
         </Stack>
