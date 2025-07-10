@@ -65,7 +65,7 @@ playground/
 
 ### 🎨 Theme Support
 - Components adapt to theme changes
-- V3 and Cyberpunk theme styles
+- Twilight theme (additional themes coming soon)
 - Dark/light mode support
 - Live theme switching
 

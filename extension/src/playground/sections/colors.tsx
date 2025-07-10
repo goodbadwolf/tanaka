@@ -80,13 +80,13 @@ export function ColorsSection() {
     'gray-900': theme.colors.gray[9],
   };
 
-  const cyberpunkColors = {
-    'neon-pink': '#ff006e',
-    'neon-blue': '#00d4ff',
-    'neon-green': '#39ff14',
-    'neon-purple': '#8338ec',
-    'dark-bg': '#0a0a0f',
-    'dark-surface': '#1a1a2e',
+  const accentColors = {
+    'accent': '#a78bfa',
+    'accent-light': '#c4b5fd',
+    'accent-dark': '#7c3aed',
+    'highlight': '#ddd6fe',
+    'muted': 'rgba(255, 255, 255, 0.7)',
+    'surface-light': '#1f1f23',
   };
 
   return (
@@ -145,12 +145,12 @@ export function ColorsSection() {
 
       <div>
         <Title order={2} mb="md">
-          Cyberpunk Theme Colors
+          Accent Colors
         </Title>
         <Grid>
-          {Object.entries(cyberpunkColors).map(([name, color]) => (
+          {Object.entries(accentColors).map(([name, color]) => (
             <Grid.Col key={name} span={{ base: 6, sm: 4, md: 3 }}>
-              <ColorCard name={name} color={color} description="Cyberpunk theme" />
+              <ColorCard name={name} color={color} description="Twilight theme accents" />
             </Grid.Col>
           ))}
         </Grid>
