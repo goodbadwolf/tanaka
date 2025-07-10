@@ -408,7 +408,141 @@ $twilight-colors: (
 - [ ] Extract and organize common patterns
 - [ ] Apply to extension popup and settings
 
-### Phase 3: Consolidation & Optimization (PENDING)
+### Phase 2.5: Styling Architecture Cleanup (CRITICAL - NEXT PRIORITY)
+
+The current codebase has a jumbled mix of styling approaches:
+- SCSS files with imports and mixins
+- Plain CSS files
+- CSS Modules (in deprecated folder)
+- Inline styles
+- CSS-in-JS (Mantine styles prop)
+- Utility functions generating styles
+
+This phase will establish a clean, consistent styling architecture using **SCSS + Mantine CSS Variables**.
+
+#### Step 1: Audit and Document Current State
+
+- [ ] Create comprehensive list of all styling approaches currently in use
+- [ ] Document which components use which styling method
+- [ ] Identify style duplication across different systems
+- [ ] Map all hardcoded colors/values that should use theme tokens
+- [ ] List all deprecated components still being imported
+
+#### Step 2: Establish New Architecture Principles
+
+**Core Principles:**
+1. **Mantine components** - Use built-in props only (no styles/sx props)
+2. **Custom components** - Use SCSS files with BEM methodology
+3. **Theme values** - Reference Mantine CSS variables exclusively
+4. **No inline styles** - All styles in SCSS files
+5. **No CSS-in-JS** - Remove all runtime style generation
+
+**File Structure:**
+```
+styles/
+├── _mantine-overrides.scss  # Override Mantine component styles
+├── _twilight-theme.scss     # Theme-specific CSS variables
+├── components/              # Component-specific SCSS
+│   ├── _index.scss         # Barrel export
+│   └── [component].scss    # One file per component
+└── main.scss               # Main entry point
+```
+
+#### Step 3: Create Twilight Theme with CSS Variables
+
+- [ ] Create `_twilight-theme.scss` with theme-specific CSS variable overrides
+- [ ] Define custom CSS variables for theme-specific values (gradients, shadows)
+- [ ] Set up data attribute selector: `[data-theme-style="twilight"]`
+- [ ] Map all Mantine color scales to twilight palette
+- [ ] Create theme-specific component overrides using CSS variables
+
+Example structure:
+```scss
+// _twilight-theme.scss
+[data-theme-style="twilight"] {
+  // Override Mantine's CSS variables
+  --mantine-color-primary-0: #f5f3ff;
+  --mantine-color-primary-6: #7c3aed;
+
+  // Custom theme variables
+  --twilight-gradient-primary: linear-gradient(135deg, #6366f1, #8b5cf6);
+  --twilight-shadow-glow: 0 0 20px rgba(139, 92, 246, 0.3);
+}
+```
+
+#### Step 4: Migrate Components to New System
+
+**For each component:**
+
+- [ ] Remove all inline styles
+- [ ] Remove CSS-in-JS (styles/sx props)
+- [ ] Create dedicated SCSS file using BEM methodology
+- [ ] Replace hardcoded values with CSS variables
+- [ ] Use Mantine's built-in props for variants/sizes
+- [ ] Test in both light/dark modes
+
+**Migration Example:**
+```scss
+// Before (inline styles + CSS-in-JS)
+<Box style={{ padding: 16, background: '#6366f1' }} />
+
+// After (SCSS + CSS variables)
+<Box className="custom-box" />
+
+// custom-box.scss
+.custom-box {
+  padding: var(--mantine-spacing-md);
+  background: var(--mantine-color-primary-6);
+}
+```
+
+#### Step 5: Update Component Library
+
+- [ ] Migrate deprecated components to new SCSS system
+- [ ] Remove CSS Modules from deprecated components
+- [ ] Update imports throughout codebase
+- [ ] Ensure consistent component API
+- [ ] Add Storybook-like documentation in playground
+
+#### Step 6: Consolidate Styling Utilities
+
+- [ ] Remove `styling-utils.ts` programmatic style generation
+- [ ] Convert useful utilities to SCSS mixins
+- [ ] Delete redundant gradient/shadow definitions
+- [ ] Create single source of truth for each style pattern
+- [ ] Document when to use mixins vs CSS variables
+
+#### Step 7: Optimize Bundle Size
+
+- [ ] Remove all unused CSS/SCSS files
+- [ ] Set up PurgeCSS for production builds
+- [ ] Eliminate duplicate style definitions
+- [ ] Tree-shake Mantine components not in use
+- [ ] Measure before/after bundle sizes
+
+#### Step 8: Documentation and Guidelines
+
+- [ ] Create comprehensive styling guide
+- [ ] Document CSS variable naming conventions
+- [ ] Provide migration examples for common patterns
+- [ ] Set up linting rules for style consistency
+- [ ] Create component styling template
+
+#### Success Criteria
+
+- ✅ Zero inline styles in components
+- ✅ No CSS-in-JS usage
+- ✅ All colors/spacing use CSS variables
+- ✅ Consistent BEM methodology
+- ✅ Single styling approach per component
+- ✅ Theme switches without flicker
+- ✅ Reduced bundle size by 30%+
+
+#### Estimated Timeline: 2-3 days
+
+This cleanup is critical before proceeding with Phase 3, as it will establish the foundation for all future component development.
+
+### Phase 3: Consolidation & Optimization (PENDING - After Phase 2.5)
 
 - [ ] Extract common patterns into mixins
 - [ ] Consolidate duplicate styles
