@@ -7,14 +7,6 @@ export enum ThemeStyle {
 
 export type ThemeColorScheme = MantineColorScheme;
 
-export const defaultThemeStyle = ThemeStyle.TWILIGHT;
-export const defaultThemeColorScheme: ThemeColorScheme = 'light';
-
-export interface ThemeSettings {
-  style?: ThemeStyle;
-  colorScheme?: ThemeColorScheme;
-}
-
 export function getThemeConfig(style?: ThemeStyle): MantineThemeOverride {
   if (style === ThemeStyle.TWILIGHT) {
     return twilightTheme;

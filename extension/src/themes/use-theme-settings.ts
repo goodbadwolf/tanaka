@@ -1,26 +1,58 @@
-// A hook that returns the theme settings and a function to set them
-// Theme settings are stored in the browser's local storage
+import { useMantineColorScheme } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
-import { defaultThemeColorScheme, defaultThemeStyle, ThemeSettings } from './theme-config';
+import { ThemeColorScheme, ThemeStyle } from './theme-config';
 
-const STORAGE_KEY = 'tanaka-theme-settings';
+const THEME_STYLE_STORAGE_KEY = 'tanaka-theme-style';
+const COLOR_SCHEME_STORAGE_KEY = 'tanaka-theme-color-scheme';
 
-/**
- * Hook to persist theme settings in local storage.
- * @returns Tuple of [themeSettings, setThemeSettings]
- */
-export function useThemeSettings(
-  defaultSettings?: ThemeSettings,
-): [ThemeSettings, (settings: ThemeSettings) => void] {
-  const computedDefaultSettings = {
-    style: defaultSettings?.style ?? defaultThemeStyle,
-    colorScheme: defaultSettings?.colorScheme ?? defaultThemeColorScheme,
-  };
+export function useThemeStyle(
+  defaultStyle?: ThemeStyle,
+): [ThemeStyle, (style: ThemeStyle) => void] {
+  const computedDefaultStyle = defaultStyle ?? ThemeStyle.TWILIGHT;
 
-  const [storedSettings, setStoredSettings] = useLocalStorage<ThemeSettings>({
-    key: STORAGE_KEY,
-    defaultValue: computedDefaultSettings,
+  const [storedStyle, setStoredStyle] = useLocalStorage<ThemeStyle>({
+    key: THEME_STYLE_STORAGE_KEY,
+    defaultValue: computedDefaultStyle,
   });
 
-  return [storedSettings, setStoredSettings];
+  return [storedStyle, setStoredStyle];
+}
+
+export function useThemeColorScheme(): {
+  colorScheme: ThemeColorScheme;
+  setColorScheme: (value: ThemeColorScheme) => void;
+  clearColorScheme: () => void;
+  toggleColorScheme: () => void;
+} {
+  const { colorScheme, setColorScheme, clearColorScheme, toggleColorScheme } =
+    useMantineColorScheme();
+
+  const [storedColorScheme, setStoredColorScheme, resetStoredColorScheme] =
+    useLocalStorage<ThemeColorScheme>({
+      key: COLOR_SCHEME_STORAGE_KEY,
+      defaultValue: colorScheme,
+    });
+
+  const customSetColorScheme = (newColorScheme: ThemeColorScheme) => {
+    setStoredColorScheme(newColorScheme);
+    setColorScheme(newColorScheme);
+  };
+
+  const customClearColorScheme = () => {
+    clearColorScheme();
+    resetStoredColorScheme();
+  };
+
+  const customToggleColorScheme = () => {
+    toggleColorScheme();
+    const toggledColorScheme = colorScheme === 'light' ? 'dark' : 'light';
+    setStoredColorScheme(toggledColorScheme);
+  };
+
+  return {
+    colorScheme: storedColorScheme,
+    setColorScheme: customSetColorScheme,
+    clearColorScheme: customClearColorScheme,
+    toggleColorScheme: customToggleColorScheme,
+  };
 }

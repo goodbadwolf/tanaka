@@ -1,5 +1,6 @@
-import { ActionIcon, Tooltip, useMantineColorScheme } from '@mantine/core';
-import { IconSun, IconMoon } from '@tabler/icons-preact';
+import { ActionIcon, Tooltip } from '@mantine/core';
+import { IconMoon, IconSun } from '@tabler/icons-preact';
+import { useThemeColorScheme } from '../../themes';
 import './theme-toggle.scss';
 
 interface IThemeToggleProps {
@@ -11,7 +12,7 @@ interface IThemeToggleProps {
 
 export function ThemeToggle(props: IThemeToggleProps) {
   const { size = 'lg', variant = 'filled', showTooltip = true, className = '' } = props;
-  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+  const { colorScheme, toggleColorScheme } = useThemeColorScheme();
   const isDark = colorScheme === 'dark';
 
   const button = (

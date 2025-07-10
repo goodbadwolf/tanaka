@@ -1,8 +1,4 @@
+export { ThemeStyle } from './theme-config';
 export { twilightTheme } from './twilight';
-export {
-  defaultThemeColorScheme,
-  defaultThemeStyle,
-  type ThemeSettings,
-  ThemeStyle,
-} from './theme-config';
-export { useThemeSettings } from './use-theme-settings';
+export { useThemeColorScheme, useThemeStyle } from './use-theme-settings';
+export { ThemeProvider } from './theme-provider';

@@ -22,7 +22,6 @@ import {
   Kbd,
   List,
   Loader,
-  MantineProvider,
   Mark,
   Menu,
   MultiSelect,
@@ -68,6 +67,7 @@ import {
 } from '@tabler/icons-preact';
 import { useState } from 'react';
 import { PageHeader } from '../components';
+import { ThemeProvider } from '../themes';
 import './playground.scss';
 
 function PlaygroundContainer() {
@@ -863,7 +863,7 @@ function PlaygroundContainer() {
 }
 
 export const PlaygroundApp = () => (
-  <MantineProvider defaultColorScheme="light">
+  <ThemeProvider>
     <PlaygroundContainer />
-  </MantineProvider>
+  </ThemeProvider>
 );
