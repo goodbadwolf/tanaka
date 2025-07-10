@@ -1,6 +1,7 @@
 import { MantineProvider } from '@mantine/core';
-import type { ReactNode } from 'react';
+import type { ComponentType, ReactNode } from 'react';
 import { useState } from 'react';
+import { setWrappedDisplayName } from '../utils/hoc-utils';
 import { collapseColorScheme, getThemeConfig, ThemeColorScheme, ThemeStyle } from './theme-config';
 
 interface IThemeProviderProps {
@@ -22,4 +23,16 @@ export function ThemeProvider(props: IThemeProviderProps) {
       {children}
     </MantineProvider>
   );
+}
+
+export function withThemeProvider<T extends object>(Component: ComponentType<T>): ComponentType<T> {
+  const WrappedComponent: ComponentType<T> = (props: T) => {
+    return (
+      <ThemeProvider>
+        <Component {...props} />
+      </ThemeProvider>
+    );
+  };
+
+  return setWrappedDisplayName('withThemeProvider', Component, WrappedComponent);
 }

@@ -67,7 +67,7 @@ import {
 } from '@tabler/icons-preact';
 import { useState } from 'react';
 import { PageHeader } from '../components';
-import { ThemeProvider } from '../themes';
+import { withThemeProvider } from '../themes/theme-provider';
 import './playground.scss';
 
 function PlaygroundContainer() {
@@ -862,8 +862,4 @@ function PlaygroundContainer() {
   );
 }
 
-export const PlaygroundApp = () => (
-  <ThemeProvider>
-    <PlaygroundContainer />
-  </ThemeProvider>
-);
+export const PlaygroundApp = withThemeProvider(PlaygroundContainer);
