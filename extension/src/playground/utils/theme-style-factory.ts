@@ -1,5 +1,5 @@
 import { MantineTheme } from '@mantine/core';
-import { ThemeStyle } from '../../themes/theme-config';
+import { ThemeStyle } from '../themes/theme-config';
 import { gradients, shadows } from './styling-utils';
 
 interface ThemeStyleConfig {

@@ -109,12 +109,17 @@ $font-family-base: system-ui, -apple-system, sans-serif;
 
 // Spacing scale
 $spacing-scale: (
-  "xs": $base-spacing * 0.5,  // 4px
-  "sm": $base-spacing,        // 8px
-  "md": $base-spacing * 2,    // 16px
-  "lg": $base-spacing * 3,    // 24px
-  "xl": $base-spacing * 4,    // 32px
-  "xxl": $base-spacing * 6    // 48px
+  "xs": $base-spacing * 0.5,
+  // 4px
+  "sm": $base-spacing,
+  // 8px
+  "md": $base-spacing * 2,
+  // 16px
+  "lg": $base-spacing * 3,
+  // 24px
+  "xl": $base-spacing * 4,
+  // 32px
+  "xxl": $base-spacing * 6 // 48px,
 );
 
 // Z-index scale
@@ -417,6 +422,7 @@ $cyberpunk-colors: (
 ### Phase 2: Component Migration (IN PROGRESS)
 
 #### Completed Steps ✅
+
 - ✅ Minimal Playground Setup
 - ✅ Theme Switching (partial - see Outstanding Tasks)
 - ✅ StyledExample Component
@@ -424,6 +430,7 @@ $cyberpunk-colors: (
 - ✅ DebugStylesExample Component
 
 #### Remaining Steps
+
 - [ ] Add Toggle Button
 - [ ] Add Dividers
 - [ ] Extract and organize common patterns
@@ -449,6 +456,7 @@ $cyberpunk-colors: (
 ## Outstanding Tasks
 
 ### Design System Foundation
+
 - [ ] Create `_tokens.scss` with maps for colors, spacing, radii, shadows
 - [ ] Implement `token($map, $key)` helper function for accessing design tokens
 - [ ] Set up CSS variables generation at build time for design tokens
@@ -456,6 +464,7 @@ $cyberpunk-colors: (
 - [ ] Extract shared keyframes to `_animations.scss`
 
 ### Theme System
+
 - [ ] Replace DOM classList manipulation with CSS variables approach
 - [ ] Add validation for theme settings loaded from localStorage
 - [ ] Implement error handling for corrupted theme data
@@ -468,6 +477,7 @@ $cyberpunk-colors: (
 - [ ] Create centralized theme configuration with TypeScript validation
 
 ### CSS Architecture
+
 - [ ] Adopt consistent CSS methodology (BEM or SMACSS)
 - [ ] Establish consistent naming convention across all styles
 - [ ] Eliminate theme-specific selectors that create tight coupling
@@ -478,6 +488,7 @@ $cyberpunk-colors: (
 - [ ] Remove duplicate selectors and properties across themes
 
 ### Component Patterns
+
 - [ ] Create gradient-bg mixin: `@mixin gradient-bg($start, $end)`
 - [ ] Convert custom-button and glowing-card to parameterized mixins
 - [ ] Refactor custom button styles to use parameterized mixin
@@ -487,6 +498,7 @@ $cyberpunk-colors: (
 - [ ] Create proper folder structure with clear module boundaries
 
 ### Performance & Optimization
+
 - [ ] Add React.memo to components that receive theme props
 - [ ] Use useMemo for expensive theme calculations
 - [ ] Implement useCallback for theme-related event handlers
@@ -496,6 +508,7 @@ $cyberpunk-colors: (
 - [ ] Add code splitting and performance optimizations
 
 ### Build Pipeline
+
 - [ ] Enable CSS Modules only for component-scoped files
 - [ ] Keep global utilities in non-module path
 - [ ] Implement CSS modules or scoping strategy for playground styles
@@ -504,11 +517,13 @@ $cyberpunk-colors: (
 - [ ] Add stylelint-scss plugin for SCSS-specific linting rules
 
 ### Browser Compatibility
+
 - [ ] Replace color-mix CSS with proper color manipulation library
 - [ ] Add fallbacks for older browser support
 - [ ] Ensure Firefox compatibility for all color utilities
 
 ### TypeScript Integration
+
 - [ ] Generate SCSS token JSON for importing into TypeScript
 - [ ] Create typed ThemeToken enum for autocomplete support
 - [ ] Replace Record<string, unknown> with proper typed interfaces
@@ -518,6 +533,7 @@ $cyberpunk-colors: (
 - [ ] Define strict types for styles parameter in createDebugComponent
 
 ### Module Organization
+
 - [ ] Remove dynamic imports from styling-utils.ts themed function
 - [ ] Restructure modules to eliminate circular dependencies
 - [ ] Use proper ES6 imports instead of require() for tree-shaking
@@ -529,13 +545,15 @@ $cyberpunk-colors: (
 - [ ] Create clear dev/production utility separation
 
 ### Code Cleanup
+
 - [ ] Delete deprecated gradient/shadow helpers in styling-utils.ts
-- [ ] Delete deprecated gradients.* and shadows.* helpers
+- [ ] Delete deprecated gradients._ and shadows._ helpers
 - [ ] Delete deprecated helpers (already marked @deprecated)
 - [ ] Create single source of truth for gradients/shadows
 - [ ] Convert components.css and utilities.css to SCSS files
 
 ### Isolation & Production
+
 - [ ] Prevent style leakage between playground and main extension
 - [ ] Ensure playground styles are isolated from production code
 - [ ] Separate playground/example code from production utilities
@@ -639,6 +657,7 @@ const isDev = process.env.NODE_ENV === 'development';
 The codebase includes extensive TypeScript styling utilities that need to remain functional:
 
 1. **styling-utils.ts** provides:
+
    - BEM class name generators (`cn.bem`, `cn.component`)
    - Gradient generators (linear, radial, themed)
    - Shadow generators (box, glow, layered)
@@ -725,12 +744,15 @@ export const GradientButton = debugStyles.createStyledComponent(Button, 'Gradien
 ### VS Code Extensions (Recommended)
 
 1. **Stylelint** - Real-time SCSS linting
+
    - Install: `dbaeumer.vscode-stylelint`
 
 2. **SCSS IntelliSense** - Autocomplete for variables/mixins
+
    - Install: `mrmlnc.vscode-scss`
 
 3. **SCSS Formatter** - Consistent code formatting
+
    - Install: `sibiraj-s.vscode-scss-formatter`
 
 4. **CSS Peek** - Navigate to style definitions

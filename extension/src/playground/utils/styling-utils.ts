@@ -1,5 +1,5 @@
 import { MantineTheme, CSSProperties } from '@mantine/core';
-import { ThemeStyle } from '../../themes/theme-config';
+import { ThemeStyle } from '../themes/theme-config';
 
 /**
  * Utility functions for creating reusable styling patterns
