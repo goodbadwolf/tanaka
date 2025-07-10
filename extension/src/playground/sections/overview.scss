@@ -1,0 +1,18 @@
+// Overview Section styles
+.tanaka-overview {
+  &__card-icon {
+    margin-bottom: var(--mantine-spacing-md);
+
+    &--primary {
+      color: var(--mantine-color-blue-6);
+    }
+
+    &--secondary {
+      color: var(--mantine-color-gray-6);
+    }
+
+    &--success {
+      color: var(--mantine-color-green-6);
+    }
+  }
+}

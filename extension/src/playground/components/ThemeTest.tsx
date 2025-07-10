@@ -1,6 +1,14 @@
 import { Box, Text, Paper, Stack } from '@mantine/core';
+import './theme-test.scss';
 
 export function ThemeTest() {
+  // Helper to render variable with its own color
+  const renderVariable = (varName: string) => (
+    <Text className="tanaka-theme-test__variable">
+      {varName}: <span style={{ color: `var(${varName})` }}>var({varName})</span>
+    </Text>
+  );
+
   return (
     <Paper p="md" radius="md" withBorder>
       <Stack gap="sm">
@@ -8,35 +16,16 @@ export function ThemeTest() {
 
         <Box>
           <Text size="sm" c="dimmed">CSS Variables:</Text>
-          <Text size="xs" style={{ fontFamily: 'monospace' }}>
-            --color-background: <span style={{ color: 'var(--color-background)' }}>var(--color-background)</span>
-          </Text>
-          <Text size="xs" style={{ fontFamily: 'monospace' }}>
-            --color-primary: <span style={{ color: 'var(--color-primary)' }}>var(--color-primary)</span>
-          </Text>
-          <Text size="xs" style={{ fontFamily: 'monospace' }}>
-            --color-secondary: <span style={{ color: 'var(--color-secondary)' }}>var(--color-secondary)</span>
-          </Text>
+          {renderVariable('--color-background')}
+          {renderVariable('--color-primary')}
+          {renderVariable('--color-secondary')}
         </Box>
 
-        <Box
-          p="xs"
-          style={{
-            background: 'var(--color-surface)',
-            border: '2px solid var(--color-primary)',
-            borderRadius: '4px'
-          }}
-        >
+        <Box className="tanaka-theme-test__surface-box">
           <Text size="sm">Surface Color Test</Text>
         </Box>
 
-        <Box
-          p="xs"
-          style={{
-            background: 'var(--twilight-gradient-primary)',
-            borderRadius: '4px'
-          }}
-        >
+        <Box className="tanaka-theme-test__gradient-box">
           <Text size="sm">Gradient Test</Text>
         </Box>
       </Stack>

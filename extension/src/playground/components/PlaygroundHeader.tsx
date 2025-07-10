@@ -1,31 +1,21 @@
-import { Box, Group, Text, Title, useMantineColorScheme } from '@mantine/core';
+import { Box, Group, Text, Title } from '@mantine/core';
 import { IconPalette } from '@tabler/icons-preact';
 import { ThemeToggle } from '../../components/theme-toggle';
 import { ThemeStyleSwitcher } from './ThemeStyleSwitcher';
+import './playground-header.scss';
 
 export function PlaygroundHeader() {
-  const { colorScheme } = useMantineColorScheme();
-  const dark = colorScheme === 'dark';
-
   return (
     <Box
       component="header"
-      style={{
-        background: dark
-          ? 'linear-gradient(135deg, #1a1b1e 0%, #2c2e33 100%)'
-          : 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
-        borderBottom: `1px solid ${dark ? '#373A40' : '#dee2e6'}`,
-        position: 'sticky',
-        top: 0,
-        zIndex: 1000,
-      }}
+      className="tanaka-playground-header"
       py="md"
     >
       <Group justify="space-between" px="xl">
         <Group>
-          <IconPalette size={32} style={{ color: 'var(--mantine-color-blue-6)' }} />
+          <IconPalette size={32} className="tanaka-playground-header__icon" />
           <div>
-            <Title order={3} style={{ lineHeight: 1.2 }}>
+            <Title order={3} className="tanaka-playground-header__title">
               Tanaka Design System
             </Title>
             <Text size="sm" c="dimmed">
