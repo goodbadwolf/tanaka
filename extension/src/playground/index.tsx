@@ -27,7 +27,7 @@ if (root) {
     boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     color: '#991b1b',
-    zIndex: '9999'
+    zIndex: '9999',
   });
 
   const title = document.createElement('h3');
@@ -35,7 +35,7 @@ if (root) {
     margin: '0 0 12px 0',
     fontSize: '20px',
     fontWeight: '600',
-    color: '#dc2626'
+    color: '#dc2626',
   });
   title.textContent = 'Failed to Initialize Playground';
 
@@ -43,9 +43,10 @@ if (root) {
   Object.assign(message.style, {
     margin: '0 0 16px 0',
     fontSize: '16px',
-    lineHeight: '1.5'
+    lineHeight: '1.5',
   });
-  message.textContent = 'The playground root element could not be found. This usually indicates a configuration issue.';
+  message.textContent =
+    'The playground root element could not be found. This usually indicates a configuration issue.';
 
   const details = document.createElement('div');
   Object.assign(details.style, {
@@ -54,7 +55,7 @@ if (root) {
     borderRadius: '4px',
     fontSize: '14px',
     fontFamily: 'monospace',
-    marginBottom: '16px'
+    marginBottom: '16px',
   });
   details.innerHTML = `
     <strong>Expected:</strong> &lt;div id="root"&gt;&lt;/div&gt;<br>
@@ -65,7 +66,7 @@ if (root) {
   Object.assign(actions.style, {
     display: 'flex',
     gap: '12px',
-    justifyContent: 'flex-end'
+    justifyContent: 'flex-end',
   });
 
   const reloadButton = document.createElement('button');
@@ -78,12 +79,12 @@ if (root) {
     fontSize: '14px',
     fontWeight: '500',
     cursor: 'pointer',
-    transition: 'background-color 0.2s'
+    transition: 'background-color 0.2s',
   });
   reloadButton.textContent = 'Reload Page';
   reloadButton.onclick = () => window.location.reload();
-  reloadButton.onmouseenter = () => reloadButton.style.backgroundColor = '#b91c1c';
-  reloadButton.onmouseleave = () => reloadButton.style.backgroundColor = '#dc2626';
+  reloadButton.onmouseenter = () => (reloadButton.style.backgroundColor = '#b91c1c');
+  reloadButton.onmouseleave = () => (reloadButton.style.backgroundColor = '#dc2626');
 
   errorContainer.appendChild(title);
   errorContainer.appendChild(message);
