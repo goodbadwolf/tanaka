@@ -53,45 +53,15 @@ export const gradients = {
 
   /**
    * Get theme-specific gradients
+   * @deprecated Use createThemeStyles from theme-style-factory instead
    */
   themed: (theme: MantineTheme, style: ThemeStyle): Record<string, string> => {
-    if (style === ThemeStyle.CYBERPUNK) {
-      return {
-        primary: gradients.linear(
-          45,
-          theme.colors.neonPink?.[6] || '#ff0f87',
-          theme.colors.neonBlue?.[6] || '#0096ff',
-        ),
-        secondary: gradients.linear(
-          135,
-          theme.colors.neonBlue?.[5] || '#0fa0ff',
-          theme.colors.neonGreen?.[5] || '#0fff0f',
-        ),
-        accent: gradients.linear(
-          90,
-          theme.colors.neonGreen?.[6] || '#00ff00',
-          theme.colors.darkPurple?.[6] || '#3000ff',
-        ),
-      };
-    }
-    // V3 theme gradients
-    return {
-      primary: gradients.linear(
-        45,
-        theme.colors.indigo?.[5] || '#6366f1',
-        theme.colors.violet?.[5] || '#8b5cf6',
-      ),
-      secondary: gradients.linear(
-        135,
-        theme.colors.indigo?.[4] || '#818cf8',
-        theme.colors.violet?.[6] || '#7c3aed',
-      ),
-      accent: gradients.linear(
-        90,
-        theme.colors.violet?.[5] || '#8b5cf6',
-        theme.colors.indigo?.[6] || '#4f46e5',
-      ),
-    };
+    // Dynamic import to avoid circular dependencies
+    const { createThemeStyles } =
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      require('./theme-style-factory') as typeof import('./theme-style-factory');
+    const { gradients } = createThemeStyles(theme, style);
+    return gradients;
   },
 };
 
@@ -134,26 +104,15 @@ export const shadows = {
 
   /**
    * Get theme-specific shadows
+   * @deprecated Use createThemeStyles from theme-style-factory instead
    */
   themed: (theme: MantineTheme, style: ThemeStyle): Record<string, string> => {
-    if (style === ThemeStyle.CYBERPUNK) {
-      return {
-        sm: shadows.glow('rgba(255, 15, 135, 0.5)', 'sm'),
-        md: shadows.glow('rgba(255, 15, 135, 0.5)', 'md'),
-        lg: shadows.glow('rgba(255, 15, 135, 0.5)', 'lg'),
-        card: shadows.layered(
-          shadows.box(0, 8, 32, 0, 'rgba(31, 38, 135, 0.37)'),
-          'inset 0 0 32px rgba(255, 15, 135, 0.1)',
-        ),
-      };
-    }
-    // V3 theme shadows
-    return {
-      sm: theme.shadows.sm,
-      md: theme.shadows.md,
-      lg: theme.shadows.lg,
-      card: shadows.box(0, 8, 32, 0, 'rgba(31, 38, 135, 0.37)'),
-    };
+    // Dynamic import to avoid circular dependencies
+    const { createThemeStyles } =
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      require('./theme-style-factory') as typeof import('./theme-style-factory');
+    const { shadows } = createThemeStyles(theme, style);
+    return shadows;
   },
 };
 
