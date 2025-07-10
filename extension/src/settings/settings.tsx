@@ -1,8 +1,9 @@
-import 'reflect-metadata';
-import { render, ErrorInfo } from 'preact';
+import { ErrorInfo, render } from 'preact';
 import { lazy, Suspense } from 'preact/compat';
+import 'reflect-metadata';
+import { ErrorBoundary } from '../components/deprecated/ErrorBoundary';
+import { LoadingSpinner } from '../components/deprecated/LoadingSpinner';
 import { DIProvider } from '../di/provider';
-import { LoadingSpinner, ErrorBoundary } from '../components';
 import { ExtensionError } from '../error/types';
 import './settings.css';
 
@@ -39,10 +40,7 @@ const root = document.getElementById('root');
 if (root) {
   render(
     <DIProvider>
-      <ErrorBoundary
-        onError={handleSettingsError}
-        reportErrors={true}
-      >
+      <ErrorBoundary onError={handleSettingsError} reportErrors={true}>
         <Suspense fallback={<LoadingFallback />}>
           <SettingsApp />
         </Suspense>
