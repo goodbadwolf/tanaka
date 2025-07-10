@@ -289,14 +289,14 @@ h6 {
 #### Component Structure Example
 
 ```scss
-// components/_cards.scss
-@use "../mixins" as m;
-@use "../shared";
+// components/card/card.scss
+@use "../../styles/mixins" as m;
+@use "../../styles/variables" as *;
 
-.card {
+.tanaka-card {
   padding: m.spacing("lg");
-  border-radius: shared.$border-radius-base * 2;
-  transition: all shared.$transition-base;
+  border-radius: $border-radius-base * 2;
+  transition: all $transition-base;
 
   // BEM elements
   &__header {
@@ -313,7 +313,7 @@ h6 {
   }
 
   &--glowing {
-    @include m.glow-effect(var(--glow-color));
+    @include m.glow-effect(var(--twilight-glow-color));
   }
 }
 ```
@@ -431,6 +431,8 @@ This gives us a clean slate to rebuild with consistent patterns.
 3. **Theme values** - Reference Mantine CSS variables exclusively
 4. **No inline styles** - All styles in SCSS files
 5. **No CSS-in-JS** - Remove all runtime style generation
+6. **Global CSS classes** - Use `.tanaka-` prefix for all custom components (no CSS modules)
+7. **Explicit naming** - Direct class names for searchability and clarity
 
 **File Structure:**
 ```
@@ -446,10 +448,32 @@ src/
 └── components/              # Flat structure, kebab-case
     ├── button/
     │   ├── button.tsx
-    │   └── button.scss
+    │   └── button.scss      # Contains .tanaka-button class
     └── [component]/
         ├── [component].tsx
-        └── [component].scss
+        └── [component].scss # Contains .tanaka-[component] class
+```
+
+**CSS Class Naming Convention:**
+```scss
+// ALWAYS use .tanaka- prefix for custom components
+.tanaka-button {
+  // Component styles
+
+  // BEM elements
+  &__icon { }        // .tanaka-button__icon
+  &__label { }       // .tanaka-button__label
+
+  // BEM modifiers  
+  &--primary { }     // .tanaka-button--primary
+  &--large { }       // .tanaka-button--large
+}
+
+// Why this approach:
+// ✅ Prevents conflicts with Mantine or third-party styles
+// ✅ Searchable - find "tanaka-button" across entire codebase
+// ✅ Explicit - what you write is what you get in DevTools
+// ✅ No CSS modules complexity or generated class names
 ```
 
 #### Step 3: Create Twilight Theme with CSS Variables
@@ -530,10 +554,37 @@ This ensures:
 **Component Guidelines:**
 - Each component gets its own folder in `components/[component-name]/` (kebab-case)
 - Component folder contains `[component-name].tsx` and `[component-name].scss`
-- Use BEM naming in SCSS: `.tanaka-button`, `.tanaka-card`, etc.
+- **CRITICAL**: Use `.tanaka-` prefix for ALL component classes (global CSS, no modules)
+- Use BEM naming: `.tanaka-button`, `.tanaka-button__icon`, `.tanaka-button--primary`
 - Reference only CSS variables, no hardcoded colors
 - No inline styles or CSS-in-JS
 - Export from component file directly (no index.ts barrel exports)
+
+**Example Component Structure:**
+```tsx
+// button/button.tsx
+import './button.scss';
+
+export function Button({ variant = 'default', children }) {
+  return (
+    <button className={`tanaka-button tanaka-button--${variant}`}>
+      {children}
+    </button>
+  );
+}
+```
+
+```scss
+// button/button.scss
+.tanaka-button {
+  // Base styles using CSS variables
+  padding: var(--mantine-spacing-sm) var(--mantine-spacing-md);
+
+  &--primary {
+    background: var(--twilight-gradient-primary);
+  }
+}
+```
 
 Example structure:
 ```scss
@@ -612,10 +663,12 @@ Example structure:
 - ✅ Zero inline styles in components
 - ✅ No CSS-in-JS usage
 - ✅ All colors/spacing use CSS variables
-- ✅ Consistent BEM methodology
+- ✅ Consistent BEM methodology with `.tanaka-` prefix
+- ✅ Global CSS classes (no CSS modules)
 - ✅ Single styling approach per component
 - ✅ Theme switches without flicker
 - ✅ Reduced bundle size by 30%+
+- ✅ All custom classes searchable with `.tanaka-` prefix
 
 #### Estimated Timeline: 2-3 days
 
