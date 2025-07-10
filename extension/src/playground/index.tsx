@@ -4,6 +4,11 @@ import { PlaygroundApp } from './playground-app';
 const root = document.getElementById('root');
 if (root) {
   render(<PlaygroundApp />, root);
+
+  // Add mounted class to enable fade-in transition
+  requestAnimationFrame(() => {
+    document.body.classList.add('app-mounted');
+  });
 } else {
   const errorContainer = document.createElement('div');
   errorContainer.setAttribute('role', 'alert');
