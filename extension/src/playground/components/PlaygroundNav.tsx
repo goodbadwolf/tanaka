@@ -9,6 +9,7 @@ import {
   IconRuler,
   IconTypography,
 } from '@tabler/icons-preact';
+import './playground-nav.scss';
 
 interface PlaygroundNavProps {
   activeSection: string;
@@ -39,11 +40,7 @@ export function PlaygroundNav({ activeSection, onSectionChange }: PlaygroundNavP
           leftSection={<item.icon size={18} />}
           active={activeSection === item.id}
           onClick={() => onSectionChange(item.id)}
-          styles={{
-            root: {
-              borderRadius: 'var(--mantine-radius-sm)',
-            },
-          }}
+          className="tanaka-playground-nav__navlink"
         />
       ))}
     </Stack>

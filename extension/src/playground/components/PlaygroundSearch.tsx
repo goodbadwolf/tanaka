@@ -1,5 +1,6 @@
 import { CloseButton, TextInput } from '@mantine/core';
 import { IconSearch } from '@tabler/icons-preact';
+import './playground-search.scss';
 
 interface PlaygroundSearchProps {
   value: string;
@@ -27,14 +28,7 @@ export function PlaygroundSearch({
           />
         )
       }
-      styles={{
-        root: {
-          position: 'sticky',
-          top: 0,
-          zIndex: 100,
-          backgroundColor: 'var(--mantine-color-body)',
-        }
-      }}
+      className="tanaka-playground-search"
     />
   );
 }

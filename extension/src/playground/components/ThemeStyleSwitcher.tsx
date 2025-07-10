@@ -1,5 +1,6 @@
 import { SegmentedControl } from '@mantine/core';
 import { useState, useEffect } from 'preact/hooks';
+import './theme-style-switcher.scss';
 
 const THEME_STYLES = [
   { value: 'twilight', label: 'Twilight' },
@@ -35,22 +36,7 @@ export function ThemeStyleSwitcher() {
       size="sm"
       radius="md"
       fullWidth={false}
-      styles={{
-        root: {
-          backgroundColor: 'var(--color-surface)',
-          border: '1px solid var(--card-border)',
-        },
-        indicator: {
-          background: 'var(--twilight-gradient-primary)',
-          boxShadow: 'var(--twilight-shadow-glow)',
-        },
-        label: {
-          color: 'var(--color-text)',
-          '&[data-active]': {
-            color: 'var(--color-text)',
-          },
-        },
-      }}
+      className="tanaka-theme-style-switcher"
     />
   );
 }
