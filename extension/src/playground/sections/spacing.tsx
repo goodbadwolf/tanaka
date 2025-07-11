@@ -1,4 +1,5 @@
 import { Box, Card, Code, Grid, Group, Stack, Text, Title } from '@mantine/core';
+import './spacing.scss';
 
 const spacingScale = [
   { name: 'xs', value: '4px', multiplier: 0.5 },
@@ -34,30 +35,18 @@ export function SpacingSection() {
         <Title order={2} mb="md">
           Spacing Scale
         </Title>
-        <Text mb="lg">
-          Based on an 8px unit system for consistent alignment and spacing.
-        </Text>
+        <Text mb="lg">Based on an 8px unit system for consistent alignment and spacing.</Text>
         <Stack gap="md">
           {spacingScale.map((space) => (
             <Card key={space.name} shadow="sm" padding="lg" radius="md" withBorder>
               <Group justify="space-between" align="center">
                 <Group>
-                  <Box
-                    style={{
-                      width: 60,
-                      height: 60,
-                      backgroundColor: 'var(--mantine-color-blue-light)',
-                      border: '2px solid var(--mantine-color-blue-6)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
+                  <Box className="tnk-spacing__preview-box">
                     <Box
+                      className="tnk-spacing__spacing-indicator"
                       style={{
                         width: space.value,
                         height: space.value,
-                        backgroundColor: 'var(--mantine-color-blue-6)',
                       }}
                     />
                   </Box>
@@ -84,13 +73,9 @@ export function SpacingSection() {
             <Grid.Col key={radius.name} span={{ base: 6, sm: 4, md: 3 }}>
               <Card shadow="sm" padding="lg" radius="md" withBorder>
                 <Box
+                  className="tnk-spacing__radius-demo"
                   style={{
-                    width: '100%',
-                    height: 80,
-                    backgroundColor: 'var(--mantine-color-blue-light)',
-                    border: '2px solid var(--mantine-color-blue-6)',
                     borderRadius: radius.value,
-                    marginBottom: 12,
                   }}
                 />
                 <Text fw={600} size="sm">
@@ -117,31 +102,20 @@ export function SpacingSection() {
                   <Text fw={600} mb="xs">
                     Container {size.toUpperCase()}
                   </Text>
-                  <Box
-                    style={{
-                      height: 40,
-                      backgroundColor: 'var(--mantine-color-gray-2)',
-                      border: '1px dashed var(--mantine-color-gray-5)',
-                      position: 'relative',
-                      overflow: 'hidden',
-                    }}
-                  >
+                  <Box className="tnk-spacing__container-wrapper">
                     <Box
-                      style={{
-                        position: 'absolute',
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        height: '100%',
-                        backgroundColor: 'var(--mantine-color-blue-light)',
-                        width: size === 'xs' ? 540 : size === 'sm' ? 720 : size === 'md' ? 960 : size === 'lg' ? 1140 : 1320,
-                        maxWidth: '100%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
+                      className={`tnk-spacing__container-demo tnk-spacing__container-demo--${size}`}
                     >
                       <Text size="xs" fw={500}>
-                        {size === 'xs' ? '540px' : size === 'sm' ? '720px' : size === 'md' ? '960px' : size === 'lg' ? '1140px' : '1320px'}
+                        {size === 'xs'
+                          ? '540px'
+                          : size === 'sm'
+                            ? '720px'
+                            : size === 'md'
+                              ? '960px'
+                              : size === 'lg'
+                                ? '1140px'
+                                : '1320px'}
                       </Text>
                     </Box>
                   </Box>
@@ -158,26 +132,9 @@ export function SpacingSection() {
         </Title>
         <Card shadow="sm" padding="lg" radius="md" withBorder>
           <Text mb="md">12-column grid system with responsive breakpoints</Text>
-          <Box
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(12, 1fr)',
-              gap: 8,
-              marginBottom: 16,
-            }}
-          >
+          <Box className="tnk-spacing__grid-demo">
             {Array.from({ length: 12 }).map((_, i) => (
-              <Box
-                key={i}
-                style={{
-                  height: 40,
-                  backgroundColor: 'var(--mantine-color-blue-light)',
-                  border: '1px solid var(--mantine-color-blue-6)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
+              <Box key={i} className="tnk-spacing__grid-cell">
                 <Text size="xs" fw={500}>
                   {i + 1}
                 </Text>

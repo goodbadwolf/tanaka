@@ -1,0 +1,19 @@
+// Component Example styles
+.tnk-component-example {
+  margin-bottom: var(--mantine-spacing-xl);
+
+  &__container {
+    border: 1px solid var(--mantine-color-default-border);
+    border-radius: var(--mantine-radius-md);
+    overflow: hidden;
+  }
+
+  &__preview {
+    padding: var(--mantine-spacing-xl);
+    background-color: var(--mantine-color-body);
+  }
+
+  &__code {
+    border-top: 1px solid var(--mantine-color-default-border);
+  }
+}

@@ -1,0 +1,21 @@
+// Theme Style Switcher styles
+.tnk-theme-style-switcher {
+  // Root styles
+  background-color: var(--color-surface);
+  border: 1px solid var(--card-border);
+
+  // Indicator styles
+  .mantine-SegmentedControl-indicator {
+    background: var(--twilight-gradient-primary);
+    box-shadow: var(--twilight-shadow-glow);
+  }
+
+  // Label styles
+  .mantine-SegmentedControl-label {
+    color: var(--color-text);
+
+    &[data-active] {
+      color: var(--color-text);
+    }
+  }
+}

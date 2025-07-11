@@ -1,6 +1,7 @@
 import { Alert, Card, Code, Grid, List, Stack, Text, Title } from '@mantine/core';
 import { IconBrandGithub, IconInfoCircle, IconRocket } from '@tabler/icons-preact';
-import { ThemeTest } from '../components/ThemeTest';
+import { ThemeTest } from '../components/theme-test';
+import './overview.scss';
 
 export function OverviewSection() {
   return (
@@ -18,20 +19,26 @@ export function OverviewSection() {
       <Grid>
         <Grid.Col span={{ base: 12, md: 4 }}>
           <Card shadow="sm" padding="lg" radius="md" withBorder h="100%">
-            <IconRocket size={32} style={{ marginBottom: 12, color: 'var(--mantine-color-blue-6)' }} />
+            <IconRocket
+              size={32}
+              className="tnk-overview__card-icon tnk-overview__card-icon--primary"
+            />
             <Text size="lg" fw={600} mb="xs">
               Getting Started
             </Text>
             <Text size="sm" c="dimmed">
-              Explore our component library, design tokens, and patterns. Everything you need to build
-              consistent UIs.
+              Explore our component library, design tokens, and patterns. Everything you need to
+              build consistent UIs.
             </Text>
           </Card>
         </Grid.Col>
 
         <Grid.Col span={{ base: 12, md: 4 }}>
           <Card shadow="sm" padding="lg" radius="md" withBorder h="100%">
-            <IconBrandGithub size={32} style={{ marginBottom: 12, color: 'var(--mantine-color-gray-6)' }} />
+            <IconBrandGithub
+              size={32}
+              className="tnk-overview__card-icon tnk-overview__card-icon--secondary"
+            />
             <Text size="lg" fw={600} mb="xs">
               Open Source
             </Text>
@@ -43,12 +50,16 @@ export function OverviewSection() {
 
         <Grid.Col span={{ base: 12, md: 4 }}>
           <Card shadow="sm" padding="lg" radius="md" withBorder h="100%">
-            <IconInfoCircle size={32} style={{ marginBottom: 12, color: 'var(--mantine-color-green-6)' }} />
+            <IconInfoCircle
+              size={32}
+              className="tnk-overview__card-icon tnk-overview__card-icon--success"
+            />
             <Text size="lg" fw={600} mb="xs">
               Documentation
             </Text>
             <Text size="sm" c="dimmed">
-              Comprehensive docs with examples, API references, and best practices for all components.
+              Comprehensive docs with examples, API references, and best practices for all
+              components.
             </Text>
           </Card>
         </Grid.Col>
@@ -82,7 +93,7 @@ export function OverviewSection() {
             </Text>
             <Code block>{`import { Button } from '../components/button';
 import { Toggle } from '../components/toggle';
-import { PageHeader } from '../components/page-header';`}</Code>
+import { AppHeader } from '../components/app-header';`}</Code>
           </div>
 
           <div>

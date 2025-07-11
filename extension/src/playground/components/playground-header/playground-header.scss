@@ -1,0 +1,23 @@
+// Playground Header styles
+.tnk-playground-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  border-bottom: 1px solid var(--mantine-color-default-border);
+
+  // Light mode gradient
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+
+  // Dark mode gradient
+  [data-mantine-color-scheme='dark'] & {
+    background: linear-gradient(135deg, #1a1b1e 0%, #2c2e33 100%);
+  }
+
+  &__icon {
+    color: var(--mantine-color-blue-6);
+  }
+
+  &__title {
+    line-height: 1.2;
+  }
+}

@@ -1,33 +1,33 @@
-// Theme Orchestrator
-// This file imports all themes and applies them based on data attributes
+@use 'sass:map';
+@use './base' as base;
+@use './twilight';
+@use './neon';
 
-@use "base";
-@use "twilight";
-@use "neon";
+// Theme registry
+$themes: (
+  twilight: twilight.$twilight-theme,
+  neon: neon.$neon-theme
+);
 
-// Apply twilight theme as default on root
+// Default theme
+$default-theme: twilight;
+
+// Apply default theme
 :root {
-  @include base.apply-theme(twilight.$twilight-colors);
-  @include base.generate-color-scale("primary", twilight.$twilight-primary-scale);
-  @include base.generate-color-scale("gray", twilight.$twilight-gray-scale);
-  @include base.apply-component-themes(twilight.$twilight-colors);
+  @include base.apply-complete-theme(map.get($themes, $default-theme));
 }
 
-// Light mode default
-:root[data-mantine-color-scheme="light"] {
-  @include base.apply-theme(twilight.$twilight-light-colors);
-  @include base.apply-component-themes(twilight.$twilight-light-colors);
+// Theme switching
+@each $name, $config in $themes {
+  [data-theme-style="#{$name}"] {
+    @include base.apply-complete-theme($config);
+
+    // Light mode variant
+    &[data-mantine-color-scheme="light"] {
+      $light-colors: map.get($config, colors-light);
+      @if $light-colors {
+        @include base.apply-theme($light-colors);
+      }
+    }
+  }
 }
-
-// Import the actual theme CSS rules
-// We need to use @import to include the CSS rules, not just the variables
-@import "twilight";
-@import "neon";
-
-// Future themes will be added here
-// [data-theme-style="midnight"] {
-//   @include base.apply-theme(midnight.$midnight-colors);
-//   @include base.generate-color-scale("primary", midnight.$midnight-primary-scale);
-//   @include base.generate-color-scale("gray", midnight.$midnight-gray-scale);
-//   @include base.apply-component-themes(midnight.$midnight-colors);
-// }

@@ -1,4 +1,5 @@
 import { Box, Card, Code, Group, Stack, Text, Title } from '@mantine/core';
+import './typography.scss';
 
 const fontSizes = [
   { name: 'xs', size: '12px', lineHeight: '16px', usage: 'Small labels, helper text' },
@@ -35,9 +36,7 @@ export function TypographySection() {
         </Title>
         <Card shadow="sm" padding="lg" radius="md" withBorder>
           <Stack gap="md">
-            <Text size="lg" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
-              System UI Font Stack (Default)
-            </Text>
+            <Text className="tnk-typography__system-font">System UI Font Stack (Default)</Text>
             <Code block>{`font-family: system-ui, -apple-system, BlinkMacSystemFont,
   'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
   'Open Sans', 'Helvetica Neue', sans-serif;`}</Code>
@@ -56,20 +55,20 @@ export function TypographySection() {
           {headingSizes.map((heading) => (
             <Card key={heading.level} shadow="sm" padding="lg" radius="md" withBorder>
               <Group justify="space-between" align="flex-start">
-                <Box style={{ flex: 1 }}>
+                <Box className="tnk-typography__flex-box">
                   <Title
                     order={heading.level as any}
+                    className="tnk-typography__heading-demo"
                     style={{
                       fontSize: heading.size,
                       lineHeight: heading.lineHeight,
                       fontWeight: heading.weight,
-                      margin: 0,
                     }}
                   >
                     Heading {heading.level}
                   </Title>
                 </Box>
-                <Stack gap={4} align="flex-end" style={{ minWidth: 200 }}>
+                <Stack gap={4} align="flex-end" className="tnk-typography__meta-stack">
                   <Text size="xs" c="dimmed">
                     Size: {heading.size}
                   </Text>
@@ -94,12 +93,10 @@ export function TypographySection() {
           {fontSizes.map((size) => (
             <Card key={size.name} shadow="sm" padding="lg" radius="md" withBorder>
               <Group justify="space-between" align="center">
-                <Box style={{ flex: 1 }}>
-                  <Text size={size.name as any}>
-                    The quick brown fox jumps over the lazy dog
-                  </Text>
+                <Box className="tnk-typography__flex-box">
+                  <Text size={size.name as any}>The quick brown fox jumps over the lazy dog</Text>
                 </Box>
-                <Stack gap={4} align="flex-end" style={{ minWidth: 280 }}>
+                <Stack gap={4} align="flex-end" className="tnk-typography__text-meta-stack">
                   <Code>{`size="${size.name}"`}</Code>
                   <Text size="xs" c="dimmed">
                     {size.size} / {size.lineHeight}
@@ -140,14 +137,7 @@ export function TypographySection() {
             <Text td="line-through">Strikethrough for deprecated items</Text>
             <Text tt="uppercase">Uppercase text for labels</Text>
             <Text c="dimmed">Dimmed text for secondary information</Text>
-            <Text
-              style={{
-                background: 'linear-gradient(45deg, #667eea 0%, #764ba2 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                fontWeight: 700,
-              }}
-            >
+            <Text className="tnk-typography__gradient-text">
               Gradient text for special emphasis
             </Text>
           </Stack>
@@ -164,8 +154,8 @@ export function TypographySection() {
               Hierarchy
             </Title>
             <Text size="sm">
-              Use consistent heading levels to create clear visual hierarchy. Never skip heading levels
-              for styling purposes.
+              Use consistent heading levels to create clear visual hierarchy. Never skip heading
+              levels for styling purposes.
             </Text>
           </Card>
 
@@ -184,8 +174,8 @@ export function TypographySection() {
               Contrast
             </Title>
             <Text size="sm">
-              Ensure text has sufficient contrast against backgrounds. Use WCAG AA standards: 4.5:1 for
-              normal text, 3:1 for large text.
+              Ensure text has sufficient contrast against backgrounds. Use WCAG AA standards: 4.5:1
+              for normal text, 3:1 for large text.
             </Text>
           </Card>
         </Stack>

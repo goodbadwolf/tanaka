@@ -1,39 +1,105 @@
-// Base theme application mixin
-// This mixin takes a theme map and applies all values as CSS custom properties
+@use 'sass:map';
+@use 'sass:meta';
+@use '../core' as core;
 
-@use "sass:map";
+// =====================================================================
+// Theme Application System
+// =====================================================================
 
+// Apply theme colors as CSS properties
 @mixin apply-theme($theme-map) {
-  // Apply each key-value pair as a CSS custom property
   @each $key, $value in $theme-map {
     --#{$key}: #{$value};
   }
 }
 
-// Helper mixin to generate Mantine color scales
-@mixin generate-color-scale($name, $colors) {
-  @for $i from 0 through 9 {
-    @if map.has-key($colors, $i) {
-      --mantine-color-#{$name}-#{$i}: #{map.get($colors, $i)};
+// Generate Mantine color scale
+@mixin generate-mantine-scale($name, $base-color) {
+  // 0-4: Tints
+  @for $i from 0 through 4 {
+    $amount: (5 - $i) * 18%;
+    --mantine-color-#{$name}-#{$i}: #{core.tint($base-color, $amount)};
+  }
+
+  // 5: Base
+  --mantine-color-#{$name}-5: #{$base-color};
+
+  // 6-9: Shades
+  @for $i from 6 through 9 {
+    $amount: ($i - 5) * 15%;
+    --mantine-color-#{$name}-#{$i}: #{core.shade($base-color, $amount)};
+  }
+}
+
+// Map theme to Mantine variables
+@mixin map-to-mantine($theme-map) {
+  // Core color mappings
+  --mantine-color-body: var(--background);
+  --mantine-color-text: var(--text);
+  --mantine-color-anchor: var(--primary);
+  --mantine-color-default: var(--background-surface);
+  --mantine-color-default-hover: var(--background-surface-light);
+  --mantine-color-default-border: var(--border);
+  --mantine-color-dimmed: var(--text-muted);
+
+  // Primary color
+  --mantine-color-primary-filled: var(--primary);
+  --mantine-color-primary-filled-hover: var(--primary-dark);
+  --mantine-color-primary-light: var(--primary-light);
+  --mantine-color-primary-light-hover: var(--primary);
+
+  // Typography
+  --mantine-font-family: #{core.$font-family-base};
+  --mantine-font-family-monospace: #{core.$font-family-mono};
+
+  // Font sizes
+  @each $key, $value in core.$font-sizes {
+    --mantine-font-size-#{$key}: #{$value};
+  }
+
+  // Radius
+  --mantine-radius-default: #{map.get(core.$radius-scale, md)};
+  @each $key, $value in core.$radius-scale {
+    --mantine-radius-#{$key}: #{$value};
+  }
+
+  // Spacing
+  @each $key, $value in core.$spacing-scale {
+    --mantine-spacing-#{$key}: #{$value};
+  }
+
+  // Shadows (use theme shadows if available)
+  @if map.has-key($theme-map, shadow-glow) {
+    --mantine-shadow-sm: var(--shadow-glow);
+    --mantine-shadow-md: var(--shadow-glow);
+    --mantine-shadow-lg: var(--shadow-glow-strong);
+  } @else {
+    @each $key, $value in core.$shadows {
+      --mantine-shadow-#{$key}: #{$value};
     }
   }
 }
 
-// Helper mixin for component-specific theme variables
-@mixin apply-component-themes($theme-map) {
-  // Extract theme colors for component use
-  @if map.has-key($theme-map, "color-primary") {
-    --button-bg: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
-    --button-hover-bg: linear-gradient(135deg, var(--color-primary-dark), var(--color-secondary-dark));
+// Complete theme application
+@mixin apply-complete-theme($config) {
+  $colors: map.get($config, colors);
+  $scales: map.get($config, scales);
+
+  // Apply colors
+  @include apply-theme($colors);
+
+  // Generate color scales
+  @each $name, $scale in $scales {
+    @if meta.type-of($scale) == 'color' {
+      @include generate-mantine-scale($name, $scale);
+    }
   }
 
-  @if map.has-key($theme-map, "color-surface") {
-    --card-bg: var(--color-surface);
-    --card-border: rgba(255, 255, 255, 0.1);
-  }
+  // Map to Mantine
+  @include map-to-mantine($colors);
 
-  @if map.has-key($theme-map, "color-primary-light") {
-    --glow-color: var(--color-primary-light);
-    --focus-ring: 0 0 0 2px var(--color-primary-light);
+  // Apply overrides
+  @if map.has-key($config, overrides) {
+    @include apply-theme(map.get($config, overrides));
   }
 }
