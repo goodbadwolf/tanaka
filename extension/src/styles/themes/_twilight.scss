@@ -1,149 +1,98 @@
-// Twilight Theme Definition
-@use "base" as base;
+@use 'sass:map';
+@use '../core' as core;
 
-// Twilight color palette
-$twilight-colors: (
+// Twilight brand colors
+$primary: #6366f1;
+$secondary: #8b5cf6;
+$accent: #ec4899;
+
+// Dark mode colors
+$twilight-dark: (
   // Primary colors
-  "color-primary": #6366f1,
-  "color-primary-light": #818cf8,
-  "color-primary-dark": #4f46e5,
+  primary: $primary,
+  primary-light: core.tint($primary, 15%),
+  primary-dark: core.shade($primary, 15%),
 
   // Secondary colors
-  "color-secondary": #8b5cf6,
-  "color-secondary-light": #a78bfa,
-  "color-secondary-dark": #7c3aed,
+  secondary: $secondary,
+  secondary-light: core.tint($secondary, 15%),
+  secondary-dark: core.shade($secondary, 15%),
 
   // Accent colors
-  "color-accent": #ec4899,
-  "color-accent-light": #f472b6,
-  "color-accent-dark": #db2777,
+  accent: $accent,
+  accent-light: core.tint($accent, 15%),
+  accent-dark: core.shade($accent, 15%),
 
-  // Background colors
-  "color-background": #0a0a0b,
-  "color-surface": #0f0f10,
-  "color-surface-light": #1a1a1c,
+  // Backgrounds
+  background: #0a0a0b,
+  background-surface: #0f0f10,
+  background-surface-light: #1a1a1c,
 
-  // Text colors
-  "color-text": #ffffff,
-  "color-text-muted": rgba(255, 255, 255, 0.7),
-  "color-text-dim": rgba(255, 255, 255, 0.5),
+  // Text
+  text: #ffffff,
+  text-muted: core.alpha(#ffffff, 0.7),
+  text-dim: core.alpha(#ffffff, 0.5),
 
-  // Special effects
-  "twilight-gradient-primary": linear-gradient(135deg, #6366f1, #8b5cf6),
-  "twilight-gradient-secondary": linear-gradient(135deg, #8b5cf6, #ec4899),
-  "twilight-gradient-accent": linear-gradient(135deg, #ec4899, #f472b6),
-  "twilight-shadow-glow": 0 0 20px rgba(139, 92, 246, 0.3),
-  "twilight-shadow-glow-strong": 0 0 40px rgba(139, 92, 246, 0.5),
+  // Borders
+  border: core.alpha(#ffffff, 0.1),
+  border-light: core.alpha(#ffffff, 0.05),
+  border-dark: core.alpha(#ffffff, 0.2),
+
+  // States
+  success: #10b981,
+  success-light: #34d399,
+  success-dark: #059669,
+
+  warning: #f59e0b,
+  warning-light: #fbbf24,
+  warning-dark: #d97706,
+
+  error: #ef4444,
+  error-light: #f87171,
+  error-dark: #dc2626,
+
+  info: #3b82f6,
+  info-light: #60a5fa,
+  info-dark: #2563eb,
+
+  // Effects
+  shadow-glow: 0 0 20px core.alpha($secondary, 0.3),
+  shadow-glow-strong: 0 0 40px core.alpha($secondary, 0.5)
 );
 
-// Mantine color scale overrides for twilight theme
-$twilight-primary-scale: (
-  0: #f5f3ff,
-  1: #ede9fe,
-  2: #ddd6fe,
-  3: #c4b5fd,
-  4: #a78bfa,
-  5: #8b5cf6,
-  6: #7c3aed,
-  7: #6d28d9,
-  8: #5b21b6,
-  9: #4c1d95,
+// Light mode colors
+$twilight-light: map.merge($twilight-dark, (
+  // Backgrounds
+  background: #f8f9fa,
+  background-surface: #ffffff,
+  background-surface-light: #f3f4f6,
+
+  // Text
+  text: #1f2937,
+  text-muted: core.alpha(#1f2937, 0.7),
+  text-dim: core.alpha(#1f2937, 0.5),
+
+  // Borders
+  border: core.alpha(#000000, 0.1),
+  border-light: core.alpha(#000000, 0.05),
+  border-dark: core.alpha(#000000, 0.2),
+
+  // Effects
+  shadow-glow: 0 0 20px core.alpha($primary, 0.2),
+  shadow-glow-strong: 0 0 40px core.alpha($primary, 0.3)
+));
+
+// Export theme
+$twilight-theme: (
+  name: twilight,
+  colors: $twilight-dark,
+  colors-light: $twilight-light,
+  scales: (
+    indigo: $primary,
+    violet: $secondary,
+    pink: $accent
+  ),
+  overrides: (
+    mantine-primary-color: indigo
+  )
 );
-
-$twilight-gray-scale: (
-  0: #fafafa,
-  1: #f4f4f5,
-  2: #e4e4e7,
-  3: #d4d4d8,
-  4: #a1a1aa,
-  5: #71717a,
-  6: #52525b,
-  7: #3f3f46,
-  8: #27272a,
-  9: #18181b,
-);
-
-// Twilight light mode colors
-$twilight-light-colors: (
-  // Primary colors - slightly darker for light mode
-  "color-primary": #5b5fc7,
-  "color-primary-light": #6366f1,
-  "color-primary-dark": #4338ca,
-
-  // Secondary colors
-  "color-secondary": #7c3aed,
-  "color-secondary-light": #8b5cf6,
-  "color-secondary-dark": #6d28d9,
-
-  // Accent colors
-  "color-accent": #db2777,
-  "color-accent-light": #ec4899,
-  "color-accent-dark": #be185d,
-
-  // Background colors - light variants
-  "color-background": #f8f9fa,
-  "color-surface": #ffffff,
-  "color-surface-light": #f3f4f6,
-
-  // Text colors - dark for light mode
-  "color-text": #1f2937,
-  "color-text-muted": rgba(31, 41, 55, 0.7),
-  "color-text-dim": rgba(31, 41, 55, 0.5),
-
-  // Special effects - adjusted for light mode
-  "twilight-gradient-primary": linear-gradient(135deg, #6366f1, #8b5cf6),
-  "twilight-gradient-secondary": linear-gradient(135deg, #8b5cf6, #ec4899),
-  "twilight-gradient-accent": linear-gradient(135deg, #ec4899, #f472b6),
-  "twilight-shadow-glow": 0 0 20px rgba(99, 102, 241, 0.2),
-  "twilight-shadow-glow-strong": 0 0 40px rgba(99, 102, 241, 0.3),
-);
-
-// Apply twilight theme
-[data-theme-style="twilight"] {
-  // Default to dark mode colors
-  @include base.apply-theme($twilight-colors);
-  @include base.generate-color-scale("primary", $twilight-primary-scale);
-  @include base.generate-color-scale("gray", $twilight-gray-scale);
-  @include base.apply-component-themes($twilight-colors);
-}
-
-// Light mode overrides for twilight
-[data-theme-style="twilight"][data-mantine-color-scheme="light"] {
-  @include base.apply-theme($twilight-light-colors);
-  // Keep the same color scales for consistency
-  @include base.apply-component-themes($twilight-light-colors);
-}
-
-// Component overrides for twilight theme
-.theme-style-twilight {
-
-  // Twilight-specific component overrides
-  .tnk-button {
-    &--primary {
-      background: var(--twilight-gradient-primary);
-      box-shadow: var(--twilight-shadow-glow);
-
-      &:hover {
-        box-shadow: var(--twilight-shadow-glow-strong);
-      }
-    }
-  }
-
-  .tnk-card {
-    &--glowing {
-      box-shadow: var(--twilight-shadow-glow);
-    }
-  }
-
-  // Mantine component overrides
-  .mantine-Button-root {
-    &[data-variant="gradient"] {
-      background: var(--twilight-gradient-primary);
-    }
-  }
-
-  .mantine-Paper-root {
-    background: var(--color-surface);
-    border: 1px solid var(--card-border);
-  }
-}

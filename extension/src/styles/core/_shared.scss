@@ -1,0 +1,118 @@
+@use 'sass:map';
+@use 'variables' as *;
+
+// =====================================================================
+// Base Resets & Global Styles
+// =====================================================================
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+
+  @media (prefers-reduced-motion: no-preference) {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  margin: 0;
+  font-family: $font-family-base;
+  font-size: map.get($font-sizes, base);
+  font-weight: map.get($font-weights, regular);
+  line-height: map.get($line-heights, base);
+  color: var(--text);
+  background-color: var(--background);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// Typography
+h1, h2, h3, h4, h5, h6 {
+  margin: 0 0 map.get($spacing-scale, md);
+  font-weight: map.get($font-weights, semibold);
+  line-height: map.get($line-heights, tight);
+}
+
+p {
+  margin: 0 0 map.get($spacing-scale, md);
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// Code
+code {
+  font-family: $font-family-mono;
+  font-size: 0.875em;
+  padding: 0.125em 0.25em;
+  background-color: var(--background-surface);
+  border-radius: map.get($radius-scale, xs);
+}
+
+// Forms
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+// Media
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+// Focus
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+// Selection
+::selection {
+  background-color: var(--primary);
+  color: white;
+}
+
+// Expose tokens as CSS variables
+:root {
+  // Spacing
+  @each $key, $value in $spacing-scale {
+    --spacing-#{$key}: #{$value};
+  }
+
+  // Radius
+  @each $key, $value in $radius-scale {
+    --radius-#{$key}: #{$value};
+  }
+
+  // Z-index
+  @each $key, $value in $z-layers {
+    --z-#{$key}: #{$value};
+  }
+
+  // Transitions
+  @each $key, $value in $transitions {
+    --transition-#{$key}: #{$value};
+  }
+}
+
+// Reduced motion
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

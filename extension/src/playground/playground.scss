@@ -1,10 +1,5 @@
-@use '../styles/gradients';
-@use '../styles/shared';
-@use "../styles/variables" as *;
-@use "../styles/animations" as *;
-
-// Import themes to include their CSS rules
-@use "../styles/themes/all";
+// Import the main entry point which includes everything
+@use "../styles/index";
 
 .playground {
   // Smooth transitions for theme switching

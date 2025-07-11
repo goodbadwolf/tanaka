@@ -2,7 +2,7 @@ import { AppShell, Box, Burger, ScrollArea } from '@mantine/core';
 import '@mantine/core/styles.css';
 import { useDisclosure } from '@mantine/hooks';
 import { useHashRouter } from '../hooks/use-hash-router';
-import { withThemeProvider } from '../themes/theme-provider';
+import { withThemeProvider } from '../styles/theme-provider';
 import { PlaygroundHeader } from './components/playground-header';
 import { PlaygroundNav } from './components/playground-nav';
 import './playground-app.scss';

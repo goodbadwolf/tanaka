@@ -1,129 +1,74 @@
-// Neon Test Theme - Intentionally jarring for testing theme switching
-@use "base" as base;
+@use '../core' as core;
 
-// Neon color palette - deliberately jarring
+// Neon colors
+$cyan: #00ffff;
+$magenta: #ff00ff;
+$lime: #00ff00;
+
 $neon-colors: (
-  // Primary colors - bright cyan
-  "color-primary": #00ffff,
-  "color-primary-light": #66ffff,
-  "color-primary-dark": #00cccc,
+  // Primary colors
+  primary: $cyan,
+  primary-light: core.tint($cyan, 20%),
+  primary-dark: core.shade($cyan, 20%),
 
-  // Secondary colors - hot pink
-  "color-secondary": #ff00ff,
-  "color-secondary-light": #ff66ff,
-  "color-secondary-dark": #cc00cc,
+  // Secondary colors
+  secondary: $magenta,
+  secondary-light: core.tint($magenta, 20%),
+  secondary-dark: core.shade($magenta, 20%),
 
-  // Accent colors - lime green
-  "color-accent": #00ff00,
-  "color-accent-light": #66ff66,
-  "color-accent-dark": #00cc00,
+  // Accent colors
+  accent: $lime,
+  accent-light: core.tint($lime, 20%),
+  accent-dark: core.shade($lime, 20%),
 
-  // Background colors - bright yellow/orange
-  "color-background": #ffff00,
-  "color-surface": #ff9900,
-  "color-surface-light": #ffcc00,
+  // Backgrounds (intentionally garish)
+  background: #ffff00,
+  background-surface: #ff9900,
+  background-surface-light: #ffcc00,
 
-  // Text colors - contrasting dark
-  "color-text": #000000,
-  "color-text-muted": rgba(0, 0, 0, 0.8),
-  "color-text-dim": rgba(0, 0, 0, 0.6),
+  // Text
+  text: #000000,
+  text-muted: core.alpha(#000000, 0.8),
+  text-dim: core.alpha(#000000, 0.6),
 
-  // Special effects - even more jarring
-  "twilight-gradient-primary": linear-gradient(45deg, #ff0000, #00ff00, #0000ff),
-  "twilight-gradient-secondary": linear-gradient(135deg, #ff00ff, #ffff00, #00ffff),
-  "twilight-gradient-accent": linear-gradient(90deg, #ff0000, #ff9900, #ffff00, #00ff00, #0099ff, #9900ff),
-  "twilight-shadow-glow": 0 0 30px #ff00ff,
-  "twilight-shadow-glow-strong": 0 0 50px #00ffff,
+  // Borders
+  border: core.alpha(#000000, 0.2),
+  border-light: core.alpha(#000000, 0.1),
+  border-dark: core.alpha(#000000, 0.3),
+
+  // States
+  success: #00ff00,
+  success-light: #66ff66,
+  success-dark: #00cc00,
+
+  warning: #ffcc00,
+  warning-light: #ffdd33,
+  warning-dark: #ff9900,
+
+  error: #ff0033,
+  error-light: #ff3366,
+  error-dark: #cc0029,
+
+  info: #00ccff,
+  info-light: #33ddff,
+  info-dark: #0099cc,
+
+  // Effects
+  shadow-glow: 0 0 30px $magenta,
+  shadow-glow-strong: 0 0 50px $cyan
 );
 
-// Neon Mantine color scales - bright variations
-$neon-primary-scale: (
-  0: #e6ffff,
-  1: #ccffff,
-  2: #99ffff,
-  3: #66ffff,
-  4: #33ffff,
-  5: #00ffff,
-  6: #00e6e6,
-  7: #00cccc,
-  8: #00b3b3,
-  9: #009999,
+// Export theme
+$neon-theme: (
+  name: neon,
+  colors: $neon-colors,
+  scales: (
+    cyan: $cyan,
+    pink: $magenta,
+    lime: $lime
+  ),
+  overrides: (
+    mantine-primary-color: cyan,
+    mantine-radius-default: 24px
+  )
 );
-
-$neon-gray-scale: (
-  0: #ffffff,
-  1: #ffff99,
-  2: #ffff66,
-  3: #ffff33,
-  4: #ffff00,
-  5: #ffcc00,
-  6: #ff9900,
-  7: #ff6600,
-  8: #ff3300,
-  9: #ff0000,
-);
-
-// Apply neon theme
-[data-theme-style="neon"] {
-  // Apply base theme colors
-  @include base.apply-theme($neon-colors);
-
-  // Apply Mantine color scales
-  @include base.generate-color-scale("primary", $neon-primary-scale);
-  @include base.generate-color-scale("gray", $neon-gray-scale);
-
-  // Apply component-specific themes
-  @include base.apply-component-themes($neon-colors);
-}
-
-// Neon doesn't change for light/dark mode - it's always jarring!
-[data-theme-style="neon"][data-mantine-color-scheme="light"] {
-  // Keep the same jarring colors for testing
-  @include base.apply-theme($neon-colors);
-  @include base.apply-component-themes($neon-colors);
-}
-
-// Component overrides for neon theme
-.theme-style-neon {
-
-  // Neon-specific component overrides
-  .tnk-button {
-    &--primary {
-      background: var(--twilight-gradient-primary);
-      box-shadow: var(--twilight-shadow-glow);
-      animation: rainbow 3s linear infinite;
-
-      &:hover {
-        box-shadow: var(--twilight-shadow-glow-strong);
-        animation-duration: 1s;
-      }
-    }
-  }
-
-  .tnk-card {
-    &--glowing {
-      box-shadow: var(--twilight-shadow-glow);
-      animation: pulse 1s ease-in-out infinite;
-    }
-  }
-
-  // Mantine component overrides
-  .mantine-Button-root {
-    &[data-variant="gradient"] {
-      background: var(--twilight-gradient-accent);
-      animation: rainbow 5s linear infinite;
-    }
-  }
-
-  .mantine-Paper-root {
-    background: var(--color-surface);
-    border: 3px solid var(--color-accent);
-    box-shadow: 0 0 20px var(--color-accent);
-  }
-
-  // Add rainbow animation for extra jarring effect
-  @keyframes rainbow {
-    0% { filter: hue-rotate(0deg); }
-    100% { filter: hue-rotate(360deg); }
-  }
-}

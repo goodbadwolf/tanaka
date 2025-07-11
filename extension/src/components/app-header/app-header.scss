@@ -1,4 +1,4 @@
-@use "../../styles/mixins" as *;
+@use "../../styles/core/mixins" as *;
 
 .tnk-app-header {
   position: relative;
@@ -63,7 +63,7 @@
       }
     }
 
-    @include rtl-flip;
+    // RTL support can be added later if needed
   }
 
   &__icon {
@@ -133,6 +133,6 @@
 .tnk-app-header {
   &__back,
   &__icon {
-    @include touch-interaction;
+    @include touch-feedback;
   }
 }
