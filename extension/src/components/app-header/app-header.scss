@@ -94,6 +94,12 @@
   &__actions {
     flex-shrink: 0;
   }
+
+  // Touch interactions
+  &__back,
+  &__icon {
+    @include touch-feedback;
+  }
 }
 
 @media (max-width: var(--mantine-breakpoint-sm)) {
@@ -123,13 +129,5 @@
         font-size: var(--mantine-h3-font-size);
       }
     }
-  }
-}
-
-// Apply touch interaction to interactive elements
-.tnk-app-header {
-  &__back,
-  &__icon {
-    @include touch-feedback;
   }
 }
