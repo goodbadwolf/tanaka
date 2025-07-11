@@ -165,6 +165,9 @@ importers:
       postcss-preset-env:
         specifier: ^10.2.4
         version: 10.2.4(postcss@8.5.6)
+      preact-devtools:
+        specifier: ^0.0.1
+        version: 0.0.1
       prettier:
         specifier: ^3.6.0
         version: 3.6.0
@@ -4941,6 +4944,9 @@ packages:
   postcss@8.5.6:
     resolution: {integrity: sha512-3Ybi1tAuwAP9s0r1UQ2J4n5Y0G05bJkpUIO0/bI9MhwmD70S5aTWbXGBwxHrelT+XM1k6dM0pk+SwNkpTRN7Pg==}
     engines: {node: ^10 || ^12 || >=14}
+
+  preact-devtools@0.0.1:
+    resolution: {integrity: sha512-qa2nzmnFrGjRT+SoanriwykEC+KMkvnj/3D18mwPuruPZ95lh1JPtceEmCU9qoz340lTlwTz3kJpiJs+3CZlbQ==}
 
   preact-router@4.1.2:
     resolution: {integrity: sha512-uICUaUFYh+XQ+6vZtQn1q+X6rSqwq+zorWOCLWPF5FAsQh3EJ+RsDQ9Ee+fjk545YWQHfUxhrBAaemfxEnMOUg==}
@@ -11556,6 +11562,8 @@ snapshots:
       nanoid: 3.3.11
       picocolors: 1.1.1
       source-map-js: 1.2.1
+
+  preact-devtools@0.0.1: {}
 
   preact-router@4.1.2(preact@10.26.9):
     dependencies:
