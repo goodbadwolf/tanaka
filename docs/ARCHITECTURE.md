@@ -134,8 +134,10 @@ Tanaka uses a structured JSON-based CRDT protocol for conflict-free synchronizat
 
 ### UI Components
 
-- Popup: Window tracking controls
-- Settings: Server configuration
+> **Note**: UI components are being rebuilt with the new SCSS architecture. The old implementations were removed in Phase 2.5 of the SCSS migration. New implementations will be created in Phase 4. See [SCSS_ROADMAP.md](./SCSS_ROADMAP.md) for details.
+
+- Popup: Window tracking controls (Phase 4)
+- Settings: Server configuration (Phase 4)
 - Future: Tab search and management
 
 ### Message Passing

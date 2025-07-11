@@ -235,4 +235,4 @@ When adding new components:
 
 - [Component Development](../components/README.md)
 - [Theme System](../themes/README.md)
-- [SCSS Migration](../../docs/SCSS_MIGRATION_PLAN.md)
+- [SCSS Roadmap](../../docs/SCSS_ROADMAP.md)
