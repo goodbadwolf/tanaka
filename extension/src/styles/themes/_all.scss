@@ -2,11 +2,13 @@
 @use './base' as base;
 @use './twilight';
 @use './neon';
+@use './midnight';
 
 // Theme registry
 $themes: (
   twilight: twilight.$twilight-theme,
-  neon: neon.$neon-theme
+  neon: neon.$neon-theme,
+  midnight: midnight.$midnight-theme
 );
 
 // Default theme

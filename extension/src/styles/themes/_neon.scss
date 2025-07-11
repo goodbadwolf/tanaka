@@ -21,20 +21,20 @@ $neon-colors: (
   accent-light: core.tint($lime, 20%),
   accent-dark: core.shade($lime, 20%),
 
-  // Backgrounds (intentionally garish)
-  background: #ffff00,
-  background-surface: #ff9900,
-  background-surface-light: #ffcc00,
+  // Backgrounds
+  background: #0a0a0a,
+  background-surface: #1a1a1a,
+  background-surface-light: #2a2a2a,
 
   // Text
-  text: #000000,
-  text-muted: core.alpha(#000000, 0.8),
-  text-dim: core.alpha(#000000, 0.6),
+  text: #ffffff,
+  text-muted: core.alpha(#ffffff, 0.8),
+  text-dim: core.alpha(#ffffff, 0.6),
 
   // Borders
-  border: core.alpha(#000000, 0.2),
-  border-light: core.alpha(#000000, 0.1),
-  border-dark: core.alpha(#000000, 0.3),
+  border: core.alpha(#ffffff, 0.2),
+  border-light: core.alpha(#ffffff, 0.1),
+  border-dark: core.alpha(#ffffff, 0.3),
 
   // States
   success: #00ff00,
@@ -55,7 +55,17 @@ $neon-colors: (
 
   // Effects
   shadow-glow: 0 0 30px $magenta,
-  shadow-glow-strong: 0 0 50px $cyan
+  shadow-glow-strong: 0 0 50px $cyan,
+
+  // RGB values for shadow functions
+  primary-rgb: '0, 255, 255',      // #00ffff (cyan)
+  secondary-rgb: '255, 0, 255',    // #ff00ff (magenta)
+  accent-rgb: '0, 255, 0',         // #00ff00 (lime)
+
+  // Theme-specific gradients
+  neon-gradient-primary: linear-gradient(135deg, $cyan, $magenta),
+  neon-gradient-accent: linear-gradient(135deg, $magenta, $lime),
+  neon-gradient-glow: radial-gradient(circle at center, core.alpha($cyan, 0.3), transparent 70%)
 );
 
 // Export theme
@@ -69,6 +79,6 @@ $neon-theme: (
   ),
   overrides: (
     mantine-primary-color: cyan,
-    mantine-radius-default: 24px
+    mantine-radius-default: 12px
   )
 );

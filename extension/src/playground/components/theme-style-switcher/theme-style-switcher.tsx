@@ -4,7 +4,8 @@ import './theme-style-switcher.scss';
 
 const THEME_STYLES = [
   { value: 'twilight', label: 'Twilight' },
-  { value: 'neon', label: 'Neon (Test)' },
+  { value: 'neon', label: 'Neon' },
+  { value: 'midnight', label: 'Midnight' },
 ];
 
 export function ThemeStyleSwitcher() {
