@@ -71,6 +71,23 @@ This file tracks all pending work for the Tanaka project.
 - Squash commits for clean history when merging
 - Delete feature branches after merge
 
+## In Progress Tasks
+
+> Tasks currently being worked on. Only move tasks here when you actually start working on them.
+
+### Branch: `feat/scss-phase-3`
+
+#### SCSS Migration Phase 3: Consolidation & Optimization
+
+See [SCSS_ROADMAP.md](./SCSS_ROADMAP.md) for detailed implementation.
+
+- [ ] Polish and finalize twilight and neon themes
+- [ ] Add Dividers component
+- [ ] Extract common patterns into mixins
+- [ ] Consolidate duplicate styles
+- [ ] Remove unused styles
+- [ ] Performance testing
+
 ## Pending Tasks
 
 All work to be completed.
@@ -286,19 +303,6 @@ See [SCSS_ROADMAP.md](./SCSS_ROADMAP.md) for detailed implementation.
 - [x] Created comprehensive styling guide and documentation
 - [x] Implemented twilight theme with CSS variables
 - [x] Removed all inline styles and CSS-in-JS usage
-
-### Branch: `feat/scss-phase-3`
-
-#### SCSS Migration Phase 3: Consolidation & Optimization
-
-See [SCSS_ROADMAP.md](./SCSS_ROADMAP.md) for detailed implementation.
-
-- [ ] Polish and finalize twilight and neon themes
-- [ ] Add Dividers component
-- [ ] Extract common patterns into mixins
-- [ ] Consolidate duplicate styles
-- [ ] Remove unused styles
-- [ ] Performance testing
 
 ### Branch: `feat/scss-phase-4`
 

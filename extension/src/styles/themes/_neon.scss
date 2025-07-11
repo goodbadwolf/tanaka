@@ -1,84 +1,114 @@
+// Neon Theme - High Contrast Cyberpunk
+// Purpose: Futuristic theme with vibrant neon colors and extreme contrast
+// Inspiration: Blade Runner, TRON, cyberpunk aesthetics
+
+@use 'sass:map';
 @use '../core' as core;
 
-// Neon colors
-$cyan: #00ffff;
-$magenta: #ff00ff;
-$lime: #00ff00;
+// Brand colors - Intense neon palette
+$primary: #00d9ff;        // Electric cyan - Primary actions
+$secondary: #ff0099;      // Hot pink - Secondary elements
+$accent: #39ff14;         // Matrix green - Highlights
+
+// Pure neon colors for effects
+$neon-cyan: #00ffff;
+$neon-pink: #ff00ff;
+$neon-green: #00ff00;
 
 $neon-colors: (
-  // Primary colors
-  primary: $cyan,
-  primary-light: core.tint($cyan, 20%),
-  primary-dark: core.shade($cyan, 20%),
+  // Brand colors - Vibrant neon tones
+  primary: $primary,
+  primary-light: core.tint($primary, 10%),
+  primary-dark: core.shade($primary, 15%),
 
-  // Secondary colors
-  secondary: $magenta,
-  secondary-light: core.tint($magenta, 20%),
-  secondary-dark: core.shade($magenta, 20%),
+  secondary: $secondary,
+  secondary-light: core.tint($secondary, 10%),
+  secondary-dark: core.shade($secondary, 15%),
 
-  // Accent colors
-  accent: $lime,
-  accent-light: core.tint($lime, 20%),
-  accent-dark: core.shade($lime, 20%),
+  accent: $accent,
+  accent-light: core.tint($accent, 10%),
+  accent-dark: core.shade($accent, 15%),
 
-  // Backgrounds
-  background: #0a0a0a,
-  background-surface: #1a1a1a,
-  background-surface-light: #2a2a2a,
+  // Backgrounds - Deep blacks for maximum contrast
+  background: #000000,              // Pure black
+  background-surface: #0a0a0a,      // Near black
+  background-surface-light: #141414,// Slightly elevated
 
-  // Text
-  text: #ffffff,
-  text-muted: core.alpha(#ffffff, 0.8),
-  text-dim: core.alpha(#ffffff, 0.6),
+  // Text - High contrast whites
+  text: #ffffff,                    // Pure white
+  text-muted: #b0b0b0,              // Gray for secondary
+  text-dim: #707070,                // Dark gray for disabled
 
-  // Borders
-  border: core.alpha(#ffffff, 0.2),
-  border-light: core.alpha(#ffffff, 0.1),
-  border-dark: core.alpha(#ffffff, 0.3),
+  // Borders - Neon glow style
+  border: rgba(0, 217, 255, 0.3),   // Cyan glow
+  border-light: rgba(0, 217, 255, 0.15),
+  border-dark: rgba(0, 217, 255, 0.5),
 
-  // States
-  success: #00ff00,
-  success-light: #66ff66,
-  success-dark: #00cc00,
+  // States - Vibrant semantic colors
+  success: $accent,                 // Matrix green
+  success-light: core.tint($accent, 15%),
+  success-dark: core.shade($accent, 15%),
 
-  warning: #ffcc00,
-  warning-light: #ffdd33,
-  warning-dark: #ff9900,
+  warning: #ffaa00,                 // Amber neon
+  warning-light: #ffcc33,
+  warning-dark: #ff8800,
 
-  error: #ff0033,
+  error: #ff0040,                   // Red neon
   error-light: #ff3366,
-  error-dark: #cc0029,
+  error-dark: #cc0033,
 
-  info: #00ccff,
-  info-light: #33ddff,
-  info-dark: #0099cc,
+  info: $primary,                   // Electric cyan
+  info-light: core.tint($primary, 15%),
+  info-dark: core.shade($primary, 15%),
 
-  // Effects
-  shadow-glow: 0 0 30px $magenta,
-  shadow-glow-strong: 0 0 50px $cyan,
+  // Effects - Intense glows
+  shadow-glow: 0 0 20px rgba(0, 217, 255, 0.8),
+  shadow-glow-strong: 0 0 40px rgba(255, 0, 153, 1),
+  shadow-glow-text: 0 0 10px currentColor,
 
-  // RGB values for shadow functions
-  primary-rgb: '0, 255, 255',      // #00ffff (cyan)
-  secondary-rgb: '255, 0, 255',    // #ff00ff (magenta)
-  accent-rgb: '0, 255, 0',         // #00ff00 (lime)
+  // RGB values for dynamic shadows
+  primary-rgb: '0, 217, 255',       // Electric cyan
+  secondary-rgb: '255, 0, 153',     // Hot pink
+  accent-rgb: '57, 255, 20',        // Matrix green
 
   // Theme-specific gradients
-  neon-gradient-primary: linear-gradient(135deg, $cyan, $magenta),
-  neon-gradient-accent: linear-gradient(135deg, $magenta, $lime),
-  neon-gradient-glow: radial-gradient(circle at center, core.alpha($cyan, 0.3), transparent 70%)
+  neon-gradient-primary: linear-gradient(135deg, $primary 0%, $secondary 100%),
+  neon-gradient-accent: linear-gradient(135deg, $secondary 0%, $accent 100%),
+  neon-gradient-glow: radial-gradient(circle at center, rgba(0, 217, 255, 0.4), transparent 70%),
+  neon-gradient-rainbow: linear-gradient(90deg, $primary 0%, $secondary 33%, $accent 66%, $primary 100%)
 );
+
+// Light mode - Neon theme stays dark even in light mode for cyberpunk aesthetic
+$neon-colors-light: map.merge($neon-colors, (
+  // Slightly lighter backgrounds for light mode (but still dark)
+  background: #0a0a0a,              // Very dark gray instead of pure black
+  background-surface: #1a1a1a,      // Dark gray
+  background-surface-light: #262626,// Slightly lighter dark gray
+
+  // Keep text light for contrast
+  text: #ffffff,
+  text-muted: #e0e0e0,
+  text-dim: #b0b0b0,
+
+  // Slightly stronger borders in light mode
+  border: rgba(0, 217, 255, 0.4),
+  border-light: rgba(0, 217, 255, 0.2),
+  border-dark: rgba(0, 217, 255, 0.6)
+));
 
 // Export theme
 $neon-theme: (
   name: neon,
   colors: $neon-colors,
+  colors-light: $neon-colors-light,
   scales: (
-    'cyan': $cyan,
-    'pink': $magenta,
-    'lime': $lime
+    'cyan': $primary,
+    'pink': $secondary,
+    'green': $accent
   ),
   overrides: (
     mantine-primary-color: cyan,
-    mantine-radius-default: 12px
+    mantine-radius-default: 4px,     // Sharp corners for tech feel
+    mantine-font-family-headings: 'Orbitron, monospace'
   )
 );

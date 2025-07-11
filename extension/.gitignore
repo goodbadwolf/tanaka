@@ -18,3 +18,7 @@ coverage/
 # Extension specific
 *.xpi
 web-ext-artifacts/
+
+# BackstopJS
+backstop_data/
+!backstop_data/engine_scripts/*

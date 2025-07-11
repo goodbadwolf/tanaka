@@ -15,18 +15,18 @@
   }
 
   &__meta-stack {
-    min-width: 200px;
+    min-width: calc(var(--mantine-spacing-xl) * 5);
   }
 
   &__text-meta-stack {
-    min-width: 280px;
+    min-width: calc(var(--mantine-spacing-xl) * 7);
   }
 
   &__gradient-text {
-    background: var(--twilight-gradient-primary);
+    background: var(--gradient-primary);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    font-weight: 700;
+    font-weight: var(--mantine-font-weight-bold);
   }
 }

@@ -1,33 +1,33 @@
 // Spacing Section styles
 .tnk-spacing {
   &__preview-box {
-    width: 60px;
-    height: 60px;
-    background-color: var(--mantine-color-blue-light);
-    border: 2px solid var(--mantine-color-blue-6);
+    width: calc(var(--mantine-spacing-xl) * 1.5);
+    height: calc(var(--mantine-spacing-xl) * 1.5);
+    background-color: var(--primary-light);
+    border: calc(var(--mantine-spacing-xs) / 2) solid var(--primary);
     display: flex;
     align-items: center;
     justify-content: center;
   }
 
   &__spacing-indicator {
-    background-color: var(--mantine-color-blue-6);
+    background-color: var(--primary);
     // Width and height are dynamic based on spacing value
   }
 
   &__radius-demo {
     width: 100%;
-    height: 80px;
-    background-color: var(--mantine-color-blue-light);
-    border: 2px solid var(--mantine-color-blue-6);
+    height: calc(var(--mantine-spacing-xl) * 2);
+    background-color: var(--primary-light);
+    border: calc(var(--mantine-spacing-xs) / 2) solid var(--primary);
     margin-bottom: var(--mantine-spacing-md);
     // Border radius is dynamic
   }
 
   &__container-wrapper {
-    height: 40px;
-    background-color: var(--mantine-color-gray-2);
-    border: 1px dashed var(--mantine-color-gray-5);
+    height: var(--mantine-spacing-xl);
+    background-color: var(--background-surface);
+    border: var(--mantine-spacing-xs) dashed var(--border);
     position: relative;
     overflow: hidden;
   }
@@ -53,14 +53,14 @@
   &__grid-demo {
     display: grid;
     grid-template-columns: repeat(12, 1fr);
-    gap: 8px;
+    gap: var(--mantine-spacing-xs);
     margin-bottom: var(--mantine-spacing-md);
   }
 
   &__grid-cell {
-    height: 40px;
-    background-color: var(--mantine-color-blue-light);
-    border: 1px solid var(--mantine-color-blue-6);
+    height: var(--mantine-spacing-xl);
+    background-color: var(--primary-light);
+    border: var(--mantine-spacing-xs) solid var(--primary);
     display: flex;
     align-items: center;
     justify-content: center;

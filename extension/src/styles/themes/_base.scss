@@ -42,6 +42,17 @@
   --mantine-color-default-border: var(--border);
   --mantine-color-dimmed: var(--text-muted);
 
+  // Additional Mantine mappings for better theme support
+  --mantine-color-white: var(--background-surface);
+  --mantine-color-black: var(--text);
+  --mantine-color-gray-0: var(--background-surface);
+  --mantine-color-gray-1: var(--background-surface-light);
+  --mantine-color-gray-6: var(--text-muted);
+  --mantine-color-gray-7: var(--text);
+  --mantine-color-dark-0: var(--text);
+  --mantine-color-dark-6: var(--background-surface);
+  --mantine-color-dark-7: var(--background);
+
   // Primary color
   --mantine-color-primary-filled: var(--primary);
   --mantine-color-primary-filled-hover: var(--primary-dark);

@@ -29,7 +29,28 @@ $default-theme: twilight;
       $light-colors: map.get($config, colors-light);
       @if $light-colors {
         @include base.apply-theme($light-colors);
+        // Re-map to Mantine variables for light mode
+        @include base.map-to-mantine($light-colors);
       }
     }
+  }
+}
+
+// Special handling for Neon theme - ensure text is always light
+[data-theme-style="neon"] {
+  // Force light text in all contexts
+  color: var(--text);
+
+  // Ensure all Mantine components use light text
+  * {
+    color: inherit;
+  }
+
+  // Specific overrides for components that might not inherit
+  .mantine-Text-root,
+  .mantine-Title-root,
+  .mantine-Card-root,
+  .mantine-Paper-root {
+    color: var(--text);
   }
 }
