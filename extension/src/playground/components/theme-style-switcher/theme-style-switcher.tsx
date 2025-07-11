@@ -1,5 +1,5 @@
 import { SegmentedControl } from '@mantine/core';
-import { useState, useEffect } from 'preact/hooks';
+import { useEffect, useState } from 'preact/hooks';
 import './theme-style-switcher.scss';
 
 const THEME_STYLES = [
@@ -22,7 +22,7 @@ export function ThemeStyleSwitcher() {
 
     // Optionally save to localStorage
     try {
-      localStorage.setItem('tanaka-theme-style', value);
+      localStorage.setItem('tnk-theme-style', value);
     } catch (e) {
       console.error('Failed to save theme preference:', e);
     }
@@ -36,7 +36,7 @@ export function ThemeStyleSwitcher() {
       size="sm"
       radius="md"
       fullWidth={false}
-      className="tanaka-theme-style-switcher"
+      className="tnk-theme-style-switcher"
     />
   );
 }

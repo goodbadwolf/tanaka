@@ -35,17 +35,15 @@ export function SpacingSection() {
         <Title order={2} mb="md">
           Spacing Scale
         </Title>
-        <Text mb="lg">
-          Based on an 8px unit system for consistent alignment and spacing.
-        </Text>
+        <Text mb="lg">Based on an 8px unit system for consistent alignment and spacing.</Text>
         <Stack gap="md">
           {spacingScale.map((space) => (
             <Card key={space.name} shadow="sm" padding="lg" radius="md" withBorder>
               <Group justify="space-between" align="center">
                 <Group>
-                  <Box className="tanaka-spacing__preview-box">
+                  <Box className="tnk-spacing__preview-box">
                     <Box
-                      className="tanaka-spacing__spacing-indicator"
+                      className="tnk-spacing__spacing-indicator"
                       style={{
                         width: space.value,
                         height: space.value,
@@ -75,7 +73,7 @@ export function SpacingSection() {
             <Grid.Col key={radius.name} span={{ base: 6, sm: 4, md: 3 }}>
               <Card shadow="sm" padding="lg" radius="md" withBorder>
                 <Box
-                  className="tanaka-spacing__radius-demo"
+                  className="tnk-spacing__radius-demo"
                   style={{
                     borderRadius: radius.value,
                   }}
@@ -104,12 +102,20 @@ export function SpacingSection() {
                   <Text fw={600} mb="xs">
                     Container {size.toUpperCase()}
                   </Text>
-                  <Box className="tanaka-spacing__container-wrapper">
+                  <Box className="tnk-spacing__container-wrapper">
                     <Box
-                      className={`tanaka-spacing__container-demo tanaka-spacing__container-demo--${size}`}
+                      className={`tnk-spacing__container-demo tnk-spacing__container-demo--${size}`}
                     >
                       <Text size="xs" fw={500}>
-                        {size === 'xs' ? '540px' : size === 'sm' ? '720px' : size === 'md' ? '960px' : size === 'lg' ? '1140px' : '1320px'}
+                        {size === 'xs'
+                          ? '540px'
+                          : size === 'sm'
+                            ? '720px'
+                            : size === 'md'
+                              ? '960px'
+                              : size === 'lg'
+                                ? '1140px'
+                                : '1320px'}
                       </Text>
                     </Box>
                   </Box>
@@ -126,12 +132,9 @@ export function SpacingSection() {
         </Title>
         <Card shadow="sm" padding="lg" radius="md" withBorder>
           <Text mb="md">12-column grid system with responsive breakpoints</Text>
-          <Box className="tanaka-spacing__grid-demo">
+          <Box className="tnk-spacing__grid-demo">
             {Array.from({ length: 12 }).map((_, i) => (
-              <Box
-                key={i}
-                className="tanaka-spacing__grid-cell"
-              >
+              <Box key={i} className="tnk-spacing__grid-cell">
                 <Text size="xs" fw={500}>
                   {i + 1}
                 </Text>

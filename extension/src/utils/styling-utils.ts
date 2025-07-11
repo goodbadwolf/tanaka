@@ -1,4 +1,4 @@
-import { MantineTheme, CSSProperties } from '@mantine/core';
+import { CSSProperties, MantineTheme } from '@mantine/core';
 import { ThemeStyle } from '../themes/theme-config';
 
 /**
@@ -21,7 +21,7 @@ export const cn = {
    * Generate component class names with optional variants
    */
   component: (name: string, variant?: string, state?: string): string => {
-    let className = `tanaka-${name}`;
+    let className = `tnk-${name}`;
     if (variant) className += `-${variant}`;
     if (state) className += ` is-${state}`;
     return className;

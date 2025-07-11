@@ -5,8 +5,8 @@ import {
   IconForms,
   IconLayout,
   IconPalette,
-  IconSettings,
   IconRuler,
+  IconSettings,
   IconTypography,
 } from '@tabler/icons-preact';
 import './playground-nav.scss';
@@ -40,7 +40,7 @@ export function PlaygroundNav({ activeSection, onSectionChange }: PlaygroundNavP
           leftSection={<item.icon size={18} />}
           active={activeSection === item.id}
           onClick={() => onSectionChange(item.id)}
-          className="tanaka-playground-nav__navlink"
+          className="tnk-playground-nav__navlink"
         />
       ))}
     </Stack>

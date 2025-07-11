@@ -87,7 +87,7 @@ $neon-gray-scale: (
 .theme-style-neon {
 
   // Neon-specific component overrides
-  .tanaka-button {
+  .tnk-button {
     &--primary {
       background: var(--twilight-gradient-primary);
       box-shadow: var(--twilight-shadow-glow);
@@ -100,7 +100,7 @@ $neon-gray-scale: (
     }
   }
 
-  .tanaka-card {
+  .tnk-card {
     &--glowing {
       box-shadow: var(--twilight-shadow-glow);
       animation: pulse 1s ease-in-out infinite;

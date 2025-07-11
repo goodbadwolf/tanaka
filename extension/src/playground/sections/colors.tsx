@@ -1,5 +1,4 @@
-import { Box, Card, Code, Grid, Group, Stack, Text, Title } from '@mantine/core';
-import { useMantineTheme } from '@mantine/core';
+import { Box, Card, Code, Grid, Group, Stack, Text, Title, useMantineTheme } from '@mantine/core';
 import './colors.scss';
 
 interface ColorCardProps {
@@ -14,7 +13,7 @@ function ColorCard({ name, color, description }: ColorCardProps) {
   return (
     <Card shadow="sm" radius="md" withBorder>
       <Box
-        className="tanaka-colors__swatch"
+        className="tnk-colors__swatch"
         style={{
           backgroundColor: color,
         }}
@@ -77,11 +76,11 @@ export function ColorsSection() {
   };
 
   const accentColors = {
-    'accent': '#a78bfa',
+    accent: '#a78bfa',
     'accent-light': '#c4b5fd',
     'accent-dark': '#7c3aed',
-    'highlight': '#ddd6fe',
-    'muted': 'rgba(255, 255, 255, 0.7)',
+    highlight: '#ddd6fe',
+    muted: 'rgba(255, 255, 255, 0.7)',
     'surface-light': '#1f1f23',
   };
 
@@ -192,9 +191,9 @@ export function ColorsSection() {
               Gradients
             </Text>
             <Group>
-              <Box className="tanaka-colors__gradient-demo tanaka-colors__gradient-demo--primary" />
-              <Box className="tanaka-colors__gradient-demo tanaka-colors__gradient-demo--vibrant" />
-              <Box className="tanaka-colors__gradient-demo tanaka-colors__gradient-demo--purple" />
+              <Box className="tnk-colors__gradient-demo tnk-colors__gradient-demo--primary" />
+              <Box className="tnk-colors__gradient-demo tnk-colors__gradient-demo--vibrant" />
+              <Box className="tnk-colors__gradient-demo tnk-colors__gradient-demo--purple" />
             </Group>
           </Card>
         </Stack>

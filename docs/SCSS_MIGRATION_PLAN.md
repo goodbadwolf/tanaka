@@ -25,10 +25,10 @@ extension/src/
 ├── components/                  # Shared components (kebab-case)
 │   ├── button/
 │   │   ├── button.tsx
-│   │   └── button.scss          # BEM: .tanaka-button
+│   │   └── button.scss          # BEM: .tnk-button
 │   ├── card/
 │   │   ├── card.tsx
-│   │   └── card.scss            # BEM: .tanaka-card
+│   │   └── card.scss            # BEM: .tnk-card
 │   ├── page-header/             # Existing component
 │   ├── theme-toggle/            # Existing component
 │   └── toggle/                  # Existing component
@@ -42,6 +42,7 @@ extension/src/
 ```
 
 Examples:
+
 - `playground/playground.scss` imports what it needs
 - `popup/popup.scss` will be lightweight
 - `settings/settings.scss` will be full-featured
@@ -51,21 +52,24 @@ Examples:
 Each app imports only what it needs, no central bundles:
 
 #### Playground (Development Environment)
+
 ```scss
 // playground/playground.scss
-@use "../styles/themes/all";  // Imports all themes and applies based on data attribute
+@use "../styles/themes/all"; // Imports all themes and applies based on data attribute
 @use "../styles/animations";
 // Import specific components as needed
 ```
 
 #### Popup (Lightweight)
+
 ```scss
 // popup/popup.scss (future)
-@use "../styles/themes/all";  // Even lightweight apps need theme
+@use "../styles/themes/all"; // Even lightweight apps need theme
 // Minimal imports for performance
 ```
 
 #### Settings (Full Featured)
+
 ```scss
 // settings/settings.scss (future)
 @use "../styles/themes/all";
@@ -99,7 +103,7 @@ $spacing-scale: (
   // 24px
   "xl": $base-spacing * 4,
   // 32px
-  "xxl": $base-spacing * 6 // 48px,,,,,
+  "xxl": $base-spacing * 6 // 48px,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 );
 
 // Z-index scale
@@ -293,7 +297,7 @@ h6 {
 @use "../../styles/mixins" as m;
 @use "../../styles/variables" as *;
 
-.tanaka-card {
+.tnk-card {
   padding: m.spacing("lg");
   border-radius: $border-radius-base * 2;
   transition: all $transition-base;
@@ -388,6 +392,7 @@ $twilight-colors: (
 ### Phase 2.5: Styling Architecture Cleanup (IN PROGRESS - Steps 4-8 NEXT)
 
 The current codebase has a jumbled mix of styling approaches:
+
 - SCSS files with imports and mixins
 - Plain CSS files
 - CSS Modules (in deprecated folder)
@@ -403,7 +408,7 @@ Since we are redesigning a huge chunk of the UI, start by removing old code:
 
 - [x] Delete webapp implementation (old routing system)
 - [x] Delete settings page implementation
-- [x] Delete popup page implementation  
+- [x] Delete popup page implementation
 - [x] Delete all deprecated components folder
 - [x] Remove all imports of deprecated components
 - [x] Clean up orphaned CSS/SCSS files
@@ -423,15 +428,17 @@ This gives us a clean slate to rebuild with consistent patterns.
 #### Step 2: Establish New Architecture Principles
 
 **Core Principles:**
+
 1. **Mantine components** - Use built-in props only (no styles/sx props)
 2. **Custom components** - Use SCSS files with BEM methodology
 3. **Theme values** - Reference Mantine CSS variables exclusively
 4. **No inline styles** - All styles in SCSS files
 5. **No CSS-in-JS** - Remove all runtime style generation
-6. **Global CSS classes** - Use `.tanaka-` prefix for all custom components (no CSS modules)
+6. **Global CSS classes** - Use `.tnk-` prefix for all custom components (no CSS modules)
 7. **Explicit naming** - Direct class names for searchability and clarity
 
 **File Structure:**
+
 ```
 src/
 ├── styles/
@@ -445,30 +452,35 @@ src/
 └── components/              # Flat structure, kebab-case
     ├── button/
     │   ├── button.tsx
-    │   └── button.scss      # Contains .tanaka-button class
+    │   └── button.scss      # Contains .tnk-button class
     └── [component]/
         ├── [component].tsx
-        └── [component].scss # Contains .tanaka-[component] class
+        └── [component].scss # Contains .tnk-[component] class
 ```
 
 **CSS Class Naming Convention:**
+
 ```scss
-// ALWAYS use .tanaka- prefix for custom components
-.tanaka-button {
+// ALWAYS use .tnk- prefix for custom components
+.tnk-button {
   // Component styles
 
   // BEM elements
-  &__icon { }        // .tanaka-button__icon
-  &__label { }       // .tanaka-button__label
+  &__icon {
+  } // .tnk-button__icon
+  &__label {
+  } // .tnk-button__label
 
-  // BEM modifiers  
-  &--primary { }     // .tanaka-button--primary
-  &--large { }       // .tanaka-button--large
+  // BEM modifiers
+  &--primary {
+  } // .tnk-button--primary
+  &--large {
+  } // .tnk-button--large
 }
 
 // Why this approach:
 // ✅ Prevents conflicts with Mantine or third-party styles
-// ✅ Searchable - find "tanaka-button" across entire codebase
+// ✅ Searchable - find "tnk-button" across entire codebase
 // ✅ Explicit - what you write is what you get in DevTools
 // ✅ No CSS modules complexity or generated class names
 ```
@@ -502,10 +514,9 @@ $twilight-theme: (
   "mantine-color-primary-0": #f5f3ff,
   "mantine-color-primary-6": #7c3aed,
   // ... all color scales
-
   // Custom theme variables
   "twilight-gradient-primary": linear-gradient(135deg, #6366f1, #8b5cf6),
-  "twilight-shadow-glow": 0 0 20px rgba(139, 92, 246, 0.3),
+  "twilight-shadow-glow": 0 0 20px rgba(139, 92, 246, 0.3)
 );
 
 // themes/_all.scss - The orchestrator
@@ -529,6 +540,7 @@ $twilight-theme: (
 ```
 
 This ensures:
+
 - Default theme is always applied to `:root`
 - Theme can be explicitly set via data attribute
 - All CSS variables are properly cascaded
@@ -545,6 +557,7 @@ This ensures:
 - [x] Keep truly dynamic values as inline styles (colors, spacing) ✅
 
 **Components Migrated:**
+
 1. **PlaygroundHeader** - `playground-header.scss`
 2. **ThemeTest** - `theme-test.scss`
 3. **Overview Section** - `overview.scss`
@@ -553,15 +566,14 @@ This ensures:
 6. **Colors Section** - `colors.scss`
 7. **PlaygroundApp** - `playground-app.scss`
 
-**Additional Components Migrated (Styles Props Removed):**
-8. **PlaygroundNav** - `playground-nav.scss` ✅
-9. **PlaygroundSearch** - `playground-search.scss` ✅
-10. **ThemeStyleSwitcher** - `theme-style-switcher.scss` ✅
+**Additional Components Migrated (Styles Props Removed):** 8. **PlaygroundNav** - `playground-nav.scss` ✅ 9. **PlaygroundSearch** - `playground-search.scss` ✅ 10. **ThemeStyleSwitcher** - `theme-style-switcher.scss` ✅
 
 **Still TODO:**
+
 - [ ] Test in both light/dark modes thoroughly
 
 **Component Structure Fix (Additional work completed):**
+
 - [x] Reorganized all playground components from flat structure to folder structure ✅
 - [x] Created kebab-case folders for each component ✅
 - [x] Moved component files into their respective folders ✅
@@ -570,15 +582,16 @@ This ensures:
 - [x] Updated all import statements to use new paths ✅
 
 **Migration Pattern Used:**
+
 ```scss
 // Before (inline styles)
 <Box style={{ padding: 16, background: '#6366f1' }} />
 
 // After (SCSS + CSS variables)
-<Box className="tanaka-component__element" />
+<Box className="tnk-component__element" />
 
 // component.scss
-.tanaka-component {
+.tnk-component {
   &__element {
     padding: var(--mantine-spacing-md);
     background: var(--mantine-color-primary-6);
@@ -589,6 +602,7 @@ This ensures:
 #### Step 5: Update Component Library ✅ COMPLETED
 
 **Note**: This step was completed as part of Step 0 cleanup:
+
 - [x] Deprecated components were deleted entirely (not migrated) ✅
 - [x] CSS Modules removed with deprecated components ✅
 - [x] Imports cleaned up after deletion ✅
@@ -624,12 +638,12 @@ This ensures:
 - ✅ Zero inline styles in components
 - ✅ No CSS-in-JS usage
 - ✅ All colors/spacing use CSS variables
-- ✅ Consistent BEM methodology with `.tanaka-` prefix
+- ✅ Consistent BEM methodology with `.tnk-` prefix
 - ✅ Global CSS classes (no CSS modules)
 - ✅ Single styling approach per component
 - ✅ Theme switches without flicker
 - ✅ Reduced bundle size by 30%+
-- ✅ All custom classes searchable with `.tanaka-` prefix
+- ✅ All custom classes searchable with `.tnk-` prefix
 
 #### Estimated Timeline: 2-3 days
 
@@ -649,13 +663,15 @@ This cleanup is critical before proceeding with Phase 3, as it will establish th
 ### Phase 4: Production Pages (PENDING)
 
 #### Popup Page
+
 - [ ] Create new popup structure
 - [ ] Build components as needed following guidelines
 - [ ] Apply twilight theme
 - [ ] Implement window tracking UI
 - [ ] Test with real extension data
 
-#### Settings Page  
+#### Settings Page
+
 - [ ] Create new settings structure
 - [ ] Build components as needed following guidelines
 - [ ] Apply twilight theme
@@ -663,31 +679,29 @@ This cleanup is critical before proceeding with Phase 3, as it will establish th
 - [ ] Test all settings functionality
 
 #### Component Guidelines (When Building)
+
 - Each component gets its own folder in `components/[component-name]/` (kebab-case)
 - Component folder contains `[component-name].tsx` and `[component-name].scss`
-- **CRITICAL**: Use `.tanaka-` prefix for ALL component classes (global CSS, no modules)
-- Use BEM naming: `.tanaka-button`, `.tanaka-button__icon`, `.tanaka-button--primary`
+- **CRITICAL**: Use `.tnk-` prefix for ALL component classes (global CSS, no modules)
+- Use BEM naming: `.tnk-button`, `.tnk-button__icon`, `.tnk-button--primary`
 - Reference only CSS variables, no hardcoded colors
 - No inline styles or CSS-in-JS
-- Export from component file directly (no index.ts barrel exports) *[Updated per user preference: index.ts files added for easier imports]*
+- Export from component file directly (no index.ts barrel exports) _[Updated per user preference: index.ts files added for easier imports]_
 
 **Example Component Structure:**
+
 ```tsx
 // button/button.tsx
-import './button.scss';
+import "./button.scss";
 
-export function Button({ variant = 'default', children }) {
-  return (
-    <button className={`tanaka-button tanaka-button--${variant}`}>
-      {children}
-    </button>
-  );
+export function Button({ variant = "default", children }) {
+  return <button className={`tnk-button tnk-button--${variant}`}>{children}</button>;
 }
 ```
 
 ```scss
 // button/button.scss
-.tanaka-button {
+.tnk-button {
   // Base styles using CSS variables
   padding: var(--mantine-spacing-sm) var(--mantine-spacing-md);
 
@@ -698,6 +712,7 @@ export function Button({ variant = 'default', children }) {
 ```
 
 #### Final Cleanup
+
 - [ ] Remove all old CSS files
 - [ ] Update imports throughout codebase
 - [ ] Final testing
@@ -956,7 +971,7 @@ const primaryColor = scssVars["primary-twilight"];
 <Title className={cn.component('title')}>
 
 // In SCSS
-.tanaka-title {
+.tnk-title {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 
   // Future theme variant example

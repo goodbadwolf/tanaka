@@ -36,9 +36,7 @@ export function TypographySection() {
         </Title>
         <Card shadow="sm" padding="lg" radius="md" withBorder>
           <Stack gap="md">
-            <Text className="tanaka-typography__system-font">
-              System UI Font Stack (Default)
-            </Text>
+            <Text className="tnk-typography__system-font">System UI Font Stack (Default)</Text>
             <Code block>{`font-family: system-ui, -apple-system, BlinkMacSystemFont,
   'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
   'Open Sans', 'Helvetica Neue', sans-serif;`}</Code>
@@ -57,10 +55,10 @@ export function TypographySection() {
           {headingSizes.map((heading) => (
             <Card key={heading.level} shadow="sm" padding="lg" radius="md" withBorder>
               <Group justify="space-between" align="flex-start">
-                <Box className="tanaka-typography__flex-box">
+                <Box className="tnk-typography__flex-box">
                   <Title
                     order={heading.level as any}
-                    className="tanaka-typography__heading-demo"
+                    className="tnk-typography__heading-demo"
                     style={{
                       fontSize: heading.size,
                       lineHeight: heading.lineHeight,
@@ -70,7 +68,7 @@ export function TypographySection() {
                     Heading {heading.level}
                   </Title>
                 </Box>
-                <Stack gap={4} align="flex-end" className="tanaka-typography__meta-stack">
+                <Stack gap={4} align="flex-end" className="tnk-typography__meta-stack">
                   <Text size="xs" c="dimmed">
                     Size: {heading.size}
                   </Text>
@@ -95,12 +93,10 @@ export function TypographySection() {
           {fontSizes.map((size) => (
             <Card key={size.name} shadow="sm" padding="lg" radius="md" withBorder>
               <Group justify="space-between" align="center">
-                <Box className="tanaka-typography__flex-box">
-                  <Text size={size.name as any}>
-                    The quick brown fox jumps over the lazy dog
-                  </Text>
+                <Box className="tnk-typography__flex-box">
+                  <Text size={size.name as any}>The quick brown fox jumps over the lazy dog</Text>
                 </Box>
-                <Stack gap={4} align="flex-end" className="tanaka-typography__text-meta-stack">
+                <Stack gap={4} align="flex-end" className="tnk-typography__text-meta-stack">
                   <Code>{`size="${size.name}"`}</Code>
                   <Text size="xs" c="dimmed">
                     {size.size} / {size.lineHeight}
@@ -141,7 +137,7 @@ export function TypographySection() {
             <Text td="line-through">Strikethrough for deprecated items</Text>
             <Text tt="uppercase">Uppercase text for labels</Text>
             <Text c="dimmed">Dimmed text for secondary information</Text>
-            <Text className="tanaka-typography__gradient-text">
+            <Text className="tnk-typography__gradient-text">
               Gradient text for special emphasis
             </Text>
           </Stack>
@@ -158,8 +154,8 @@ export function TypographySection() {
               Hierarchy
             </Title>
             <Text size="sm">
-              Use consistent heading levels to create clear visual hierarchy. Never skip heading levels
-              for styling purposes.
+              Use consistent heading levels to create clear visual hierarchy. Never skip heading
+              levels for styling purposes.
             </Text>
           </Card>
 
@@ -178,8 +174,8 @@ export function TypographySection() {
               Contrast
             </Title>
             <Text size="sm">
-              Ensure text has sufficient contrast against backgrounds. Use WCAG AA standards: 4.5:1 for
-              normal text, 3:1 for large text.
+              Ensure text has sufficient contrast against backgrounds. Use WCAG AA standards: 4.5:1
+              for normal text, 3:1 for large text.
             </Text>
           </Card>
         </Stack>

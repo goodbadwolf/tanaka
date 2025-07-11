@@ -2,7 +2,7 @@ import { useMantineColorScheme } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
 import { ThemeStyle } from './theme-config';
 
-const THEME_STYLE_STORAGE_KEY = 'tanaka-theme-style';
+const THEME_STYLE_STORAGE_KEY = 'tnk-theme-style';
 
 export function useThemeStyle(
   defaultStyle?: ThemeStyle,

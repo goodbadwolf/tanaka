@@ -11,7 +11,7 @@ interface PlaygroundSearchProps {
 export function PlaygroundSearch({
   value,
   onChange,
-  placeholder = "Search components..."
+  placeholder = 'Search components...',
 }: PlaygroundSearchProps) {
   return (
     <TextInput
@@ -20,15 +20,9 @@ export function PlaygroundSearch({
       placeholder={placeholder}
       leftSection={<IconSearch size={16} />}
       rightSection={
-        value && (
-          <CloseButton
-            size="sm"
-            onClick={() => onChange('')}
-            aria-label="Clear search"
-          />
-        )
+        value && <CloseButton size="sm" onClick={() => onChange('')} aria-label="Clear search" />
       }
-      className="tanaka-playground-search"
+      className="tnk-playground-search"
     />
   );
 }

@@ -118,7 +118,7 @@ $twilight-light-colors: (
 .theme-style-twilight {
 
   // Twilight-specific component overrides
-  .tanaka-button {
+  .tnk-button {
     &--primary {
       background: var(--twilight-gradient-primary);
       box-shadow: var(--twilight-shadow-glow);
@@ -129,7 +129,7 @@ $twilight-light-colors: (
     }
   }
 
-  .tanaka-card {
+  .tnk-card {
     &--glowing {
       box-shadow: var(--twilight-shadow-glow);
     }

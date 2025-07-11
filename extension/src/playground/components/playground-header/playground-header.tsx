@@ -6,16 +6,12 @@ import './playground-header.scss';
 
 export function PlaygroundHeader() {
   return (
-    <Box
-      component="header"
-      className="tanaka-playground-header"
-      py="md"
-    >
+    <Box component="header" className="tnk-playground-header" py="md">
       <Group justify="space-between" px="xl">
         <Group>
-          <IconPalette size={32} className="tanaka-playground-header__icon" />
+          <IconPalette size={32} className="tnk-playground-header__icon" />
           <div>
-            <Title order={3} className="tanaka-playground-header__title">
+            <Title order={3} className="tnk-playground-header__title">
               Tanaka Design System
             </Title>
             <Text size="sm" c="dimmed">

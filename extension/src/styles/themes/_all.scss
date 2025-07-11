@@ -1,6 +1,10 @@
 // Theme Orchestrator
 // This file imports all themes and applies them based on data attributes
 
+// Forward theme CSS rules first (required by SCSS)
+@forward "twilight";
+@forward "neon";
+
 @use "base";
 @use "twilight";
 @use "neon";
@@ -18,11 +22,6 @@
   @include base.apply-theme(twilight.$twilight-light-colors);
   @include base.apply-component-themes(twilight.$twilight-light-colors);
 }
-
-// Import the actual theme CSS rules
-// We need to use @import to include the CSS rules, not just the variables
-@import "twilight";
-@import "neon";
 
 // Future themes will be added here
 // [data-theme-style="midnight"] {
