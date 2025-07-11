@@ -1,6 +1,7 @@
 import { ActionIcon, Code, Collapse, Group, Paper, Stack, Text, Tooltip } from '@mantine/core';
 import { IconCode, IconCopy } from '@tabler/icons-preact';
 import { useState } from 'react';
+import { renderComponent } from '../../../utils/component-utils';
 import type { ComponentExample as ComponentExampleType } from '../../types';
 import './component-example.scss';
 
@@ -9,7 +10,10 @@ interface ComponentExampleProps {
   showCode?: boolean;
 }
 
-export function ComponentExample({ example, showCode: defaultShowCode = false }: ComponentExampleProps) {
+export function ComponentExample({
+  example,
+  showCode: defaultShowCode = false,
+}: ComponentExampleProps) {
   const [showCode, setShowCode] = useState(defaultShowCode);
   const [copied, setCopied] = useState(false);
 
@@ -61,7 +65,7 @@ export function ComponentExample({ example, showCode: defaultShowCode = false }:
       </Group>
 
       <Paper p="md" withBorder radius="sm">
-        {example.component}
+        {renderComponent(example.component)}
       </Paper>
 
       {example.code && (

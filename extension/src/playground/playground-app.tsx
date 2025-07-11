@@ -14,6 +14,7 @@ import { buttonsSection, inputsSection, selectionSection } from './sections';
 import { ColorsSection } from './sections/colors';
 import { OverviewSection } from './sections/overview';
 import { SpacingSection } from './sections/spacing';
+import { TanakaComponentsSection } from './sections/tanaka-components';
 import { TypographySection } from './sections/typography';
 
 function PlaygroundContainer() {
@@ -31,6 +32,8 @@ function PlaygroundContainer() {
         return <TypographySection />;
       case 'spacing':
         return <SpacingSection />;
+      case 'tanaka-components':
+        return <TanakaComponentsSection />;
       case 'components':
         // Component showcase with search
         if (searchQuery) {
