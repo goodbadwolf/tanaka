@@ -1,5 +1,8 @@
 # SCSS Migration Plan for Tanaka Extension
 
+> **Note**: This document contains the detailed technical implementation for SCSS migration.  
+> For high-level task tracking, see [TODOS.md](./TODOS.md).
+
 ## Executive Summary
 
 This document outlines a comprehensive plan to migrate the Tanaka extension's styling from duplicated CSS files to a modular SCSS architecture. The migration will reduce code duplication by 70-90%, improve maintainability, and enable proper BEM methodology while maintaining compatibility with Mantine's component system.
@@ -10,7 +13,7 @@ This document outlines a comprehensive plan to migrate the Tanaka extension's st
 
 ### SCSS Folder Structure
 
-```
+```text
 extension/src/
 ├── styles/
 │   ├── _variables.scss          # Design tokens (spacing, breakpoints, z-index)
@@ -439,7 +442,7 @@ This gives us a clean slate to rebuild with consistent patterns.
 
 **File Structure:**
 
-```
+```text
 src/
 ├── styles/
 │   ├── _variables.scss      # Design tokens
@@ -809,7 +812,7 @@ export function Button({ variant = "default", children }) {
 ### Code Cleanup
 
 - [ ] Delete deprecated gradient/shadow helpers in styling-utils.ts
-- [ ] Delete deprecated gradients._ and shadows._ helpers
+- [ ] Delete deprecated gradients and shadows helpers
 - [ ] Delete deprecated helpers (already marked @deprecated)
 - [ ] Create single source of truth for gradients/shadows
 - [ ] Convert components.css and utilities.css to SCSS files
@@ -912,7 +915,7 @@ const isDev = process.env.NODE_ENV === 'development';
 }
 ```
 
-### TypeScript Integration
+### TypeScript Integration Details
 
 #### Current TypeScript Utilities
 

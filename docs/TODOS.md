@@ -75,14 +75,14 @@ This file tracks all pending work for the Tanaka project.
 
 All work to be completed.
 
-**Note: v3 Design Elements to Preserve**
+> **Note: v3 Design Elements to Preserve**
 
 - Colors: #6366f1 (primary), #8b5cf6 (secondary), #0a0a0b (dark bg), #0f0f10 (surface)
 - UI: Purple gradient buttons, glowing effects, card-based layout, smooth animations
 
 ### Branch: `docs/operational-basics`
 
-**Basic Documentation**
+#### Basic Documentation
 
 - [ ] Write simple deployment steps
 - [ ] Document backup/restore process
@@ -90,7 +90,7 @@ All work to be completed.
 
 ### Branch: `chore/update-cargo-test-references`
 
-**Update cargo test to cargo nextest**
+#### Update cargo test to cargo nextest
 
 - [ ] Update .github/workflows/ci.yml to use cargo nextest run
 - [ ] Check all documentation files for cargo test references
@@ -99,7 +99,7 @@ All work to be completed.
 
 ### Branch: `docs/git-best-practices`
 
-**Git Best Practices Documentation**
+#### Git Best Practices Documentation
 
 - [ ] Document that `git add -A` should never be used
 - [ ] Explain why it stages unintended files
@@ -109,7 +109,7 @@ All work to be completed.
 
 ### Branch: `fix/memory-leaks`
 
-**Fix Memory Leaks & Performance**
+#### Fix Memory Leaks & Performance
 
 - [ ] Extension: Fix event handler cleanup in TabEventHandler
 - [ ] Extension: Fix window tracking memory issues
@@ -123,7 +123,7 @@ All work to be completed.
 
 ### Branch: `feat/error-recovery`
 
-**Error Recovery**
+#### Error Recovery
 
 - [ ] Extension: Add exponential backoff (1s start, 60s max, 2x multiplier)
 - [ ] Extension: Add small random jitter to prevent thundering herd
@@ -140,8 +140,9 @@ All work to be completed.
 
 ### ~~Branch: `feat/mantine-setup`~~ (COMPLETED - Merged to main)
 
-**Setup Mantine** (UI Redesign - build components iteratively as needed)
-**NOTE**: Pick one item at a time when working, and commit it when finished after confirmation from the user. Only then move on to the next one
+#### Setup Mantine (UI Redesign - build components iteratively as needed)
+
+> **NOTE**: Pick one item at a time when working, and commit it when finished after confirmation from the user. Only then move on to the next one
 
 - [x] Install Mantine and dependencies
 - [x] Basic theme configuration (colors from v3 prototype)
@@ -192,7 +193,7 @@ All work to be completed.
 
 ### Branch: `feat/popup-redesign`
 
-**Popup Redesign**
+#### Popup Redesign
 
 - [ ] Set up MantineProvider in popup entry point
 - [ ] Get popup page working end-to-end with Mantine
@@ -204,7 +205,7 @@ All work to be completed.
 
 ### Branch: `feat/settings-redesign`
 
-**Settings Redesign**
+#### Settings Redesign
 
 - [ ] Set up MantineProvider in settings entry point
 - [ ] Tabbed interface (General, Sync, Devices, Advanced, About)
@@ -215,7 +216,7 @@ All work to be completed.
 
 ### Branch: `feat/remaining-pages`
 
-**Additional Pages**
+#### Additional Pages
 
 - [ ] Onboarding flow (if needed)
 - [ ] Error states with troubleshooting
@@ -224,7 +225,7 @@ All work to be completed.
 
 ### Branch: `feat/ui-polish`
 
-**Polish & Refactor**
+#### Polish & Refactor
 
 - [ ] Extract truly reusable components
 - [ ] Optimize bundle size (target < 150KB)
@@ -237,7 +238,7 @@ All work to be completed.
 
 ### Branch: `chore/postcss-setup`
 
-**PostCSS Configuration**
+#### PostCSS Configuration
 
 - [ ] Add PostCSS configuration for advanced CSS features
 - [ ] Install postcss, postcss-loader, and autoprefixer
@@ -246,7 +247,7 @@ All work to be completed.
 
 ### Branch: `feat/code-cleanup`
 
-**Code Quality**
+#### Code Quality
 
 - [ ] Fix TypeScript strict mode issues
 - [ ] Increase test coverage to 80%
@@ -255,12 +256,45 @@ All work to be completed.
 
 ### Branch: `feat/v1-release`
 
-**Release**
+#### Release
 
 - [ ] Submit to Mozilla addon store
 - [ ] Create signed release builds
 - [ ] Write installation guide
 - [ ] Test full user journey
 - [ ] Tag v1.0 release
+
+### Branch: `docs/design-system-planning`
+
+#### Design System Architecture Planning
+
+- [ ] Review DESIGN_SYSTEM_SPEC.md and evaluate transformation scope
+- [ ] Create implementation roadmap with dependencies on SCSS migration Phase 3
+- [ ] Define migration strategy from playground to design system
+- [ ] Document breaking changes and backward compatibility approach
+
+### Branch: `feat/scss-phase-3`
+
+#### SCSS Migration Phase 3: Consolidation & Optimization
+
+See [SCSS_MIGRATION_PLAN.md](./SCSS_MIGRATION_PLAN.md) for detailed implementation.
+
+- [ ] Polish and finalize twilight and neon themes
+- [ ] Add Dividers component
+- [ ] Extract common patterns into mixins
+- [ ] Consolidate duplicate styles
+- [ ] Remove unused styles
+- [ ] Performance testing
+
+### Branch: `feat/scss-phase-4`
+
+#### SCSS Migration Phase 4: Production Pages
+
+See [SCSS_MIGRATION_PLAN.md](./SCSS_MIGRATION_PLAN.md) for detailed implementation.
+
+- [ ] Implement new popup page with SCSS architecture
+- [ ] Implement new settings page with SCSS architecture
+- [ ] Apply consistent theme system
+- [ ] Test with real extension data
 
 ---
