@@ -1,5 +1,6 @@
 import { NavLink, Stack, Text } from '@mantine/core';
 import {
+  IconBrandTabler,
   IconBrush,
   IconComponents,
   IconForms,
@@ -8,7 +9,6 @@ import {
   IconRuler,
   IconSettings,
   IconTypography,
-  IconBrandTabler,
 } from '@tabler/icons-preact';
 import './playground-nav.scss';
 
@@ -22,7 +22,7 @@ const navItems = [
   { id: 'colors', label: 'Colors', icon: IconBrush },
   { id: 'typography', label: 'Typography', icon: IconTypography },
   { id: 'spacing', label: 'Spacing & Layout', icon: IconRuler },
-  { id: 'tanaka-components', label: 'Tanaka Components', icon: IconBrandTabler },
+  { id: 'tanaka', label: 'Tanaka Components', icon: IconBrandTabler },
   { id: 'components', label: 'Mantine Components', icon: IconComponents },
   { id: 'forms', label: 'Form Elements', icon: IconForms },
   { id: 'layout', label: 'Layout System', icon: IconLayout },

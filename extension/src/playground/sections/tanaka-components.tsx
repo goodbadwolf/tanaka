@@ -1,5 +1,12 @@
 import { ActionIcon, Box, Button, Group } from '@mantine/core';
-import { IconBell, IconComponents, IconHome, IconSearch, IconSettings, IconUser } from '@tabler/icons-preact';
+import {
+  IconBell,
+  IconComponents,
+  IconHome,
+  IconSearch,
+  IconSettings,
+  IconUser,
+} from '@tabler/icons-preact';
 import { AppHeader } from '../../components/app-header';
 import { PlaygroundSection } from '../components/playground-section';
 import './tanaka-components.scss';
@@ -20,7 +27,7 @@ const appHeaderExamples = [
     component: () => (
       <AppHeader title="Profile Settings" onBack={() => console.log('Back clicked')} />
     ),
-    code: `<AppHeader 
+    code: `<AppHeader
   title="Profile Settings"
   onBack={() => router.back()}
 />`,
@@ -32,7 +39,7 @@ const appHeaderExamples = [
     component: () => (
       <AppHeader title="Account Settings" subtitle="Manage your profile and preferences" />
     ),
-    code: `<AppHeader 
+    code: `<AppHeader
   title="Account Settings"
   subtitle="Manage your profile and preferences"
 />`,
@@ -42,7 +49,7 @@ const appHeaderExamples = [
     title: 'Header with Icon',
     description: 'Header with a visual icon',
     component: () => <AppHeader title="Dashboard" subtitle="Welcome back" icon={<IconHome />} />,
-    code: `<AppHeader 
+    code: `<AppHeader
   title="Dashboard"
   subtitle="Welcome back"
   icon={<IconHome />}
@@ -68,7 +75,7 @@ const appHeaderExamples = [
         }
       />
     ),
-    code: `<AppHeader 
+    code: `<AppHeader
   title="Messages"
   icon={<IconBell />}
   actions={
@@ -95,7 +102,7 @@ const appHeaderExamples = [
         actions={<Button size="xs">Save</Button>}
       />
     ),
-    code: `<AppHeader 
+    code: `<AppHeader
   variant="compact"
   title="Quick Settings"
   onBack={() => router.back()}
@@ -119,7 +126,7 @@ const appHeaderExamples = [
         }
       />
     ),
-    code: `<AppHeader 
+    code: `<AppHeader
   variant="prominent"
   title="Welcome to Tanaka"
   subtitle="Sync your tabs across all devices"
@@ -155,7 +162,7 @@ const appHeaderExamples = [
         }
       />
     ),
-    code: `<AppHeader 
+    code: `<AppHeader
   title="Advanced Settings"
   subtitle="Configure all aspects of your account"
   icon={<IconSettings />}
@@ -175,7 +182,7 @@ const appHeaderExamples = [
 ];
 
 const tanakaComponentsSection = {
-  id: 'tanaka-components',
+  id: 'tanaka',
   title: 'Tanaka Components',
   description: 'Custom components built specifically for the Tanaka extension',
   icon: IconComponents,
