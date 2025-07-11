@@ -412,7 +412,7 @@ pnpm update            # Update dependencies
 # Development
 pnpm run dev           # Start with hot reload
 pnpm run start         # Launch Firefox
-pnpm run webapp        # Run as webapp
+pnpm run webapp        # Run as webapp (temporarily unavailable - Phase 4)
 
 # Building
 pnpm run build:dev     # Development build
@@ -581,10 +581,12 @@ key_path = "key.pem"
 
 ## 10. Webapp Mode
 
+> **Note**: The webapp mode, along with popup and settings pages, has been temporarily removed during the SCSS migration (Phase 2.5). These will be reimplemented with the new SCSS architecture in Phase 4. See [SCSS_ROADMAP.md](./SCSS_ROADMAP.md) for details.
+
 Test the extension without Firefox:
 
 ```bash
-pnpm run webapp
+pnpm run webapp  # Currently unavailable - will be restored in Phase 4
 ```
 
 Features:

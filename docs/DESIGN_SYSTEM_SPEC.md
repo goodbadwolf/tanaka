@@ -261,7 +261,7 @@ This transformation will position the Design System as a critical development to
 ## Implementation Prerequisites
 
 Before starting this transformation:
-1. Complete Phase 3 of SCSS migration (see [SCSS_MIGRATION_PLAN.md](./SCSS_MIGRATION_PLAN.md))
+1. Complete Phase 3 of SCSS migration (see [SCSS_ROADMAP.md](./SCSS_ROADMAP.md))
 2. Ensure all components follow new styling architecture
 3. Stabilize current theme system
 4. Clean up any remaining legacy code
@@ -292,7 +292,7 @@ Before starting this transformation:
 
 ## Related Documentation
 
-- [SCSS Migration Plan](./SCSS_MIGRATION_PLAN.md) - Technical styling architecture
+- [SCSS Roadmap](./SCSS_ROADMAP.md) - Technical styling architecture
 - [TODOs](./TODOS.md) - Project-wide task tracking
 - [Architecture](./ARCHITECTURE.md) - System design overview
 

@@ -273,11 +273,25 @@ All work to be completed.
 - [ ] Define migration strategy from playground to design system
 - [ ] Document breaking changes and backward compatibility approach
 
+### Branch: `feat/scss-phase-2.5` (COMPLETED - Merged to main)
+
+#### SCSS Migration Phase 2.5: Styling Architecture Cleanup
+
+See [SCSS_ROADMAP.md](./SCSS_ROADMAP.md) for detailed implementation.
+
+- [x] Clean slate - removed old webapp, settings, popup implementations
+- [x] Established new architecture with `.tnk-` prefix for all custom components
+- [x] Migrated all playground components to SCSS with BEM methodology
+- [x] Achieved 90% bundle size reduction (29MB → 2.8MB)
+- [x] Created comprehensive styling guide and documentation
+- [x] Implemented twilight theme with CSS variables
+- [x] Removed all inline styles and CSS-in-JS usage
+
 ### Branch: `feat/scss-phase-3`
 
 #### SCSS Migration Phase 3: Consolidation & Optimization
 
-See [SCSS_MIGRATION_PLAN.md](./SCSS_MIGRATION_PLAN.md) for detailed implementation.
+See [SCSS_ROADMAP.md](./SCSS_ROADMAP.md) for detailed implementation.
 
 - [ ] Polish and finalize twilight and neon themes
 - [ ] Add Dividers component
@@ -290,7 +304,7 @@ See [SCSS_MIGRATION_PLAN.md](./SCSS_MIGRATION_PLAN.md) for detailed implementati
 
 #### SCSS Migration Phase 4: Production Pages
 
-See [SCSS_MIGRATION_PLAN.md](./SCSS_MIGRATION_PLAN.md) for detailed implementation.
+See [SCSS_ROADMAP.md](./SCSS_ROADMAP.md) for detailed implementation.
 
 - [ ] Implement new popup page with SCSS architecture
 - [ ] Implement new settings page with SCSS architecture
