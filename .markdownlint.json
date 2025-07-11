@@ -1,0 +1,14 @@
+{
+  "default": true,
+  "MD013": false,
+  "MD024": {
+    "siblings_only": true
+  },
+  "MD040": true,
+  "MD041": true,
+  "MD047": true,
+  "line-length": false,
+  "no-duplicate-heading": {
+    "siblings_only": true
+  }
+}
