@@ -57,7 +57,17 @@ $twilight-dark: (
 
   // Effects
   shadow-glow: 0 0 20px core.alpha($secondary, 0.3),
-  shadow-glow-strong: 0 0 40px core.alpha($secondary, 0.5)
+  shadow-glow-strong: 0 0 40px core.alpha($secondary, 0.5),
+
+  // Theme-specific gradients
+  twilight-gradient-primary: linear-gradient(135deg, $primary, $secondary),
+  twilight-gradient-accent: linear-gradient(135deg, $secondary, $accent),
+  twilight-gradient-glow: radial-gradient(circle at center, core.alpha($secondary, 0.2), transparent 70%),
+
+  // RGB values for shadow functions
+  primary-rgb: '99, 102, 241',      // #6366f1
+  secondary-rgb: '139, 92, 246',    // #8b5cf6
+  accent-rgb: '236, 72, 153'        // #ec4899
 );
 
 // Light mode colors
@@ -88,9 +98,9 @@ $twilight-theme: (
   colors: $twilight-dark,
   colors-light: $twilight-light,
   scales: (
-    indigo: $primary,
-    violet: $secondary,
-    pink: $accent
+    'indigo': $primary,
+    'violet': $secondary,
+    'pink': $accent
   ),
   overrides: (
     mantine-primary-color: indigo

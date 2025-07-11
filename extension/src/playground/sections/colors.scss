@@ -16,15 +16,15 @@
     border-radius: var(--mantine-radius-sm);
 
     &--primary {
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      background: var(--gradient-primary);
     }
 
     &--vibrant {
-      background: linear-gradient(135deg, #ff006e, #8338ec);
+      background: var(--gradient-accent);
     }
 
     &--purple {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: var(--twilight-gradient-primary);
     }
   }
 }

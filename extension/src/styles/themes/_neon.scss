@@ -63,9 +63,9 @@ $neon-theme: (
   name: neon,
   colors: $neon-colors,
   scales: (
-    cyan: $cyan,
-    pink: $magenta,
-    lime: $lime
+    'cyan': $cyan,
+    'pink': $magenta,
+    'lime': $lime
   ),
   overrides: (
     mantine-primary-color: cyan,

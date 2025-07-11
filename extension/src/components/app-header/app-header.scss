@@ -19,10 +19,7 @@
   }
 
   &--prominent {
-    background: linear-gradient(135deg,
-      var(--mantine-color-primary-5),
-      var(--mantine-color-primary-7)
-    );
+    background: var(--gradient-primary);
     color: var(--mantine-color-white);
 
     .tnk-app-header__title,
@@ -97,6 +94,12 @@
   &__actions {
     flex-shrink: 0;
   }
+
+  // Touch interactions
+  &__back,
+  &__icon {
+    @include touch-feedback;
+  }
 }
 
 @media (max-width: var(--mantine-breakpoint-sm)) {
@@ -126,13 +129,5 @@
         font-size: var(--mantine-h3-font-size);
       }
     }
-  }
-}
-
-// Apply touch interaction to interactive elements
-.tnk-app-header {
-  &__back,
-  &__icon {
-    @include touch-feedback;
   }
 }

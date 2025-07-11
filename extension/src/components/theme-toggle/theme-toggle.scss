@@ -1,6 +1,6 @@
 .theme-toggle {
   transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-md);
 
   &:hover {
     transform: scale(1.1);
@@ -28,8 +28,4 @@
   }
 }
 
-[data-mantine-color-scheme='dark'] {
-  .theme-toggle {
-    box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
-  }
-}
+// Dark mode shadow is handled by the CSS variable in _shadows.scss

@@ -3,7 +3,45 @@
   "rules": {
     "scss/dollar-variable-pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
     "scss/at-mixin-pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
-    "selector-class-pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*(__[a-z0-9]+(-[a-z0-9]+)*)?(--[a-z0-9]+(-[a-z0-9]+)*)?$",
-    "max-nesting-depth": 3
+    "scss/at-function-pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+    "selector-class-pattern": "^tnk-[a-z][a-z0-9]*(-[a-z0-9]+)*(__[a-z0-9]+(-[a-z0-9]+)*)?(--[a-z0-9]+(-[a-z0-9]+)*)?$",
+    "max-nesting-depth": 3,
+    "declaration-block-no-redundant-longhand-properties": true,
+    "shorthand-property-no-redundant-values": true,
+    "declaration-property-value-no-unknown": true,
+    "color-hex-length": "short",
+    "color-hex-case": "lower",
+    "function-name-case": "lower",
+    "value-keyword-case": ["lower", {
+      "camelCaseSvgKeywords": true
+    }],
+    "selector-pseudo-class-no-unknown": [true, {
+      "ignorePseudoClasses": ["global"]
+    }],
+    "declaration-property-unit-allowed-list": {
+      "line-height": [],
+      "transition": ["s", "ms"],
+      "transition-duration": ["s", "ms"],
+      "animation": ["s", "ms"],
+      "animation-duration": ["s", "ms"]
+    },
+    "scss/at-use-no-unnamespaced": true,
+    "scss/no-global-function-names": true,
+    "scss/comment-no-empty": true,
+    "order/properties-alphabetical-order": null,
+    "scss/at-import-no-partial-leading-underscore": null,
+    "scss/load-no-partial-leading-underscore": null,
+    "custom-property-pattern": "^([a-z][a-z0-9]*)(-[a-z0-9]+)*$",
+    "scss/no-duplicate-mixins": true,
+    "declaration-empty-line-before": null,
+    "rule-empty-line-before": null,
+    "at-rule-empty-line-before": null,
+    "scss/operator-no-unspaced": true,
+    "value-no-vendor-prefix": [true, {
+      "ignoreValues": ["box", "inline-box"]
+    }],
+    "property-no-vendor-prefix": [true, {
+      "ignoreProperties": ["background-clip", "text-fill-color"]
+    }]
   }
 }
