@@ -53,44 +53,97 @@
     </style>
     <script>
       (() => {
+        const DATA_ATTR_KEY = 'data-mantine-color-scheme';
+        const THEME_STYLE_KEY = 'data-theme-style';
+
+        // Start with defaults
+        let themeStyle = 'twilight';
+        let colorScheme = 'auto';
+
         try {
-          if (typeof Storage === 'undefined') {
-            console.warn('localStorage not available');
-            return;
-          }
-          const DATA_ATTR_KEY = 'data-mantine-color-scheme';
-          const THEME_STYLE_KEY = 'data-theme-style';
-          const mantineColorScheme = localStorage.getItem('mantine-color-scheme-value');
-
-          // Set theme style from localStorage or default to twilight
-          const savedThemeStyle = localStorage.getItem('tnk-theme-style') || 'twilight';
-          document.documentElement.setAttribute(THEME_STYLE_KEY, savedThemeStyle);
-
-          const validSchemes = ['light', 'dark', 'auto'];
-          if (mantineColorScheme && validSchemes.includes(mantineColorScheme)) {
-            document.documentElement.setAttribute(DATA_ATTR_KEY, mantineColorScheme);
-          } else {
-            document.documentElement.setAttribute(DATA_ATTR_KEY, 'auto');
+          // Check for saved values in localStorage
+          if (typeof Storage !== 'undefined') {
+            if (localStorage.getItem('tnk-theme-style', 'SENTINEL') !== 'SENTINEL') {
+              themeStyle = localStorage.getItem('tnk-theme-style');
+              console.log('themeStyle from localStorage', themeStyle);
+            }
+            if (localStorage.getItem('mantine-color-scheme-value', 'SENTINEL') !== 'SENTINEL') {
+              const mantineColorScheme = localStorage.getItem('mantine-color-scheme-value');
+              const validSchemes = ['light', 'dark', 'auto'];
+              if (mantineColorScheme && validSchemes.includes(mantineColorScheme)) {
+                colorScheme = mantineColorScheme;
+                console.log('colorScheme from localStorage', colorScheme);
+              }
+            }
           }
 
-          if (mantineColorScheme === 'auto' || !mantineColorScheme) {
+          // Check for URL parameter overrides
+          const urlParams = new URLSearchParams(window.location.search);
+          const overrideThemeStyle = urlParams.get('overrideThemeStyle');
+          const overrideColorScheme = urlParams.get('overrideColorScheme');
+
+          if (overrideThemeStyle) {
+            console.log('overrideThemeStyle', overrideThemeStyle);
+            themeStyle = overrideThemeStyle;
+            console.log('themeStyle from url', themeStyle);
+          }
+
+          if (overrideColorScheme && ['light', 'dark', 'auto'].includes(overrideColorScheme)) {
+            console.log('overrideColorScheme', overrideColorScheme);
+            colorScheme = overrideColorScheme;
+            console.log('colorScheme from url', colorScheme);
+          }
+
+          // Set colorScheme to either light or dark if colorScheme is auto
+          if (colorScheme === 'auto') {
+            console.log('colorScheme is auto');
             if (window.matchMedia) {
               try {
                 const prefersDarkQuery = window.matchMedia('(prefers-color-scheme: dark)');
                 const prefersDark = prefersDarkQuery.matches;
                 const systemScheme = prefersDark ? 'dark' : 'light';
-                document.documentElement.setAttribute(DATA_ATTR_KEY, systemScheme);
+                colorScheme = systemScheme;
+                console.log('colorScheme from matchMedia', colorScheme);
               } catch (e) {
-                document.documentElement.setAttribute(DATA_ATTR_KEY, 'light');
+                colorScheme = 'light';
+                console.log('colorScheme from matchMedia error', colorScheme);
               }
             } else {
-              document.documentElement.setAttribute(DATA_ATTR_KEY, 'light');
+              colorScheme = 'light';
+              console.log('colorScheme from no matchMedia', colorScheme);
             }
           }
+
+          console.log('setting themeStyle to html element', themeStyle);
+          console.log('setting colorScheme to html element', colorScheme);
+          document.documentElement.setAttribute(THEME_STYLE_KEY, themeStyle);
+          document.documentElement.setAttribute(DATA_ATTR_KEY, colorScheme);
+
+          // TODO: Remove this once we have a better way to handle theme overrides.
+          // URL parameters are a temporary override. By setting localStorage here,
+          // this can override a user's preference if they override the url parameters.
+          // So, why are we setting localStorage here? BackstopJS.
+          // When BackstopJS runs, it has no localStorage. In other parts of the code,
+          // where the theme is actually used, if localStorage is not set, the theme
+          // will be set to the default of twilight light mode. So, we need to set
+          // localStorage here to ensure that the theme is set to the correct value
+          // **ONLY FOR BACKSTOPJS**
+          console.log('setting themeStyle to localStorage', themeStyle);
+          console.log('setting colorScheme to localStorage', colorScheme);
+          localStorage.setItem('tnk-theme-style', themeStyle);
+          localStorage.setItem('mantine-color-scheme-value', colorScheme);
         } catch (error) {
           console.error('Error setting initial theme:', error);
-          document.documentElement.setAttribute(DATA_ATTR_KEY, 'light');
+          document.documentElement.setAttribute('data-mantine-color-scheme', 'light');
+          document.documentElement.setAttribute('data-theme-style', 'twilight');
         }
+        console.log('themeStyle', themeStyle, 'value:', localStorage.getItem('tnk-theme-style'));
+        console.log(
+          'colorScheme',
+          colorScheme,
+          'value:',
+          localStorage.getItem('mantine-color-scheme-value'),
+        );
       })();
     </script>
   </head>

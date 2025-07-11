@@ -4,15 +4,15 @@
     margin-bottom: var(--mantine-spacing-md);
 
     &--primary {
-      color: var(--mantine-color-blue-6);
+      color: var(--primary);
     }
 
     &--secondary {
-      color: var(--mantine-color-gray-6);
+      color: var(--text-muted);
     }
 
     &--success {
-      color: var(--mantine-color-green-6);
+      color: var(--success);
     }
   }
 }

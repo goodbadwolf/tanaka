@@ -22,7 +22,7 @@
   --gradient-shimmer: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.1) 50%,
+    var(--border-light) 50%,
     transparent
   );
 

@@ -1,0 +1,169 @@
+{
+  "id": "tanaka_twilight_theme_test",
+  "viewports": [{ "label": "desktop", "width": 1920, "height": 1080 }],
+  "scenarios": [
+    {
+      "label": "Twilight_Dark_01_Overview",
+      "url": "http://localhost:3000/playground/index.html?overrideThemeStyle=twilight&overrideColorScheme=dark#/overview",
+      "selectors": ["document"],
+      "delay": 1000,
+      "misMatchThreshold": 0.1,
+      "requireSameDimensions": true
+    },
+    {
+      "label": "Twilight_Dark_02_Colors",
+      "url": "http://localhost:3000/playground/index.html?overrideThemeStyle=twilight&overrideColorScheme=dark#/colors",
+      "selectors": ["document"],
+      "delay": 1000,
+      "misMatchThreshold": 0.1,
+      "requireSameDimensions": true
+    },
+    {
+      "label": "Twilight_Dark_03_Typography",
+      "url": "http://localhost:3000/playground/index.html?overrideThemeStyle=twilight&overrideColorScheme=dark#/typography",
+      "selectors": ["document"],
+      "delay": 1000,
+      "misMatchThreshold": 0.1,
+      "requireSameDimensions": true
+    },
+    {
+      "label": "Twilight_Dark_04_Spacing",
+      "url": "http://localhost:3000/playground/index.html?overrideThemeStyle=twilight&overrideColorScheme=dark#/spacing",
+      "selectors": ["document"],
+      "delay": 1000,
+      "misMatchThreshold": 0.1,
+      "requireSameDimensions": true
+    },
+    {
+      "label": "Twilight_Dark_05_TanakaComponents",
+      "url": "http://localhost:3000/playground/index.html?overrideThemeStyle=twilight&overrideColorScheme=dark#/tanaka",
+      "selectors": ["document"],
+      "delay": 1000,
+      "misMatchThreshold": 0.1,
+      "requireSameDimensions": true
+    },
+    {
+      "label": "Twilight_Dark_06_MantineComponents",
+      "url": "http://localhost:3000/playground/index.html?overrideThemeStyle=twilight&overrideColorScheme=dark#/components",
+      "selectors": ["document"],
+      "delay": 1000,
+      "misMatchThreshold": 0.1,
+      "requireSameDimensions": true
+    },
+    {
+      "label": "Twilight_Dark_07_Forms",
+      "url": "http://localhost:3000/playground/index.html?overrideThemeStyle=twilight&overrideColorScheme=dark#/forms",
+      "selectors": ["document"],
+      "delay": 1000,
+      "misMatchThreshold": 0.1,
+      "requireSameDimensions": true
+    },
+    {
+      "label": "Twilight_Dark_08_Layout",
+      "url": "http://localhost:3000/playground/index.html?overrideThemeStyle=twilight&overrideColorScheme=dark#/layout",
+      "selectors": ["document"],
+      "delay": 1000,
+      "misMatchThreshold": 0.1,
+      "requireSameDimensions": true
+    },
+    {
+      "label": "Twilight_Dark_09_Patterns",
+      "url": "http://localhost:3000/playground/index.html?overrideThemeStyle=twilight&overrideColorScheme=dark#/patterns",
+      "selectors": ["document"],
+      "delay": 1000,
+      "misMatchThreshold": 0.1,
+      "requireSameDimensions": true
+    },
+    {
+      "label": "Twilight_Light_01_Overview",
+      "url": "http://localhost:3000/playground/index.html?overrideThemeStyle=twilight&overrideColorScheme=light#/overview",
+      "selectors": ["document"],
+      "delay": 1000,
+      "misMatchThreshold": 0.1,
+      "requireSameDimensions": true
+    },
+    {
+      "label": "Twilight_Light_02_Colors",
+      "url": "http://localhost:3000/playground/index.html?overrideThemeStyle=twilight&overrideColorScheme=light#/colors",
+      "selectors": ["document"],
+      "delay": 1000,
+      "misMatchThreshold": 0.1,
+      "requireSameDimensions": true
+    },
+    {
+      "label": "Twilight_Light_03_Typography",
+      "url": "http://localhost:3000/playground/index.html?overrideThemeStyle=twilight&overrideColorScheme=light#/typography",
+      "selectors": ["document"],
+      "delay": 1000,
+      "misMatchThreshold": 0.1,
+      "requireSameDimensions": true
+    },
+    {
+      "label": "Twilight_Light_04_Spacing",
+      "url": "http://localhost:3000/playground/index.html?overrideThemeStyle=twilight&overrideColorScheme=light#/spacing",
+      "selectors": ["document"],
+      "delay": 1000,
+      "misMatchThreshold": 0.1,
+      "requireSameDimensions": true
+    },
+    {
+      "label": "Twilight_Light_05_TanakaComponents",
+      "url": "http://localhost:3000/playground/index.html?overrideThemeStyle=twilight&overrideColorScheme=light#/tanaka",
+      "selectors": ["document"],
+      "delay": 1000,
+      "misMatchThreshold": 0.1,
+      "requireSameDimensions": true
+    },
+    {
+      "label": "Twilight_Light_06_MantineComponents",
+      "url": "http://localhost:3000/playground/index.html?overrideThemeStyle=twilight&overrideColorScheme=light#/components",
+      "selectors": ["document"],
+      "delay": 1000,
+      "misMatchThreshold": 0.1,
+      "requireSameDimensions": true
+    },
+    {
+      "label": "Twilight_Light_07_Forms",
+      "url": "http://localhost:3000/playground/index.html?overrideThemeStyle=twilight&overrideColorScheme=light#/forms",
+      "selectors": ["document"],
+      "delay": 1000,
+      "misMatchThreshold": 0.1,
+      "requireSameDimensions": true
+    },
+    {
+      "label": "Twilight_Light_08_Layout",
+      "url": "http://localhost:3000/playground/index.html?overrideThemeStyle=twilight&overrideColorScheme=light#/layout",
+      "selectors": ["document"],
+      "delay": 1000,
+      "misMatchThreshold": 0.1,
+      "requireSameDimensions": true
+    },
+    {
+      "label": "Twilight_Light_09_Patterns",
+      "url": "http://localhost:3000/playground/index.html?overrideThemeStyle=twilight&overrideColorScheme=light#/patterns",
+      "selectors": ["document"],
+      "delay": 1000,
+      "misMatchThreshold": 0.1,
+      "requireSameDimensions": true
+    }
+  ],
+  "paths": {
+    "bitmaps_reference": "backstop_twilight_data/bitmaps_reference",
+    "bitmaps_test": "backstop_twilight_data/bitmaps_test",
+    "engine_scripts": "backstop_twilight_data/engine_scripts",
+    "html_report": "backstop_twilight_data/html_report",
+    "ci_report": "backstop_twilight_data/ci_report"
+  },
+  "engine": "puppeteer",
+  "engineOptions": {
+    "args": ["--no-sandbox"],
+    "headless": true,
+    "executablePath": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+  },
+  "report": ["browser", "CI"],
+  "openReport": false,
+  "asyncCaptureLimit": 5,
+  "asyncCompareLimit": 50,
+  "debug": false,
+  "debugWindow": false
+}

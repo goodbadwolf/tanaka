@@ -1,7 +1,7 @@
 // Colors Section styles
 .tnk-colors {
   &__swatch {
-    height: 80px;
+    height: calc(var(--mantine-spacing-xl) * 2);
     margin-bottom: var(--mantine-spacing-md);
     border-radius: var(--mantine-radius-sm);
     display: flex;
@@ -11,8 +11,8 @@
   }
 
   &__gradient-demo {
-    width: 100px;
-    height: 50px;
+    width: calc(var(--mantine-spacing-xl) * 2.5);
+    height: calc(var(--mantine-spacing-xl) * 1.25);
     border-radius: var(--mantine-radius-sm);
 
     &--primary {
@@ -24,7 +24,7 @@
     }
 
     &--purple {
-      background: var(--twilight-gradient-primary);
+      background: var(--gradient-primary);
     }
   }
 }

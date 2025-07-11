@@ -1,10 +1,14 @@
 @use 'sass:map';
 @use '../core' as core;
 
-// Twilight brand colors
-$primary: #6366f1;
-$secondary: #8b5cf6;
-$accent: #ec4899;
+// Twilight Theme - Professional Dark Theme
+// Purpose: Default theme for daily productivity with excellent readability
+// Inspiration: VS Code Dark+, GitHub Dark, Slack Aubergine
+
+// Brand colors - Refined indigo/violet palette
+$primary: #6366f1;      // Indigo 500 - Primary actions
+$secondary: #8b5cf6;    // Violet 500 - Secondary elements
+$accent: #f59e0b;       // Amber 500 - Highlights and warnings
 
 // Dark mode colors
 $twilight-dark: (
@@ -23,73 +27,83 @@ $twilight-dark: (
   accent-light: core.tint($accent, 15%),
   accent-dark: core.shade($accent, 15%),
 
-  // Backgrounds
-  background: #0a0a0b,
-  background-surface: #0f0f10,
-  background-surface-light: #1a1a1c,
+  // Backgrounds - Slightly warmer grays for reduced eye strain
+  background: #0f0f11,              // Main background
+  background-surface: #18181b,      // Cards, panels
+  background-surface-light: #27272a,// Hover states, nested surfaces
 
-  // Text
-  text: #ffffff,
-  text-muted: core.alpha(#ffffff, 0.7),
-  text-dim: core.alpha(#ffffff, 0.5),
+  // Text - Optimized for readability
+  text: #fafafa,                    // Primary text (slightly warm white)
+  text-muted: #a1a1aa,              // Secondary text
+  text-dim: #71717a,                // Tertiary text, placeholders
 
-  // Borders
-  border: core.alpha(#ffffff, 0.1),
-  border-light: core.alpha(#ffffff, 0.05),
-  border-dark: core.alpha(#ffffff, 0.2),
+  // Borders - Subtle but visible
+  border: #27272a,                  // Default borders
+  border-light: #18181b,            // Subtle dividers
+  border-dark: #3f3f46,             // Emphasized borders
 
-  // States
-  success: #10b981,
-  success-light: #34d399,
-  success-dark: #059669,
+  // States - Balanced for dark backgrounds
+  success: #22c55e,                 // Green 500
+  success-light: #4ade80,           // Green 400
+  success-dark: #16a34a,            // Green 600
 
-  warning: #f59e0b,
-  warning-light: #fbbf24,
-  warning-dark: #d97706,
+  warning: $accent,                 // Using accent color for warnings
+  warning-light: #fbbf24,           // Amber 400
+  warning-dark: #d97706,            // Amber 600
 
-  error: #ef4444,
-  error-light: #f87171,
-  error-dark: #dc2626,
+  error: #ef4444,                   // Red 500
+  error-light: #f87171,             // Red 400
+  error-dark: #dc2626,              // Red 600
 
-  info: #3b82f6,
-  info-light: #60a5fa,
-  info-dark: #2563eb,
+  info: #3b82f6,                    // Blue 500
+  info-light: #60a5fa,              // Blue 400
+  info-dark: #2563eb,               // Blue 600
 
-  // Effects
-  shadow-glow: 0 0 20px core.alpha($secondary, 0.3),
-  shadow-glow-strong: 0 0 40px core.alpha($secondary, 0.5),
+  // Effects - Subtle and professional
+  shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05),
+  shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1),
+  shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1),
+  shadow-glow: 0 0 16px core.alpha($primary, 0.2),
+  shadow-glow-strong: 0 0 24px core.alpha($primary, 0.4),
 
-  // Theme-specific gradients
-  twilight-gradient-primary: linear-gradient(135deg, $primary, $secondary),
-  twilight-gradient-accent: linear-gradient(135deg, $secondary, $accent),
-  twilight-gradient-glow: radial-gradient(circle at center, core.alpha($secondary, 0.2), transparent 70%),
+  // Theme-specific gradients - Refined and subtle
+  gradient-primary: linear-gradient(135deg, $primary, $secondary),
+  gradient-surface: linear-gradient(135deg, #18181b, #27272a),
+  gradient-accent: linear-gradient(135deg, $primary, $accent),
+  gradient-glow: radial-gradient(circle at center, core.alpha($primary, 0.15), transparent 70%),
 
   // RGB values for shadow functions
   primary-rgb: '99, 102, 241',      // #6366f1
   secondary-rgb: '139, 92, 246',    // #8b5cf6
-  accent-rgb: '236, 72, 153'        // #ec4899
+  accent-rgb: '245, 158, 11'        // #f59e0b (updated to amber)
 );
 
-// Light mode colors
+// Light mode colors - Clean and modern
 $twilight-light: map.merge($twilight-dark, (
-  // Backgrounds
-  background: #f8f9fa,
-  background-surface: #ffffff,
-  background-surface-light: #f3f4f6,
+  // Backgrounds - Pure and clean
+  background: #fafafa,              // Slightly off-white
+  background-surface: #ffffff,      // Pure white for cards
+  background-surface-light: #f4f4f5,// Subtle gray for hover
 
-  // Text
-  text: #1f2937,
-  text-muted: core.alpha(#1f2937, 0.7),
-  text-dim: core.alpha(#1f2937, 0.5),
+  // Text - High contrast for readability
+  text: #18181b,                    // Near black
+  text-muted: #52525b,              // Gray 600
+  text-dim: #a1a1aa,                // Gray 400
 
-  // Borders
-  border: core.alpha(#000000, 0.1),
-  border-light: core.alpha(#000000, 0.05),
-  border-dark: core.alpha(#000000, 0.2),
+  // Borders - Visible but not heavy
+  border: #e4e4e7,                  // Gray 200
+  border-light: #f4f4f5,            // Gray 100
+  border-dark: #d4d4d8,             // Gray 300
 
-  // Effects
-  shadow-glow: 0 0 20px core.alpha($primary, 0.2),
-  shadow-glow-strong: 0 0 40px core.alpha($primary, 0.3)
+  // Shadows - Softer for light mode
+  shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05),
+  shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.08),
+  shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08),
+  shadow-glow: 0 0 16px core.alpha($primary, 0.15),
+  shadow-glow-strong: 0 0 24px core.alpha($primary, 0.25),
+
+  // Gradients adjusted for light mode
+  gradient-surface: linear-gradient(135deg, #ffffff, #f4f4f5)
 ));
 
 // Export theme
@@ -100,7 +114,7 @@ $twilight-theme: (
   scales: (
     'indigo': $primary,
     'violet': $secondary,
-    'pink': $accent
+    'amber': $accent
   ),
   overrides: (
     mantine-primary-color: indigo

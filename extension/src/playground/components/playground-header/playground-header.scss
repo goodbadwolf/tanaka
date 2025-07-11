@@ -2,17 +2,17 @@
 .tnk-playground-header {
   position: sticky;
   top: 0;
-  z-index: 1000;
-  border-bottom: 1px solid var(--mantine-color-default-border);
+  z-index: var(--z-dropdown);
+  border-bottom: var(--mantine-spacing-xs) solid var(--mantine-color-default-border);
 
   // Surface gradient that adapts to theme
   background: var(--gradient-surface);
 
   &__icon {
-    color: var(--mantine-color-blue-6);
+    color: var(--primary);
   }
 
   &__title {
-    line-height: 1.2;
+    line-height: var(--mantine-line-height-sm);
   }
 }

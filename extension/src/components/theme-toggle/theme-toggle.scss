@@ -1,5 +1,5 @@
 .theme-toggle {
-  transition: all 0.2s ease;
+  transition: all var(--mantine-transition-duration-md) var(--mantine-transition-timing-function);
   box-shadow: var(--shadow-md);
 
   &:hover {
@@ -12,7 +12,7 @@
 
   // Add a subtle rotation animation on theme change
   &[data-transitioning="true"] {
-    animation: theme-toggle-rotate 0.3s ease-in-out;
+    animation: theme-toggle-rotate var(--mantine-transition-duration-slow) var(--mantine-transition-timing-function);
   }
 }
 
