@@ -83,7 +83,7 @@ export function OverviewSection() {
             </Text>
             <Code block>{`import { Button } from '../components/button';
 import { Toggle } from '../components/toggle';
-import { PageHeader } from '../components/page-header';`}</Code>
+import { AppHeader } from '../components/app-header';`}</Code>
           </div>
 
           <div>

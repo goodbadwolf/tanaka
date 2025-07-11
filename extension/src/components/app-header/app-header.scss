@@ -1,0 +1,138 @@
+@use "../../styles/mixins" as *;
+
+.tnk-app-header {
+  position: relative;
+  border-radius: 0;
+  border-bottom: 1px solid var(--mantine-color-default-border);
+  background: var(--mantine-color-body);
+  transition: all var(--mantine-transition-duration-md) var(--mantine-transition-timing-function);
+
+  &:not([data-with-border]) {
+    border-bottom: none;
+  }
+
+  &--compact {
+    .tnk-app-header__title {
+      font-size: var(--mantine-h4-font-size);
+      line-height: var(--mantine-h4-line-height);
+    }
+  }
+
+  &--prominent {
+    background: linear-gradient(135deg,
+      var(--mantine-color-primary-5),
+      var(--mantine-color-primary-7)
+    );
+    color: var(--mantine-color-white);
+
+    .tnk-app-header__title,
+    .tnk-app-header__subtitle {
+      color: inherit;
+    }
+
+    .tnk-app-header__back {
+      color: var(--mantine-color-white);
+
+      @include hover-style {
+        &:hover {
+          background-color: var(--mantine-color-white-alpha-10);
+        }
+      }
+    }
+  }
+
+  &__main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--mantine-spacing-md);
+  }
+
+  &__content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__back {
+    flex-shrink: 0;
+    transition: var(--mantine-transition-duration-md) var(--mantine-transition-timing-function);
+
+    @include hover-style {
+      &:hover {
+        background-color: var(--mantine-color-gray-light);
+      }
+    }
+
+    @include rtl-flip;
+  }
+
+  &__icon {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    color: var(--mantine-color-primary-filled);
+  }
+
+  &__text {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  &__title {
+    margin: 0;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    line-height: 1.2;
+    @include text-truncate;
+  }
+
+  &__subtitle {
+    margin-top: var(--mantine-spacing-xs);
+    line-height: 1.4;
+    opacity: 0.8;
+    @include text-truncate;
+  }
+
+  &__actions {
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: var(--mantine-breakpoint-sm)) {
+  .tnk-app-header {
+    &:not(.tnk-app-header--compact) {
+      .tnk-app-header__main {
+        flex-wrap: wrap;
+        gap: var(--mantine-spacing-sm);
+      }
+
+      .tnk-app-header__content {
+        flex: 1 1 100%;
+        order: 1;
+      }
+
+      .tnk-app-header__actions {
+        flex: 1 1 auto;
+        order: 2;
+        justify-content: flex-end;
+        margin-top: var(--mantine-spacing-xs);
+      }
+    }
+
+    &--default,
+    &--prominent {
+      .tnk-app-header__title {
+        font-size: var(--mantine-h3-font-size);
+      }
+    }
+  }
+}
+
+// Apply touch interaction to interactive elements
+.tnk-app-header {
+  &__back,
+  &__icon {
+    @include touch-interaction;
+  }
+}
