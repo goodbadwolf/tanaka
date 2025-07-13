@@ -92,7 +92,8 @@
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.36.0",
     "web-ext": "^8.8.0",
-    "webextension-polyfill": "^0.12.0"
+    "webextension-polyfill": "^0.12.0",
+    "webpack-bundle-analyzer": "^4.10.2"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

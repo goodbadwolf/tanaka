@@ -207,6 +207,9 @@ importers:
       webextension-polyfill:
         specifier: ^0.12.0
         version: 0.12.0
+      webpack-bundle-analyzer:
+        specifier: ^4.10.2
+        version: 4.10.2
 
 packages:
 
