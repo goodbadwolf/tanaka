@@ -2,12 +2,10 @@ import { defineConfig } from '@rspack/cli';
 import { rspack } from '@rspack/core';
 import RefreshPlugin from '@rspack/plugin-react-refresh';
 import HtmlRspackPlugin from 'html-rspack-plugin';
-import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
-// import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-// import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
+import { dirname, resolve } from 'path';
 import * as sass from 'sass';
-import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const isDev = process.env.NODE_ENV === 'development';
@@ -100,9 +98,7 @@ export default defineConfig({
             options: {
               modules: {
                 auto: true,
-                localIdentName: isDev
-                  ? '[name]__[local]--[hash:base64:5]'
-                  : '[hash:base64:8]',
+                localIdentName: isDev ? '[name]__[local]--[hash:base64:5]' : '[hash:base64:8]',
               },
               sourceMap: isDev,
             },
@@ -145,8 +141,6 @@ export default defineConfig({
   plugins: [
     isDev && new RefreshPlugin(),
 
-
-
     new HtmlRspackPlugin({
       template: './src/playground/index.html',
       filename: 'playground/index.html',
@@ -166,11 +160,6 @@ export default defineConfig({
       'process.env.BUILD_ENV': JSON.stringify(buildEnv),
       __APP_VERSION__: JSON.stringify(process.env.npm_package_version),
     }),
-
-    // !isDev && new MiniCssExtractPlugin({
-    //   filename: '[name].[contenthash].css',
-    //   chunkFilename: '[id].[contenthash].css',
-    // }),
 
     isAnalyze &&
       new BundleAnalyzerPlugin({
@@ -217,7 +206,6 @@ export default defineConfig({
               },
             },
           }),
-          // new CssMinimizerPlugin(),
         ]
       : [],
     sideEffects: false, // Enable tree shaking
