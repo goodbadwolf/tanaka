@@ -1,6 +1,5 @@
 import { Box, Group, Text, Title } from '@mantine/core';
 import { IconPalette } from '@tabler/icons-preact';
-import { ThemeToggle } from '../../../components/theme-toggle';
 import { ThemeStyleSwitcher } from '../theme-style-switcher';
 import './playground-header.scss';
 
@@ -15,13 +14,12 @@ export function PlaygroundHeader() {
               Tanaka Design System
             </Title>
             <Text size="sm" c="dimmed">
-              Component library & UI showcase
+              Mantine & Tanaka components showcase
             </Text>
           </div>
         </Group>
         <Group gap="md">
           <ThemeStyleSwitcher />
-          <ThemeToggle />
         </Group>
       </Group>
     </Box>
