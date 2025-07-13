@@ -81,7 +81,7 @@ This file tracks all pending work for the Tanaka project.
 
 See [SCSS_ROADMAP.md](./SCSS_ROADMAP.md) for detailed implementation.
 
-- [ ] Polish and finalize twilight and neon themes
+- [x] Polish and finalize twilight and neon themes (PR #119)
 - [ ] Add Dividers component
 - [ ] Extract common patterns into mixins
 - [ ] Consolidate duplicate styles
