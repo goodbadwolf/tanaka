@@ -20,5 +20,5 @@ coverage/
 web-ext-artifacts/
 
 # BackstopJS
-backstop_data/
-!backstop_data/engine_scripts/*
+backstop_*_data/
+backstop*.json
