@@ -131,3 +131,15 @@
     }
   }
 }
+
+// Playground-specific styles
+.tnk-playground-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-dropdown);
+  background: var(--gradient-surface);
+
+  .tnk-app-header__icon {
+    color: var(--primary);
+  }
+}
