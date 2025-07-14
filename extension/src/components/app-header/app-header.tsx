@@ -15,7 +15,7 @@ export interface AppHeaderProps {
   loading?: boolean;
   withBorder?: boolean;
   isMainHeader?: boolean;
-  'aria-label'?: string;
+  ariaLabel?: string;
 }
 
 export function AppHeader(props: AppHeaderProps) {
@@ -30,7 +30,7 @@ export function AppHeader(props: AppHeaderProps) {
     loading = false,
     withBorder = true,
     isMainHeader = false,
-    'aria-label': ariaLabel,
+    ariaLabel,
   } = props;
 
   const padding = variant === 'compact' ? 'sm' : variant === 'prominent' ? 'xl' : 'lg';
