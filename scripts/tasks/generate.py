@@ -69,7 +69,7 @@ def generate_api_models(force: bool = False) -> TaskResult:
             message="No Rust files with ts-rs derives found",
             exit_code=EXIT_FAILURE,
         )
-    logger.info(f"Found {len(source_files)} source files with ts-rs models")
+    logger.info(f"Found {len(source_files)} Rust source files with ts-rs models")
 
     needs_regeneration = SetOnce[bool]()
     if force:
@@ -84,17 +84,17 @@ def generate_api_models(force: bool = False) -> TaskResult:
             exit_code=EXIT_FAILURE,
         )
     generated_files = _find_generated_files(extension_dir / "src" / "api")
-    logger.info(f"Found {len(generated_files)} generated files")
+    logger.info(f"Found {len(generated_files)} TypeScript generated files")
 
     if not generated_files:
         needs_regeneration.set(True, "no generated files found")
-
-    # If any of the source files are newer than the generated files, we need to regenerate
-    latest_generated_mtime = max(gen_file.stat().st_mtime for gen_file in generated_files)
-    for src_file in source_files:
-        if src_file.stat().st_mtime > latest_generated_mtime:
-            needs_regeneration.set(True, "source files are newer than generated files")
-            break
+    else:
+        # If any of the source files are newer than the generated files, we need to regenerate
+        latest_generated_mtime = max(gen_file.stat().st_mtime for gen_file in generated_files)
+        for src_file in source_files:
+            if src_file.stat().st_mtime > latest_generated_mtime:
+                needs_regeneration.set(True, "source files are newer than generated files")
+                break
 
     if not needs_regeneration.get():
         logger.success("Generated TypeScript files are up-to-date")
@@ -120,7 +120,7 @@ def generate_api_models(force: bool = False) -> TaskResult:
         logger.info("Formatting generated TypeScript files...")
         try:
             run_command(
-                ["pnpm", "run", "lint:fix:specific", "--", "src/api/**/*.ts"],
+                ["pnpm", "run", "lint:specific", "--", "src/api/**/*.ts"],
                 cwd=extension_dir,
             )
             logger.success("Generated files formatted successfully")
