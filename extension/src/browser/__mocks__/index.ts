@@ -2,6 +2,7 @@
  * Mock implementation of the Browser API for testing.
  * This file should only be imported in test environments where Jest is available.
  */
+/*
 import type { IBrowser } from '../core';
 
 export function createMockBrowser(): IBrowser {
@@ -78,3 +79,4 @@ export class MockBrowser implements IBrowser {
   public readonly localStorage = this.mockBrowser.localStorage;
   public readonly runtime = this.mockBrowser.runtime;
 }
+*/

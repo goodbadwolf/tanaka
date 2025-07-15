@@ -92,7 +92,7 @@ class PerformanceMonitor {
   generateReport(): PerformanceReport {
     const marks = this.getMarks()
     const totalDuration = marks.reduce(
-      (sum, mark) => sum + (mark.duration || 0),
+      (sum, mark) => sum + (mark.duration ?? 0),
       0,
     )
 
@@ -123,15 +123,14 @@ class PerformanceMonitor {
 
     const report = this.generateReport()
 
-    console.group("Performance Report")
-    console.table(
+    console.info("Performance Report")
+    console.info(
       report.marks.map((mark) => ({
         name: mark.name,
         duration: `${mark.duration?.toFixed(2)}ms`,
       })),
     )
     console.info(`Total duration: ${report.totalDuration.toFixed(2)}ms`)
-    console.groupEnd()
   }
 
   /**
@@ -189,7 +188,7 @@ const componentRenderCounts = new Map<string, number>()
 export function trackComponentRender(componentName: string): void {
   if (process.env.NODE_ENV !== "development") return
 
-  const count = (componentRenderCounts.get(componentName) || 0) + 1
+  const count = (componentRenderCounts.get(componentName) ?? 0) + 1
   componentRenderCounts.set(componentName, count)
 }
 
@@ -201,11 +200,10 @@ export function logRenderStats(): void {
     .sort((a, b) => b[1] - a[1])
 
   if (stats.length > 0) {
-    console.group("🚀 Component Render Stats")
+    console.info("🚀 Component Render Stats")
     stats.forEach(([name, count]) => {
       console.info(`${name}: ${count} renders`)
     })
-    console.groupEnd()
   }
 }
 

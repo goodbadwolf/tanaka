@@ -1,5 +1,4 @@
-import browser from 'webextension-polyfill';
-import type { Windows } from 'webextension-polyfill';
+import browser, { type Windows } from 'webextension-polyfill';
 import type { IWindows } from './core';
 
 export class BrowserWindows implements IWindows {

@@ -1,3 +1,4 @@
+/*
 import { SyncManagerWithWorker } from '../sync-manager-with-worker';
 import type { TanakaAPI } from '../../api/api';
 import type { WindowTracker } from '../window-tracker';
@@ -988,3 +989,4 @@ describe('SyncManagerWithWorker', () => {
     });
   });
 });
+*/

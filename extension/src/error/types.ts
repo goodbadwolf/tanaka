@@ -3,35 +3,34 @@
  */
 
 import {
-  type ErrorCode,
-  type DetailedError,
-  type EnhancedError,
-  type RetryConfig,
-  type ErrorSeverity,
+  AUTH_TOKEN_INVALID,
+  AUTH_TOKEN_MISSING,
   type ApiErrorResponse,
   type ApiSuccessResponse,
   type AsyncResult,
-  ERROR_CODE_MESSAGES,
-  // Import all error codes
-  NETWORK_FAILURE,
+  BROWSER_API_UNAVAILABLE,
   CONNECTION_TIMEOUT,
-  DNS_RESOLUTION_FAILED,
-  AUTH_TOKEN_MISSING,
-  AUTH_TOKEN_INVALID,
-  PERMISSION_DENIED,
-  SERVER_UNAVAILABLE,
-  SERVER_ERROR,
-  SERVER_OVERLOADED,
-  INVALID_DATA,
-  SYNC_CONFLICT,
-  DATA_CORRUPTION,
-  STORAGE_QUOTA_EXCEEDED,
   DATABASE_ERROR,
+  DATA_CORRUPTION,
+  DNS_RESOLUTION_FAILED,
+  type DetailedError,
+  ERROR_CODE_MESSAGES,
+  EXTENSION_PERMISSION_DENIED,
+  type EnhancedError,
+  type ErrorCode,
+  type ErrorSeverity,
+  INVALID_CONFIGURATION,
+  INVALID_DATA,
   INVALID_SERVER_URL,
   MISSING_CONFIGURATION,
-  INVALID_CONFIGURATION,
-  EXTENSION_PERMISSION_DENIED,
-  BROWSER_API_UNAVAILABLE,
+  NETWORK_FAILURE,
+  PERMISSION_DENIED,
+  type RetryConfig,
+  SERVER_ERROR,
+  SERVER_OVERLOADED,
+  SERVER_UNAVAILABLE,
+  STORAGE_QUOTA_EXCEEDED,
+  SYNC_CONFLICT,
   TAB_ACCESS_DENIED,
   WINDOW_ACCESS_DENIED,
 } from '../api/errors';
@@ -112,7 +111,7 @@ export class ExtensionError extends Error implements EnhancedError {
       cause?: Error;
     } = {},
   ) {
-    const finalMessage = message || ERROR_CODE_MESSAGES[code] || `Error: ${code}`;
+    const finalMessage = message ?? ERROR_CODE_MESSAGES[code] ?? `Error: ${code}`;
     super(finalMessage);
     // Set cause if provided
     if (options.cause && 'cause' in this) {
@@ -124,7 +123,7 @@ export class ExtensionError extends Error implements EnhancedError {
     this.code = code;
     this.message = finalMessage;
     this.timestamp = new Date().toISOString();
-    this.severity = options.severity || this.getDefaultSeverity(code);
+    this.severity = options.severity ?? this.getDefaultSeverity(code);
     this.recoverable = options.recoverable ?? this.getDefaultRecoverable(code);
     this.reportable = options.reportable ?? this.getDefaultReportable(code);
     this.context = options.context;
@@ -132,7 +131,7 @@ export class ExtensionError extends Error implements EnhancedError {
     this.userId = options.userId;
     this.requestId = options.requestId;
     this.metadata = options.metadata;
-    this.recoveryActions = options.recoveryActions || this.getDefaultRecoveryActions(code);
+    this.recoveryActions = options.recoveryActions ?? this.getDefaultRecoveryActions(code);
 
     // Ensure the stack trace points to the caller (Node.js only)
     const errorConstructor = Error as typeof Error & {

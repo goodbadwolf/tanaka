@@ -111,6 +111,7 @@ export async function withRetry<T>(
 
   let lastError: ExtensionError | Error | undefined;
 
+  // Retry loop must be sequential
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
       // Check abort signal
@@ -123,6 +124,7 @@ export async function withRetry<T>(
       }
 
       // Execute operation
+      // eslint-disable-next-line no-await-in-loop
       return await operation();
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
@@ -156,12 +158,13 @@ export async function withRetry<T>(
       }
 
       // Wait before retrying
+      // eslint-disable-next-line no-await-in-loop
       await sleep(delay);
     }
   }
 
   // Should never reach here, but throw last error just in case
-  throw lastError || new Error('Retry failed with unknown error');
+  throw lastError ?? new Error('Retry failed with unknown error');
 }
 
 /**

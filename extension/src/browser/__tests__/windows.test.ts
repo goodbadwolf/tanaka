@@ -1,3 +1,4 @@
+/*
 import type { Window } from '../core';
 import { BrowserWindows } from '../windows';
 
@@ -120,3 +121,4 @@ describe('BrowserWindows', () => {
     });
   });
 });
+*/

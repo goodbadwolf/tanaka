@@ -98,7 +98,7 @@ export class MockBrowser implements IBrowser {
 
     const window = this.mockWindows.get(windowId);
     if (window) {
-      window.tabs = window.tabs || [];
+      window.tabs = window.tabs ?? [];
       window.tabs.push(tab);
     }
 
@@ -129,8 +129,8 @@ export class MockBrowser implements IBrowser {
     },
 
     create: async (createProperties: Tabs.CreateCreatePropertiesType): Promise<Tabs.Tab> => {
-      const windowId = createProperties.windowId || Array.from(this.mockWindows.keys())[0];
-      const tabId = this.addMockTab(windowId, createProperties.url || 'about:blank', 'New Tab');
+      const windowId = createProperties.windowId ?? Array.from(this.mockWindows.keys())[0];
+      const tabId = this.addMockTab(windowId, createProperties.url ?? 'about:blank', 'New Tab');
       const tab = this.mockTabs.get(tabId);
       if (!tab) throw new Error(`Tab ${tabId} not found`);
 
@@ -169,7 +169,7 @@ export class MockBrowser implements IBrowser {
         // Simulate tab removed event
         setTimeout(() => {
           this.tabRemovedEmitter.trigger(tabId, {
-            windowId: windowId || 0,
+            windowId: windowId ?? 0,
             isWindowClosing: false,
           });
         }, 10);
@@ -211,7 +211,7 @@ export class MockBrowser implements IBrowser {
 
       const fromIndex = tab.index;
       const toIndex = moveProperties.index;
-      const toWindowId = moveProperties.windowId || tab.windowId;
+      const toWindowId = moveProperties.windowId ?? tab.windowId;
 
       // Update tab properties
       tab.index = toIndex;
@@ -222,7 +222,7 @@ export class MockBrowser implements IBrowser {
       // Simulate tab moved event
       setTimeout(() => {
         this.tabMovedEmitter.trigger(tabId, {
-          windowId: toWindowId || tab.windowId || 0,
+          windowId: toWindowId ?? tab.windowId ?? 0,
           fromIndex,
           toIndex,
         });
@@ -309,13 +309,13 @@ export class MockBrowser implements IBrowser {
     },
 
     request: async (permissions: Permissions.Permissions): Promise<boolean> => {
-      console.log('[Mock] Requesting permissions:', permissions);
+      console.info('[Mock] Requesting permissions:', permissions);
       // For mock, simulate user granting permissions
       return true;
     },
 
     remove: async (permissions: Permissions.Permissions): Promise<boolean> => {
-      console.log('[Mock] Removing permissions:', permissions);
+      console.info('[Mock] Removing permissions:', permissions);
       return true;
     },
 
@@ -334,12 +334,12 @@ export class MockBrowser implements IBrowser {
     },
 
     openOptionsPage: async (): Promise<void> => {
-      console.log('[Mock] Opening options page');
+      console.info('[Mock] Opening options page');
       window.open('/settings', '_blank');
     },
 
     sendMessage: async (message: unknown): Promise<unknown> => {
-      console.log('[Mock] Message sent:', message);
+      console.info('[Mock] Message sent:', message);
 
       // Simulate async message handling
       return new Promise((resolve) => {

@@ -129,6 +129,18 @@ export default defineConfig({
       "@": fileURLToPath(new URL("src", import.meta.url)),
       src: fileURLToPath(new URL("src", import.meta.url)),
       "@assets": fileURLToPath(new URL("src/assets", import.meta.url)),
+      "@env": resolve(
+        __dirname,
+        `src/config/environments/${process.env.BUILD_ENV}.ts`,
+      ),
+      ...(process.env.APP_MODE !== "extension"
+        ? {
+            "webextension-polyfill": resolve(
+              __dirname,
+              "src/browser/__mocks__/mock-polyfill.ts",
+            ),
+          }
+        : {}),
     },
   },
 

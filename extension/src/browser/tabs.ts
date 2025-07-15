@@ -1,5 +1,4 @@
-import browser from 'webextension-polyfill';
-import type { Tabs } from 'webextension-polyfill';
+import browser, { type Tabs } from 'webextension-polyfill';
 import type { ITabs } from './core';
 
 export class BrowserTabs implements ITabs {

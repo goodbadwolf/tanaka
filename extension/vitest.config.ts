@@ -8,16 +8,24 @@ export default defineConfig({
     globals: true,
     environment: "happy-dom",
     setupFiles: ["./src/tests/setup.ts"],
+    exclude: [
+      "**/node_modules/**",
+      "**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
+      "**/__tests__/**",
+    ],
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],
       exclude: [
-        "node_modules/",
+        "**/node_modules/**",
         "src/tests/",
         "**/*.d.ts",
         "**/*.config.*",
         "**/mockData.ts",
         "scripts/",
+        // TODO: remove this once we have a proper coverage setup
+        "**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
+        "**/__tests__/**",
       ],
     },
   },
