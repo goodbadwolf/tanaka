@@ -1,3 +1,6 @@
+import { useBrowserLocalStorage } from "@/composables/useBrowserStorage"
+import { defineStore } from "pinia"
+
 export const useTestStore = defineStore("app", () => {
   const { data: count } = useBrowserLocalStorage("count", 0)
   const { data: name } = useBrowserLocalStorage("name", "John Doe")

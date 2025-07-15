@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { useTestStore } from '@/stores/test.store';
+import { storeToRefs } from 'pinia';
+
 const testStore = useTestStore()
 const { increment, decrement } = testStore
 const { count, name } = storeToRefs(testStore)

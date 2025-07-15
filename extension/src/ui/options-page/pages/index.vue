@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import { useOptionsStore } from '@/stores/options.store'
+import { storeToRefs } from 'pinia'
+import { reactive, watch } from 'vue'
+
 const optionsStore = useOptionsStore()
 // const { toggleDark } = optionsStore
 const { isDark, profile, others } = storeToRefs(optionsStore)

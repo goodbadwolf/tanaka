@@ -5,8 +5,8 @@ import globals from "globals"
 import path from "node:path"
 import { fileURLToPath } from "node:url"
 import tseslint from "typescript-eslint"
+// @ts-expect-error - Configuration file with dynamic imports
 import { define } from "./define.config.mjs"
-import AutoImportGlobals from "./src/types/.eslintrc-auto-import.json" with { type: "json" }
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -41,7 +41,6 @@ export default [
         ...globals.browser,
         ...globals.worker,
         ...globals.webextensions,
-        ...AutoImportGlobals.globals,
         ...viteDefineGlobals,
       },
     },
