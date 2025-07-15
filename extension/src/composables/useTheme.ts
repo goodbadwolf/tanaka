@@ -1,6 +1,7 @@
 import type { BasicColorSchema } from "@vueuse/core"
-import { useBrowserLocalStorage } from "./useBrowserStorage"
+import { computed, watch } from "vue"
 import { name } from "~/package.json"
+import { useBrowserLocalStorage } from "./useBrowserStorage"
 
 export function applyTheme(mode: BasicColorSchema) {
   const container = document.getElementById(name)

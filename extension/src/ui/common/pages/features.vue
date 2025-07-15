@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { ref } from 'vue';
+
 const features = ref([
   {
     title: "Effortless Authentication Integration",

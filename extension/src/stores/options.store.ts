@@ -1,3 +1,10 @@
+import {
+  useBrowserLocalStorage,
+  useBrowserSyncStorage,
+} from "@/composables/useBrowserStorage"
+import { useTheme } from "@/composables/useTheme"
+import { defineStore } from "pinia"
+
 export const useOptionsStore = defineStore("options", () => {
   const { isDark, toggleDark } = useTheme()
 

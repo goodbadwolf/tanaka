@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { appRouter } from '@/utils/router';
 const displayName = __DISPLAY_NAME__
 const version = __VERSION__
 </script>

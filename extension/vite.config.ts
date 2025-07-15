@@ -1,17 +1,17 @@
-import fs from "node:fs"
-import { fileURLToPath } from "node:url"
-import { defineConfig } from "vite"
-import vue from "@vitejs/plugin-vue"
-import vueDevTools from "vite-plugin-vue-devtools"
-import VueRouter from "unplugin-vue-router/vite"
-import TurboConsole from "unplugin-turbo-console/vite"
 import VueI18nPlugin from "@intlify/unplugin-vue-i18n/vite"
 import ui from "@nuxt/ui/vite"
+import vue from "@vitejs/plugin-vue"
 import "dotenv/config"
+import fs from "node:fs"
+import { fileURLToPath } from "node:url"
+import TurboConsole from "unplugin-turbo-console/vite"
+import VueRouter from "unplugin-vue-router/vite"
+import { defineConfig } from "vite"
+import vueDevTools from "vite-plugin-vue-devtools"
 
-// @ts-expect-error commonjs module
-import { define, raw } from "./define.config.mjs"
 import { dirname, relative, resolve } from "node:path"
+// @ts-expect-error - Configuration file with dynamic imports
+import { define, raw } from "./define.config.mjs"
 
 const IS_DEV = process.env.NODE_ENV === "development"
 const PORT = Number(process.env.PORT) || 3303
@@ -83,27 +83,6 @@ export default defineConfig({
     vue(),
 
     ui({
-      autoImport: {
-        imports: [
-          "vue",
-          "vue-router",
-          "pinia",
-          "@vueuse/core",
-          { "vue-router/auto": ["definePage"] },
-          { "vue-i18n": ["useI18n", "t"] },
-          {
-            "webextension-polyfill": [["=", "browser"]],
-          },
-        ],
-        dts: "src/types/auto-imports.d.ts",
-        dirs: ["src/composables/**", "src/stores/**", "src/utils/**"],
-        vueTemplate: true,
-        viteOptimizeDeps: true,
-        eslintrc: {
-          enabled: true,
-          filepath: "src/types/.eslintrc-auto-import.json",
-        },
-      },
       components: {
         dirs: ["src/components"],
         dts: "src/types/components.d.ts",
