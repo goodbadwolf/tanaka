@@ -1,5 +1,5 @@
 import { crx } from "@crxjs/vite-plugin"
-import { defineConfig, mergeConfig, UserConfig, PluginOption } from "vite"
+import { PluginOption, UserConfig, defineConfig, mergeConfig } from "vite"
 import zipPack from "vite-plugin-zip-pack"
 import manifest from "./manifest.firefox.config"
 import packageJson from "./package.json" with { type: "json" }

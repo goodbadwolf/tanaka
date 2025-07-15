@@ -1,16 +1,29 @@
-import { ref, watch, nextTick, toRaw } from "vue"
+import { nextTick, ref, toRaw, watch } from "vue"
 
-type StorageValue = string | number | boolean | null | Record<string, unknown> | unknown[]
+type StorageValue =
+  | string
+  | number
+  | boolean
+  | null
+  | Record<string, unknown>
+  | unknown[]
 
-function mergeDeep(defaults: Record<string, unknown>, source: Record<string, unknown>): Record<string, unknown> {
+function mergeDeep(
+  defaults: Record<string, StorageValue>,
+  source: Record<string, StorageValue>,
+): Record<string, StorageValue> {
   // Merge the default options with the stored options
-  const output: Record<string, unknown> = { ...defaults } // Start with defaults
+  const output: Record<string, StorageValue> = { ...defaults } // Start with defaults
 
   Object.keys(defaults).forEach((key) => {
     const defaultValue = defaults[key]
     const sourceValue = source?.[key]
 
-    if (isObject(defaultValue) && sourceValue != null && isObject(sourceValue)) {
+    if (
+      isObject(defaultValue) &&
+      sourceValue != null &&
+      isObject(sourceValue)
+    ) {
       // Recursively merge nested objects
       output[key] = mergeDeep(defaultValue, sourceValue)
     } else if (checkType(defaultValue, sourceValue)) {
@@ -35,7 +48,7 @@ function checkType(defaultValue: unknown, value: unknown): boolean {
   )
 }
 
-function isObject(value: unknown): value is Record<string, unknown> {
+function isObject(value: unknown): value is Record<string, StorageValue> {
   return value !== null && value instanceof Object && !Array.isArray(value)
 }
 
@@ -61,7 +74,10 @@ function useBrowserStorage<T>(
     chrome.storage[storageType].get(key, async (result) => {
       if (result?.[key] !== undefined) {
         if (defaultIsObject && isObject(result[key])) {
-          data.value = mergeDeep(defaultValue as Record<string, unknown>, result[key]) as T
+          data.value = mergeDeep(
+            defaultValue as Record<string, StorageValue>,
+            result[key],
+          ) as T
         } else if (checkType(defaultValue, result[key])) {
           data.value = result[key] as T
         }
@@ -91,7 +107,8 @@ function useBrowserStorage<T>(
   chrome.storage[storageType].onChanged.addListener(async function (changes) {
     if (changes?.[key]) {
       isUpdatingFromStorage = true
-      const { oldValue, newValue } = changes[key]
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { oldValue: _oldValue, newValue } = changes[key]
       data.value = newValue
       await nextTick()
       isUpdatingFromStorage = false
