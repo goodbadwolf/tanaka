@@ -10,8 +10,7 @@ import { defineConfig } from "vite"
 import vueDevTools from "vite-plugin-vue-devtools"
 
 import { dirname, relative, resolve } from "node:path"
-// @ts-expect-error - Configuration file with dynamic imports
-import { define, raw } from "./define.config.mjs"
+import { define, raw } from "./define.config"
 
 const IS_DEV = process.env.NODE_ENV === "development"
 const PORT = Number(process.env.PORT) || 3303

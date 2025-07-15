@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process"
-import packageJson from "./package.json" with { type: "json" }
+import packageJson from "./package.json"
 
 // Get the current git commit hash.
 const gitCommit = spawnSync("git", ["rev-parse", "--short", "HEAD"])
@@ -11,7 +11,7 @@ const gitCommit = spawnSync("git", ["rev-parse", "--short", "HEAD"])
 // These variables are available in your Vue components and will be replaced by their values at build time.
 // These will be compiled into your app. Don't store secrets here!
 
-const raw = {
+const raw: Record<string, string> = {
   VERSION: packageJson.version,
   NAME: packageJson.name,
   DISPLAY_NAME: packageJson.displayName,
@@ -21,7 +21,7 @@ const raw = {
   HTML_TITLE: packageJson.displayName,
 }
 
-const define = Object.fromEntries(
+const define: Record<string, string> = Object.fromEntries(
   Object.entries(raw).map(([k, v]) => [`__${k}__`, JSON.stringify(v)]),
 )
 
