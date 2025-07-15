@@ -1,13 +1,18 @@
 export {
-  TanakaAPI,
-  TabData,
-  type TanakaAPIOptions,
   browserTabToSyncTab,
   parseSyncTab,
-} from './api';
+  TanakaAPI,
+  type TanakaAPIOptions,
+} from "./api"
+export type { TabData } from "./api"
 export type {
-  Tab,
   SyncRequest as ModelSyncRequest,
   SyncResponse as ModelSyncResponse,
-} from './models';
-export type { SyncRequest, SyncResponse, CrdtOperation, TabData as CrdtTabData } from './sync';
+  Tab,
+} from "./models"
+export type {
+  CrdtOperation,
+  TabData as CrdtTabData,
+  SyncRequest,
+  SyncResponse,
+} from "./sync"

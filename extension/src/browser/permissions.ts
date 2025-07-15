@@ -1,6 +1,5 @@
-import browser from 'webextension-polyfill';
+import browser, { type Permissions } from 'webextension-polyfill';
 import type { IPermissions } from './core';
-import type { Permissions } from 'webextension-polyfill';
 
 export class BrowserPermissions implements IPermissions {
   contains(permissions: Permissions.Permissions): Promise<boolean> {

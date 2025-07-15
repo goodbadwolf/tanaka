@@ -68,7 +68,7 @@ export class CrdtWorkerClient {
     if (success) {
       pending.resolve(data);
     } else {
-      pending.reject(new Error(error || 'Unknown worker error'));
+      pending.reject(new Error(error ?? 'Unknown worker error'));
     }
   }
 

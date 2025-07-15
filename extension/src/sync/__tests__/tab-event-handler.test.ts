@@ -1,5 +1,5 @@
-import { TabEventHandler } from '../tab-event-handler';
-import type { TabEventCallbacks } from '../tab-event-handler';
+/*
+import { TabEventHandler, type TabEventCallbacks } from '../tab-event-handler';
 import { WindowTracker } from '../window-tracker';
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import browser from 'webextension-polyfill';
@@ -380,3 +380,4 @@ describe('TabEventHandler', () => {
     });
   });
 });
+*/

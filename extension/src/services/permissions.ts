@@ -54,7 +54,7 @@ export class PermissionsService {
         (perm) => !granted.permissions?.includes(perm),
       );
 
-      const missingOrigins = (this.requiredPermissions.origins || []).filter(
+      const missingOrigins = (this.requiredPermissions.origins ?? []).filter(
         (origin) => !granted.origins?.includes(origin),
       );
 
