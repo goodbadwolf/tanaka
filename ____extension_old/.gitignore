@@ -1,0 +1,24 @@
+# Build output
+dist/
+
+# Generated icons
+icons/
+
+# Rspack
+.rspack/
+rspack-bundle-analyzer/
+
+# Testing artifacts
+coverage/
+.nyc_output/
+
+# TypeScript
+*.tsbuildinfo
+
+# Extension specific
+*.xpi
+web-ext-artifacts/
+
+# BackstopJS
+backstop_*_data/
+backstop*.json

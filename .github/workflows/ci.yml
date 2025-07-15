@@ -157,7 +157,7 @@ jobs:
       - name: Run extension tests
         run: |
           cd extension
-          pnpm test --coverage --watchAll=false
+          pnpm tests --coverage
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4

@@ -1,5 +1,5 @@
-ignoredBuiltDependencies:
-  - esbuild
-  - puppeteer
 onlyBuiltDependencies:
-  - unrs-resolver
+  - "@tailwindcss/oxide"
+  - esbuild
+  - spawn-sync
+  - vue-demi

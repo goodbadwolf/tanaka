@@ -1,0 +1,5 @@
+ignoredBuiltDependencies:
+  - esbuild
+  - puppeteer
+onlyBuiltDependencies:
+  - unrs-resolver

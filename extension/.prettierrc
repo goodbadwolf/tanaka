@@ -1,7 +1,10 @@
 {
-  "semi": true,
+  "htmlWhitespaceSensitivity": "ignore",
+  "quoteProps": "as-needed",
+  "semi": false,
+  "singleAttributePerLine": true,
+  "singleQuote": false,
+  "tabWidth": 2,
   "trailingComma": "all",
-  "singleQuote": true,
-  "printWidth": 100,
-  "tabWidth": 2
+  "useTabs": false
 }
