@@ -9,6 +9,7 @@ export default defineConfig({
     environment: "happy-dom",
     setupFiles: ["./src/tests/setup.ts"],
     exclude: [
+      // TODO: remove this once we have a proper coverage setup
       "**/node_modules/**",
       "**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
       "**/__tests__/**",
