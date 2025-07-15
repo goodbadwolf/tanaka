@@ -81,7 +81,7 @@ Be a **pragmatic, experienced engineer** who values:
 
 Tanaka is a Firefox tab synchronization system built with:
 
-- **Extension**: TypeScript WebExtension using Yjs CRDT
+- **Extension**: Vue 3 + TypeScript WebExtension with Yjs CRDT integration
 - **Server**: Rust server using axum, tokio, yrs, and SQLite
 - **Architecture**: Client-server with CRDT-based sync
 
@@ -99,9 +99,9 @@ Tanaka is a Firefox tab synchronization system built with:
 
 ### Working with this Codebase
 
-- Firefox WebExtension (TypeScript) + Rust backend server
-- Extension uses Yjs for CRDT-based tab synchronization
-- TypeScript types generated from Rust models using ts-rs - import from `types/generated`
+- Firefox WebExtension (Vue 3 + TypeScript + Vite) + Rust backend server
+- Extension uses Vue 3, Nuxt UI, Pinia, and planned Yjs CRDT integration
+- Current API types are in `src/api/` directory structure
 - Always check existing patterns in neighboring files before implementing
 - Run `cargo fmt` and `pnpm run lint` before suggesting code changes
 - Prefer editing existing files over creating new ones
@@ -111,7 +111,7 @@ Tanaka is a Firefox tab synchronization system built with:
 
 ```
 tanaka/
-├── extension/          # Firefox WebExtension (TypeScript, Yjs)
+├── extension/          # Firefox WebExtension (Vue 3 + TypeScript + Vite)
 ├── server/            # Rust Tanaka server (axum, tokio, yrs, SQLite)
 │   └── config/        # Example configuration files
 └── docs/              # Project documentation
