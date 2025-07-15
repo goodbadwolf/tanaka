@@ -223,7 +223,8 @@ cargo build
 ```bash
 cd extension
 pnpm install
-pnpm run build:dev
+pnpm run build:chrome  # For Chrome/Chromium
+pnpm run build:firefox # For Firefox
 ```
 
 ### 5. Start Development
@@ -233,10 +234,17 @@ pnpm run build:dev
 cd server && cargo run
 
 # Terminal 2: Run extension with hot reload
-cd extension && pnpm run dev
+cd extension && pnpm run dev  # Builds both Chrome and Firefox
+# Or target specific browser:
+# pnpm run dev:chrome
+# pnpm run dev:firefox
 
-# Terminal 3: Launch Firefox with extension
-cd extension && pnpm run start
+# Terminal 3: Launch browser with extension
+cd extension && pnpm run launch:firefox  # For Firefox
+# Or for Chrome:
+# pnpm run launch:chrome
+# Or all browsers:
+# pnpm run launch:all
 ```
 
 ---
@@ -324,7 +332,7 @@ Migrations are stored in `server/migrations/` and are applied in order based on 
 
 ### Code Organization
 
-```
+```text
 tanaka/
 ├── extension/          # Firefox WebExtension (TypeScript)
 │   ├── src/           # Source code
@@ -406,33 +414,34 @@ cargo llvm-cov --lcov --output-path lcov.info  # Generate LCOV report
 ```bash
 # Dependencies
 pnpm install            # Install dependencies
-pnpm outdated          # Check for updates
-pnpm update            # Update dependencies
 
 # Development
-pnpm run dev           # Start with hot reload
-pnpm run start         # Launch Firefox
-pnpm run webapp        # Run as webapp (temporarily unavailable - Phase 4)
+pnpm run dev            # Build both Chrome and Firefox with hot reload
+pnpm run dev:chrome     # Chrome development with hot reload
+pnpm run dev:firefox    # Firefox development with watch mode
 
 # Building
-pnpm run build:dev     # Development build
-pnpm run build:prod    # Production build
-pnpm run watch         # Watch mode
+pnpm run build          # Build both Chrome and Firefox for production
+pnpm run build:chrome   # Build Chrome extension
+pnpm run build:firefox  # Build Firefox extension
 
-# Lint
-pnpm run lint          # ESLint
-pnpm run lint:fix      # Fix issues
-pnpm run typecheck     # TypeScript check
-pnpm run format        # Prettier
+# Browser Launch
+pnpm run launch:chrome  # Launch Chrome with extension
+pnpm run launch:firefox # Launch Firefox with extension
+pnpm run launch:all     # Launch all available browsers
+
+# Code Quality
+pnpm run lint           # ESLint with auto-fix
+pnpm run lint:manifest  # Validate manifest files
+pnpm run lint:generated # Lint generated API files
+pnpm run typecheck      # TypeScript type checking
+pnpm run format         # Prettier formatting
 
 # Testing
-pnpm run test          # Run tests
-pnpm run test:watch    # Watch mode
-pnpm run test:coverage # Coverage report
-
-# Analysis
-pnpm run analyze       # Bundle analysis
-pnpm run gen-icons     # Generate icons
+pnpm run tests          # Run Vitest tests
+pnpm run tests:watch    # Watch mode
+pnpm run tests:coverage # Coverage report
+pnpm run tests:ui       # Vitest UI
 ```
 
 ---
@@ -466,6 +475,7 @@ pnpm run gen-icons     # Generate icons
   ```
 
 - **rstest**: Parameterized testing for comprehensive coverage
+
   ```rust
   #[rstest]
   #[case::upsert(CrdtOperation::UpsertTab { /* ... */ })]
@@ -591,7 +601,7 @@ pnpm run webapp  # Currently unavailable - will be restored in Phase 4
 
 Features:
 
-- Runs at http://localhost:3000
+- Runs at <http://localhost:3000>
 - Mock browser APIs
 - Hot module replacement
 - Route-based navigation:
@@ -676,17 +686,17 @@ Troubleshooting:
 
 ## 14. Component Library
 
-The extension includes reusable React components. See the full [Component Documentation](#component-library-1) below.
+The extension includes reusable Vue components. See the full [Component Documentation](#17-component-library) below.
 
 Quick usage:
 
-```tsx
-import { Button, Input, Card } from "../components";
-
-<Card header="Settings">
-  <Input label="Server URL" type="url" />
-  <Button variant="primary">Save</Button>
-</Card>;
+```vue
+<template>
+  <Card header="Settings">
+    <Input label="Server URL" type="url" />
+    <Button variant="primary">Save</Button>
+  </Card>
+</template>
 ```
 
 ---
@@ -934,6 +944,7 @@ The extension includes an optimized sync manager that dynamically adjusts sync b
    - Error backoff: Exponential (5s, 10s, 20s... up to 60s)
 
 2. **Priority-based Operation Batching**
+
    | Priority | Operations | Delay |
    |----------|------------|-------|
    | CRITICAL | close_tab, track/untrack_window | 50ms |
