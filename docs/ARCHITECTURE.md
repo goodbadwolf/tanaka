@@ -125,6 +125,15 @@ Tanaka uses a structured JSON-based CRDT protocol for conflict-free synchronizat
 
 ## Extension Architecture
 
+### Technology Stack
+
+- **Frontend**: Vue 3 + TypeScript + Vite
+- **UI Framework**: Nuxt UI + Tailwind CSS 4
+- **State Management**: Pinia stores
+- **Routing**: Vue Router with file-based routing
+- **Build Tool**: Vite with CRXJS plugin
+- **Testing**: Vitest + Vue Test Utils
+
 ### Background Service
 
 - Persistent background script
@@ -150,7 +159,7 @@ Tanaka uses a structured JSON-based CRDT protocol for conflict-free synchronizat
 
 Tanaka uses Web Workers to offload heavy CRDT operations from the main thread:
 
-```
+```text
 Main Thread                 Web Worker Thread
 ┌─────────────────┐       ┌─────────────────┐
 │ SyncManager     │       │ CrdtWorker      │
