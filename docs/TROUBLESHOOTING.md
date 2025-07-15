@@ -212,7 +212,7 @@ RUST_BACKTRACE=1 cargo build -vv
    ```javascript
    // In extension console
    const data = await browser.storage.local.get();
-   console.log("Storage size:", JSON.stringify(data).length);
+   console.info("Storage size:", JSON.stringify(data).length);
    ```
 
 2. **Disable during development**:
@@ -247,7 +247,7 @@ RUST_BACKTRACE=1 cargo build -vv
    ```javascript
    // In extension console
    const workers = await browser.runtime.getBackgroundPage();
-   console.log("Worker available:", typeof Worker !== "undefined");
+   console.info("Worker available:", typeof Worker !== "undefined");
    ```
 
 2. **Verify worker file exists**:
@@ -313,7 +313,7 @@ pnpm run start -- --firefox="/Applications/Firefox.app/Contents/MacOS/firefox"
    ```typescript
    // Add to background.ts
    const DEBUG = true;
-   console.log = DEBUG ? console.log : () => {};
+   console.info = DEBUG ? console.info : () => {};
    ```
 
 2. **Inspect storage**:
@@ -324,7 +324,7 @@ pnpm run start -- --firefox="/Applications/Firefox.app/Contents/MacOS/firefox"
 
    // Watch for changes
    browser.storage.onChanged.addListener((changes, area) => {
-     console.log("Storage changed:", changes);
+     console.info("Storage changed:", changes);
    });
    ```
 
@@ -338,7 +338,7 @@ pnpm run start -- --firefox="/Applications/Firefox.app/Contents/MacOS/firefox"
    ```typescript
    // Log all messages
    browser.runtime.onMessage.addListener((msg, sender) => {
-     console.log("Message:", msg, "From:", sender);
+     console.info("Message:", msg, "From:", sender);
      return true;
    });
    ```
@@ -373,11 +373,11 @@ import * as Y from "yjs";
 
 // Get current state
 const doc = syncManager.getDocument();
-console.log("Doc state:", doc.toJSON());
+console.info("Doc state:", doc.toJSON());
 
 // Check for pending updates
 const pending = Y.encodeStateAsUpdate(doc);
-console.log("Pending size:", pending.byteLength);
+console.info("Pending size:", pending.byteLength);
 ```
 
 ---
@@ -413,7 +413,7 @@ console.log("Pending size:", pending.byteLength);
    ```javascript
    // List current permissions
    const perms = await browser.permissions.getAll();
-   console.log("Permissions:", perms);
+   console.info("Permissions:", perms);
    ```
 
 2. **Request missing permissions**:
@@ -476,7 +476,7 @@ console.timeEnd("sync");
 
 // Memory profiling
 if (performance.memory) {
-  console.log("Memory:", {
+  console.info("Memory:", {
     used: Math.round(performance.memory.usedJSHeapSize / 1048576) + "MB",
     total: Math.round(performance.memory.totalJSHeapSize / 1048576) + "MB",
   });
