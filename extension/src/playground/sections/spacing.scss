@@ -1,0 +1,68 @@
+// Spacing Section styles
+.tnk-spacing {
+  &__preview-box {
+    width: 60px;
+    height: 60px;
+    background-color: var(--mantine-color-blue-light);
+    border: 2px solid var(--mantine-color-blue-6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__spacing-indicator {
+    background-color: var(--mantine-color-blue-6);
+    // Width and height are dynamic based on spacing value
+  }
+
+  &__radius-demo {
+    width: 100%;
+    height: 80px;
+    background-color: var(--mantine-color-blue-light);
+    border: 2px solid var(--mantine-color-blue-6);
+    margin-bottom: var(--mantine-spacing-md);
+    // Border radius is dynamic
+  }
+
+  &__container-wrapper {
+    height: 40px;
+    background-color: var(--mantine-color-gray-2);
+    border: 1px dashed var(--mantine-color-gray-5);
+    position: relative;
+    overflow: hidden;
+  }
+
+  &__container-demo {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 100%;
+    background-color: var(--mantine-color-blue-light);
+    max-width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &--xs { width: 540px; }
+    &--sm { width: 720px; }
+    &--md { width: 960px; }
+    &--lg { width: 1140px; }
+    &--xl { width: 1320px; }
+  }
+
+  &__grid-demo {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 8px;
+    margin-bottom: var(--mantine-spacing-md);
+  }
+
+  &__grid-cell {
+    height: 40px;
+    background-color: var(--mantine-color-blue-light);
+    border: 1px solid var(--mantine-color-blue-6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
